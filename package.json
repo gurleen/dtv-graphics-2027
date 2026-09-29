@@ -19,7 +19,11 @@
     "ograf:build:basketball-v2-talent-lower-third-single": "bun ograf/scripts/build_package.ts ograf/graphics/basketball_v2_talent_lower_third_single",
     "ograf:build:basketball-v2-talent-lower-third-double": "bun ograf/scripts/build_package.ts ograf/graphics/basketball_v2_talent_lower_third_double",
     "ograf:build:basketball-v2-talent-lower-third-triple": "bun ograf/scripts/build_package.ts ograf/graphics/basketball_v2_talent_lower_third_triple",
-    "ograf:harness": "bun ograf/harness/serve.ts"
+    "ograf:harness": "bun ograf/harness/serve.ts",
+    "site:build": "bun run ograf:build && bun run site:assemble",
+    "site:assemble": "bun site/scripts/build_site.ts",
+    "site:preview": "wrangler dev",
+    "site:deploy": "wrangler deploy"
   },
   "dependencies": {
     "@rive-app/canvas": "^2.42.1",
@@ -29,12 +33,14 @@
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@fontsource/ibm-plex-sans": "^5.3.0",
     "@tailwindcss/vite": "^4.1.13",
     "@vitejs/plugin-react": "^4.7.0",
     "ajv": "^8.20.0",
     "ograf": "^1.2.0",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
-    "vite": "^7.1.4"
+    "vite": "^7.1.4",
+    "wrangler": "^4.143.1"
   }
 }

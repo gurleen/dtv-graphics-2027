@@ -23,6 +23,8 @@ rive . --screenshot --advance=1   # render one frame to build/<name>.png
 bun run dev                  # Vite preview of the scorebug
 bun run ograf:build          # build every OGraf package into build/ograf/
 bun run ograf:harness        # local stand-in renderer on http://localhost:8974
+bun run site:build           # stakeholder preview website in build/site/
+bun run site:deploy          # publish that website to Cloudflare Workers
 ```
 
 ## Layout
@@ -32,6 +34,7 @@ bun run ograf:harness        # local stand-in renderer on http://localhost:8974
 | `graphics/basketball-v2/` | Current graphics: the `.rml` scenes, Luau controllers and generators |
 | `graphics/10_*`, `graphics/11_*`, `graphics/legacy/` | Earlier ports. Use them for data, not layout |
 | `ograf/` | Packaging: build script, shared web component, local harness, one directory per package |
+| `site/` | Stakeholder preview website: build script and viewer, published as static assets (`wrangler.jsonc`) |
 | `preview/` | Vite and React page that runs the scorebug in the Rive web runtime |
 | `scripts/render_frames.ts` | Renders frames and contact sheets for reviewing motion |
 | `docs/` | Porting tracker and the vendored OGraf specification |
@@ -79,4 +82,5 @@ the Rive workspace, so do it deliberately.
 - [`graphics/basketball-v2/README.md`](graphics/basketball-v2/README.md): the finished graphics and their fields
 - [`docs/GRAPHICS_PORTING.md`](docs/GRAPHICS_PORTING.md): porting tracker and OGraf packaging notes
 - [`docs/ograf/`](docs/ograf/): the OGraf specification
+- [`site/README.md`](site/README.md): the stakeholder preview website and how to publish it
 - [`preview/README.md`](preview/README.md): how the preview page works

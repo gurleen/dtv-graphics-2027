@@ -1,0 +1,11 @@
+// Serves the stakeholder preview site (build/site/) as Workers static assets, with no
+// Worker script. Build first: `bun run site:build`. Then `bun run site:preview` to try
+// it locally and `bun run site:deploy` to publish.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dtv-graphics-preview",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./build/site"
+  }
+}
