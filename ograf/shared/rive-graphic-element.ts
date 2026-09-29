@@ -92,10 +92,35 @@ export abstract class RiveGraphicElement extends HTMLElement implements Graphics
     // A graphic is not on air until playAction(); load() must leave nothing visible.
     this.setOnAir(false);
     await this.binder.apply(this.instance!, params.data ?? {});
+    await this.onDataApplied(params.data ?? {});
     return ok('Loaded');
   }
 
+  // --- extension points ---------------------------------------------------------------
+  // A graphic that draws something beside the Rive canvas (a video overlay, say)
+  // overrides these; the base implementations do nothing.
+
+  /** The shadow root holding the canvas; content appended after the canvas draws over it. */
+  protected get stage(): ShadowRoot | null {
+    return this.shadowRoot;
+  }
+
+  /** The bound view model instance, for writing properties no field maps to. */
+  protected get viewModelInstance(): ViewModelInstance | null {
+    return this.instance;
+  }
+
+  /** Called after load() and each updateAction() has written `data` into the scene. */
+  protected async onDataApplied(_data: unknown): Promise<void> {}
+
+  /** Called as the on-air property changes, in the same frame the scene sees it. */
+  protected onAirChanged(_onAir: boolean): void {}
+
+  /** Called at the start of dispose(), before the canvas and runtime are released. */
+  protected onDispose(): void {}
+
   async dispose(): Promise<ReturnPayload> {
+    this.onDispose();
     this.binder?.dispose();
     this.binder = null;
     this.rive?.cleanup();
@@ -109,6 +134,7 @@ export abstract class RiveGraphicElement extends HTMLElement implements Graphics
   async updateAction(params: { data: unknown; skipAnimation?: boolean } = { data: {} }): Promise<ReturnPayload> {
     if (!this.instance || !this.binder) return { statusCode: 409, statusMessage: 'Graphic is not loaded' };
     await this.binder.apply(this.instance, params.data);
+    await this.onDataApplied(params.data);
     return ok('Updated');
   }
 
@@ -213,5 +239,6 @@ export abstract class RiveGraphicElement extends HTMLElement implements Graphics
   private setOnAir(onAir: boolean): void {
     const flag = this.instance?.boolean(this.definition.onAirProperty);
     if (flag) flag.value = onAir;
+    this.onAirChanged(onAir);
   }
 }

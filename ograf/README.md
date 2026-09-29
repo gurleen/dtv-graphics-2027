@@ -66,14 +66,24 @@ new step directly. The manifest sets `stepCount` and a per-step `playAction`
 duration. See `graphics/basketball_v2_starting_five_lower_third/`; the
 harness's `previous` button sends `delta: -1`.
 
+A graphic that needs something the Rive runtime cannot draw (a video, say)
+overrides `RiveGraphicElement`'s extension points: `stage` (the shadow root; append
+after the canvas to draw over it), `viewModelInstance`, `onDataApplied(data)`
+(after `load` and each `updateAction`), `onAirChanged(onAir)` (in the frame the
+scene sees the flag) and `onDispose()`. A field of kind `mediaUrl` is emitted in
+the schema like `imageUrl`, but the binder skips it; the subclass reads it from
+`data` itself. Do not name a method `animate`: it shadows `HTMLElement.animate`.
+See `graphics/basketball_v2_player_to_watch_lower_third/`, which lays a video
+over the headshot and keeps it in step with the scene's intro and outro.
+
 ## The layout
 
 | Path | |
 |---|---|
 | `shared/schema.ts` | `Field` type and the GDD JSON-schema emitter. Import-free, so the builder can load it outside a browser. |
 | `shared/definition.ts` | `RiveGraphicDefinition` and `GraphicSource`. Types only. |
-| `shared/binder.ts` | Writes a data payload into a bound `ViewModelInstance`, including fetching and decoding image URLs. |
-| `shared/rive-graphic-element.ts` | `RiveGraphicElement`, the abstract `GraphicsAPI.Graphic` implementation. |
+| `shared/binder.ts` | Writes a data payload into a bound `ViewModelInstance`, including fetching and decoding image URLs. Skips `mediaUrl` fields. |
+| `shared/rive-graphic-element.ts` | `RiveGraphicElement`, the abstract `GraphicsAPI.Graphic` implementation, with extension points for content drawn beside the canvas. |
 | `scripts/build_package.ts` | The builder. |
 | `harness/` | A local stand-in renderer. Development only; never packaged. |
 

@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 38), naming, and a five-step checklist
+the id namespace registry (next free: 39), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -283,6 +283,65 @@ View model `BasketballStartingFiveLowerThirdV2`, public properties:
 `{team}PlayerNPosition`, `{team}PlayerNHeadshot` for N = 1 to 5, numbered left
 to right. Send text in capitals. To review a team change frame by frame:
 `bun scripts/render_frames.ts graphics/basketball-v2/starting_five_lower_third.rml --on-air --data=step=1 --frames=0-60:4 --out=build/frames/starting_five/change --sheet=5`.
+
+## Player to Watch lower third (`player_to_watch_lower_third.rml`)
+
+A pre-game feature for one player, presented by Belfor: either up to four
+stats or a line or two of copy. Block origin 260, 802; size 1400 x 220,
+standing on the scorebug's baseline (y 1022). **It overlaps the scorebug, so it
+is for pre-game only; never put the two on air together.**
+
+- **Generated.** `generate_player_to_watch_lower_third.ts` writes the `.rml`.
+  Edit the generator, then run
+  `bun graphics/basketball-v2/generate_player_to_watch_lower_third.ts`; never
+  edit the `.rml` output by hand.
+- **Headshot (220 wide, team tint):** a transparent cutout in a 212 x 304 frame
+  whose top 84 units rise above the block, so the head breaks out over the
+  header. A secondary-colour marker runs down the left edge.
+- **Header (44 high, dark glass):** `PLAYER TO WATCH`, then the optional
+  context tag (for example `2026-27 SEASON`) after a secondary-colour `/`; a
+  blank tag hides the separator. `PRESENTED BY` and the full-colour sponsor logo
+  on a white chip sit at the right.
+- **Name row (84 high, team tint):** the jersey number, first name over last
+  name (shrinks to fit), and position over class year at the right, over a
+  faded team logo.
+- **Body row (84 high, dark glass):** `bodyMode` `STATS` shows up to four stat
+  cells, value over label; a blank value hides its cell and the rest share the
+  row evenly. `TEXT` shows `bodyText` (Bold 32, two lines, longer copy shrinks
+  to fit). Changing either on air crossfades or re-spaces smoothly.
+- **Controller script.** `player_to_watch_controller.luau` counts the shown
+  stats and writes each cell's x, width and opacity, the two body opacities and
+  the context separator into `_`-prefixed view model properties the scene
+  binds. Those properties are internal; never send them.
+- **Intro (1.4 s) and outro (0.4 s):** the player lower third's build, with the
+  light igniting at the headshot/column seam. The headshot rises 16 units and
+  fades in as its wipe opens; the stat cells slide down from under the name row
+  4 frames apart.
+
+View model `BasketballPlayerToWatchLowerThirdV2`, public properties:
+`isPlaying`, `bodyMode` (`STATS` or `TEXT`), `firstName`, `lastName`,
+`jerseyNumber`, `position`, `classYear`, `contextLabel`, `statNValue` and
+`statNLabel` for N = 1 to 4, `bodyText`, `headshot`, `teamLogo`,
+`teamPrimaryColor`, `teamSecondaryColor`, `sponsorLogo`. Send text in capitals.
+
+**Motion headshot.** The OGraf package also takes `headshotMediaUrl`: an MP4,
+WebM or animated GIF played muted and looping in place of the still. The Rive
+runtime draws no video, so the package lays a web element over the canvas,
+exactly on the headshot frame, animates it in step with the intro and outro,
+and hides the still (`_headshotOpacity`) while it plays. Media that fails to
+load within 5 s falls back to the still. Rive screenshots, `render_frames.ts`
+and the package thumbnail never show it; test it in `bun run ograf:harness`.
+Send an empty string to go back to the still: omitting the key leaves the media
+unchanged. Crop motion media to 212:304 (portrait); it is scaled to cover the
+frame and anchored at the top.
+
+**Sponsor asset.** `assets/images/sponsors/belfor.png` is the source;
+`belfor_trimmed.png` beside it is the 1600-wide export the scene uses, with the
+transparent margin cropped. Re-export with
+`ffmpeg -i belfor.png -vf "crop=7501:2508:251:246,scale=1600:-1:flags=lanczos" -pix_fmt rgba belfor_trimmed.png`.
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-player-to-watch-lower-third`.
 
 ## Test data
 

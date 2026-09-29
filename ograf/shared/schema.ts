@@ -11,7 +11,11 @@
  * generate the manifest, where the Rive runtime would not load.
  */
 
-export type FieldKind = 'string' | 'number' | 'integer' | 'boolean' | 'color' | 'imageUrl' | 'select';
+/**
+ * `mediaUrl` is a URL the graphic plays itself, outside the Rive scene (for example a
+ * video laid over the canvas); the binder leaves it to the graphic class.
+ */
+export type FieldKind = 'string' | 'number' | 'integer' | 'boolean' | 'color' | 'imageUrl' | 'mediaUrl' | 'select';
 
 export interface Field {
   /** Key in the manifest `schema` and in the `data` payload of load()/updateAction(). */
@@ -53,6 +57,7 @@ const toGddProperty = (field: Field, order: number): GddProperty => {
       // GDD pins the pattern for color-rrggbb to this exact string, and requires it.
       return { ...common, type: 'string', gddType: 'color-rrggbb', pattern: '^#[0-9a-f]{6}$' };
     case 'imageUrl':
+    case 'mediaUrl':
       // Not GDD's 'file-path/image-path': these are remote CDN URLs, not paths the
       // renderer can browse, so a plain single-line string is the honest description.
       return { ...common, type: 'string', gddType: 'single-line' };
