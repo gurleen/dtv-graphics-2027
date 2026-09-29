@@ -74,6 +74,19 @@ neutral panel replaces tint and underlay with one dark-glass fill.
 A faded team logo behind text, or a white radial bloom behind a full-colour
 logo, sits inside the content node and is clipped by the tint shape.
 
+### Tables
+
+A table's cells share one panel. Glass on every cell reads as a grid of
+separate blocks, which is too loud; divide the table with hairlines and tone
+instead. From the halftime card:
+
+| Part | Value | Use |
+|---|---|---|
+| Panel | one dark-glass stack the size of the table | Under every cell |
+| Row hairline | `1FFFFFFF`, 1 high on a whole unit, full width, in each 4-unit gap | Divides the rows; draws over highlighted cells |
+| Label band | `0AFFFFFF`, from the first hairline to the last | Sets off the label column. It lifts the glass: a darker band is lost over dark video |
+| Highlighted cell | team tint, square, out to the hairlines, with the glaze fill in the same shape | The leader mark; the only cell with a fill of its own |
+
 ## Typography
 
 Zuume only: `assets/fonts/Zuume-Bold.ttf` and `assets/fonts/Zuume-Regular.ttf`,
@@ -116,7 +129,7 @@ can be on air together.
 | Lower-third block origin y | 890 |
 | Lower-third block height | 132 = 84 panel + 4 gap + 44 strip |
 | Centred origin x | 960 − width / 2 |
-| Gap between panels | 4 (no rules or dividers) |
+| Gap between panels | 4 (no rules or dividers; a table's rows take hairlines, see [Tables](#tables)) |
 | Gap between blocks | 24 (talent blocks; also the minimum clearance from the scorebug, whose right edge is x 526) |
 | Outer corner radius | 12 (24 on the locator and halftime cards) |
 | Inner seam radius | 3 (6 on the locator and halftime cards) |

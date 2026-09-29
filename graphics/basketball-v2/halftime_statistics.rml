@@ -86,66 +86,43 @@
 <!-- ============================== Column ==================================== -->
 <Node name="Statistics Column" id="39:300" x="344" y="0">
   <ClippingShape name="Column Reveal Clip" sourceId="39:505"/>
+  <Shape name="Column Hairlines" x="0" y="0">
+  <Rectangle x="0" y="62" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="166" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="230" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="294" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="358" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="422" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="486" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Rectangle x="0" y="550" width="668" height="1" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Fill><SolidColor colorValue="1FFFFFFF"/></Fill>
+</Shape>
   <Node name="Title Strip" id="39:301" x="0" y="0">
   <Text name="Title" x="24" y="44" originValue="baseline" wrapValue="noWrap" width="620" height="46" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:302" fontAssetId="39:900" fontSize="40" letterSpacing="1"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Title Value" styleId="39:302" text="HALFTIME STATS"><DataBindContext sourcePathIds="39:1000-39:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="Title Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Title Reveal" id="39:303" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Title Strip Glaze" x="0" y="0">
-    <Rectangle width="668" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Title Strip Body" x="0" y="0">
-    <Rectangle width="668" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Score Row" id="39:3000" x="0" y="64">
   <Node name="Away Score Cell" x="0" y="0">
   <Text name="Away Score" x="16" y="79" originValue="baseline" wrapValue="noWrap" width="208" height="96" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3004" fontAssetId="39:900" fontSize="84" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Score Value" styleId="39:3004" text="31"><DataBindContext sourcePathIds="39:1000-39:1015" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Score Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Score Reveal" id="39:3010" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Away Score Glaze" x="0" y="0">
-    <Rectangle width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="100"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="100"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Away Score Lead Gate" id="39:3020" x="0" y="0" opacity="0.78">
-    <Shape name="Away Score Lead Tint" id="39:3021" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1100" propertyKey="18"/>
-      <Rectangle width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Away Score Lead Tint" id="39:3021" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1100" propertyKey="18"/>
+      <Rectangle width="240" height="104" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="104"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Away Score Body" x="0" y="0">
-    <Rectangle width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Score Label Cell" x="244" y="0">
   <Text name="Score Label" x="12" y="59" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3005" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Score Label Value" styleId="39:3005" text="SCORE"></TextValueRun><TextModifierGroup name="Score Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Score Label Reveal" id="39:3011" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Score Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="100"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="100"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Score Label Body" x="0" y="0">
-    <Rectangle width="180" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Home Score Cell" x="428" y="0">
   <Text name="Home Score" x="16" y="79" originValue="baseline" wrapValue="noWrap" width="208" height="96" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3006" fontAssetId="39:900" fontSize="84" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Score Value" styleId="39:3006" text="34"><DataBindContext sourcePathIds="39:1000-39:1016" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Score Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Score Reveal" id="39:3012" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Home Score Glaze" x="0" y="0">
-    <Rectangle width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="100"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="100"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Home Score Lead Gate" id="39:3022" x="0" y="0" opacity="0.78">
-    <Shape name="Home Score Lead Tint" id="39:3023" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1101" propertyKey="18"/>
-      <Rectangle width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Home Score Lead Tint" id="39:3023" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1101" propertyKey="18"/>
+      <Rectangle width="240" height="104" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="104"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Home Score Body" x="0" y="0">
-    <Rectangle width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
 <Node name="Row 1" id="39:3100" x="0" y="168">
@@ -157,33 +134,16 @@
     <TextValueRun name="Row 1 Away Detail Separator" styleId="39:3105" text="  "><DataBindContext sourcePathIds="39:1000-39:1032" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 1 Away Detail" styleId="39:3105" text="42.9%"><DataBindContext sourcePathIds="39:1000-39:1032" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 1 Away Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 1 Away Reveal" id="39:3110" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 1 Away Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 1 Away Lead Gate" id="39:3120" x="0" y="0" opacity="0.78">
-    <Shape name="Row 1 Away Lead Tint" id="39:3121" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1036" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 1 Away Lead Tint" id="39:3121" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1036" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 1 Away Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 1 Label Cell" x="244" y="0">
   <Text name="Row 1 Label" x="12" y="39" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3106" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Row 1 Label Value" styleId="39:3106" text="FG"><DataBindContext sourcePathIds="39:1000-39:1030" propertyKey="268"/></TextValueRun><TextModifierGroup name="Row 1 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 1 Label Reveal" id="39:3111" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 1 Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Row 1 Label Body" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 1 Home Cell" x="428" y="0">
   <Text name="Row 1 Home" x="12" y="45" originValue="baseline" wrapValue="noWrap" width="216" height="52" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center">
@@ -193,21 +153,13 @@
     <TextValueRun name="Row 1 Home Detail Separator" styleId="39:3108" text="  "><DataBindContext sourcePathIds="39:1000-39:1034" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 1 Home Detail" styleId="39:3108" text="48.1%"><DataBindContext sourcePathIds="39:1000-39:1034" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 1 Home Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 1 Home Reveal" id="39:3112" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 1 Home Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 1 Home Lead Gate" id="39:3122" x="0" y="0" opacity="0.78">
-    <Shape name="Row 1 Home Lead Tint" id="39:3123" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1037" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 1 Home Lead Tint" id="39:3123" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1037" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 1 Home Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
 <Node name="Row 2" id="39:3200" x="0" y="232">
@@ -219,33 +171,16 @@
     <TextValueRun name="Row 2 Away Detail Separator" styleId="39:3205" text="  "><DataBindContext sourcePathIds="39:1000-39:1042" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 2 Away Detail" styleId="39:3205" text="36.4%"><DataBindContext sourcePathIds="39:1000-39:1042" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 2 Away Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 2 Away Reveal" id="39:3210" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 2 Away Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 2 Away Lead Gate" id="39:3220" x="0" y="0" opacity="0.78">
-    <Shape name="Row 2 Away Lead Tint" id="39:3221" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1046" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 2 Away Lead Tint" id="39:3221" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1046" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 2 Away Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 2 Label Cell" x="244" y="0">
   <Text name="Row 2 Label" x="12" y="39" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3206" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Row 2 Label Value" styleId="39:3206" text="3PT"><DataBindContext sourcePathIds="39:1000-39:1040" propertyKey="268"/></TextValueRun><TextModifierGroup name="Row 2 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 2 Label Reveal" id="39:3211" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 2 Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Row 2 Label Body" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 2 Home Cell" x="428" y="0">
   <Text name="Row 2 Home" x="12" y="45" originValue="baseline" wrapValue="noWrap" width="216" height="52" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center">
@@ -255,21 +190,13 @@
     <TextValueRun name="Row 2 Home Detail Separator" styleId="39:3208" text="  "><DataBindContext sourcePathIds="39:1000-39:1044" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 2 Home Detail" styleId="39:3208" text="41.7%"><DataBindContext sourcePathIds="39:1000-39:1044" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 2 Home Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 2 Home Reveal" id="39:3212" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 2 Home Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 2 Home Lead Gate" id="39:3222" x="0" y="0" opacity="0.78">
-    <Shape name="Row 2 Home Lead Tint" id="39:3223" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1047" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 2 Home Lead Tint" id="39:3223" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1047" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 2 Home Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
 <Node name="Row 3" id="39:3300" x="0" y="296">
@@ -281,33 +208,16 @@
     <TextValueRun name="Row 3 Away Detail Separator" styleId="39:3305" text="  "><DataBindContext sourcePathIds="39:1000-39:1052" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 3 Away Detail" styleId="39:3305" text="75.0%"><DataBindContext sourcePathIds="39:1000-39:1052" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 3 Away Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 3 Away Reveal" id="39:3310" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 3 Away Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 3 Away Lead Gate" id="39:3320" x="0" y="0" opacity="0.78">
-    <Shape name="Row 3 Away Lead Tint" id="39:3321" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1056" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 3 Away Lead Tint" id="39:3321" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1056" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 3 Away Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 3 Label Cell" x="244" y="0">
   <Text name="Row 3 Label" x="12" y="39" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3306" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Row 3 Label Value" styleId="39:3306" text="FT"><DataBindContext sourcePathIds="39:1000-39:1050" propertyKey="268"/></TextValueRun><TextModifierGroup name="Row 3 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 3 Label Reveal" id="39:3311" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 3 Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Row 3 Label Body" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 3 Home Cell" x="428" y="0">
   <Text name="Row 3 Home" x="12" y="45" originValue="baseline" wrapValue="noWrap" width="216" height="52" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center">
@@ -317,21 +227,13 @@
     <TextValueRun name="Row 3 Home Detail Separator" styleId="39:3308" text="  "><DataBindContext sourcePathIds="39:1000-39:1054" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 3 Home Detail" styleId="39:3308" text="60.0%"><DataBindContext sourcePathIds="39:1000-39:1054" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 3 Home Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 3 Home Reveal" id="39:3312" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 3 Home Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 3 Home Lead Gate" id="39:3322" x="0" y="0" opacity="0.78">
-    <Shape name="Row 3 Home Lead Tint" id="39:3323" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1057" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 3 Home Lead Tint" id="39:3323" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1057" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 3 Home Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
 <Node name="Row 4" id="39:3400" x="0" y="360">
@@ -343,33 +245,16 @@
     <TextValueRun name="Row 4 Away Detail Separator" styleId="39:3405" text=""><DataBindContext sourcePathIds="39:1000-39:1062" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 4 Away Detail" styleId="39:3405" text=""><DataBindContext sourcePathIds="39:1000-39:1062" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 4 Away Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 4 Away Reveal" id="39:3410" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 4 Away Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 4 Away Lead Gate" id="39:3420" x="0" y="0" opacity="0.78">
-    <Shape name="Row 4 Away Lead Tint" id="39:3421" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1066" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 4 Away Lead Tint" id="39:3421" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1066" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 4 Away Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 4 Label Cell" x="244" y="0">
   <Text name="Row 4 Label" x="12" y="39" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3406" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Row 4 Label Value" styleId="39:3406" text="REB"><DataBindContext sourcePathIds="39:1000-39:1060" propertyKey="268"/></TextValueRun><TextModifierGroup name="Row 4 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 4 Label Reveal" id="39:3411" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 4 Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Row 4 Label Body" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 4 Home Cell" x="428" y="0">
   <Text name="Row 4 Home" x="12" y="45" originValue="baseline" wrapValue="noWrap" width="216" height="52" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center">
@@ -379,21 +264,13 @@
     <TextValueRun name="Row 4 Home Detail Separator" styleId="39:3408" text=""><DataBindContext sourcePathIds="39:1000-39:1064" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 4 Home Detail" styleId="39:3408" text=""><DataBindContext sourcePathIds="39:1000-39:1064" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 4 Home Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 4 Home Reveal" id="39:3412" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 4 Home Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 4 Home Lead Gate" id="39:3422" x="0" y="0" opacity="0.78">
-    <Shape name="Row 4 Home Lead Tint" id="39:3423" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1067" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 4 Home Lead Tint" id="39:3423" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1067" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 4 Home Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
 <Node name="Row 5" id="39:3500" x="0" y="424">
@@ -405,33 +282,16 @@
     <TextValueRun name="Row 5 Away Detail Separator" styleId="39:3505" text=""><DataBindContext sourcePathIds="39:1000-39:1072" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 5 Away Detail" styleId="39:3505" text=""><DataBindContext sourcePathIds="39:1000-39:1072" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 5 Away Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 5 Away Reveal" id="39:3510" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 5 Away Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 5 Away Lead Gate" id="39:3520" x="0" y="0" opacity="0.78">
-    <Shape name="Row 5 Away Lead Tint" id="39:3521" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1076" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 5 Away Lead Tint" id="39:3521" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1076" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 5 Away Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 5 Label Cell" x="244" y="0">
   <Text name="Row 5 Label" x="12" y="39" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3506" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Row 5 Label Value" styleId="39:3506" text="AST"><DataBindContext sourcePathIds="39:1000-39:1070" propertyKey="268"/></TextValueRun><TextModifierGroup name="Row 5 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 5 Label Reveal" id="39:3511" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 5 Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Row 5 Label Body" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 5 Home Cell" x="428" y="0">
   <Text name="Row 5 Home" x="12" y="45" originValue="baseline" wrapValue="noWrap" width="216" height="52" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center">
@@ -441,21 +301,13 @@
     <TextValueRun name="Row 5 Home Detail Separator" styleId="39:3508" text=""><DataBindContext sourcePathIds="39:1000-39:1074" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 5 Home Detail" styleId="39:3508" text=""><DataBindContext sourcePathIds="39:1000-39:1074" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 5 Home Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 5 Home Reveal" id="39:3512" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 5 Home Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 5 Home Lead Gate" id="39:3522" x="0" y="0" opacity="0.78">
-    <Shape name="Row 5 Home Lead Tint" id="39:3523" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1077" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 5 Home Lead Tint" id="39:3523" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1077" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 5 Home Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
 <Node name="Row 6" id="39:3600" x="0" y="488">
@@ -467,33 +319,16 @@
     <TextValueRun name="Row 6 Away Detail Separator" styleId="39:3605" text=""><DataBindContext sourcePathIds="39:1000-39:1082" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 6 Away Detail" styleId="39:3605" text=""><DataBindContext sourcePathIds="39:1000-39:1082" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 6 Away Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 6 Away Reveal" id="39:3610" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 6 Away Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 6 Away Lead Gate" id="39:3620" x="0" y="0" opacity="0.78">
-    <Shape name="Row 6 Away Lead Tint" id="39:3621" x="0" y="0" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1086" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 6 Away Lead Tint" id="39:3621" x="0" y="-2" opacity="1"><DataBindContext sourcePathIds="39:1000-39:1086" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FFC2071B"><DataBindContext sourcePathIds="39:1000-39:1022" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 6 Away Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 6 Label Cell" x="244" y="0">
   <Text name="Row 6 Label" x="12" y="39" originValue="baseline" wrapValue="noWrap" width="156" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center"><TextStylePaint id="39:3606" fontAssetId="39:901" fontSize="26" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Row 6 Label Value" styleId="39:3606" text="TO"><DataBindContext sourcePathIds="39:1000-39:1080" propertyKey="268"/></TextValueRun><TextModifierGroup name="Row 6 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 6 Label Reveal" id="39:3611" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 6 Label Glaze" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Row 6 Label Body" x="0" y="0">
-    <Rectangle width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
   <Node name="Row 6 Home Cell" x="428" y="0">
   <Text name="Row 6 Home" x="12" y="45" originValue="baseline" wrapValue="noWrap" width="216" height="52" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center">
@@ -503,21 +338,13 @@
     <TextValueRun name="Row 6 Home Detail Separator" styleId="39:3608" text=""><DataBindContext sourcePathIds="39:1000-39:1084" propertyKey="268" converterId="39:960"/></TextValueRun>
     <TextValueRun name="Row 6 Home Detail" styleId="39:3608" text=""><DataBindContext sourcePathIds="39:1000-39:1084" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Row 6 Home Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Row 6 Home Reveal" id="39:3612" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Shape name="Row 6 Home Glaze" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="60"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
   <Node name="Row 6 Home Lead Gate" id="39:3622" x="0" y="0" opacity="0.78">
-    <Shape name="Row 6 Home Lead Tint" id="39:3623" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1087" propertyKey="18"/>
-      <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Shape name="Row 6 Home Lead Tint" id="39:3623" x="0" y="-2" opacity="0"><DataBindContext sourcePathIds="39:1000-39:1087" propertyKey="18"/>
+      <Rectangle width="240" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="39:1000-39:1023" propertyKey="37"/></SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  <Shape name="Row 6 Home Body" x="0" y="0">
-    <Rectangle width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
 </Node>
 </Node>
   <Node name="Sponsor Strip" id="39:400" x="0" y="552">
@@ -533,16 +360,20 @@
       </Shape>
     </Node>
   </Node>
-  <Shape name="Sponsor Strip Glaze" x="0" y="0">
-    <Rectangle width="668" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+</Node>
+  <Shape name="Column Label Band" x="240" y="62">
+  <Rectangle width="188" height="489" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+  <Fill><SolidColor colorValue="0AFFFFFF"/></Fill>
+</Shape>
+  <Shape name="Column Glaze" x="0" y="0">
+    <Rectangle width="668" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="636"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
+    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="636"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Sponsor Strip Body" x="0" y="0">
-    <Rectangle width="668" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+  <Shape name="Column Body" x="0" y="0">
+    <Rectangle width="668" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
-</Node>
 </Node>
 
 <!-- ============================== Home panel ================================ -->
@@ -606,30 +437,8 @@
 <Shape name="Card Reveal Mask" id="39:505" x="678" y="-8"><Rectangle id="39:506" width="1372" height="652" originX="0.5" originY="0"/></Shape>
 <Shape name="Card Silhouette" id="39:610">
   <Rectangle x="0" y="0" width="340" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="6"/>
+  <Rectangle x="344" y="0" width="668" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
   <Rectangle x="1016" y="0" width="340" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="24"/>
-  <Rectangle x="344" y="0" width="668" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="64" width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="64" width="180" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="64" width="240" height="100" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="168" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="168" width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="168" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="232" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="232" width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="232" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="296" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="296" width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="296" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="360" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="360" width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="360" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="424" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="424" width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="424" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="488" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="588" y="488" width="180" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="772" y="488" width="240" height="60" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="552" width="668" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
 </Shape>
 <Shape name="Sponsor Slide Mask" id="39:620" x="344" y="552"><Rectangle width="668" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/></Shape>
 </Node>

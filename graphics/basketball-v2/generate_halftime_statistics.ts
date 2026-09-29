@@ -10,8 +10,9 @@
  *
  *   Team panels  full height at either end, tinted in the team colour: the school over
  *                the mascot, then the logo.
- *   Column       between them: the title, the score row, six statistic rows (away value,
- *                label, home value) and the sponsor strip.
+ *   Column       between them, one dark glass panel: the title, the score row, six
+ *                statistic rows (away value, label, home value) and the sponsor strip,
+ *                divided by hairlines, with the label column set off in a lighter tone.
  *
  * In the score row and each statistic row, the leading team's cell takes that team's
  * tint. The comparison is made by halftime_statistics_controller.luau, which writes the
@@ -51,8 +52,9 @@ const STATISTICS: Statistic[] = [
   { label: 'TO', awayValue: '5', awayDetail: '', homeValue: '7', homeDetail: '', leadingValue: 'LOWER' },
 ];
 
-// Geometry. Every piece is separated by GAP; the column's cells line up in three
-// columns (away value, label, home value) from the score row down.
+// Geometry. The column's cells line up in three columns (away value, label, home value)
+// from the score row down, GAP apart; the column is one panel, and a hairline in each
+// gap between rows divides them.
 const GAP = 4;
 const TEAM_WIDTH = 340;
 const VALUE_WIDTH = 240;
@@ -78,6 +80,20 @@ const CARD_Y = (1080 - CARD_HEIGHT) / 2;
 const SEAM_X = CARD_WIDTH / 2;
 const OUTER_RADIUS = 24;
 const INNER_RADIUS = 6;
+// The column's dividers: a hairline in each gap between rows, and a lighter band behind
+// the labels, from the first hairline to the last, that sets the three columns apart
+// without rules. The band fills the gaps beside the label cells, so a marked cell meets
+// it edge to edge. It lifts the glass rather than darkening it, as a darker band is
+// lost over dark video.
+const DIVIDER_YS = [
+  TITLE_HEIGHT, SCORE_Y + SCORE_HEIGHT, ...STATISTICS.map((_, index) => rowY(index) + ROW_HEIGHT),
+].map((y) => y + GAP / 2);
+const HAIRLINE_COLOR = '1FFFFFFF';
+const LABEL_BAND_X = VALUE_WIDTH;
+const LABEL_BAND_Y = DIVIDER_YS[0]!;
+const LABEL_BAND_WIDTH = LABEL_WIDTH + 2 * GAP;
+const LABEL_BAND_HEIGHT = DIVIDER_YS[DIVIDER_YS.length - 1]! + 1 - LABEL_BAND_Y;
+const LABEL_BAND_COLOR = '0AFFFFFF';
 const STRIPE_HEIGHT = 6;
 const CONTENT_DRIFT = 40;
 const LOGO_X = TEAM_WIDTH / 2;
@@ -214,10 +230,12 @@ const P = {
 
 type Radii = [number, number, number, number];
 
-// Corner radii: the card's outer corners take 24, every seam 6.
+// Corner radii: the card's outer corners take 24, every seam 6; the column's inner
+// parts (leader marks, dividers) are square.
 const AWAY_RADII: Radii = [OUTER_RADIUS, INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS];
 const HOME_RADII: Radii = [INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS, OUTER_RADIUS];
 const INNER_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS];
+const SQUARE_RADII: Radii = [0, 0, 0, 0];
 const CHIP_RADII: Radii = [4, 4, 4, 4];
 
 // Per-team elements: the away panel at 100, the home panel at 200, and each team's
@@ -355,33 +373,32 @@ const teamPanel = (t: Team) => {
 // --- column ---------------------------------------------------------------------------
 
 /**
- * A team's value cell: dark glass under the team's tint. The tint's own opacity is the
- * controller's lead mark (1 when this team leads the row); the gate around it carries
- * the resting tint opacity and the intro's fade.
+ * A team's value cell: its text over the column's glass, and the team's tint when the
+ * team leads the row. The tint's own opacity is the controller's lead mark (1 when this
+ * team leads); the gate around it carries the resting tint opacity and the intro's fade.
+ * The tint fills the cell out to the hairlines, which draw over it, and darkens toward
+ * its foot as the glass does, so two marked cells in a column still read as two.
  */
 const valueCell = (o: {
   name: string; x: number; height: number; content: string; gate: string; tint: string;
   team: Team; leadProperty: number; leads: boolean;
 }) => `<Node name="${o.name} Cell" x="${o.x}" y="0">
   ${o.content}
-  ${glaze(o.name, VALUE_WIDTH, o.height, INNER_RADII, '59FFFFFF')}
   <Node name="${o.name} Lead Gate" id="${o.gate}" x="0" y="0" opacity="${TINT_OPACITY}">
-    <Shape name="${o.name} Lead Tint" id="${o.tint}" x="0" y="0" opacity="${o.leads ? 1 : 0}">${bound(o.leadProperty, OPACITY)}
-      ${rectangle(VALUE_WIDTH, o.height, INNER_RADII)}
+    <Shape name="${o.name} Lead Tint" id="${o.tint}" x="0" y="${-GAP / 2}" opacity="${o.leads ? 1 : 0}">${bound(o.leadProperty, OPACITY)}
+      ${rectangle(VALUE_WIDTH, o.height + GAP, SQUARE_RADII)}
       <Fill><SolidColor colorValue="${o.team.data.primary}">${bound(o.team.property.primary, COLOR)}</SolidColor></Fill>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${o.height + GAP}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     </Shape>
   </Node>
-  ${glassBody(o.name, VALUE_WIDTH, o.height, INNER_RADII)}
 </Node>`;
 
-const labelCell = (name: string, height: number, content: string) => `<Node name="${name} Cell" x="${LABEL_X}" y="0">
+const labelCell = (name: string, content: string) => `<Node name="${name} Cell" x="${LABEL_X}" y="0">
   ${content}
-  ${darkGlass(name, LABEL_WIDTH, height, INNER_RADII)}
 </Node>`;
 
 const titleStrip = `<Node name="Title Strip" id="${TITLE_STRIP}" x="0" y="0">
   ${text({ name: 'Title', x: 24, y: 44, width: COLUMN_WIDTH - 48, height: 46, font: FONT_BOLD, size: 40, spacing: 1, color: 'FFFFFFFF', styleId: TITLE_STYLE, value: TITLE, property: P.title, reveal: TITLE_REVEAL, align: 'center' })}
-  ${darkGlass('Title Strip', COLUMN_WIDTH, TITLE_HEIGHT, INNER_RADII)}
 </Node>`;
 
 const scoreCell = (t: Team) => valueCell({
@@ -392,7 +409,7 @@ const scoreCell = (t: Team) => valueCell({
 
 const scoreRow = `<Node name="Score Row" id="${SCORE_ROW}" x="0" y="${SCORE_Y}">
   ${scoreCell(TEAMS[0])}
-  ${labelCell('Score Label', SCORE_HEIGHT, text({ name: 'Score Label', x: 12, y: 59, width: LABEL_WIDTH - 24, height: 30, font: FONT_REGULAR, size: 26, spacing: 2, color: 'B3FFFFFF', styleId: SCORE_LABEL_STYLE, value: 'SCORE', reveal: SCORE_LABEL_REVEAL, align: 'center' }))}
+  ${labelCell('Score Label', text({ name: 'Score Label', x: 12, y: 59, width: LABEL_WIDTH - 24, height: 30, font: FONT_REGULAR, size: 26, spacing: 2, color: 'B3FFFFFF', styleId: SCORE_LABEL_STYLE, value: 'SCORE', reveal: SCORE_LABEL_REVEAL, align: 'center' }))}
   ${scoreCell(TEAMS[1])}
 </Node>`;
 
@@ -421,7 +438,7 @@ const statisticRow = (r: Row) => {
     leadProperty: r.property.awayLeadOpacity, leads: r.leader === 'away',
     content: statisticText({ name: `${r.name} Away`, value: s.awayValue, detail: s.awayDetail, valueProperty: r.property.awayValue, detailProperty: r.property.awayDetail, valueStyle: r.awayValueStyle, detailStyle: r.awayDetailStyle, reveal: r.awayReveal }),
   })}
-  ${labelCell(`${r.name} Label`, ROW_HEIGHT, text({ name: `${r.name} Label`, x: 12, y: 39, width: LABEL_WIDTH - 24, height: 30, font: FONT_REGULAR, size: 26, spacing: 2, color: 'B3FFFFFF', styleId: r.labelStyle, value: s.label, property: r.property.label, reveal: r.labelReveal, align: 'center' }))}
+  ${labelCell(`${r.name} Label`, text({ name: `${r.name} Label`, x: 12, y: 39, width: LABEL_WIDTH - 24, height: 30, font: FONT_REGULAR, size: 26, spacing: 2, color: 'B3FFFFFF', styleId: r.labelStyle, value: s.label, property: r.property.label, reveal: r.labelReveal, align: 'center' }))}
   ${valueCell({
     name: `${r.name} Home`, x: HOME_VALUE_X, height: ROW_HEIGHT, gate: r.homeGate, tint: r.homeTint, team: home,
     leadProperty: r.property.homeLeadOpacity, leads: r.leader === 'home',
@@ -431,7 +448,7 @@ const statisticRow = (r: Row) => {
 };
 
 // The label and the chip slide down together from under the last row, clipped to the
-// strip; the strip's glass is revealed with the rest of the column.
+// strip.
 const sponsorStrip = `<Node name="Sponsor Strip" id="${SPONSOR_STRIP}" x="0" y="${STRIP_Y}">
   <Node name="Sponsor Sliding Content" id="${SPONSOR_CONTENT}" x="0" y="0">
     <ClippingShape name="Sponsor Slide Clip" sourceId="${SPONSOR_MASK}"/>
@@ -445,25 +462,35 @@ const sponsorStrip = `<Node name="Sponsor Strip" id="${SPONSOR_STRIP}" x="0" y="
       </Shape>
     </Node>
   </Node>
-  ${darkGlass('Sponsor Strip', COLUMN_WIDTH, STRIP_HEIGHT, INNER_RADII)}
 </Node>`;
+
+// Every cell sits on the column's one panel of dark glass. The hairlines are one-unit
+// rules on whole units, so they stay sharp at 1080; they draw over the leader marks.
+const columnHairlines = `<Shape name="Column Hairlines" x="0" y="0">
+  ${DIVIDER_YS.map((y) => rectangle(COLUMN_WIDTH, 1, SQUARE_RADII, ` x="0" y="${y}"`)).join('\n  ')}
+  <Fill><SolidColor colorValue="${HAIRLINE_COLOR}"/></Fill>
+</Shape>`;
+
+const labelBand = `<Shape name="Column Label Band" x="${LABEL_BAND_X}" y="${LABEL_BAND_Y}">
+  ${rectangle(LABEL_BAND_WIDTH, LABEL_BAND_HEIGHT, SQUARE_RADII)}
+  <Fill><SolidColor colorValue="${LABEL_BAND_COLOR}"/></Fill>
+</Shape>`;
 
 const column = `<Node name="Statistics Column" id="${COLUMN}" x="${COLUMN_X}" y="0">
   <ClippingShape name="Column Reveal Clip" sourceId="${REVEAL_MASK}"/>
+  ${columnHairlines}
   ${titleStrip}
   ${scoreRow}
 ${ROWS.map(statisticRow).join('\n')}
   ${sponsorStrip}
+  ${labelBand}
+  ${darkGlass('Column', COLUMN_WIDTH, CARD_HEIGHT, INNER_RADII)}
 </Node>`;
 
-const CELL_COLUMNS: [number, number][] = [[0, VALUE_WIDTH], [LABEL_X, LABEL_WIDTH], [HOME_VALUE_X, VALUE_WIDTH]];
 const silhouette = [
   rectangle(TEAM_WIDTH, CARD_HEIGHT, AWAY_RADII, ' x="0" y="0"'),
+  rectangle(COLUMN_WIDTH, CARD_HEIGHT, INNER_RADII, ` x="${COLUMN_X}" y="0"`),
   rectangle(TEAM_WIDTH, CARD_HEIGHT, HOME_RADII, ` x="${HOME_X}" y="0"`),
-  rectangle(COLUMN_WIDTH, TITLE_HEIGHT, INNER_RADII, ` x="${COLUMN_X}" y="0"`),
-  ...CELL_COLUMNS.map(([x, width]) => rectangle(width, SCORE_HEIGHT, INNER_RADII, ` x="${COLUMN_X + x}" y="${SCORE_Y}"`)),
-  ...ROWS.flatMap((r) => CELL_COLUMNS.map(([x, width]) => rectangle(width, ROW_HEIGHT, INNER_RADII, ` x="${COLUMN_X + x}" y="${rowY(r.index)}"`))),
-  rectangle(COLUMN_WIDTH, STRIP_HEIGHT, INNER_RADII, ` x="${COLUMN_X}" y="${STRIP_Y}"`),
 ].join('\n  ');
 
 // --- timelines ------------------------------------------------------------------------

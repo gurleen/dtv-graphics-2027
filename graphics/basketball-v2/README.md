@@ -361,18 +361,22 @@ inner seams.
   top. The school (Regular 30, muted) sits over the mascot (Bold 84, on the
   scores' baseline), then the full-colour logo, about 260 across, over a soft
   bloom.
-- **Column (668 wide):** cells in three columns, away value (240), label (180)
-  and home value (240), 4 units apart. From the top: the title strip (60 high,
-  `title`); the score row (100 high), the scores in Bold 84 either side of
-  `SCORE`; six statistic rows (60 high); and the sponsor strip (84 high),
-  `PRESENTED BY` and the full-colour sponsor logo on a 216 x 64 white chip,
-  centred as a group.
+- **Column (668 wide):** one panel of dark glass; the cells have no glass of
+  their own. They line up in three columns, away value (240), label (180) and
+  home value (240). From the top: the title strip (60 high, `title`); the score
+  row (100 high), the scores in Bold 84 either side of `SCORE`; six statistic
+  rows (60 high); and the sponsor strip (84 high), `PRESENTED BY` and the
+  full-colour sponsor logo on a 216 x 64 white chip, centred as a group. A
+  one-unit hairline in each 4-unit gap divides the rows, and a lighter band
+  behind the labels sets the three columns apart.
 - **Statistic text:** the value (Bold 44), then an optional muted detail
   (Regular 30), for example `12-28  42.9%`. A blank detail also removes the gap,
   so the value stays centred; `detail_separator.luau` is the converter that
   does this.
 - **Leader mark.** In the score row and each statistic row, the leading team's
-  cell takes that team's tint. `halftime_statistics_controller.luau` compares
+  cell fills with that team's tint, out to the hairlines, which draw over it.
+  The tint darkens toward its foot as the glass does, so two marked cells in a
+  column still read as two. `halftime_statistics_controller.luau` compares
   the details when both hold a number, and the values otherwise; the figure in
   a text is its first number, so `12-28` compares as 12. `rowNLeadingValue` says
   which figure leads: `HIGHER` (the default), `LOWER` (turnovers) or `NONE`,
