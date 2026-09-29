@@ -1,0 +1,560 @@
+<Rive version="1" kind="fragment">
+<!-- Basketball player lower third v2: a tinted-glass block, 820 x 132, centred at
+     the bottom of a transparent 1920 x 1080 canvas (origin 550, 890), on the same
+     baseline as the scorebug. Headshot panel on the left; the name panel (number,
+     first name over last name, position over class) and the dark glass stat strip
+     stack to its right. Sibling draw order is front to back; within one shape the
+     last paint declared is on top. -->
+<Artboard name="Basketball Player Lower Third v2" id="31:2" x="0" y="3800" width="1920" height="1080" viewModelId="31:1000" viewModelInstanceId="31:1001" defaultStateMachineId="31:7" styleId="31:5">
+<LayoutComponentStyle name="Player Lower Third v2 Style" id="31:5"/>
+<Fill><SolidColor colorValue="00000000"/></Fill>
+
+<Node name="Lower Third" id="31:10" x="550" y="890">
+
+<!-- Seam ignition, outward reveal edges and a finishing glass sheen. -->
+<Node name="Headshot Leading Edge" id="31:500" x="-8">
+  <Shape name="Headshot Reveal Mask" id="31:501" y="-8"><Rectangle width="900" height="148" originX="0" originY="0"/></Shape>
+  <Node name="Headshot Edge Light" id="31:502" y="42" opacity="0">
+    <Shape name="Headshot Edge Line" y="-42"><Rectangle width="2" height="132" originX="0.5" originY="0"/><Fill><SolidColor colorValue="E6FFFFFF"/></Fill></Shape>
+    <Shape name="Headshot Edge Glow" y="-42"><Rectangle width="44" height="132" originX="0" originY="0"/><Fill><LinearGradient startX="0" startY="0" endX="44" endY="0"><GradientStop colorValue="30FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill></Shape>
+  </Node>
+</Node>
+<Node name="Name Leading Edge" id="31:505" x="828">
+  <Shape name="Name Reveal Mask" id="31:506" y="-8"><Rectangle width="900" height="100" originX="1" originY="0"/></Shape>
+  <Node name="Name Edge Light" id="31:507" y="42" opacity="0">
+    <Shape name="Name Edge Line" y="-42"><Rectangle width="2" height="84" originX="0.5" originY="0"/><Fill><SolidColor colorValue="E6FFFFFF"/></Fill></Shape>
+    <Shape name="Name Edge Glow" y="-42"><Rectangle width="44" height="84" originX="1" originY="0"/><Fill><LinearGradient startX="0" startY="0" endX="-44" endY="0"><GradientStop colorValue="30FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill></Shape>
+  </Node>
+</Node>
+<Shape name="Glass Specular Sweep" id="31:600" x="940" y="66" rotation="0.3490659" opacity="0">
+  <Rectangle width="110" height="340"/>
+  <Fill><LinearGradient startX="-55" startY="0" endX="55" endY="0"><GradientStop colorValue="00FFFFFF" position="0"/><GradientStop colorValue="20FFFFFF" position="0.5"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill>
+  <ClippingShape name="Sweep Silhouette Clip" sourceId="31:610"/>
+</Shape>
+
+<!-- ============================ Headshot panel ============================ -->
+<Node name="Headshot Panel" id="31:100" x="0" y="0">
+  <ClippingShape name="Headshot Reveal Clip" sourceId="31:501"/>
+  <Shape name="Headshot Marker" id="31:101" x="0" y="0">
+    <Rectangle width="8" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusBL="12"/>
+    <Fill><SolidColor colorValue="FFFFC600"><DataBindContext sourcePathIds="31:1000-31:1023" propertyKey="37"/></SolidColor></Fill>
+  </Shape>
+  <Shape name="Headshot Glaze" x="0" y="0">
+    <Rectangle width="140" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="132"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
+    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="132"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+  </Shape>
+  <!-- The frame covers the panel with any headshot, whatever its size, and the
+       panel shape crops it to the rounded corners. -->
+  <LayoutComponent name="Headshot Frame" id="31:110" x="0" y="0" width="140" height="132" styleId="31:111">
+    <LayoutComponentStyle name="Headshot Frame Style" id="31:111"/>
+    <ClippingShape name="Headshot Clip" sourceId="31:130"/>
+    <Image name="Headshot" fit="cover" alignmentX="0" alignmentY="-1" assetId="31:910"><DataBindContext sourcePathIds="31:1000-31:1020" propertyKey="206"/></Image>
+  </LayoutComponent>
+  <Shape name="Headshot Tint" id="31:130" x="0" y="0" opacity="0.78">
+    <Rectangle width="140" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+    <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="31:1000-31:1022" propertyKey="37"/></SolidColor></Fill>
+  </Shape>
+  <Shape name="Headshot Underlay" x="0" y="0">
+    <Rectangle width="140" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+    <Fill><SolidColor colorValue="59000000"/></Fill>
+  </Shape>
+</Node>
+
+<!-- ============================== Name panel ============================== -->
+<Node name="Name Panel" id="31:200" x="144" y="0">
+  <ClippingShape name="Name Reveal Clip" sourceId="31:506"/>
+  <Node name="Name Content" id="31:210">
+  <Text name="Jersey Number" x="20" y="70" originValue="baseline" wrapValue="noWrap" sizingValue="autoWidth">
+    <TextStylePaint id="31:220" fontAssetId="31:901" fontSize="32" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
+    <TextStylePaint id="31:221" fontAssetId="31:900" fontSize="68" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
+    <TextValueRun name="Jersey Number Sign" styleId="31:220" text="#"></TextValueRun>
+    <TextValueRun name="Jersey Number Value" styleId="31:221" text="12"><DataBindContext sourcePathIds="31:1000-31:1012" propertyKey="268"/></TextValueRun>
+  <TextModifierGroup name="Jersey Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Jersey Number Reveal" id="31:240" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="First Name" x="108" y="30" originValue="baseline" wrapValue="noWrap" width="340" height="30" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="31:222" fontAssetId="31:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="D9FFFFFF"/></Fill></TextStylePaint><TextValueRun name="First Name Value" styleId="31:222" text="JORDAN"><DataBindContext sourcePathIds="31:1000-31:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="First Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="First Name Reveal" id="31:241" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Last Name" x="108" y="70" originValue="baseline" wrapValue="noWrap" width="340" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="31:223" fontAssetId="31:900" fontSize="50" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Last Name Value" styleId="31:223" text="MITCHELL"><DataBindContext sourcePathIds="31:1000-31:1011" propertyKey="268"/></TextValueRun><TextModifierGroup name="Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Last Name Reveal" id="31:242" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Position" x="456" y="40" originValue="baseline" wrapValue="noWrap" width="200" sizingValue="fixed" alignValue="right"><TextStylePaint id="31:224" fontAssetId="31:900" fontSize="30" letterSpacing="1"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Position Value" styleId="31:224" text="GUARD"><DataBindContext sourcePathIds="31:1000-31:1013" propertyKey="268"/></TextValueRun><TextModifierGroup name="Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Position Reveal" id="31:243" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Class" x="456" y="68" originValue="baseline" wrapValue="noWrap" width="200" sizingValue="fixed" alignValue="right"><TextStylePaint id="31:225" fontAssetId="31:901" fontSize="22" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Class Value" styleId="31:225" text="JUNIOR"><DataBindContext sourcePathIds="31:1000-31:1014" propertyKey="268"/></TextValueRun><TextModifierGroup name="Class Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Class Reveal" id="31:244" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  </Node>
+  <Shape name="Name Glaze" x="0" y="0">
+    <Rectangle width="676" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
+    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+  </Shape>
+  <!-- The logo sits behind the position and class as a large faded mark, cropped by the panel. -->
+  <Image id="31:211" name="Team Logo" x="560" y="42" opacity="0.18" scaleX="0.3" scaleY="0.3" assetId="31:911"><DataBindContext sourcePathIds="31:1000-31:1021" propertyKey="206"/><ClippingShape name="Team Logo Clip" sourceId="31:230"/></Image>
+  <Shape name="Name Tint" id="31:230" x="0" y="0" opacity="0.78">
+    <Rectangle width="676" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+    <Fill><SolidColor colorValue="FF07294D"><DataBindContext sourcePathIds="31:1000-31:1022" propertyKey="37"/></SolidColor></Fill>
+  </Shape>
+  <Shape name="Name Underlay" x="0" y="0">
+    <Rectangle width="676" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+    <Fill><SolidColor colorValue="59000000"/></Fill>
+  </Shape>
+</Node>
+
+<!-- ============================== Stat strip ============================== -->
+<Node name="Stat Strip" id="31:300" x="144" y="88">
+  <ClippingShape name="Stat Reveal Clip" sourceId="31:620"/>
+  <Node name="Stat Sliding Content" id="31:310">
+  <Text name="Stat Line" x="20" y="32" originValue="baseline" wrapValue="noWrap" width="636" height="34" sizingValue="fixed" overflowValue="fitFontSize">
+    <TextStylePaint id="31:320" fontAssetId="31:901" fontSize="22" letterSpacing="2"><Fill><SolidColor colorValue="A6FFFFFF"/></Fill></TextStylePaint>
+    <TextStylePaint id="31:321" fontAssetId="31:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
+    <TextValueRun name="Stat Label Value" styleId="31:320" text="TONIGHT"><DataBindContext sourcePathIds="31:1000-31:1015" propertyKey="268"/></TextValueRun>
+    <TextValueRun name="Stat Label Gap" styleId="31:320" text="    "></TextValueRun>
+    <TextValueRun name="Stat Line Value" styleId="31:321" text="18 PTS  ·  7 REB  ·  4 AST  ·  3-5 3PT"><DataBindContext sourcePathIds="31:1000-31:1016" propertyKey="268"/></TextValueRun>
+  <TextModifierGroup name="Stat Line Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat Line Reveal" id="31:340" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Shape name="Stat Glaze" x="0" y="0">
+    <Rectangle width="676" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
+    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
+    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+  </Shape>
+  <Shape name="Stat Body" x="0" y="0">
+    <Rectangle width="676" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
+</Node>
+
+</Node>
+
+<!-- Separation from bright video: a feathered dark stroke around the block. -->
+<Shape name="Block Shadow" id="31:20" x="0" y="4" opacity="0.6">
+  <Rectangle width="820" height="132" originX="0" originY="0" cornerRadiusTL="12"/>
+  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
+</Shape>
+<Shape name="Block Silhouette" id="31:610"><Rectangle x="0" y="0" width="140" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/><Rectangle x="144" y="0" width="676" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="144" y="88" width="676" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/></Shape>
+<Shape name="Stat Reveal Mask" id="31:620" x="144" y="88"><Rectangle width="676" height="44" originX="0" originY="0"/></Shape>
+</Node>
+
+<!-- Intro: seam ignition, outward glass wipes, rising type and one sheen; 1.2 s.
+     Hold and Outro explicitly restore every animated property for repeat takes. -->
+<LinearAnimation name="Intro" id="31:31" fps="60" duration="72" loopValue="oneShot">
+  <KeyedObject objectId="31:100"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:500"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="142" interpolationType="hold"/>
+    <KeyFrameDouble frame="6" value="142" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="36" value="-8" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:505"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="142" interpolationType="hold"/>
+    <KeyFrameDouble frame="6" value="142" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="828" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="2" value="1" interpolationType="linear"/>
+    <KeyFrameDouble frame="18" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="0" interpolationType="linear"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="2" value="1" interpolationType="linear"/>
+    <KeyFrameDouble frame="18" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="0" interpolationType="linear"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:101"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="18" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="38" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:110"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="10" interpolationType="hold"/>
+    <KeyFrameDouble frame="8" value="10" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="42" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:210"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-22" interpolationType="hold"/>
+    <KeyFrameDouble frame="8" value="-22" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="44" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:211"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.336" interpolationType="hold"/>
+    <KeyFrameDouble frame="8" value="0.336" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="48" value="0.3" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:211"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.336" interpolationType="hold"/>
+    <KeyFrameDouble frame="8" value="0.336" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="48" value="0.3" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:310"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="-44" interpolationType="hold"/>
+    <KeyFrameDouble frame="22" value="-44" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:20"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="12" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="42" value="0.6" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:240"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="14" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="32" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:240"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="14" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="32" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:241"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="18" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:241"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="18" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:242"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="44" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:242"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="44" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:243"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="44" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:243"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="44" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:244"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="26" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:244"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="26" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:340"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="28" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:340"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="28" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-120" interpolationType="hold"/>
+    <KeyFrameDouble frame="34" value="-120" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.6" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="72" value="940" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="34" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="40" value="0.65" interpolationType="linear"/>
+    <KeyFrameDouble frame="62" value="0.65" interpolationType="linear"/>
+    <KeyFrameDouble frame="72" value="0" interpolationType="linear"/>
+  </KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<LinearAnimation name="Hold" id="31:30" fps="60" duration="1" loopValue="loop">
+  <KeyedObject objectId="31:100"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:500"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-8" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:505"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="828" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:101"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:110"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:210"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:211"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.3" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:211"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.3" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:310"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:20"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:240"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:240"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:241"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:241"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:242"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:242"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:243"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:243"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:244"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:244"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:340"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:340"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="940" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<LinearAnimation name="Outro" id="31:32" fps="60" duration="24" loopValue="oneShot">
+  <KeyedObject objectId="31:100"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:500"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-8" interpolationType="hold"/>
+    <KeyFrameDouble frame="4" value="-8" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="142" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:505"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="828" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="828" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="142" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="6" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="10" value="0.45" interpolationType="linear"/>
+    <KeyFrameDouble frame="22" value="0.45" interpolationType="linear"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="linear"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="6" value="0" interpolationType="linear"/>
+    <KeyFrameDouble frame="10" value="0.45" interpolationType="linear"/>
+    <KeyFrameDouble frame="22" value="0.45" interpolationType="linear"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="linear"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:101"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="8" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:110"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="8" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:210"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="-18" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:211"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.3" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:211"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.3" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:310"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="18" value="-44" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:20"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0.6" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:240"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:240"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:241"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:241"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:242"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:242"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:243"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:243"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:244"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:244"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:340"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:340"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="940" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<LinearAnimation name="Hidden" id="31:33" fps="60" duration="1" loopValue="oneShot">
+  <KeyedObject objectId="31:100"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:502"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:507"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:20"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="31:600"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<!-- isPlaying drives the graphic: true takes it on air (Intro then Hold), false
+     dismisses it (Outro then Hidden). It defaults to false, so nothing shows
+     until the host raises it. -->
+<StateMachine name="Player Lower Third" id="31:7"><StateMachineLayer name="Display">
+  <AnyState x="820" y="-120"/><ExitState x="940" y="-120"/>
+  <EntryState x="0" y="0"><StateTransition stateToId="31:43"/></EntryState>
+  <AnimationState x="180" y="140" id="31:43" animationId="31:33"><StateTransition stateToId="31:41" duration="0"><TransitionViewModelCondition opValue="equal"><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="31:1000-31:1002" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition></AnimationState>
+  <AnimationState x="180" y="0" id="31:41" animationId="31:31" reset="true">
+    <StateTransition stateToId="31:40" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" duration="0"/>
+    <StateTransition stateToId="31:42" duration="0"><TransitionViewModelCondition opValue="notEqual"><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="31:1000-31:1002" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition>
+  </AnimationState>
+  <AnimationState x="420" y="0" id="31:40" animationId="31:30"><StateTransition stateToId="31:42" duration="0"><TransitionViewModelCondition opValue="notEqual"><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="31:1000-31:1002" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition></AnimationState>
+  <AnimationState x="660" y="0" id="31:42" animationId="31:32" reset="true"><StateTransition stateToId="31:43" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" duration="0"/></AnimationState>
+</StateMachineLayer></StateMachine>
+</Artboard>
+
+<FontAsset name="Player Lower Third v2 Zuume Bold" id="31:900" file="assets/fonts/Zuume-Bold.ttf"/>
+<FontAsset name="Player Lower Third v2 Zuume Regular" id="31:901" file="assets/fonts/Zuume-Regular.ttf"/>
+<ImageAsset name="Player Lower Third v2 Headshot Placeholder" id="31:910" file="assets/images/headshots/placeholder.png"/>
+<ImageAsset name="Player Lower Third v2 Drexel" id="31:911" file="assets/images/scorebug/drexel.png"/>
+
+<ViewModel name="BasketballPlayerLowerThirdV2" id="31:1000" defaultInstanceId="31:1001">
+<ViewModelPropertyBoolean name="isPlaying" id="31:1002" componentProps="1"/>
+<ViewModelPropertyString name="firstName" id="31:1010" componentProps="1"/>
+<ViewModelPropertyString name="lastName" id="31:1011" componentProps="1"/>
+<ViewModelPropertyString name="jerseyNumber" id="31:1012" componentProps="1"/>
+<ViewModelPropertyString name="position" id="31:1013" componentProps="1"/>
+<ViewModelPropertyString name="classYear" id="31:1014" componentProps="1"/>
+<ViewModelPropertyString name="statLabel" id="31:1015" componentProps="1"/>
+<ViewModelPropertyString name="statLine" id="31:1016" componentProps="1"/>
+<ViewModelPropertyAssetImage name="headshot" id="31:1020" componentProps="1"/>
+<ViewModelPropertyAssetImage name="teamLogo" id="31:1021" componentProps="1"/>
+<ViewModelPropertyColor name="teamPrimaryColor" id="31:1022" componentProps="1"/>
+<ViewModelPropertyColor name="teamSecondaryColor" id="31:1023" componentProps="1"/>
+<ViewModelInstance name="Default" id="31:1001" exports="true">
+<ViewModelInstanceBoolean viewModelPropertyId="31:1002" propertyValue="false"/>
+<ViewModelInstanceString viewModelPropertyId="31:1010" propertyValue="JORDAN"/>
+<ViewModelInstanceString viewModelPropertyId="31:1011" propertyValue="MITCHELL"/>
+<ViewModelInstanceString viewModelPropertyId="31:1012" propertyValue="12"/>
+<ViewModelInstanceString viewModelPropertyId="31:1013" propertyValue="GUARD"/>
+<ViewModelInstanceString viewModelPropertyId="31:1014" propertyValue="JUNIOR"/>
+<ViewModelInstanceString viewModelPropertyId="31:1015" propertyValue="TONIGHT"/>
+<ViewModelInstanceString viewModelPropertyId="31:1016" propertyValue="18 PTS  ·  7 REB  ·  4 AST  ·  3-5 3PT"/>
+<ViewModelInstanceAssetImage viewModelPropertyId="31:1020" propertyValue="31:910"/>
+<ViewModelInstanceAssetImage viewModelPropertyId="31:1021" propertyValue="31:911"/>
+<ViewModelInstanceColor viewModelPropertyId="31:1022" propertyValue="FF07294D"/>
+<ViewModelInstanceColor viewModelPropertyId="31:1023" propertyValue="FFFFC600"/>
+</ViewModelInstance>
+</ViewModel>
+</Rive>

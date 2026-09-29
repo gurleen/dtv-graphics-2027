@@ -1,0 +1,196 @@
+<Rive version="1" kind="fragment">
+    <!-- Futura editorial variant. 150 frames / 60 fps. Full coverage at frame 60; cut video there. Autoplays once, then wipe replays. -->
+    <FontAsset file="assets/fonts/Futura-Bold.ttf" name="Futura Bold" id="9:51" />
+    <FontAsset file="assets/fonts/Futura-CondensedExtraBold.ttf" name="Futura CondensedExtraBold" id="9:52" />
+    <Artboard name="Team Wipe — Futura" id="9:2" width="1920" height="1080" x="6060" defaultStateMachineId="9:900" styleId="9:5">
+        <LayoutComponentStyle id="9:5" />
+        <Fill id="0:3286">
+            <SolidColor colorValue="00000000" id="0:3287" />
+        </Fill>
+        <Node name="Editorial page" id="9:10" x="-2000">
+            <Node name="Slogan typesetting" id="9:20" y="27">
+                <Text name="Fear headline" x="95" y="166" sizingValue="autoWidth" wrapValue="noWrap" id="0:3288">
+                    <TextStylePaint id="9:101" fontAssetId="9:51" fontSize="250" lineHeight="250" letterSpacing="-10">
+                        <Fill id="0:3289">
+                            <SolidColor colorValue="FF071E3C" id="0:3290" />
+                        </Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="9:101" text="FEAR" id="0:3291" />
+                </Text>
+                <Text name="The headline" x="104" y="413" sizingValue="autoWidth" wrapValue="noWrap" id="0:3292">
+                    <TextStylePaint id="9:102" fontAssetId="9:51" fontSize="122" lineHeight="122" letterSpacing="-3">
+                        <Fill id="0:3293">
+                            <SolidColor colorValue="FF071E3C" id="0:3294" />
+                        </Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="9:102" text="THE" id="0:3295" />
+                </Text>
+                <Text name="Dragon headline" x="88" y="539" sizingValue="autoWidth" wrapValue="noWrap" id="0:3296">
+                    <TextStylePaint id="9:103" fontAssetId="9:52" fontSize="246" lineHeight="246" letterSpacing="-4">
+                        <Fill id="0:3297">
+                            <SolidColor colorValue="FF071E3C" id="0:3298" />
+                        </Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="9:103" text="DRAGON." id="0:3299" />
+                </Text>
+            </Node>
+            <Node name="Dragon roundel" id="9:30" x="1480" y="540">
+                <Image name="Drexel dragon" assetId="1:60" scaleX="0.65" scaleY="0.65" id="0:3300" />
+                <Shape name="Navy disc" x="0" y="0" id="0:3301">
+                    <Ellipse width="592" height="592" id="0:3302" />
+                    <Fill id="0:3303">
+                        <SolidColor colorValue="FF071E3C" id="0:3304" />
+                    </Fill>
+                </Shape>
+                <Shape name="Offset gold disc" x="15" y="18" id="0:3305">
+                    <Ellipse width="604" height="604" id="0:3306" />
+                    <Fill id="0:3307">
+                        <SolidColor colorValue="FFFFC600" id="0:3308" />
+                    </Fill>
+                </Shape>
+            </Node>
+            <Shape name="Page paper" x="960" y="540" id="0:3309">
+                <Rectangle width="1920" height="1080" id="0:3310" />
+                <Fill id="0:3311">
+                    <SolidColor colorValue="FFF3EEDC" id="0:3312" />
+                </Fill>
+            </Shape>
+        </Node>
+        <Node name="Gold leading sheet" id="9:11" x="-2200">
+            <Shape name="Gold sheet" x="960" y="540" id="0:3313">
+                <Rectangle width="1920" height="1080" id="0:3314" />
+                <Fill id="0:3315">
+                    <SolidColor colorValue="FFFFC600" id="0:3316" />
+                </Fill>
+            </Shape>
+        </Node>
+        <Node name="Navy leading sheet" id="9:12" x="-2300">
+            <Shape name="Navy sheet" x="960" y="540" id="0:3317">
+                <Rectangle width="1920" height="1080" id="0:3318" />
+                <Fill id="0:3319">
+                    <SolidColor colorValue="FF071E3C" id="0:3320" />
+                </Fill>
+            </Shape>
+        </Node>
+        <LinearAnimation name="Wipe" id="9:800" fps="60" duration="150" loopValue="oneShot">
+            <KeyedObject objectId="9:10" id="0:3321">
+                <KeyedProperty propertyKey="13" id="0:3322">
+                    <KeyFrameDouble frame="0" value="-2000" interpolationType="cubic" id="0:3323">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3324" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="8" value="-2000" interpolationType="cubic" id="0:3325">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3326" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="38" value="0" interpolationType="cubic" id="0:3327">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3328" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="48" value="0" interpolationType="cubic" id="0:3329">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3330" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="92" value="2000" interpolationType="cubic" id="0:3331">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3332" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="150" value="2000" interpolationType="cubic" id="0:3333">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3334" />
+                    </KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="9:11" id="0:3335">
+                <KeyedProperty propertyKey="13" id="0:3336">
+                    <KeyFrameDouble frame="0" value="-2200" interpolationType="cubic" id="0:3337">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3338" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="4" value="-2200" interpolationType="cubic" id="0:3339">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3340" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="30" value="0" interpolationType="cubic" id="0:3341">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3342" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="52" value="0" interpolationType="cubic" id="0:3343">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3344" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="99" value="2100" interpolationType="cubic" id="0:3345">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3346" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="150" value="2100" interpolationType="cubic" id="0:3347">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3348" />
+                    </KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="9:12" id="0:3349">
+                <KeyedProperty propertyKey="13" id="0:3350">
+                    <KeyFrameDouble frame="0" value="-2300" interpolationType="cubic" id="0:3351">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3352" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="25" value="0" interpolationType="cubic" id="0:3353">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3354" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="58" value="0" interpolationType="cubic" id="0:3355">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3356" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="106" value="2200" interpolationType="cubic" id="0:3357">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3358" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="150" value="2200" interpolationType="cubic" id="0:3359">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3360" />
+                    </KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="9:30" id="0:3361">
+                <KeyedProperty propertyKey="16" id="0:3362">
+                    <KeyFrameDouble frame="0" value="0.7" interpolationType="cubic" id="0:3363">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3364" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="106" value="1.08" interpolationType="cubic" id="0:3365">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3366" />
+                    </KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="9:30" id="0:3367">
+                <KeyedProperty propertyKey="17" id="0:3368">
+                    <KeyFrameDouble frame="0" value="0.7" interpolationType="cubic" id="0:3369">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3370" />
+                    </KeyFrameDouble>
+                    <KeyFrameDouble frame="106" value="1.08" interpolationType="cubic" id="0:3371">
+                        <CubicEaseInterpolator x1="0.65" y1="0" x2="0.25" y2="1" id="0:3372" />
+                    </KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+        <LinearAnimation name="Clear" id="9:801" duration="1">
+            <KeyedObject objectId="9:10" id="0:3373">
+                <KeyedProperty propertyKey="13" id="0:3374">
+                    <KeyFrameDouble frame="0" value="2300" id="0:3375" />
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="9:11" id="0:3376">
+                <KeyedProperty propertyKey="13" id="0:3377">
+                    <KeyFrameDouble frame="0" value="2300" id="0:3378" />
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="9:12" id="0:3379">
+                <KeyedProperty propertyKey="13" id="0:3380">
+                    <KeyFrameDouble frame="0" value="2300" id="0:3381" />
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+        <StateMachine name="Wipe Control" id="9:900">
+            <StateMachineTrigger name="wipe" id="9:901" />
+            <StateMachineLayer name="Playback" id="0:3382">
+                <EntryState id="0:3383">
+                    <StateTransition stateToId="9:903" id="0:3384" />
+                </EntryState>
+                <AnimationState x="220" y="0" id="9:903" animationId="9:800">
+                    <StateTransition stateToId="9:904" enableExitTime="true" exitTime="2500" duration="0" id="0:3385" />
+                </AnimationState>
+                <AnimationState x="440" y="0" id="9:904" animationId="9:801">
+                    <StateTransition stateToId="9:903" duration="0" id="0:3386">
+                        <TransitionTriggerCondition inputId="9:901" id="0:3387" />
+                    </StateTransition>
+                </AnimationState>
+                <AnyState x="220" y="-150" id="0:3388" />
+                <ExitState x="440" y="-150" id="0:3389" />
+            </StateMachineLayer>
+        </StateMachine>
+    </Artboard>
+</Rive>

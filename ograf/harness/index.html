@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>OGraf harness</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 340px minmax(0, 1fr);
+        min-height: 100vh;
+        background: #0c1118;
+        color: #e2e8f0;
+        font: 13px/1.5 ui-sans-serif, system-ui, sans-serif;
+      }
+      aside { padding: 20px; border-right: 1px solid #ffffff1a; overflow-y: auto; }
+      main { padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+      h1 { margin: 0 0 4px; font-size: 15px; }
+      h2 { margin: 20px 0 8px; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #64748b; }
+      label { display: block; margin-bottom: 10px; font-size: 11px; color: #94a3b8; }
+      input, select { width: 100%; box-sizing: border-box; margin-top: 3px; padding: 5px 7px; border: 1px solid #ffffff26; border-radius: 5px; background: #0c1118; color: inherit; font: inherit; }
+      input[type="checkbox"] { width: auto; }
+      input[type="color"] { padding: 1px; height: 26px; }
+      .actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      button { padding: 7px; border: 1px solid #ffffff26; border-radius: 5px; background: #111821; color: inherit; font: inherit; cursor: pointer; }
+      button:hover { border-color: #38bdf8; background: #38bdf81a; }
+      #stage {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        background: repeating-conic-gradient(#1b222c 0% 25%, #141a22 0% 50%) 50% / 32px 32px;
+        border: 1px solid #ffffff1a;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      #stage > * { position: absolute; inset: 0; }
+      #log { flex: 1; min-height: 120px; margin: 0; padding: 10px; border: 1px solid #ffffff1a; border-radius: 8px; background: #0f151d; overflow-y: auto; white-space: pre-wrap; font: 11px/1.6 ui-monospace, monospace; color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <h1>OGraf harness</h1>
+      <label>Package<select id="package"></select></label>
+      <h2>Actions</h2>
+      <div class="actions">
+        <button id="load">load</button>
+        <button id="dispose">dispose</button>
+        <button id="play">playAction</button>
+        <button id="stop">stopAction</button>
+        <button id="previous" title="playAction({ delta: -1 }), for a multi-step graphic">previous step</button>
+        <button id="update">updateAction</button>
+        <button id="reset">reset fields</button>
+      </div>
+      <h2>Data</h2>
+      <form id="fields"></form>
+    </aside>
+    <main>
+      <div id="stage"></div>
+      <pre id="log"></pre>
+    </main>
+    <script type="module" src="/harness.js"></script>
+  </body>
+</html>

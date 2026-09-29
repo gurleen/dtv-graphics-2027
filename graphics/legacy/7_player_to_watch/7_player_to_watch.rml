@@ -1,0 +1,514 @@
+<Rive version="1" kind="fragment">
+    <!--
+        Player To Watch — port of dtv-graphics-2026/src/graphics/7_player_to_watch.
+
+        Layout is a single 1920x145 band seated at y=850, split into three
+        fixed panels that mirror the source's flex row:
+            0    .. 500   team panel   (team colour, knockout logo, player name)
+            500  .. 1420  note panel   (#D8D8D8, the operator's stat line)
+            1420 .. 1920  sponsor panel(#D8D8D8, Steamfitters Local 420 mark)
+
+        The entrance choreographs the panels and content independently.
+        The Band node controls overall visibility and the exit fade.
+    -->
+    <Artboard defaultStateMachineId="1:90" viewModelId="1:70" viewModelInstanceId="1:80"
+              styleId="1:5" width="1920" height="1080" name="Player To Watch" id="1:3">
+        <LayoutComponentStyle name="Player To Watch Style" id="1:5"/>
+
+        <!-- Transparent matte: the scene keys over the program video. -->
+        <Fill name="Matte" id="0:2623">
+            <SolidColor colorValue="00000000" name="Color" id="0:2624"/>
+        </Fill>
+
+        <!-- Declaration order is front-to-back: the first sibling draws on top. -->
+        <Node name="Band" id="1:10">
+
+            <!--
+                Player name, over the knockout logo. Tailwind v4 registers
+                --tw-leading with inherits:false, so the parent's leading-10 does
+                not reach the two paragraphs: each falls back to line-height 1,
+                giving 48px and 72px line boxes. The 120px stack is centred in the
+                145px panel, so the line boxes sit at 862.5 and 910.5. Rive anchors
+                a text box at its content-box top and puts the first baseline an
+                ascender below, so y is the line box top plus the CSS half-leading,
+                (lineHeight - fontSize) / 2, which is zero at line-height 1.
+            -->
+            <Text x="12" y="862.5" sizingValue="autoWidth" overflowValue="visible"
+                  name="First Name" id="1:31">
+                <TextStylePaint fontSize="48" lineHeight="48" fontAssetId="1:50"
+                                name="First Name Style" id="1:40">
+                    <Fill name="Fill" id="0:2625">
+                        <SolidColor colorValue="FFFFFFFF" name="Color" id="0:2626"/>
+                    </Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="1:40" text="JUSTIN" name="Run" id="0:2627">
+                    <DataBindContext sourcePathIds="1:70-1:71" propertyKey="268" id="0:2628"/>
+                </TextValueRun>
+            </Text>
+
+            <Text x="12" y="910.5" sizingValue="autoWidth" overflowValue="visible"
+                  name="Last Name" id="1:32">
+                <TextStylePaint fontSize="72" lineHeight="72" fontAssetId="1:50"
+                                name="Last Name Style" id="1:41">
+                    <Fill name="Fill" id="0:2629">
+                        <SolidColor colorValue="FFFFFFFF" name="Color" id="0:2630"/>
+                    </Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="1:41" text="MOORE" name="Run" id="0:2631">
+                    <DataBindContext sourcePathIds="1:70-1:72" propertyKey="268" id="0:2632"/>
+                </TextValueRun>
+            </Text>
+
+            <!--
+                Knockout logo: the source draws the 1024px mark at 350x350 with a
+                275px left and -100px top offset, clipped by the panel. Image has
+                no width/height, so the size comes from scale (350/1024) and the
+                panel shape is the clip source.
+            -->
+            <Image x="450" y="925" scaleX="0.341797" scaleY="0.341797"
+                   assetId="1:60" name="Team Knockout Logo" id="1:30">
+                <ClippingShape sourceId="1:20" name="Clip To Team Panel" id="0:2633"/>
+                <DataBindContext sourcePathIds="1:70-1:75" propertyKey="206" id="0:2634"/>
+            </Image>
+
+            <!--
+                Operator note. The source renders markdown and bolds the **spans**;
+                this port draws it as one run in a single weight. To take the
+                paragraph weight of the original instead, point the run's styleId
+                at "1:43" (Zuume Regular).
+            -->
+            <Text x="532" y="850" width="856" height="145"
+                  sizingValue="fixed" wrapValue="wrap" alignValue="center"
+                  verticalAlignValue="middle" overflowValue="visible"
+                  name="Note" id="1:33">
+                <TextStylePaint fontSize="60" lineHeight="60" fontAssetId="1:50"
+                                name="Note Bold Style" id="1:42">
+                    <Fill name="Fill" id="0:2635">
+                        <SolidColor colorValue="FF000000" name="Color" id="0:2636"/>
+                    </Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="60" lineHeight="60" fontAssetId="1:51"
+                                name="Note Regular Style" id="1:43">
+                    <Fill name="Fill" id="0:2637">
+                        <SolidColor colorValue="FF000000" name="Color" id="0:2638"/>
+                    </Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="1:42" text="24 PTS, 8 REB, 6 AST, 3 STL&#10;IN WIN OVER VILLANOVA (11/15)" name="Run" id="0:2639">
+                    <DataBindContext sourcePathIds="1:70-1:73" propertyKey="268" id="0:2640"/>
+                </TextValueRun>
+            </Text>
+
+            <!--
+                Sponsor mark, centred in the right panel. The crest is taller
+                than it is wide, so height is the binding dimension: 125 of the
+                panel's 145 rows, leaving a 10px margin top and bottom.
+                1187x1325 at 125/1325 = 0.094340 gives 112x125.
+            -->
+            <Image x="1670" y="922.5" scaleX="0.094340" scaleY="0.094340"
+                   assetId="1:61" name="Sponsor Logo" id="1:34"/>
+
+            <!-- Panels, behind everything above. -->
+            <Shape x="0" y="850" name="Team Panel" id="1:20">
+                <Rectangle width="500" height="145" originX="0" originY="0" name="Path" id="0:2641"/>
+                <Fill name="Fill" id="0:2642">
+                    <SolidColor colorValue="FF07294D" name="Color" id="0:2643">
+                        <DataBindContext sourcePathIds="1:70-1:74" propertyKey="37" id="0:2644"/>
+                    </SolidColor>
+                </Fill>
+            </Shape>
+
+            <Shape x="500" y="850" name="Note Panel" id="1:21">
+                <Rectangle width="920" height="145" originX="0" originY="0" name="Path" id="0:2645"/>
+                <Fill name="Fill" id="0:2646">
+                    <SolidColor colorValue="FFD8D8D8" name="Color" id="0:2647"/>
+                </Fill>
+            </Shape>
+
+            <Shape x="1420" y="850" name="Sponsor Panel" id="1:22">
+                <Rectangle width="500" height="145" originX="0" originY="0" name="Path" id="0:2648"/>
+                <Fill name="Fill" id="0:2649">
+                    <SolidColor colorValue="FFD8D8D8" name="Color" id="0:2650"/>
+                </Fill>
+            </Shape>
+        </Node>
+
+        <!--
+            Entrance: a 1.2s left-to-right panel build, followed by staggered
+            name lifts, a drifting team mark, and a soft sponsor settle.
+            Panel scale is anchored at each panel's left edge. Content has
+            independent timing so type never stretches with the backgrounds.
+            Hidden and Hold key the complete pose for repeatable playback.
+        -->
+        <LinearAnimation fps="60" duration="1" name="Hidden" id="1:103">
+            <KeyedObject objectId="1:10" id="0:2651">
+                <KeyedProperty propertyKey="13" id="0:2652">
+                    <KeyFrameDouble value="0" frame="0" id="0:2653"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2654">
+                    <KeyFrameDouble value="0" frame="0" id="0:2655"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:20" id="0:2656">
+                <KeyedProperty propertyKey="16" id="0:2657">
+                    <KeyFrameDouble value="0" frame="0" id="0:2658"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:21" id="0:2659">
+                <KeyedProperty propertyKey="16" id="0:2660">
+                    <KeyFrameDouble value="0" frame="0" id="0:2661"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:22" id="0:2662">
+                <KeyedProperty propertyKey="16" id="0:2663">
+                    <KeyFrameDouble value="0" frame="0" id="0:2664"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:31" id="0:2665">
+                <KeyedProperty propertyKey="14" id="0:2666">
+                    <KeyFrameDouble value="884.5" frame="0" id="0:2667"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2668">
+                    <KeyFrameDouble value="0" frame="0" id="0:2669"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:32" id="0:2670">
+                <KeyedProperty propertyKey="14" id="0:2671">
+                    <KeyFrameDouble value="938.5" frame="0" id="0:2672"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2673">
+                    <KeyFrameDouble value="0" frame="0" id="0:2674"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:30" id="0:2675">
+                <KeyedProperty propertyKey="13" id="0:2676">
+                    <KeyFrameDouble value="477" frame="0" id="0:2677"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2678">
+                    <KeyFrameDouble value="0" frame="0" id="0:2679"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:33" id="0:2680">
+                <KeyedProperty propertyKey="13" id="0:2681">
+                    <KeyFrameDouble value="560" frame="0" id="0:2682"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2683">
+                    <KeyFrameDouble value="0" frame="0" id="0:2684"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:34" id="0:2685">
+                <KeyedProperty propertyKey="14" id="0:2686">
+                    <KeyFrameDouble value="934.5" frame="0" id="0:2687"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16" id="0:2688">
+                    <KeyFrameDouble value="0.084906" frame="0" id="0:2689"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17" id="0:2690">
+                    <KeyFrameDouble value="0.084906" frame="0" id="0:2691"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2692">
+                    <KeyFrameDouble value="0" frame="0" id="0:2693"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <LinearAnimation fps="60" duration="72" name="Show" id="1:100">
+            <KeyedObject objectId="1:10" id="0:2694">
+                <KeyedProperty propertyKey="13" id="0:2695">
+                    <KeyFrameDouble value="0" frame="0" id="0:2696"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2697">
+                    <KeyFrameDouble value="1" frame="0" id="0:2698"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:20" id="0:2699">
+                <KeyedProperty propertyKey="16" id="0:2700">
+                    <KeyFrameDouble value="0" frame="0" interpolationType="cubic" id="0:2701">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2702"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="32" id="0:2703"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:21" id="0:2704">
+                <KeyedProperty propertyKey="16" id="0:2705">
+                    <KeyFrameDouble value="0" frame="0" id="0:2706"/>
+                    <KeyFrameDouble value="0" frame="7" interpolationType="cubic" id="0:2707">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2708"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="46" id="0:2709"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:22" id="0:2710">
+                <KeyedProperty propertyKey="16" id="0:2711">
+                    <KeyFrameDouble value="0" frame="0" id="0:2712"/>
+                    <KeyFrameDouble value="0" frame="19" interpolationType="cubic" id="0:2713">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2714"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="58" id="0:2715"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:31" id="0:2716">
+                <KeyedProperty propertyKey="14" id="0:2717">
+                    <KeyFrameDouble value="884.5" frame="0" id="0:2718"/>
+                    <KeyFrameDouble value="884.5" frame="12" interpolationType="cubic" id="0:2719">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2720"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="862.5" frame="43" id="0:2721"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2722">
+                    <KeyFrameDouble value="0" frame="0" id="0:2723"/>
+                    <KeyFrameDouble value="0" frame="12" interpolationType="cubic" id="0:2724">
+                        <CubicEaseInterpolator x1="0.25" y1="0" x2="0.65" y2="1" id="0:2725"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="29" id="0:2726"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:32" id="0:2727">
+                <KeyedProperty propertyKey="14" id="0:2728">
+                    <KeyFrameDouble value="938.5" frame="0" id="0:2729"/>
+                    <KeyFrameDouble value="938.5" frame="17" interpolationType="cubic" id="0:2730">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2731"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="910.5" frame="49" id="0:2732"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2733">
+                    <KeyFrameDouble value="0" frame="0" id="0:2734"/>
+                    <KeyFrameDouble value="0" frame="17" interpolationType="cubic" id="0:2735">
+                        <CubicEaseInterpolator x1="0.25" y1="0" x2="0.65" y2="1" id="0:2736"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="35" id="0:2737"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:30" id="0:2738">
+                <KeyedProperty propertyKey="13" id="0:2739">
+                    <KeyFrameDouble value="477" frame="0" id="0:2740"/>
+                    <KeyFrameDouble value="477" frame="14" interpolationType="cubic" id="0:2741">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2742"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="450" frame="58" id="0:2743"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2744">
+                    <KeyFrameDouble value="0" frame="0" id="0:2745"/>
+                    <KeyFrameDouble value="0" frame="14" interpolationType="cubic" id="0:2746">
+                        <CubicEaseInterpolator x1="0.25" y1="0" x2="0.65" y2="1" id="0:2747"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="40" id="0:2748"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:33" id="0:2749">
+                <KeyedProperty propertyKey="13" id="0:2750">
+                    <KeyFrameDouble value="560" frame="0" id="0:2751"/>
+                    <KeyFrameDouble value="560" frame="29" interpolationType="cubic" id="0:2752">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2753"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="532" frame="65" id="0:2754"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2755">
+                    <KeyFrameDouble value="0" frame="0" id="0:2756"/>
+                    <KeyFrameDouble value="0" frame="29" interpolationType="cubic" id="0:2757">
+                        <CubicEaseInterpolator x1="0.25" y1="0" x2="0.65" y2="1" id="0:2758"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="48" id="0:2759"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:34" id="0:2760">
+                <KeyedProperty propertyKey="14" id="0:2761">
+                    <KeyFrameDouble value="934.5" frame="0" id="0:2762"/>
+                    <KeyFrameDouble value="934.5" frame="38" interpolationType="cubic" id="0:2763">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2764"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="922.5" frame="72" id="0:2765"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16" id="0:2766">
+                    <KeyFrameDouble value="0.084906" frame="0" id="0:2767"/>
+                    <KeyFrameDouble value="0.084906" frame="38" interpolationType="cubic" id="0:2768">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2769"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="0.09434" frame="72" id="0:2770"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17" id="0:2771">
+                    <KeyFrameDouble value="0.084906" frame="0" id="0:2772"/>
+                    <KeyFrameDouble value="0.084906" frame="38" interpolationType="cubic" id="0:2773">
+                        <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:2774"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="0.09434" frame="72" id="0:2775"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2776">
+                    <KeyFrameDouble value="0" frame="0" id="0:2777"/>
+                    <KeyFrameDouble value="0" frame="38" interpolationType="cubic" id="0:2778">
+                        <CubicEaseInterpolator x1="0.25" y1="0" x2="0.65" y2="1" id="0:2779"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="1" frame="57" id="0:2780"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <LinearAnimation fps="60" duration="1" name="Hold" id="1:101">
+            <KeyedObject objectId="1:10" id="0:2781">
+                <KeyedProperty propertyKey="13" id="0:2782">
+                    <KeyFrameDouble value="0" frame="0" id="0:2783"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2784">
+                    <KeyFrameDouble value="1" frame="0" id="0:2785"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:20" id="0:2786">
+                <KeyedProperty propertyKey="16" id="0:2787">
+                    <KeyFrameDouble value="1" frame="0" id="0:2788"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:21" id="0:2789">
+                <KeyedProperty propertyKey="16" id="0:2790">
+                    <KeyFrameDouble value="1" frame="0" id="0:2791"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:22" id="0:2792">
+                <KeyedProperty propertyKey="16" id="0:2793">
+                    <KeyFrameDouble value="1" frame="0" id="0:2794"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:31" id="0:2795">
+                <KeyedProperty propertyKey="14" id="0:2796">
+                    <KeyFrameDouble value="862.5" frame="0" id="0:2797"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2798">
+                    <KeyFrameDouble value="1" frame="0" id="0:2799"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:32" id="0:2800">
+                <KeyedProperty propertyKey="14" id="0:2801">
+                    <KeyFrameDouble value="910.5" frame="0" id="0:2802"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2803">
+                    <KeyFrameDouble value="1" frame="0" id="0:2804"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:30" id="0:2805">
+                <KeyedProperty propertyKey="13" id="0:2806">
+                    <KeyFrameDouble value="450" frame="0" id="0:2807"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2808">
+                    <KeyFrameDouble value="1" frame="0" id="0:2809"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:33" id="0:2810">
+                <KeyedProperty propertyKey="13" id="0:2811">
+                    <KeyFrameDouble value="532" frame="0" id="0:2812"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2813">
+                    <KeyFrameDouble value="1" frame="0" id="0:2814"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="1:34" id="0:2815">
+                <KeyedProperty propertyKey="14" id="0:2816">
+                    <KeyFrameDouble value="922.5" frame="0" id="0:2817"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16" id="0:2818">
+                    <KeyFrameDouble value="0.09434" frame="0" id="0:2819"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17" id="0:2820">
+                    <KeyFrameDouble value="0.09434" frame="0" id="0:2821"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2822">
+                    <KeyFrameDouble value="1" frame="0" id="0:2823"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <LinearAnimation duration="30" name="Dismiss" id="1:102">
+            <KeyedObject objectId="1:10" id="0:2824">
+                <KeyedProperty propertyKey="13" id="0:2825">
+                    <KeyFrameDouble value="0" frame="0" id="0:2826"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18" id="0:2827">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="cubic" id="0:2828">
+                        <CubicEaseInterpolator x1="0" y1="0.55" x2="0.45" y2="1" id="0:2829"/>
+                    </KeyFrameDouble>
+                    <KeyFrameDouble value="0" frame="30" id="0:2830"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!--
+            isVisible drives the band the way SPX's play/stop steps drive the
+            web version: true takes it on air, false dismisses it.
+        -->
+        <StateMachine name="Player To Watch" id="1:90">
+            <StateMachineLayer name="Band" id="1:91">
+                <AnyState x="160" y="-160" id="0:2831"/>
+                <ExitState x="700" y="-160" id="0:2832"/>
+                <EntryState x="-40" y="0" id="0:2833">
+                    <StateTransition stateToId="1:92" id="0:2834"/>
+                </EntryState>
+
+                <AnimationState x="160" y="0" animationId="1:103" id="1:92">
+                    <StateTransition stateToId="1:93" duration="0" id="0:2835">
+                        <TransitionViewModelCondition opValue="equal" id="0:2836">
+                            <TransitionPropertyViewModelComparator id="0:2837">
+                                <BindablePropertyBoolean id="0:2838">
+                                    <DataBindContext sourcePathIds="1:70-1:76" propertyKey="634" id="0:2839"/>
+                                </BindablePropertyBoolean>
+                            </TransitionPropertyViewModelComparator>
+                            <TransitionValueBooleanComparator value="true" id="0:2840"/>
+                        </TransitionViewModelCondition>
+                    </StateTransition>
+                </AnimationState>
+
+                <AnimationState x="340" y="0" animationId="1:100" reset="true" id="1:93">
+                    <StateTransition stateToId="1:94" duration="0"
+                                     enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" id="0:2841"/>
+                </AnimationState>
+
+                <AnimationState x="520" y="0" animationId="1:101" id="1:94">
+                    <StateTransition stateToId="1:95" duration="0" id="0:2842">
+                        <TransitionViewModelCondition opValue="equal" id="0:2843">
+                            <TransitionPropertyViewModelComparator id="0:2844">
+                                <BindablePropertyBoolean id="0:2845">
+                                    <DataBindContext sourcePathIds="1:70-1:76" propertyKey="634" id="0:2846"/>
+                                </BindablePropertyBoolean>
+                            </TransitionPropertyViewModelComparator>
+                            <TransitionValueBooleanComparator value="false" id="0:2847"/>
+                        </TransitionViewModelCondition>
+                    </StateTransition>
+                </AnimationState>
+
+                <AnimationState x="700" y="0" animationId="1:102" reset="true" id="1:95">
+                    <StateTransition stateToId="1:92" duration="0"
+                                     enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" id="0:2848"/>
+                </AnimationState>
+            </StateMachineLayer>
+        </StateMachine>
+    </Artboard>
+
+    <!--
+        Zuume is the on-air face; both weights are embedded so the .riv is
+        self-contained.
+    -->
+    <FontAsset file="assets/fonts/Zuume-Bold.ttf" name="Zuume Bold" id="1:50"/>
+    <FontAsset file="assets/fonts/Zuume-Regular.ttf" name="Zuume Regular" id="1:51"/>
+
+    <!--
+        The knockout logo ships with the current team baked in and is exposed on
+        the view model, so the player can substitute the matchup's mark at load
+        through its asset handler.
+    -->
+    <ImageAsset file="assets/images/team_knockout_logo.png" name="Team Knockout Logo" id="1:60"/>
+    <ImageAsset file="assets/images/steamfitters_local_420_logo.png" name="Sponsor Logo" id="1:61"/>
+
+    <ViewModel defaultInstanceId="1:80" name="PlayerToWatch" id="1:70">
+        <ViewModelPropertyString name="firstName" id="1:71"/>
+        <ViewModelPropertyString name="lastName" id="1:72"/>
+        <ViewModelPropertyString name="statText" id="1:73"/>
+        <ViewModelPropertyColor name="teamColor" id="1:74"/>
+        <ViewModelPropertyAssetImage name="teamLogo" id="1:75"/>
+        <ViewModelPropertyBoolean name="isVisible" id="1:76"/>
+
+        <ViewModelInstance exports="true" name="Default" id="1:80">
+            <ViewModelInstanceString propertyValue="JUSTIN" viewModelPropertyId="1:71" id="0:2849"/>
+            <ViewModelInstanceString propertyValue="MOORE" viewModelPropertyId="1:72" id="0:2850"/>
+            <ViewModelInstanceString propertyValue="24 PTS, 8 REB, 6 AST, 3 STL&#10;IN WIN OVER VILLANOVA (11/15)" viewModelPropertyId="1:73" id="0:2851"/>
+            <ViewModelInstanceColor propertyValue="FF07294D" viewModelPropertyId="1:74" id="0:2852"/>
+            <ViewModelInstanceAssetImage propertyValue="1:60" viewModelPropertyId="1:75" id="0:2853"/>
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:76" id="0:2854"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

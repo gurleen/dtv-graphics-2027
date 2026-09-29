@@ -1,0 +1,558 @@
+<?xml version="1.0"?>
+<Rive version="1" kind="fragment">
+  <Artboard name="NCAA Basketball Locator" id="21:2" x="6060" y="1380" width="1920" height="1080" viewModelId="21:80" viewModelInstanceId="21:81" defaultStateMachineId="21:7" styleId="21:3">
+    <LayoutComponentStyle name="Locator style" id="21:3" />
+    <Fill id="0:3574">
+      <SolidColor colorValue="00000000" id="0:3575" />
+    </Fill>
+    <Node name="Locator" id="21:10" x="0" y="654">
+      <ClippingShape sourceId="21:11" id="0:3576" />
+      <Node name="Header" id="21:20">
+        <Text name="Competition" x="96" y="9" width="1000" height="31.200000000000003" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="left" id="0:3577">
+          <TextStylePaint id="21:100" fontAssetId="21:90" fontSize="24">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3578" />
+            <Fill id="0:3579">
+              <SolidColor colorValue="FFF8FCF6" id="0:3580" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:100" text="COLLEGE BASKETBALL" id="0:3581">
+            <DataBindContext sourcePathIds="21:80-21:1013" propertyKey="268" id="0:3582" />
+          </TextValueRun>
+        </Text>
+        <Text name="Game status" x="1224" y="12" width="600" height="26" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="right" id="0:3583">
+          <TextStylePaint id="21:101" fontAssetId="21:90" fontSize="20">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3584" />
+            <Fill id="0:3585">
+              <SolidColor colorValue="FFD6E6E0" id="0:3586" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:101" text="TONIGHT  •  7:00 PM" id="0:3587">
+            <DataBindContext sourcePathIds="21:80-21:1016" propertyKey="268" id="0:3588" />
+          </TextValueRun>
+        </Text>
+        <Shape name="Header highlight" x="0" y="0" id="0:3589">
+          <Rectangle width="1920" height="2" originX="0" originY="0" id="0:3590" />
+          <Fill id="0:3591">
+            <SolidColor colorValue="FF75918A" id="0:3592" />
+          </Fill>
+        </Shape>
+        <Shape name="Header face" x="0" y="0" id="0:3593">
+          <Rectangle width="1920" height="46" originX="0" originY="0" id="0:3594" />
+          <Fill id="0:3595">
+            <LinearGradient startX="0" startY="0" endX="0" endY="46" id="0:3596">
+              <GradientStop position="0" colorValue="FF121B16" id="0:3597" />
+              <GradientStop position="1" colorValue="FF050806" id="0:3598" />
+            </LinearGradient>
+          </Fill>
+        </Shape>
+      </Node>
+      <Node name="Venue footer" id="21:23" y="282">
+        <Text name="Venue" x="96" y="10" width="1100" height="28.6" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="left" id="0:3599">
+          <TextStylePaint id="21:102" fontAssetId="21:90" fontSize="22">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3600" />
+            <Fill id="0:3601">
+              <SolidColor colorValue="FF14261F" id="0:3602" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:102" text="DASKALAKIS ATHLETIC CENTER" id="0:3603">
+            <DataBindContext sourcePathIds="21:80-21:1014" propertyKey="268" id="0:3604" />
+          </TextValueRun>
+        </Text>
+        <Text name="Location" x="1224" y="12" width="600" height="24.7" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="right" id="0:3605">
+          <TextStylePaint id="21:103" fontAssetId="21:90" fontSize="19">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3606" />
+            <Fill id="0:3607">
+              <SolidColor colorValue="FF314B40" id="0:3608" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:103" text="PHILADELPHIA, PA" id="0:3609">
+            <DataBindContext sourcePathIds="21:80-21:1015" propertyKey="268" id="0:3610" />
+          </TextValueRun>
+        </Text>
+        <Shape name="Venue face" x="0" y="0" id="0:3611">
+          <Rectangle width="1920" height="46" originX="0" originY="0" id="0:3612" />
+          <Fill id="0:3613">
+            <SolidColor colorValue="FFF8FCF6" id="0:3614" />
+          </Fill>
+        </Shape>
+      </Node>
+      <Node name="Center spine" id="21:24" x="240">
+        <Text name="Versus" x="660" y="138" width="120" height="52" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="center" id="0:3615">
+          <TextStylePaint id="21:104" fontAssetId="21:90" fontSize="40">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3616" />
+            <Fill id="0:3617">
+              <SolidColor colorValue="FFF8FCF6" id="0:3618" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:104" text="VS" id="0:3619">
+            <DataBindContext sourcePathIds="21:80-21:1017" propertyKey="268" id="0:3620" />
+          </TextValueRun>
+        </Text>
+        <Shape name="Center face" x="648" y="46" id="0:3629">
+          <Rectangle width="144" height="236" originX="0" originY="0" id="0:3630" />
+          <Fill id="0:3631">
+            <LinearGradient startX="0" startY="0" endX="0" endY="236" id="0:3632">
+              <GradientStop position="0" colorValue="FF121B16" id="0:3633" />
+              <GradientStop position="1" colorValue="FF050806" id="0:3634" />
+            </LinearGradient>
+          </Fill>
+        </Shape>
+      </Node>
+      <Node name="away team assembly" id="21:21" x="0" y="46">
+        <Text name="away acronym" x="48" y="118" sizingValue="autoWidth" overflowValue="visible" wrapValue="noWrap" alignValue="center" rotation="-1.57079633" originX="0.5" originY="0.5" id="0:3635">
+          <TextStylePaint id="21:105" fontAssetId="21:90" fontSize="44">
+            <TextStyleAxis tag="2003265652" axisValue="700" id="0:3636" />
+            <Fill id="0:3637">
+              <SolidColor colorValue="FF9E1B32" id="0:3638">
+                <DataBindContext sourcePathIds="21:80-21:1007" propertyKey="37" id="0:3639" />
+              </SolidColor>
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:105" text="SJU" id="0:3640">
+            <DataBindContext sourcePathIds="21:80-21:1001" propertyKey="268" id="0:3641" />
+          </TextValueRun>
+        </Text>
+        <Node name="away logo assembly" id="21:25">
+          <Image name="away logo" x="226" y="118" scaleX="0.32" scaleY="0.32" assetId="21:91" id="0:3642">
+            <DataBindContext sourcePathIds="21:80-21:1011" propertyKey="206" id="0:3643" />
+            <ClippingShape sourceId="21:30" id="0:3644" />
+          </Image>
+          <Shape id="21:30" name="away logo mask" x="96" y="0">
+            <Rectangle width="260" height="236" originX="0" originY="0" id="0:3645" />
+          </Shape>
+        </Node>
+        <Text name="away school" x="380" y="73" width="472" height="63" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="left" id="0:3672">
+          <TextStylePaint id="21:106" fontAssetId="21:90" fontSize="46">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3673" />
+            <Fill id="0:3674">
+              <SolidColor colorValue="FFF8FCF6" id="0:3675" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:106" text="SAINT JOSEPH’S" id="0:3676">
+            <DataBindContext sourcePathIds="21:80-21:1003" propertyKey="268" id="0:3677" />
+          </TextValueRun>
+        </Text>
+        <Text name="away record" x="380" y="140" width="472" height="34" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="left" id="0:3678">
+          <TextStylePaint id="21:107" fontAssetId="21:90" fontSize="26">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3679" />
+            <Fill id="0:3680">
+              <SolidColor colorValue="FFD6E6E0" id="0:3681" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:107" text="15–5  •  7–2 A10" id="0:3682">
+            <DataBindContext sourcePathIds="21:80-21:1005" propertyKey="268" id="0:3683" />
+          </TextValueRun>
+        </Text>
+        <Shape name="away end strip" x="0" y="0" id="0:3695">
+          <Rectangle width="96" height="236" originX="0" originY="0" id="0:3696" />
+          <Fill id="0:3697">
+            <SolidColor colorValue="FF161616" id="0:3698">
+              <DataBindContext sourcePathIds="21:80-21:1009" propertyKey="37" id="0:3699" />
+            </SolidColor>
+          </Fill>
+        </Shape>
+        <Shape name="away panel shade" x="96" y="0" id="0:3957">
+          <Rectangle width="792" height="236" originX="0" originY="0" id="0:3958" />
+          <Fill id="0:3959">
+            <LinearGradient startX="0" startY="0" endX="0" endY="236" id="0:3960">
+              <GradientStop position="0" colorValue="00000000" id="0:3961" />
+              <GradientStop position="0.45" colorValue="33000000" id="0:3962" />
+              <GradientStop position="1" colorValue="8C000000" id="0:3963" />
+            </LinearGradient>
+          </Fill>
+        </Shape>
+        <Shape name="away face" x="96" y="0" id="0:3700">
+          <Rectangle width="792" height="236" originX="0" originY="0" id="0:3701" />
+          <Fill id="0:3964">
+            <SolidColor colorValue="FF9E1B32" id="0:3965">
+              <DataBindContext sourcePathIds="21:80-21:1007" propertyKey="37" id="0:3966" />
+            </SolidColor>
+          </Fill>
+        </Shape>
+      </Node>
+      <Node name="home team assembly" id="21:22" x="1032" y="46">
+        <Text name="home acronym" x="840" y="118" sizingValue="autoWidth" overflowValue="visible" wrapValue="noWrap" alignValue="center" rotation="1.57079633" originX="0.5" originY="0.5" id="0:3706">
+          <TextStylePaint id="21:108" fontAssetId="21:90" fontSize="44">
+            <TextStyleAxis tag="2003265652" axisValue="700" id="0:3707" />
+            <Fill id="0:3708">
+              <SolidColor colorValue="FF0B386C" id="0:3709">
+                <DataBindContext sourcePathIds="21:80-21:1008" propertyKey="37" id="0:3710" />
+              </SolidColor>
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:108" text="DRE" id="0:3711">
+            <DataBindContext sourcePathIds="21:80-21:1002" propertyKey="268" id="0:3712" />
+          </TextValueRun>
+        </Text>
+        <Node name="home logo assembly" id="21:26">
+          <Image name="home logo" x="662" y="118" scaleX="0.32" scaleY="0.32" assetId="21:92" id="0:3713">
+            <DataBindContext sourcePathIds="21:80-21:1012" propertyKey="206" id="0:3714" />
+            <ClippingShape sourceId="21:31" id="0:3715" />
+          </Image>
+          <Shape id="21:31" name="home logo mask" x="532" y="0">
+            <Rectangle width="260" height="236" originX="0" originY="0" id="0:3716" />
+          </Shape>
+        </Node>
+        <Text name="home school" x="36" y="73" width="472" height="63" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="right" id="0:3743">
+          <TextStylePaint id="21:109" fontAssetId="21:90" fontSize="46">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3744" />
+            <Fill id="0:3745">
+              <SolidColor colorValue="FFF8FCF6" id="0:3746" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:109" text="DREXEL" id="0:3747">
+            <DataBindContext sourcePathIds="21:80-21:1004" propertyKey="268" id="0:3748" />
+          </TextValueRun>
+        </Text>
+        <Text name="home record" x="36" y="140" width="472" height="34" sizingValue="fixed" overflowValue="fitFontSize" wrapValue="noWrap" alignValue="right" id="0:3749">
+          <TextStylePaint id="21:110" fontAssetId="21:90" fontSize="26">
+            <TextStyleAxis tag="2003265652" axisValue="800" id="0:3750" />
+            <Fill id="0:3751">
+              <SolidColor colorValue="FFD6E6E0" id="0:3752" />
+            </Fill>
+          </TextStylePaint>
+          <TextValueRun styleId="21:110" text="14–6  •  6–3 CAA" id="0:3753">
+            <DataBindContext sourcePathIds="21:80-21:1006" propertyKey="268" id="0:3754" />
+          </TextValueRun>
+        </Text>
+        <Shape name="home end strip" x="792" y="0" id="0:3766">
+          <Rectangle width="96" height="236" originX="0" originY="0" id="0:3767" />
+          <Fill id="0:3768">
+            <SolidColor colorValue="FFFFD966" id="0:3769">
+              <DataBindContext sourcePathIds="21:80-21:1010" propertyKey="37" id="0:3770" />
+            </SolidColor>
+          </Fill>
+        </Shape>
+        <Shape name="home panel shade" x="0" y="0" id="0:3967">
+          <Rectangle width="792" height="236" originX="0" originY="0" id="0:3968" />
+          <Fill id="0:3969">
+            <LinearGradient startX="0" startY="0" endX="0" endY="236" id="0:3970">
+              <GradientStop position="0" colorValue="00000000" id="0:3971" />
+              <GradientStop position="0.45" colorValue="33000000" id="0:3972" />
+              <GradientStop position="1" colorValue="8C000000" id="0:3973" />
+            </LinearGradient>
+          </Fill>
+        </Shape>
+        <Shape name="home face" x="0" y="0" id="0:3771">
+          <Rectangle width="792" height="236" originX="0" originY="0" id="0:3772" />
+          <Fill id="0:3974">
+            <SolidColor colorValue="FF0B386C" id="0:3975">
+              <DataBindContext sourcePathIds="21:80-21:1008" propertyKey="37" id="0:3976" />
+            </SolidColor>
+          </Fill>
+        </Shape>
+      </Node>
+      <Shape name="Center out reveal" id="21:11" x="960" y="170">
+        <Rectangle id="21:12" width="1920" height="380" />
+      </Shape>
+    </Node>
+    <LinearAnimation name="Intro" id="21:40" fps="60" duration="60">
+      <KeyedObject objectId="21:10" id="0:3781">
+        <KeyedProperty propertyKey="18" id="0:3782">
+          <KeyFrameDouble frame="0" value="1" interpolationType="hold" id="0:3783" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:12" id="0:3784">
+        <KeyedProperty propertyKey="20" id="0:3785">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic" id="0:3786">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3787" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="5" value="130" interpolationType="cubic" id="0:3788">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3789" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="1920" interpolationType="hold" id="0:3790" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:20" id="0:3791">
+        <KeyedProperty propertyKey="14" id="0:3792">
+          <KeyFrameDouble frame="0" value="14" interpolationType="cubic" id="0:3793">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3794" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="12" value="14" interpolationType="cubic" id="0:3795">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3796" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="38" value="0" interpolationType="hold" id="0:3797" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:23" id="0:3798">
+        <KeyedProperty propertyKey="14" id="0:3799">
+          <KeyFrameDouble frame="0" value="262" interpolationType="cubic" id="0:3800">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3801" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="20" value="262" interpolationType="cubic" id="0:3802">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3803" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="50" value="282" interpolationType="hold" id="0:3804" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:21" id="0:3805">
+        <KeyedProperty propertyKey="13" id="0:3806">
+          <KeyFrameDouble frame="0" value="120" interpolationType="cubic" id="0:3807">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3808" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="8" value="120" interpolationType="cubic" id="0:3809">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3810" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="46" value="0" interpolationType="hold" id="0:3811" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:22" id="0:3812">
+        <KeyedProperty propertyKey="13" id="0:3813">
+          <KeyFrameDouble frame="0" value="912.0" interpolationType="cubic" id="0:3814">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3815" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="8" value="912.0" interpolationType="cubic" id="0:3816">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3817" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="46" value="1032.0" interpolationType="hold" id="0:3818" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:25" id="0:3819">
+        <KeyedProperty propertyKey="14" id="0:3820">
+          <KeyFrameDouble frame="0" value="32" interpolationType="cubic" id="0:3821">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3822" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="15" value="32" interpolationType="cubic" id="0:3823">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3824" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="52" value="0" interpolationType="hold" id="0:3825" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:26" id="0:3826">
+        <KeyedProperty propertyKey="14" id="0:3827">
+          <KeyFrameDouble frame="0" value="32" interpolationType="cubic" id="0:3828">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3829" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="18" value="32" interpolationType="cubic" id="0:3830">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3831" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="55" value="0" interpolationType="hold" id="0:3832" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:24" id="0:3833">
+        <KeyedProperty propertyKey="18" id="0:3834">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic" id="0:3835">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3836" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="20" value="0" interpolationType="cubic" id="0:3837">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3838" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="40" value="1" interpolationType="hold" id="0:3839" />
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation name="Hold" id="21:41" fps="60" duration="60" loopValue="loop">
+      <KeyedObject objectId="21:10" id="0:3840">
+        <KeyedProperty propertyKey="18" id="0:3841">
+          <KeyFrameDouble frame="0" value="1" interpolationType="hold" id="0:3842" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:12" id="0:3843">
+        <KeyedProperty propertyKey="20" id="0:3844">
+          <KeyFrameDouble frame="0" value="1920" interpolationType="hold" id="0:3845" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:20" id="0:3846">
+        <KeyedProperty propertyKey="14" id="0:3847">
+          <KeyFrameDouble frame="0" value="0" interpolationType="hold" id="0:3848" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:23" id="0:3849">
+        <KeyedProperty propertyKey="14" id="0:3850">
+          <KeyFrameDouble frame="0" value="282" interpolationType="hold" id="0:3851" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:21" id="0:3852">
+        <KeyedProperty propertyKey="13" id="0:3853">
+          <KeyFrameDouble frame="0" value="0" interpolationType="hold" id="0:3854" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:22" id="0:3855">
+        <KeyedProperty propertyKey="13" id="0:3856">
+          <KeyFrameDouble frame="0" value="1032.0" interpolationType="hold" id="0:3857" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:25" id="0:3858">
+        <KeyedProperty propertyKey="14" id="0:3859">
+          <KeyFrameDouble frame="0" value="0" interpolationType="hold" id="0:3860" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:26" id="0:3861">
+        <KeyedProperty propertyKey="14" id="0:3862">
+          <KeyFrameDouble frame="0" value="0" interpolationType="hold" id="0:3863" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:24" id="0:3864">
+        <KeyedProperty propertyKey="18" id="0:3865">
+          <KeyFrameDouble frame="0" value="1" interpolationType="hold" id="0:3866" />
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation name="Outro" id="21:42" fps="60" duration="60">
+      <KeyedObject objectId="21:10" id="0:3867">
+        <KeyedProperty propertyKey="18" id="0:3868">
+          <KeyFrameDouble frame="0" value="1" interpolationType="cubic" id="0:3869">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3870" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="48" value="1" interpolationType="cubic" id="0:3871">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3872" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="60" value="0" interpolationType="hold" id="0:3873" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:12" id="0:3874">
+        <KeyedProperty propertyKey="20" id="0:3875">
+          <KeyFrameDouble frame="0" value="1920" interpolationType="cubic" id="0:3876">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3877" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="55" value="0" interpolationType="hold" id="0:3878" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:20" id="0:3879">
+        <KeyedProperty propertyKey="14" id="0:3880">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic" id="0:3881">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3882" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="14" interpolationType="hold" id="0:3883" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:23" id="0:3884">
+        <KeyedProperty propertyKey="14" id="0:3885">
+          <KeyFrameDouble frame="0" value="282" interpolationType="cubic" id="0:3886">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3887" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="262" interpolationType="hold" id="0:3888" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:21" id="0:3889">
+        <KeyedProperty propertyKey="13" id="0:3890">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic" id="0:3891">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3892" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="120" interpolationType="hold" id="0:3893" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:22" id="0:3894">
+        <KeyedProperty propertyKey="13" id="0:3895">
+          <KeyFrameDouble frame="0" value="1032.0" interpolationType="cubic" id="0:3896">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3897" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="912.0" interpolationType="hold" id="0:3898" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:25" id="0:3899">
+        <KeyedProperty propertyKey="14" id="0:3900">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic" id="0:3901">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3902" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="32" interpolationType="hold" id="0:3903" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:26" id="0:3904">
+        <KeyedProperty propertyKey="14" id="0:3905">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic" id="0:3906">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3907" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="32" interpolationType="hold" id="0:3908" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="21:24" id="0:3909">
+        <KeyedProperty propertyKey="18" id="0:3910">
+          <KeyFrameDouble frame="0" value="1" interpolationType="cubic" id="0:3911">
+            <CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1" id="0:3912" />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="34" value="0" interpolationType="hold" id="0:3913" />
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation name="Hidden" id="21:43" fps="60" duration="1">
+      <KeyedObject objectId="21:10" id="0:3914">
+        <KeyedProperty propertyKey="18" id="0:3915">
+          <KeyFrameDouble frame="0" value="0" interpolationType="hold" id="0:3916" />
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <StateMachine name="Locator" id="21:7">
+      <StateMachineLayer name="Display" id="0:3917">
+        <AnyState x="820" y="-120" id="0:3918" />
+        <ExitState x="940" y="-120" id="0:3919" />
+        <EntryState x="0" y="0" id="0:3920">
+          <StateTransition stateToId="21:50" id="0:3921" />
+        </EntryState>
+        <AnimationState id="21:50" x="180" y="120" animationId="21:43">
+          <StateTransition stateToId="21:51" duration="0" id="0:3922">
+            <TransitionViewModelCondition opValue="equal" id="0:3923">
+              <TransitionPropertyViewModelComparator id="0:3924">
+                <BindablePropertyBoolean id="0:3925">
+                  <DataBindContext sourcePathIds="21:80-21:1000" propertyKey="634" id="0:3926" />
+                </BindablePropertyBoolean>
+              </TransitionPropertyViewModelComparator>
+              <TransitionValueBooleanComparator value="true" id="0:3927" />
+            </TransitionViewModelCondition>
+          </StateTransition>
+        </AnimationState>
+        <AnimationState id="21:51" x="180" y="0" animationId="21:40" reset="true">
+          <StateTransition stateToId="21:52" duration="0" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" id="0:3928" />
+        </AnimationState>
+        <AnimationState id="21:52" x="420" y="0" animationId="21:41">
+          <StateTransition stateToId="21:53" duration="0" id="0:3929">
+            <TransitionViewModelCondition opValue="equal" id="0:3930">
+              <TransitionPropertyViewModelComparator id="0:3931">
+                <BindablePropertyBoolean id="0:3932">
+                  <DataBindContext sourcePathIds="21:80-21:1000" propertyKey="634" id="0:3933" />
+                </BindablePropertyBoolean>
+              </TransitionPropertyViewModelComparator>
+              <TransitionValueBooleanComparator value="false" id="0:3934" />
+            </TransitionViewModelCondition>
+          </StateTransition>
+        </AnimationState>
+        <AnimationState id="21:53" x="660" y="0" animationId="21:42" reset="true">
+          <StateTransition stateToId="21:50" duration="0" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" id="0:3935" />
+        </AnimationState>
+      </StateMachineLayer>
+    </StateMachine>
+  </Artboard>
+  <FontAsset id="21:90" name="Locator Roboto" file="assets/fonts/Roboto-Variable.ttf" />
+  <ImageAsset id="21:91" name="Locator away logo" file="assets/images/scorebug/saint-josephs.png" />
+  <ImageAsset id="21:92" name="Locator home logo" file="assets/images/scorebug/drexel.png" />
+  <ViewModel name="BasketballLocator" id="21:80" defaultInstanceId="21:81">
+    <ViewModelPropertyBoolean name="isPlaying" id="21:1000" componentProps="1" />
+    <ViewModelPropertyString name="awayAcronym" id="21:1001" componentProps="1" />
+    <ViewModelPropertyString name="homeAcronym" id="21:1002" componentProps="1" />
+    <ViewModelPropertyString name="awayName" id="21:1003" componentProps="1" />
+    <ViewModelPropertyString name="homeName" id="21:1004" componentProps="1" />
+    <ViewModelPropertyString name="awayRecord" id="21:1005" componentProps="1" />
+    <ViewModelPropertyString name="homeRecord" id="21:1006" componentProps="1" />
+    <ViewModelPropertyColor name="awayPrimaryColor" id="21:1007" componentProps="1" />
+    <ViewModelPropertyColor name="homePrimaryColor" id="21:1008" componentProps="1" />
+    <ViewModelPropertyColor name="awaySecondaryColor" id="21:1009" componentProps="1" />
+    <ViewModelPropertyColor name="homeSecondaryColor" id="21:1010" componentProps="1" />
+    <ViewModelPropertyAssetImage name="awayLogo" id="21:1011" componentProps="1" />
+    <ViewModelPropertyAssetImage name="homeLogo" id="21:1012" componentProps="1" />
+    <ViewModelPropertyString name="competition" id="21:1013" componentProps="1" />
+    <ViewModelPropertyString name="venue" id="21:1014" componentProps="1" />
+    <ViewModelPropertyString name="location" id="21:1015" componentProps="1" />
+    <ViewModelPropertyString name="status" id="21:1016" componentProps="1" />
+    <ViewModelPropertyString name="centerLabel" id="21:1017" componentProps="1" />
+    <ViewModelInstance name="Default" id="21:81" exports="true">
+      <ViewModelInstanceBoolean viewModelPropertyId="21:1000" propertyValue="false" id="0:3936" />
+      <ViewModelInstanceString viewModelPropertyId="21:1001" propertyValue="SJU" id="0:3937" />
+      <ViewModelInstanceString viewModelPropertyId="21:1002" propertyValue="DRE" id="0:3938" />
+      <ViewModelInstanceString viewModelPropertyId="21:1003" propertyValue="SAINT JOSEPH’S" id="0:3939" />
+      <ViewModelInstanceString viewModelPropertyId="21:1004" propertyValue="DREXEL" id="0:3940" />
+      <ViewModelInstanceString viewModelPropertyId="21:1005" propertyValue="15–5  •  7–2 A10" id="0:3941" />
+      <ViewModelInstanceString viewModelPropertyId="21:1006" propertyValue="14–6  •  6–3 CAA" id="0:3942" />
+      <ViewModelInstanceColor viewModelPropertyId="21:1007" propertyValue="FF9E1B32" id="0:3943" />
+      <ViewModelInstanceColor viewModelPropertyId="21:1008" propertyValue="FF0B386C" id="0:3944" />
+      <ViewModelInstanceColor viewModelPropertyId="21:1009" propertyValue="FF161616" id="0:3945" />
+      <ViewModelInstanceColor viewModelPropertyId="21:1010" propertyValue="FFFFD966" id="0:3946" />
+      <ViewModelInstanceAssetImage viewModelPropertyId="21:1011" propertyValue="21:91" id="0:3947" />
+      <ViewModelInstanceAssetImage viewModelPropertyId="21:1012" propertyValue="21:92" id="0:3948" />
+      <ViewModelInstanceString viewModelPropertyId="21:1013" propertyValue="COLLEGE BASKETBALL" id="0:3949" />
+      <ViewModelInstanceString viewModelPropertyId="21:1014" propertyValue="DASKALAKIS ATHLETIC CENTER" id="0:3950" />
+      <ViewModelInstanceString viewModelPropertyId="21:1015" propertyValue="PHILADELPHIA, PA" id="0:3951" />
+      <ViewModelInstanceString viewModelPropertyId="21:1016" propertyValue="TONIGHT  •  7:00 PM" id="0:3952" />
+      <ViewModelInstanceString viewModelPropertyId="21:1017" propertyValue="VS" id="0:3953" />
+    </ViewModelInstance>
+  </ViewModel>
+</Rive>

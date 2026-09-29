@@ -1,0 +1,922 @@
+<Rive version="1" kind="fragment">
+<!-- Basketball scorebug v2: a stacked tinted-glass corner block, 430 x 132, at the
+     bottom left of a transparent 1920 x 1080 canvas (origin 96, 890). Away row on
+     top, home row below, dark glass clock panel on the right. Sibling draw order
+     is front to back; within one shape the last paint declared is on top. -->
+<Artboard name="Basketball Scorebug v2" id="30:2" x="0" y="2600" width="1920" height="1080" viewModelId="30:1000" viewModelInstanceId="30:1001" defaultStateMachineId="30:7" styleId="30:5">
+<LayoutComponentStyle name="Scorebug v2 Style" id="30:5"/>
+<Fill><SolidColor colorValue="00000000"/></Fill>
+
+<ScriptedDrawable name="Scorebug Controller" scriptAssetId="30:950"/>
+<Node name="Scorebug" id="30:10" x="96" y="890">
+
+<!-- =========================== Specular sweep =========================== -->
+<!-- The intro's closing flourish: one soft diagonal sheen crosses the glass from
+     left to right, clipped to the block silhouette. Invisible at rest. -->
+<Shape name="Block Specular Sweep" id="30:600" x="520" y="66" rotation="0.3490659" opacity="0">
+  <Rectangle width="60" height="400" originX="0.5" originY="0.5"/>
+  <Fill><LinearGradient startX="-30" startY="0" endX="30" endY="0"><GradientStop colorValue="00FFFFFF" position="0"/><GradientStop colorValue="24FFFFFF" position="0.5"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill>
+  <ClippingShape name="Block Specular Sweep Clip" sourceId="30:610"/>
+</Shape>
+
+<!-- ======================== Intro leading edges ======================== -->
+<!-- The seam between the team rows and the clock panel is where the intro
+     starts. Each edge carries an unpainted mask that reveals its side as the
+     edge travels out from the seam, and a light that rides the mask edge with a
+     gradient trailing over the revealed glass. At rest the edges sit past the
+     outer block edges, so the masks are fully open, and the lights are off. The
+     masks are tall and wide enough to cover the rows and the clock panel while
+     the outro slides them. -->
+<Node name="Rows Leading Edge" id="30:500" x="-8" y="0">
+  <Shape name="Rows Reveal Mask" id="30:501" x="0" y="-60">
+    <Rectangle width="600" height="300" originX="0" originY="0"/>
+  </Shape>
+  <!-- Its origin is level with the block centre, so the light extends from
+       there when it ignites. -->
+  <Node name="Rows Edge Light" id="30:502" x="0" y="66" opacity="0">
+    <Shape name="Rows Edge Line" x="0" y="0">
+      <Rectangle width="2" height="132" originX="0.5" originY="0.5"/>
+      <Fill><SolidColor colorValue="F2FFFFFF"/></Fill>
+    </Shape>
+    <Shape name="Rows Edge Gradient" x="0" y="0">
+      <Rectangle width="32" height="132" originX="0" originY="0.5"/>
+      <Fill><LinearGradient startX="0" startY="0" endX="32" endY="0"><GradientStop colorValue="38FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill>
+    </Shape>
+  </Node>
+</Node>
+<Node name="Clock Leading Edge" id="30:505" x="440" y="0">
+  <Shape name="Clock Reveal Mask" id="30:506" x="0" y="-60">
+    <Rectangle width="600" height="300" originX="1" originY="0"/>
+  </Shape>
+  <Node name="Clock Edge Light" id="30:507" x="0" y="66" opacity="0">
+    <Shape name="Clock Edge Line" x="0" y="0">
+      <Rectangle width="2" height="132" originX="0.5" originY="0.5"/>
+      <Fill><SolidColor colorValue="F2FFFFFF"/></Fill>
+    </Shape>
+    <Shape name="Clock Edge Gradient" x="0" y="0">
+      <Rectangle width="32" height="132" originX="1" originY="0.5"/>
+      <Fill><LinearGradient startX="0" startY="0" endX="-32" endY="0"><GradientStop colorValue="38FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill>
+    </Shape>
+  </Node>
+</Node>
+
+<!-- ============================== Away row ============================== -->
+<Node name="Away Row" id="30:100" x="0" y="0">
+  <!-- The marker sits outside the reveal mask, so the intro can draw it upward
+       from the seam between the rows once the leading edge has passed. -->
+  <Shape name="Away Marker" id="30:101" x="0" y="64">
+    <Rectangle width="8" height="64" originX="0" originY="1" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusBL="3"/>
+    <Fill><SolidColor colorValue="FFFFFFFF"><DataBindContext sourcePathIds="30:1000-30:1024" propertyKey="37"/></SolidColor></Fill>
+  </Shape>
+  <!-- Everything else in the row is revealed by the rows leading edge. -->
+  <Node name="Away Panel" id="30:102" x="0" y="0">
+    <ClippingShape name="Away Reveal Clip" sourceId="30:501"/>
+    <!-- The intro drifts the content outward behind the leading edge, more
+         slowly than the edge, so the glass appears to open over it. -->
+    <Node name="Away Content" id="30:150" x="0" y="0">
+      <!-- away content: acronym over timeout pips, bonus, possession, score -->
+      <Node name="Away Score Window" id="30:110" x="112" y="0">
+        <ClippingShape name="Away Score Clip" sourceId="30:111"/>
+        <Node name="Away Score Reel" id="30:112"><DataBindContext sourcePathIds="30:1000-30:1052" propertyKey="14"/>
+          <Text name="Away Score" x="0" y="52" originValue="baseline" wrapValue="noWrap" width="114" sizingValue="fixed" alignValue="right"><TextStylePaint id="30:120" fontAssetId="30:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Score Value" styleId="30:120" text="68"><DataBindContext sourcePathIds="30:1000-30:1050" propertyKey="268"/></TextValueRun>
+            <!-- Fully modified glyphs are transparent and 24 below the baseline.
+                 The intro sweeps the range from the seam end to the start of the
+                 text, so the digits rise in one at a time, outward from the seam.
+                 At rest the range lies before the first glyph. -->
+            <TextModifierGroup name="Away Score Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="24">
+              <TextModifierRange name="Away Score Cascade Range" id="30:152" unitsValue="1" modifyFrom="-1" falloffFrom="-1" falloffTo="-0.45" modifyTo="0">
+                <CubicInterpolatorComponent name="Away Score Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+              </TextModifierRange>
+            </TextModifierGroup>
+          </Text>
+          <Text name="Away Incoming Score" x="0" y="116" originValue="baseline" wrapValue="noWrap" width="114" sizingValue="fixed" alignValue="right"><TextStylePaint id="30:125" fontAssetId="30:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Incoming Score Value" styleId="30:125" text="68"><DataBindContext sourcePathIds="30:1000-30:1051" propertyKey="268"/></TextValueRun></Text>
+        </Node>
+        <Shape name="Away Score Clip Area" id="30:111" x="0" y="0"><Rectangle width="122" height="64" originX="0" originY="0"/></Shape>
+      </Node>
+      <Node name="Away Possession" id="30:113" x="148" y="32">
+        <DataBindContext sourcePathIds="30:1000-30:1034" propertyKey="18" converterId="30:1172"/>
+        <Shape name="Away Possession Chevron" rotation="1.57079633"><Triangle width="12" height="9"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+      </Node>
+      <Node name="Away Bonus" id="30:114" x="88" y="22">
+        <DataBindContext sourcePathIds="30:1000-30:1032" propertyKey="18" converterId="30:1170"/>
+        <Text name="Away Bonus Label" x="0" y="15" originValue="baseline" wrapValue="noWrap" width="46" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:121" fontAssetId="30:901" fontSize="16" letterSpacing="1"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Bonus Label Value" styleId="30:121" text="BONUS"></TextValueRun></Text>
+        <Shape name="Away Bonus Pill"><Rectangle width="46" height="20" originX="0" originY="0" cornerRadiusTL="10"/>
+          <Fill><SolidColor colorValue="26FFFFFF"/></Fill><Stroke thickness="1"><SolidColor colorValue="A6FFFFFF"/></Stroke></Shape>
+      </Node>
+      <Node name="Away Timeouts" x="20" y="47">
+        <Shape name="Away Timeout 1" x="0" y="0"><DataBindContext sourcePathIds="30:1000-30:1030" propertyKey="18" converterId="30:1150"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+        <Shape name="Away Timeout 2" x="16" y="0"><DataBindContext sourcePathIds="30:1000-30:1030" propertyKey="18" converterId="30:1151"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+        <Shape name="Away Timeout 3" x="32" y="0"><DataBindContext sourcePathIds="30:1000-30:1030" propertyKey="18" converterId="30:1152"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+        <Shape name="Away Timeout 4" x="48" y="0"><DataBindContext sourcePathIds="30:1000-30:1030" propertyKey="18" converterId="30:1153"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+      </Node>
+      <Text name="Away Acronym" x="20" y="40" originValue="baseline" wrapValue="noWrap" sizingValue="autoWidth"><TextStylePaint id="30:122" fontAssetId="30:900" fontSize="40" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Acronym Value" styleId="30:122" text="JOES"><DataBindContext sourcePathIds="30:1000-30:1010" propertyKey="268"/></TextValueRun>
+        <TextModifierGroup name="Away Acronym Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="20">
+          <TextModifierRange name="Away Acronym Cascade Range" id="30:151" unitsValue="1" modifyFrom="-1" falloffFrom="-1" falloffTo="-0.45" modifyTo="0">
+            <CubicInterpolatorComponent name="Away Acronym Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+          </TextModifierRange>
+        </TextModifierGroup>
+      </Text>
+    </Node>
+    <Shape name="Away Score Flash" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1053" propertyKey="18"/>
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
+      <Fill><LinearGradient startX="234" startY="0" endX="80" endY="0"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="26FFFFFF" position="1"/></LinearGradient></Fill>
+    </Shape>
+    <Shape name="Away Glaze" x="0" y="0">
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
+      <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+    </Shape>
+    <!-- The logo sits behind the acronym as a large faded mark, cropped by the row. -->
+    <Image name="Away Logo" id="30:131" x="56" y="36" opacity="0.22" scaleX="0.18" scaleY="0.18" assetId="30:910"><DataBindContext sourcePathIds="30:1000-30:1014" propertyKey="206"/><ClippingShape name="Away Logo Clip" sourceId="30:130"/></Image>
+    <Shape name="Away Tint" id="30:130" x="0" y="0" opacity="0.78">
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
+      <Fill><SolidColor colorValue="FF9E1B32"><DataBindContext sourcePathIds="30:1000-30:1022" propertyKey="37"/></SolidColor></Fill>
+    </Shape>
+    <Shape name="Away Underlay" x="0" y="0">
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
+      <Fill><SolidColor colorValue="59000000"/></Fill>
+    </Shape>
+  </Node>
+</Node>
+
+<!-- ============================== Home row ============================== -->
+<Node name="Home Row" id="30:200" x="0" y="68">
+  <!-- Drawn downward from the seam between the rows, the mirror of the away marker. -->
+  <Shape name="Home Marker" id="30:201" x="0" y="0">
+    <Rectangle width="8" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusBL="12"/>
+    <Fill><SolidColor colorValue="FFFFD966"><DataBindContext sourcePathIds="30:1000-30:1025" propertyKey="37"/></SolidColor></Fill>
+  </Shape>
+  <Node name="Home Panel" id="30:202" x="0" y="0">
+    <ClippingShape name="Home Reveal Clip" sourceId="30:501"/>
+    <Node name="Home Content" id="30:250" x="0" y="0">
+      <!-- home content: acronym over timeout pips, bonus, possession, score -->
+      <Node name="Home Score Window" id="30:210" x="112" y="0">
+        <ClippingShape name="Home Score Clip" sourceId="30:211"/>
+        <Node name="Home Score Reel" id="30:212"><DataBindContext sourcePathIds="30:1000-30:1056" propertyKey="14"/>
+          <Text name="Home Score" x="0" y="52" originValue="baseline" wrapValue="noWrap" width="114" sizingValue="fixed" alignValue="right"><TextStylePaint id="30:220" fontAssetId="30:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Score Value" styleId="30:220" text="72"><DataBindContext sourcePathIds="30:1000-30:1054" propertyKey="268"/></TextValueRun>
+            <TextModifierGroup name="Home Score Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="24">
+              <TextModifierRange name="Home Score Cascade Range" id="30:252" unitsValue="1" modifyFrom="-1" falloffFrom="-1" falloffTo="-0.45" modifyTo="0">
+                <CubicInterpolatorComponent name="Home Score Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+              </TextModifierRange>
+            </TextModifierGroup>
+          </Text>
+          <Text name="Home Incoming Score" x="0" y="116" originValue="baseline" wrapValue="noWrap" width="114" sizingValue="fixed" alignValue="right"><TextStylePaint id="30:225" fontAssetId="30:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Incoming Score Value" styleId="30:225" text="72"><DataBindContext sourcePathIds="30:1000-30:1055" propertyKey="268"/></TextValueRun></Text>
+        </Node>
+        <Shape name="Home Score Clip Area" id="30:211" x="0" y="0"><Rectangle width="122" height="64" originX="0" originY="0"/></Shape>
+      </Node>
+      <Node name="Home Possession" id="30:213" x="148" y="32">
+        <DataBindContext sourcePathIds="30:1000-30:1035" propertyKey="18" converterId="30:1173"/>
+        <Shape name="Home Possession Chevron" rotation="1.57079633"><Triangle width="12" height="9"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+      </Node>
+      <Node name="Home Bonus" id="30:214" x="88" y="22">
+        <DataBindContext sourcePathIds="30:1000-30:1033" propertyKey="18" converterId="30:1171"/>
+        <Text name="Home Bonus Label" x="0" y="15" originValue="baseline" wrapValue="noWrap" width="46" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:221" fontAssetId="30:901" fontSize="16" letterSpacing="1"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Bonus Label Value" styleId="30:221" text="BONUS"></TextValueRun></Text>
+        <Shape name="Home Bonus Pill"><Rectangle width="46" height="20" originX="0" originY="0" cornerRadiusTL="10"/>
+          <Fill><SolidColor colorValue="26FFFFFF"/></Fill><Stroke thickness="1"><SolidColor colorValue="A6FFFFFF"/></Stroke></Shape>
+      </Node>
+      <Node name="Home Timeouts" x="20" y="47">
+        <Shape name="Home Timeout 1" x="0" y="0"><DataBindContext sourcePathIds="30:1000-30:1031" propertyKey="18" converterId="30:1160"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+        <Shape name="Home Timeout 2" x="16" y="0"><DataBindContext sourcePathIds="30:1000-30:1031" propertyKey="18" converterId="30:1161"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+        <Shape name="Home Timeout 3" x="32" y="0"><DataBindContext sourcePathIds="30:1000-30:1031" propertyKey="18" converterId="30:1162"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+        <Shape name="Home Timeout 4" x="48" y="0"><DataBindContext sourcePathIds="30:1000-30:1031" propertyKey="18" converterId="30:1163"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
+      </Node>
+      <Text name="Home Acronym" x="20" y="40" originValue="baseline" wrapValue="noWrap" sizingValue="autoWidth"><TextStylePaint id="30:222" fontAssetId="30:900" fontSize="40" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Acronym Value" styleId="30:222" text="DREX"><DataBindContext sourcePathIds="30:1000-30:1011" propertyKey="268"/></TextValueRun>
+        <TextModifierGroup name="Home Acronym Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="20">
+          <TextModifierRange name="Home Acronym Cascade Range" id="30:251" unitsValue="1" modifyFrom="-1" falloffFrom="-1" falloffTo="-0.45" modifyTo="0">
+            <CubicInterpolatorComponent name="Home Acronym Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+          </TextModifierRange>
+        </TextModifierGroup>
+      </Text>
+    </Node>
+    <Shape name="Home Score Flash" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1057" propertyKey="18"/>
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+      <Fill><LinearGradient startX="234" startY="0" endX="80" endY="0"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="26FFFFFF" position="1"/></LinearGradient></Fill>
+    </Shape>
+    <Shape name="Home Glaze" x="0" y="0">
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
+      <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="64"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+    </Shape>
+    <!-- The logo sits behind the acronym as a large faded mark, cropped by the row. -->
+    <Image name="Home Logo" id="30:231" x="56" y="36" opacity="0.22" scaleX="0.18" scaleY="0.18" assetId="30:911"><DataBindContext sourcePathIds="30:1000-30:1015" propertyKey="206"/><ClippingShape name="Home Logo Clip" sourceId="30:230"/></Image>
+    <Shape name="Home Tint" id="30:230" x="0" y="0" opacity="0.78">
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+      <Fill><SolidColor colorValue="FF0B386C"><DataBindContext sourcePathIds="30:1000-30:1023" propertyKey="37"/></SolidColor></Fill>
+    </Shape>
+    <Shape name="Home Underlay" x="0" y="0">
+      <Rectangle width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+      <Fill><SolidColor colorValue="59000000"/></Fill>
+    </Shape>
+  </Node>
+</Node>
+
+<!-- ============================ Clock panel ============================= -->
+<!-- Revealed by the clock leading edge, which travels rightward from the seam. -->
+<Node name="Clock Panel" id="30:300" x="238" y="0">
+  <ClippingShape name="Clock Reveal Clip" sourceId="30:506"/>
+  <Node name="Clock Content" id="30:350" x="0" y="0">
+    <!-- Drawn round the shot clock cell during the intro, then faded out;
+         invisible at rest. -->
+    <Shape name="Shot Clock Trace" id="30:360" x="163" y="51" opacity="0">
+      <Rectangle width="54" height="94" originX="0.5" originY="0.5" cornerRadiusTL="10"/>
+      <Stroke thickness="1.5" cap="round"><SolidColor colorValue="E6FFFFFF"/><TrimPath name="Shot Clock Trace Trim" id="30:361" start="0" end="1"/></Stroke>
+    </Shape>
+    <Node name="Shot Clock Value" x="163" y="51"><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="16"/><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="17"/>
+    <Text name="Shot Clock" x="-23" y="16" originValue="baseline" wrapValue="noWrap" width="46" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:320" fontAssetId="30:900" fontSize="44" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Shot Clock Value" styleId="30:320" text="24"><DataBindContext sourcePathIds="30:1000-30:1042" propertyKey="268"/></TextValueRun>
+      <!-- The clock panel cascades run the other way: from the start of the text
+           to its end, and at rest the range lies past the last glyph. -->
+      <TextModifierGroup name="Shot Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="20">
+        <TextModifierRange name="Shot Clock Cascade Range" id="30:353" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
+          <CubicInterpolatorComponent name="Shot Clock Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+        </TextModifierRange>
+      </TextModifierGroup>
+    </Text></Node>
+    <Shape name="Shot Clock Alert" id="30:310" x="140" y="8" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1060" propertyKey="18"/>
+      <Rectangle width="46" height="86" originX="0" originY="0" cornerRadiusTL="6"/>
+      <Fill><SolidColor colorValue="FFE5322D"/></Fill>
+    </Shape>
+    <Text name="Game Clock" x="2" y="88" originValue="baseline" wrapValue="noWrap" width="134" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:322" fontAssetId="30:900" fontSize="62" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Game Clock Value" styleId="30:322" text="13:59"><DataBindContext sourcePathIds="30:1000-30:1041" propertyKey="268"/></TextValueRun>
+      <TextModifierGroup name="Game Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="26">
+        <TextModifierRange name="Game Clock Cascade Range" id="30:352" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
+          <CubicInterpolatorComponent name="Game Clock Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+        </TextModifierRange>
+      </TextModifierGroup>
+    </Text>
+    <Text name="Period" x="2" y="33" originValue="baseline" wrapValue="noWrap" width="134" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:323" fontAssetId="30:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="CCFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Period Value" styleId="30:323" text="2ND"><DataBindContext sourcePathIds="30:1000-30:1040" propertyKey="268"/></TextValueRun>
+      <TextModifierGroup name="Period Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14">
+        <TextModifierRange name="Period Cascade Range" id="30:351" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
+          <CubicInterpolatorComponent name="Period Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
+        </TextModifierRange>
+      </TextModifierGroup>
+    </Text>
+    <Image name="Sponsor Logo" id="30:362" x="97" y="116.5" scaleX="0.105" scaleY="0.105" assetId="30:912"><DataBindContext sourcePathIds="30:1000-30:1043" propertyKey="206"/></Image>
+    <Shape name="Shot Clock Cell" x="140" y="8">
+      <Rectangle width="46" height="86" originX="0" originY="0" cornerRadiusTL="6"/>
+      <Fill><SolidColor colorValue="1AFFFFFF"/></Fill>
+    </Shape>
+    <!-- Anchored at its seam end, so the intro draws it outward. -->
+    <Shape name="Sponsor Divider" id="30:363" x="12" y="100">
+      <Rectangle width="170" height="1" originX="0" originY="0"/>
+      <Fill><SolidColor colorValue="26FFFFFF"/></Fill>
+    </Shape>
+  </Node>
+  <Shape name="Clock Glaze" x="0" y="0">
+    <Rectangle width="194" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="12"/>
+    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="132"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
+    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="132"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+  </Shape>
+  <Shape name="Clock Body" x="0" y="0">
+    <Rectangle width="194" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="12"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
+</Node>
+
+<!-- Separation from bright video: a feathered dark stroke around the block. Its
+     origin is on the seam (236 of 430), so the intro can grow it outward with
+     the leading edges. -->
+<Shape name="Block Shadow" id="30:20" x="236" y="4" opacity="0.6">
+  <Rectangle id="30:21" width="430" height="132" originX="0.5488372" originY="0" cornerRadiusTL="12"/>
+  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
+</Shape>
+
+<!-- ============================= Clip sources ============================= -->
+<!-- Unpainted, so it contributes geometry and draws nothing. -->
+<Shape name="Block Silhouette" id="30:610" x="0" y="0">
+  <Rectangle x="0" y="0" width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
+  <Rectangle x="0" y="68" width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+  <Rectangle x="238" y="0" width="194" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="12"/>
+</Shape>
+</Node>
+
+<!-- Intro, 1.1 s at 60 fps, after the matchup locator. A light ignites on the
+     seam between the team rows and the clock panel and splits into two leading
+     edges that wipe the block open outward (in-out, 0.47 s): the rows to the
+     left, the clock panel to the right. The content drifts outward behind the
+     edges, the faded logos settle from 112%, and the scores, acronyms and clock
+     text rise in letter by letter, outward from the seam. The team markers draw
+     outward from the seam between the rows once the edge has passed, a trace
+     is drawn round the shot clock cell and fades, the sponsor rises into its
+     strip, and one specular sweep crosses the glass to finish. Everything reads
+     by about 0.67 s. Every ease decelerates without overshoot. The first block
+     restores what Outro and Hidden change. -->
+<LinearAnimation name="Intro" id="30:31" fps="60" duration="66" loopValue="oneShot">
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="14"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+
+  <!-- Ignition: the seam light extends from the block centre, then fades as
+       the edges carry it outward. -->
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="14" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.6" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.22" y1="1" x2="0.36" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="14" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.6" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- Reveal: the leading edges travel from the seam past the outer edges. -->
+  <KeyedObject objectId="30:500"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="236" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="236" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="-8" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:505"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="236" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="236" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="440" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- The content drifts outward behind the edges and settles after them. -->
+  <KeyedObject objectId="30:150"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="16" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="16" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:250"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="16" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="16" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:350"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-16" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="-16" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="46" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- The markers draw outward from the seam between the rows, away upward and
+       home downward, as the edge clears the outer end of the rows. -->
+  <KeyedObject objectId="30:101"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="22" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:201"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="22" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- The faded logo marks settle from 112% as they fade in. -->
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.2016" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0.2016" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="50" value="0.18" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.2016" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0.2016" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="50" value="0.18" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="26" value="0.22" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.2016" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0.2016" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="50" value="0.18" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.2016" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0.2016" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="50" value="0.18" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="26" value="0.22" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- Scores, then acronyms, then clock text rise in letter by letter, nearest
+       the seam first. Each cascade keys the two range positions on its seam
+       side together, 0.45 apart, so the soft edge keeps its width as it crosses
+       the text. -->
+  <KeyedObject objectId="30:152"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="28" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:152"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="28" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:252"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="28" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:252"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="28" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:151"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="16" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:151"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="16" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:251"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="16" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:251"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="16" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:351"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="28" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:351"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="10" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="28" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:352"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="13" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="31" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:352"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="13" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="31" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:353"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="18" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:353"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="18" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.2" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- Shot clock: a trace draws round the cell from its top and fades. -->
+  <KeyedObject objectId="30:361"><KeyedProperty propertyKey="115">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="18" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.65" y1="0" x2="0.35" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:360"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="40" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.37" y1="0" x2="0.63" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="54" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- Sponsor strip: the divider draws outward from the seam and the logo
+       rises into place. -->
+  <KeyedObject objectId="30:363"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="16" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="40" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:362"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="124.5" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="124.5" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="44" value="116.5" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:362"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="22" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="36" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- The shadow grows outward from the seam with the edges. -->
+  <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.33" y1="1" x2="0.68" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="30" value="0.6" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:21"><KeyedProperty propertyKey="20">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="34" value="430" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+
+  <!-- Specular sweep, once, as the build settles. -->
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-80" interpolationType="hold"/>
+    <KeyFrameDouble frame="30" value="-80" interpolationType="cubic"><CubicEaseInterpolator x1="0.45" y1="0" x2="0.25" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="64" value="520" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="66" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<!-- The resting pose. Every property the intro animates is keyed here at its
+     final value, so a new intro key needs a matching Hold and Outro key. -->
+<LinearAnimation name="Hold" id="30:30" fps="60" duration="1" loopValue="loop">
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="14"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:21"><KeyedProperty propertyKey="20"><KeyFrameDouble frame="0" value="430" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:500"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="-8" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:505"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="440" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="17"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="17"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:150"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:250"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:350"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:101"><KeyedProperty propertyKey="17"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:201"><KeyedProperty propertyKey="17"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="16"><KeyFrameDouble frame="0" value="0.18" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="17"><KeyFrameDouble frame="0" value="0.18" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0.22" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="16"><KeyFrameDouble frame="0" value="0.18" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="17"><KeyFrameDouble frame="0" value="0.18" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0.22" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:151"><KeyedProperty propertyKey="318"><KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:151"><KeyedProperty propertyKey="336"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:152"><KeyedProperty propertyKey="318"><KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:152"><KeyedProperty propertyKey="336"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:251"><KeyedProperty propertyKey="318"><KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:251"><KeyedProperty propertyKey="336"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:252"><KeyedProperty propertyKey="318"><KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:252"><KeyedProperty propertyKey="336"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:351"><KeyedProperty propertyKey="327"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:351"><KeyedProperty propertyKey="317"><KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:352"><KeyedProperty propertyKey="327"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:352"><KeyedProperty propertyKey="317"><KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:353"><KeyedProperty propertyKey="327"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:353"><KeyedProperty propertyKey="317"><KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:361"><KeyedProperty propertyKey="115"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:360"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:362"><KeyedProperty propertyKey="14"><KeyFrameDouble frame="0" value="116.5" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:362"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:363"><KeyedProperty propertyKey="16"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="520" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<!-- Outro, 0.4 s: markers retract and type sinks away as illuminated edges
+     close the glass toward the seam. The joined light contracts and extinguishes.
+     Every intro property is keyed, including effects disabled during the exit. -->
+<LinearAnimation name="Outro" id="30:32" fps="60" duration="24" loopValue="oneShot">
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="0.6" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:21"><KeyedProperty propertyKey="20">
+    <KeyFrameDouble frame="0" value="430" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="430" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:500"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="-8" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="-8" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="236" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:505"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="440" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="440" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="236" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="3" value="0.85" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="0.85" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="3" value="0.85" interpolationType="hold"/>
+    <KeyFrameDouble frame="20" value="0.85" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:150"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="12" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:250"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="12" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:350"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="-12" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:101"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="9" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:201"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="9" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.18" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0.2016" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.18" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0.2016" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:131"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0.22" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="0.22" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="18" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="0.18" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0.2016" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="17">
+    <KeyFrameDouble frame="0" value="0.18" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="20" value="0.2016" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:231"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0.22" interpolationType="hold"/>
+    <KeyFrameDouble frame="2" value="0.22" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="18" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:151"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="13" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:151"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="13" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:152"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="19" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:152"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="19" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:251"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="13" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:251"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="13" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:252"><KeyedProperty propertyKey="318">
+    <KeyFrameDouble frame="0" value="-0.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="-0.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="19" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:252"><KeyedProperty propertyKey="336">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="19" value="1.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:351"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="19" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:351"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="5" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="19" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:352"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="3" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="17" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:352"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="hold"/>
+    <KeyFrameDouble frame="3" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="17" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:353"><KeyedProperty propertyKey="327">
+    <KeyFrameDouble frame="0" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="-0.45" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:353"><KeyedProperty propertyKey="317">
+    <KeyFrameDouble frame="0" value="1.45" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:361"><KeyedProperty propertyKey="115">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:360"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:362"><KeyedProperty propertyKey="14">
+    <KeyFrameDouble frame="0" value="116.5" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="124.5" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:362"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="12" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:363"><KeyedProperty propertyKey="16">
+    <KeyFrameDouble frame="0" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
+    <KeyFrameDouble frame="14" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="13">
+    <KeyFrameDouble frame="0" value="520" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<!-- Everything that can show is off, including the intro lights, which sit
+     outside the rows and the clock panel. -->
+<LinearAnimation name="Hidden" id="30:33" fps="60" duration="1" loopValue="oneShot">
+  <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:100"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:502"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:507"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:600"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+</LinearAnimation>
+
+<!-- isPlaying drives the bug: true takes it on air (Intro then Hold), false
+     dismisses it (Outro then Hidden). It defaults to false, so nothing shows
+     until the host raises it. -->
+<StateMachine name="Scorebug" id="30:7"><StateMachineLayer name="Display">
+  <AnyState x="820" y="-120"/><ExitState x="940" y="-120"/>
+  <EntryState x="0" y="0"><StateTransition stateToId="30:43"/></EntryState>
+  <AnimationState x="180" y="140" id="30:43" animationId="30:33"><StateTransition stateToId="30:41" duration="0"><TransitionViewModelCondition opValue="equal"><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="30:1000-30:1002" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition></AnimationState>
+  <AnimationState x="180" y="0" id="30:41" animationId="30:31" reset="true">
+    <StateTransition stateToId="30:40" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" duration="0"/>
+    <StateTransition stateToId="30:42" duration="0"><TransitionViewModelCondition opValue="notEqual"><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="30:1000-30:1002" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition>
+  </AnimationState>
+  <AnimationState x="420" y="0" id="30:40" animationId="30:30"><StateTransition stateToId="30:42" duration="0"><TransitionViewModelCondition opValue="notEqual"><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="30:1000-30:1002" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition></AnimationState>
+  <AnimationState x="660" y="0" id="30:42" animationId="30:32" reset="true"><StateTransition stateToId="30:43" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100" duration="0"/></AnimationState>
+</StateMachineLayer></StateMachine>
+</Artboard>
+
+<FontAsset name="Scorebug v2 Zuume Bold" id="30:900" file="assets/fonts/Zuume-Bold.ttf"/>
+<FontAsset name="Scorebug v2 Zuume Regular" id="30:901" file="assets/fonts/Zuume-Regular.ttf"/>
+<ImageAsset name="Scorebug v2 Saint Joseph's" id="30:910" file="assets/images/scorebug/saint-josephs.png"/>
+<ImageAsset name="Scorebug v2 Drexel" id="30:911" file="assets/images/scorebug/drexel.png"/>
+<ImageAsset name="Scorebug v2 Independence Blue Cross" id="30:912" file="assets/images/sponsors/independence_blue_cross.png"/>
+
+<ViewModel name="BasketballScorebugV2" id="30:1000" defaultInstanceId="30:1001">
+<ViewModelPropertyBoolean name="isPlaying" id="30:1002" componentProps="1"/>
+<ViewModelPropertyString name="awayAcronym" id="30:1010" componentProps="1"/>
+<ViewModelPropertyString name="homeAcronym" id="30:1011" componentProps="1"/>
+<ViewModelPropertyNumber name="awayScore" id="30:1012" componentProps="1"/>
+<ViewModelPropertyNumber name="homeScore" id="30:1013" componentProps="1"/>
+<ViewModelPropertyAssetImage name="awayLogo" id="30:1014" componentProps="1"/>
+<ViewModelPropertyAssetImage name="homeLogo" id="30:1015" componentProps="1"/>
+<ViewModelPropertyColor name="awayPrimaryColor" id="30:1022" componentProps="1"/>
+<ViewModelPropertyColor name="homePrimaryColor" id="30:1023" componentProps="1"/>
+<ViewModelPropertyColor name="awaySecondaryColor" id="30:1024" componentProps="1"/>
+<ViewModelPropertyColor name="homeSecondaryColor" id="30:1025" componentProps="1"/>
+<ViewModelPropertyNumber name="awayTimeouts" id="30:1030" componentProps="1"/>
+<ViewModelPropertyNumber name="homeTimeouts" id="30:1031" componentProps="1"/>
+<ViewModelPropertyBoolean name="awayBonus" id="30:1032" componentProps="1"/>
+<ViewModelPropertyBoolean name="homeBonus" id="30:1033" componentProps="1"/>
+<ViewModelPropertyBoolean name="awayPossession" id="30:1034" componentProps="1"/>
+<ViewModelPropertyBoolean name="homePossession" id="30:1035" componentProps="1"/>
+<ViewModelPropertyString name="period" id="30:1040" componentProps="1"/>
+<ViewModelPropertyString name="clock" id="30:1041" componentProps="1"/>
+<ViewModelPropertyString name="shotClock" id="30:1042" componentProps="1"/>
+<ViewModelPropertyAssetImage name="sponsorLogo" id="30:1043" componentProps="1"/>
+<!-- Internal: written by scorebug_controller.luau every frame. -->
+<ViewModelPropertyString name="_awayShown" id="30:1050"/>
+<ViewModelPropertyString name="_awayIncoming" id="30:1051"/>
+<ViewModelPropertyNumber name="_awayRoll" id="30:1052"/>
+<ViewModelPropertyNumber name="_awayFlash" id="30:1053"/>
+<ViewModelPropertyString name="_homeShown" id="30:1054"/>
+<ViewModelPropertyString name="_homeIncoming" id="30:1055"/>
+<ViewModelPropertyNumber name="_homeRoll" id="30:1056"/>
+<ViewModelPropertyNumber name="_homeFlash" id="30:1057"/>
+<ViewModelPropertyNumber name="_shotAlert" id="30:1060"/>
+<ViewModelPropertyNumber name="_shotPulse" id="30:1061"/>
+<ViewModelInstance name="Default" id="30:1001" exports="true">
+<ViewModelInstanceBoolean viewModelPropertyId="30:1002" propertyValue="false"/>
+<ViewModelInstanceString viewModelPropertyId="30:1010" propertyValue="JOES"/>
+<ViewModelInstanceString viewModelPropertyId="30:1011" propertyValue="DREX"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1012" propertyValue="68"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1013" propertyValue="72"/>
+<ViewModelInstanceAssetImage viewModelPropertyId="30:1014" propertyValue="30:910"/>
+<ViewModelInstanceAssetImage viewModelPropertyId="30:1015" propertyValue="30:911"/>
+<ViewModelInstanceColor viewModelPropertyId="30:1022" propertyValue="FFC2071B"/>
+<ViewModelInstanceColor viewModelPropertyId="30:1023" propertyValue="FF07294D"/>
+<ViewModelInstanceColor viewModelPropertyId="30:1024" propertyValue="FF101010"/>
+<ViewModelInstanceColor viewModelPropertyId="30:1025" propertyValue="FFFFC600"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1030" propertyValue="3"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1031" propertyValue="4"/>
+<ViewModelInstanceBoolean viewModelPropertyId="30:1032" propertyValue="false"/>
+<ViewModelInstanceBoolean viewModelPropertyId="30:1033" propertyValue="true"/>
+<ViewModelInstanceBoolean viewModelPropertyId="30:1034" propertyValue="false"/>
+<ViewModelInstanceBoolean viewModelPropertyId="30:1035" propertyValue="true"/>
+<ViewModelInstanceString viewModelPropertyId="30:1040" propertyValue="2ND"/>
+<ViewModelInstanceString viewModelPropertyId="30:1041" propertyValue="13:59"/>
+<ViewModelInstanceString viewModelPropertyId="30:1042" propertyValue="24"/>
+<ViewModelInstanceAssetImage viewModelPropertyId="30:1043" propertyValue="30:912"/>
+<ViewModelInstanceString viewModelPropertyId="30:1050" propertyValue="68"/>
+<ViewModelInstanceString viewModelPropertyId="30:1051" propertyValue="68"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1052" propertyValue="0"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1053" propertyValue="0"/>
+<ViewModelInstanceString viewModelPropertyId="30:1054" propertyValue="72"/>
+<ViewModelInstanceString viewModelPropertyId="30:1055" propertyValue="72"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1056" propertyValue="0"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1057" propertyValue="0"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1060" propertyValue="0"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1061" propertyValue="1"/>
+</ViewModelInstance>
+</ViewModel>
+
+<!-- Scores reach text as whole numbers. -->
+<DataConverterToString name="Whole Number" id="30:1101" decimals="0" round="true"/>
+<!-- A boolean read as 0 or 1, for opacity. -->
+<DataConverterToNumber name="Visible" id="30:1100"/>
+<!-- Pip n is lit when the team has n or more timeouts left, a faint ghost otherwise. -->
+<DataConverterRangeMapper name="Timeout Pip 1" id="30:1120" minInput="0" maxInput="1" minOutput="0.16" maxOutput="1" clampLower="true" clampUpper="true"/>
+<DataConverterRangeMapper name="Timeout Pip 2" id="30:1121" minInput="1" maxInput="2" minOutput="0.16" maxOutput="1" clampLower="true" clampUpper="true"/>
+<DataConverterRangeMapper name="Timeout Pip 3" id="30:1122" minInput="2" maxInput="3" minOutput="0.16" maxOutput="1" clampLower="true" clampUpper="true"/>
+<DataConverterRangeMapper name="Timeout Pip 4" id="30:1123" minInput="3" maxInput="4" minOutput="0.16" maxOutput="1" clampLower="true" clampUpper="true"/>
+<!-- Each bind owns its own interpolator so the eased state is never shared. -->
+<DataConverterInterpolator name="Away Timeout Pip 1 Ease" id="30:1130" duration="0.35"/>
+<DataConverterGroup name="Away Timeout Pip 1" id="30:1150"><DataConverterGroupItem converterId="30:1120"/><DataConverterGroupItem converterId="30:1130"/></DataConverterGroup>
+<DataConverterInterpolator name="Away Timeout Pip 2 Ease" id="30:1131" duration="0.35"/>
+<DataConverterGroup name="Away Timeout Pip 2" id="30:1151"><DataConverterGroupItem converterId="30:1121"/><DataConverterGroupItem converterId="30:1131"/></DataConverterGroup>
+<DataConverterInterpolator name="Away Timeout Pip 3 Ease" id="30:1132" duration="0.35"/>
+<DataConverterGroup name="Away Timeout Pip 3" id="30:1152"><DataConverterGroupItem converterId="30:1122"/><DataConverterGroupItem converterId="30:1132"/></DataConverterGroup>
+<DataConverterInterpolator name="Away Timeout Pip 4 Ease" id="30:1133" duration="0.35"/>
+<DataConverterGroup name="Away Timeout Pip 4" id="30:1153"><DataConverterGroupItem converterId="30:1123"/><DataConverterGroupItem converterId="30:1133"/></DataConverterGroup>
+<DataConverterInterpolator name="Home Timeout Pip 1 Ease" id="30:1140" duration="0.35"/>
+<DataConverterGroup name="Home Timeout Pip 1" id="30:1160"><DataConverterGroupItem converterId="30:1120"/><DataConverterGroupItem converterId="30:1140"/></DataConverterGroup>
+<DataConverterInterpolator name="Home Timeout Pip 2 Ease" id="30:1141" duration="0.35"/>
+<DataConverterGroup name="Home Timeout Pip 2" id="30:1161"><DataConverterGroupItem converterId="30:1121"/><DataConverterGroupItem converterId="30:1141"/></DataConverterGroup>
+<DataConverterInterpolator name="Home Timeout Pip 3 Ease" id="30:1142" duration="0.35"/>
+<DataConverterGroup name="Home Timeout Pip 3" id="30:1162"><DataConverterGroupItem converterId="30:1122"/><DataConverterGroupItem converterId="30:1142"/></DataConverterGroup>
+<DataConverterInterpolator name="Home Timeout Pip 4 Ease" id="30:1143" duration="0.35"/>
+<DataConverterGroup name="Home Timeout Pip 4" id="30:1163"><DataConverterGroupItem converterId="30:1123"/><DataConverterGroupItem converterId="30:1143"/></DataConverterGroup>
+<DataConverterInterpolator name="Away Bonus Ease" id="30:1110" duration="0.25"/>
+<DataConverterGroup name="Away Bonus" id="30:1170"><DataConverterGroupItem converterId="30:1100"/><DataConverterGroupItem converterId="30:1110"/></DataConverterGroup>
+<DataConverterInterpolator name="Home Bonus Ease" id="30:1111" duration="0.25"/>
+<DataConverterGroup name="Home Bonus" id="30:1171"><DataConverterGroupItem converterId="30:1100"/><DataConverterGroupItem converterId="30:1111"/></DataConverterGroup>
+<DataConverterInterpolator name="Away Possession Ease" id="30:1112" duration="0.25"/>
+<DataConverterGroup name="Away Possession" id="30:1172"><DataConverterGroupItem converterId="30:1100"/><DataConverterGroupItem converterId="30:1112"/></DataConverterGroup>
+<DataConverterInterpolator name="Home Possession Ease" id="30:1113" duration="0.25"/>
+<DataConverterGroup name="Home Possession" id="30:1173"><DataConverterGroupItem converterId="30:1100"/><DataConverterGroupItem converterId="30:1113"/></DataConverterGroup>
+<ScriptAsset name="scorebug_controller" folderPath="graphics/basketball-v2" id="30:950" file="graphics/basketball-v2/scorebug_controller.luau"/>
+</Rive>

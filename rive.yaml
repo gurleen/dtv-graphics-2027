@@ -1,0 +1,19 @@
+name: dtv-rive
+main: Team Wipe — Futura
+
+artboard:
+  width: 1920
+  height: 1080
+
+exclude:
+  - docs
+  - ograf
+  - preview
+  - preview-dist
+
+logs:
+  file: build/rive.log
+  problems: build/problems.log
+push:
+  projectId: 1995023
+  fileId: 2595781

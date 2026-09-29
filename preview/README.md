@@ -1,0 +1,15 @@
+# Graphics preview
+
+From the repository root, run `bun install` once, then `bun run dev` for the Vite dev server or `bun run build` for a static build in `preview-dist/`.
+
+The page shows `graphics/10_ncaa_basketball_scorebug/10_ncaa_basketball_scorebug.rml` in the Rive web runtime. The preview generator creates an isolated Rive project under `build/`, sets the `BasketballScorebug.isPlaying` view-model default to true in that temporary copy, and writes both a `.riv` runtime asset and a reference PNG. In development, changing the scorebug RML, its script, font, or logos regenerates the runtime asset and reloads the page.
+
+The browser executes the embedded `basketball_score_scroll.luau` controller. React writes every public view-model property: the game state (`isPlaying`, `period`, `clock`, `shotClock`) and, per side, `awayScore`/`homeScore`, `awayAcronym`/`homeAcronym`, `awayLogo`/`homeLogo`, `awayPrimaryColor`/`homePrimaryColor`, `awaySecondaryColor`/`homeSecondaryColor`, `awayTimeouts`/`homeTimeouts` and `awayBonus`/`homeBonus`. It never writes the internal score strings, offsets, or glow values. The game clock and looping shot clock run in React, and a score increase of exactly three selects the +3 / gold pulse sequence automatically. Colors are written with `ViewModelInstanceColor.rgb()` rather than the signed 32-bit `value`.
+
+Team presets come from `src/teams.json`, a vendored copy of `src/data/teams.json` in the `dtv-graphics-2026-hgfx` repository, normalized by `src/teams.ts` into 361 teams grouped by conference. Selecting a team sets the acronym from `abbreviation` and both colors from `color` and `alternate_color`; the 35 entries with a missing or malformed color fall back to neutral values. Logos are served from `https://images.dragonstv.io/logos/<logo_name>`, built from each team's `logo_name`. The 38 teams with no `logo_name` keep whatever logo is already up and are omitted from the logo picker.
+
+The page swaps a logo by fetching its bytes and calling `decodeImage`, so a school need not be embedded in the `.riv` to be previewed. Each logo decodes once into a module-level cache because the engine holds a reference until `unref()`; a failed fetch is evicted so the next selection retries the CDN.
+
+Browser scripting requires signed bytecode. Run `rive login` before generating the preview. The generator renders the reference PNG first, then runs `rive --publish` to sign the script through Rive's compile service and copies that signed output into `preview/public/graphics/`. Generation requires network access and fails if signing fails. Do not replace the browser asset with an unsigned `--once` or `--screenshot` build. Rive may watermark signed output when the generated project is not bound to an editor file.
+
+The page lets you inspect the transparent graphic against dark, light, or checkerboard backgrounds and show the artboard bounds. Add future graphics to the `graphics` list in `src/main.tsx` and generate their preview assets alongside the scorebug in `scripts/generate.ts`.

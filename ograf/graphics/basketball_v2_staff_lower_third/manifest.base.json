@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
+  "id": "dtv-basketball-v2-staff-lower-third",
+  "version": "1.0.0",
+  "name": "Basketball v2 Staff Lower Third",
+  "description": "DTV basketball lower third for coaching staff, administrators and other non-players: team logo, name, and a title strip.",
+  "author": { "name": "Dragons TV", "url": "https://dragonstv.io" },
+  "main": "index.mjs",
+  "supportsRealTime": true,
+  "supportsNonRealTime": false,
+  "stepCount": 1,
+  "actionDurations": [
+    { "type": "playAction", "duration": 1200 },
+    { "type": "stopAction", "duration": 400 },
+    { "type": "updateAction", "duration": -1 }
+  ],
+  "renderRequirements": [
+    {
+      "resolution": { "width": { "ideal": 1920 }, "height": { "ideal": 1080 } },
+      "frameRate": { "min": 50 },
+      "accessToPublicInternet": { "ideal": true }
+    }
+  ],
+  "thumbnails": [
+    { "file": "thumbnail.png", "resolution": { "width": 1920, "height": 1080 } }
+  ]
+}

@@ -1,0 +1,152 @@
+# Graphics Porting Tracker
+
+## Purpose
+
+`~/Developer/dtv-graphics-2026` is a Bun + React broadcast graphics project
+(HTML/CSS overlays, source at `src/graphics/<n>_<name>/`). We are porting
+these graphics one at a time into this repo (`dtv-rive`) as Rive projects
+(`.rml` scenes built to `.riv`).
+
+**Workflow for future agents:**
+
+1. Pick the next unstarted graphic from the table below.
+2. Read its source files in `dtv-graphics-2026` (`.tsx`/`.html`/`.css`/`props.ts`/`models.ts`) to understand layout, data fields, and animation behavior.
+3. Rebuild it as an `.rml` scene in this repo, following `AGENTS.md` (use `rive schema`/`rive docs`, don't guess property names). A basketball graphic is built new in `graphics/basketball-v2/` in the v2 design, not copied from the source layout: follow `graphics/basketball-v2/DESIGN_SYSTEM.md`, which has the tokens, motion recipe, id namespace registry and a checklist.
+4. Verify with `rive . --verify` and `rive inspect . --summary`; screenshot with `rive . --screenshot --advance=1` when appearance matters.
+5. Package it as an OGraf graphic — see **OGraf packaging** below. A scene that
+   builds is not a deliverable; no renderer can ingest an `.rml`.
+6. Update the **Status** column below (`todo` → `in progress` → `ported`, or `superseded (v2)` when a basketball-v2 graphic replaces it), and note any data-binding fields or gotchas found along the way in the **Notes** column.
+7. Do graphics in roughly numeric order unless a specific one is requested — lower-numbered ones tend to be simpler/more foundational (e.g. `0_lower_third`, `1_basketball_scorebug`) and later ones reuse patterns from them.
+
+Source root: `~/Developer/dtv-graphics-2026/src/graphics/`
+
+## Graphics List
+
+| # | Directory | Description (inferred) | Source Files | Status | Notes |
+|---|-----------|-------------------------|---------------|--------|-------|
+| 0 | `0_lower_third` | Generic/base lower third template | `0_lower_third.tsx`, `.html` | todo | Uses `AnimationContainer`, `Rect`, `use-animation` — likely the simplest starting point/reference for the shared animation pattern. |
+| 1 | `1_basketball_scorebug` | Basketball scorebug (score, clock, team info) | `1_basketball_scorebug.tsx`, `.html`, `models.ts`, `props.ts`, `ibx.png` | superseded (v2) | Replaced by `graphics/basketball-v2/basketball_scorebug.rml`. Source notes: uses `NumberFlow` for animated score digits; has an image asset (`ibx.png`) and its own `models.ts`/`props.ts`. |
+| 2 | `2_score_to_break` | "Score to break" bug shown going into a commercial break | `2_score_to_break.tsx`, `.html` | todo | Pulls live data via `useBasketballLiveData` / `BasketballLiveData`; uses `GlobalSettingsContext`. |
+| 3 | `3_matchup` | Matchup/versus graphic (team vs. team) | `3_matchup.tsx`, `.html`, `props.ts` | ported (legacy) | `graphics/legacy/3_matchup/3_matchup.rml` (id namespace `3:`). View model `Matchup`: `home`/`awaySchoolName`, `home`/`awayTeamName`, `home`/`awayColor`, `home`/`awayLogo` (both default to the shared `team_knockout_logo.png` placeholder at `1:60`, swap per-team via the asset handler), `confLogo` (defaults to `CAAWhite.png`, added from `~/Creative/Assets/Logos` — `EIWA.png` exists there too for the wrestling variant but wasn't wired in), `sponsorText`, `sponsorLogo` (`sponsor_logo.png`, already in assets — a Belfor mark, not the source's "Independence" one, but same role), `venueText`, `isVisible`. Same Hidden/Show/Hold/Dismiss state-machine shape as `7_player_to_watch`. Layout: 785+350+785=1920 lets the away/CAA/home row span edge to edge with no gutter; team names are right/left-aligned so they lean toward the center CAA box (source achieves this with flex-row-reverse + items-start/items-end, this port just sets `alignValue` directly). **Gotcha:** `Image`'s `x`/`y` anchor at its own *center* (`originX`/`originY` default `0.5`), unlike `Text`/`Shape` which anchor top-left — got this wrong on the first pass (logos rendered high/cropped) and had to convert every image placement, including their entrance keyframes, from a top-left calc to a center one. **Simplification:** the source wraps each band in an `overflow-hidden` mask div so the entrance wipes into view; this port skips per-band clip masks and animates position only (a Node's own translateY plus its children's independent translateY still compound, matching the source's nested-tween behavior) — visually close but not a pixel-exact wipe. |
+| 4 | `4_starting_lineups_lower` | Starting lineups lower third | `4_starting_lineups_lower.tsx`, `.html`, `props.ts` | todo | Uses `getPlayerHeadshot`, `Sport`, `ZLayers`. |
+| 5 | `5_halftime_adjustments` | Halftime adjustments graphic | `5_halftime_adjustments.tsx`, `.html`, `props.ts` | todo | Uses a decorative `Squares` react-bits component and full `AppState`/`GameState`/`TeamGameState` data. |
+| 6 | `6_halftime_stats` | Halftime stats graphic | `6_halftime_stats.tsx`, `.html` | todo | Uses `Boxscore`, `ShotStats`, `TeamSide` — box score/shooting stat display. |
+| 7 | `7_player_to_watch` | "Player to watch" feature graphic | `7_player_to_watch.tsx`, `.html` | ported (legacy) | `graphics/legacy/7_player_to_watch/7_player_to_watch.rml` (id namespace `1:`). View model `PlayerToWatch`: `firstName`, `lastName`, `statText`, `teamColor`, `teamLogo` (`ViewModelPropertyAssetImage`), `isVisible` (drives the state machine in place of SPX play/stop). Zuume Bold/Regular embedded from `assets/fonts/`. **Markdown bold in `statText` is dropped** — one `TextValueRun`, single weight (per-segment runs would be needed to keep the emphasis). Gotchas: Rive anchors a `Text` at its content-box top and places the first baseline at `y + 0.8 x fontSize` (Zuume sets USE_TYPO_METRICS), so `y = CSS line-box top + (lineHeight - fontSize) / 2`; and Tailwind v4 registers `--tw-leading` with `inherits: false`, so a parent `leading-*` does **not** reach child `text-*` elements — they fall back to the size's own line-height. Sponsor logo is scaled to fit inside its panel rather than clipped like the web version. |
+| 8 | `8_talent_lower_third_double` | Talent (broadcaster) lower third, double (two people) | `8_talent_lower_third_double.tsx`, `.html` | superseded (v2) | Replaced by `graphics/basketball-v2/talent_lower_third_double.rml` (and `_triple`), generated by `generate_talent_lower_thirds.ts`. |
+| 9 | `9_talent_lower_third_single` | Talent (broadcaster) lower third, single (one person) | `9_talent_lower_third_single.tsx`, `.html` | superseded (v2) | Replaced by `graphics/basketball-v2/talent_lower_third_single.rml`. |
+| 10 | `10_player_lower_third` | Player lower third | `10_player_lower_third.tsx`, `.html` | superseded (v2) | Replaced by `graphics/basketball-v2/player_lower_third.rml`; the stat line is a plain string (`statLabel`, `statLine`) rather than a live linescore. |
+| 11 | `11_series_history` | Series history graphic (head-to-head series record) | `11_series_history.tsx`, `.html` | todo | Uses `AppState`, `Team`, `useAppState`. |
+| 12 | `12_coming_up_next` | "Coming up next" bumper graphic | `12_coming_up_next.tsx`, `.html` | todo | Uses `GlobalSettingsContext`, `getTeamKnockoutLogo`. |
+| 13 | `13_coach_lower_third` | Coach lower third | `13_coach_lower_third.tsx`, `.html` | superseded (v2) | Replaced by `graphics/basketball-v2/staff_lower_third.rml` (coaches and other staff: `firstName`, `lastName`, `title`, `detail`). No markdown. |
+| 14 | `14_coach_lower_third_double` | Coach lower third, double (two coaches) | `14_coach_lower_third_double.tsx`, `.html` | todo | No v2 equivalent yet; build from `staff_lower_third.rml` per `graphics/basketball-v2/DESIGN_SYSTEM.md`. |
+| 15 | `15_wrestling_scorebug` | Wrestling scorebug | `15_wrestling_scorebug.tsx`, `.html`, `.css` | todo | Only graphic with its own `.css` file; uses `Wrestler`, `WrestlingScorebugState`. |
+| 16 | `16_wrestling_probables` | Wrestling probable starters/matchups | `16_probable_starters.tsx`, `.html` | todo | Note: `.tsx` filename (`16_probable_starters.tsx`) doesn't match directory name; uses `WrestlerYear` from `controls/wrestling/types`. |
+| 17 | `17_conf_standings` | Conference standings table | `17_conf_standings.tsx`, `.html` | todo | Uses `TeamStandingsRecord`, `useSpxObject`, `useTeamData` (StatCrew/SPX data source). |
+| 18 | `18_around_the_conf` | "Around the conference" scoreboard ticker | `18_around_the_conf.tsx`, `.html` | todo | Uses `ScoreboardGame`, `useSpxObject` — likely a multi-game scroll/carousel. |
+| 19 | `19_pwe_lower_third` | PWE (Pro Wrestling Eclipse?) lower third | `19_pwe_lower_third.tsx`, `.html`, `pwe.png` | todo | Has its own logo asset (`pwe.png`) and a country flag icon (`country-flag-icons`) — likely a wrestler/nationality lower third. |
+
+## OGraf Packaging
+
+A port is finished when it is packaged, not when it verifies. `ograf/` wraps a
+scene as an [OGraf](../docs/ograf/README.md) graphic — the EBU's open format for
+handing a graphic to a broadcast renderer — and `ograf/README.md` is the
+instruction sheet. The short version:
+
+- Four files in a new `ograf/graphics/<name>/` directory: `fields.ts` (one entry
+  per public view model property), `definition.ts` (artboard, state machine,
+  view model, on-air property, intro/outro durations), `graphic.ts` (a two-line
+  subclass), `manifest.base.json`. Then
+  `bun ograf/scripts/build_package.ts ograf/graphics/<name>`.
+- `bun run ograf:harness` drives the built package through `load` / `playAction`
+  / `updateAction` / `stopAction` in a browser.
+- **The scene must follow the Hidden/Intro/Hold/Outro shape** gated on one
+  boolean view model property. That property is not an operator field: it is
+  what `playAction` and `stopAction` flip. Every graphic ported so far already
+  works this way (`isVisible`, `isPlaying`); keep doing it.
+- **Read the intro/outro durations off the scene**, not off intuition — a
+  `LinearAnimation` with `fps="60" duration="60"` is 1000 ms. They go in both
+  `definition.ts` and the manifest's `actionDurations`, and a renderer schedules
+  against them.
+- **An unsigned `.riv` never loads in a browser, and fails silently** — no error,
+  the load promise simply never settles. Packaging always publishes
+  (`rive login` required). Separately, a publish is watermarked until someone
+  runs `rive push` at the repository root to bind the project to a Rive file;
+  the builder then carries that binding into its staging project.
+
+## Shared Infrastructure Referenced (not per-graphic, for context)
+
+- `src/components/animation-container.tsx`, `src/components/rect.tsx`, `src/components/fade-text.tsx`, `src/components/markdown-text.tsx`, `src/components/react-bits/Squares.tsx`
+- `src/util/use-animation.ts`, `src/util/use-props.ts`, `src/util/layers.ts` (`ZLayers`), `src/util/spx.ts`
+- `src/data/models.ts`, `src/data/teams.ts` — core app/team/game state types and hooks
+- `src/contexts/GlobalSettingsContext.tsx`
+- `src/hooks/use-basketball-bug-state.ts`, `src/hooks/misc.ts`
+- `src/types/basketball.ts`, `src/types/team.ts`
+- `src/controls/` — operator control panel (global + wrestling-specific + text-slider), not part of the on-air graphic itself but defines what data/props are driven live
+- `src/scripts/statcrew/` — StatCrew integration scripts (likely the live data feed for basketball scorebug/standings)
+
+Worth reading these once (e.g. when starting #0 or #1) to understand the shared animation/props pattern before porting graphics that depend on them.
+
+## RML Gotchas Learned Porting (read before your first graphic)
+
+- **`Image` anchors at its own center, not top-left.** `originX`/`originY`
+  default to `0.5`. `Text` and `Shape` anchor top-left (`x`/`y` is the
+  content-box corner). If you compute an image's position/size like a CSS
+  top-left box (as the source `.tsx` does) and set `x`/`y` straight from that
+  math, the image renders high and to the left of where you meant, and any
+  entrance keyframes on it will be off by half its rendered width/height.
+  Convert: `center = topLeft + (renderedSize / 2)` for both the static
+  position and every keyframe on that object's `x`/`y`.
+- **`Text` needs `sizingValue="fixed"` + a `width` for `alignValue` to do
+  anything.** Under `autoWidth` the box shrink-wraps the line, so
+  `alignValue="center"/"right"` has no slack to distribute and silently does
+  nothing — the line just starts at `x`. This is how you get text converging
+  toward a shared center point (e.g. two team names leaning toward a middle
+  logo): give each a fixed `width` sized to its layout column, not
+  `autoWidth`.
+- **All `.rml` files in the project compile as one document.** Ids
+  (`client:object`) must be unique across every file, not just within one —
+  pick a distinct client number per graphic (this repo uses the graphic's
+  index, e.g. `3:*` for `3_matchup`) so you don't collide with ids in
+  an already-ported graphic. The upside: you can reference an
+  id declared in another file directly — e.g. `graphics/legacy/3_matchup/3_matchup.rml` reuses
+  `graphics/legacy/7_player_to_watch/7_player_to_watch.rml`'s `FontAsset` ids (`1:50`/`1:51` for Zuume) and its
+  `team_knockout_logo.png` `ImageAsset` id (`1:60`) instead of redeclaring
+  fonts/assets that are already embedded.
+- **Multiple artboards need distinct `x`/`y` on the `<Artboard>` element** or
+  `rive inspect` warns `artboards-overlap` (cosmetic — it only affects how
+  they're laid out on the editor's stage, not the build) — space them out by
+  size plus a gutter, e.g. `x="2020"` for a second 1920-wide artboard.
+- **Screenshotting a non-default artboard:** `rive . --artboard="Name"
+  --screenshot=build/out.png --advance=<N>`. `main` in `rive.yaml` only picks
+  the *default* artboard; every other one still builds and is screenshottable
+  by name. State machines built on the Hidden/Show/Hold/Dismiss pattern (see
+  `graphics/legacy/7_player_to_watch/7_player_to_watch.rml`, `graphics/legacy/3_matchup/3_matchup.rml`) auto-transition out of Hidden on
+  load if the driving `isVisible` bindable defaults to `true`, so
+  `--advance=<enough frames to clear the Show animation's duration>` lands on
+  the settled Hold pose; a smaller `--advance` mid-entrance is useful for
+  checking the animation itself, not just the rest state.
+- **Team/conference logo assets live outside both repos**, at
+  `~/Creative/Assets/Logos` (team knockout-style logos per school, plus
+  `CAA.png`/`CAAWhite.png`/`EIWA.png` conference marks) and
+  `~/Creative/Assets/Sponsors` (sponsor marks, e.g. `IBX.png`). Check there
+  before assuming an asset needs to be sourced from the user or faked — copy
+  the file into this project's `assets/images/` and declare an `ImageAsset`
+  pointing at it.
+- **Each graphic lives in its own `graphics/<name>/` folder** alongside its
+  `.rml` and any `.luau` scripts unique to it; shared `assets/` stays at the
+  project root, since `file=` paths are project-relative regardless of
+  which folder the referencing `.rml` sits in. **A `<ScriptAsset>` nested in a
+  subfolder needs an explicit `folderPath` matching that folder** (e.g.
+  `folderPath="graphics/10_ncaa_basketball_scorebug"`), and every `require()`
+  of it must use the folder-qualified name (e.g.
+  `require('graphics/10_ncaa_basketball_scorebug/basketball_score_scroll_phase')`).
+  Skip the `folderPath` and the build still reports `0 errors` under
+  `--verify`/`--once`, but `require` silently fails to resolve the module —
+  the same "looks clean, does nothing" trap as declaration order (above).
+  A plain, undeclared `.luau` module (like a `_test`/`.test` script with no
+  `<ScriptAsset>` tag) needs no `folderPath` itself — it just has to `require`
+  its dependency by the dependency's folder-qualified name too.
+- **A convergent two-box layout** (two team panels reading toward a shared
+  center element) is just `alignValue="right"` on the left box's text and
+  `alignValue="left"` on the right box's, both with fixed-width text boxes —
+  no special layout primitive needed.

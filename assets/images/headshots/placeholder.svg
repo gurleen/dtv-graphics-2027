@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750">
+  <!-- Neutral head-and-shoulders silhouette on a transparent ground. Stands in
+       for a player headshot until a real one is supplied. -->
+  <defs>
+    <linearGradient id="tone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.30"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="300" cy="270" rx="118" ry="140" fill="url(#tone)"/>
+  <rect x="252" y="380" width="96" height="90" fill="url(#tone)"/>
+  <path d="M40 750 C40 560 150 470 300 470 C450 470 560 560 560 750 Z" fill="url(#tone)"/>
+</svg>
