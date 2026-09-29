@@ -300,11 +300,12 @@ is for pre-game only; never put the two on air together.**
   header. A secondary-colour marker runs down the left edge.
 - **Header (44 high, dark glass):** `PLAYER TO WATCH`, then the optional
   context tag (for example `2026-27 SEASON`) after a secondary-colour `/`; a
-  blank tag hides the separator. `PRESENTED BY` and the full-colour sponsor logo
-  on a white chip sit at the right.
+  blank tag hides the separator. `PRESENTED BY` sits at the right, centred over
+  the sponsor chip.
 - **Name row (84 high, team tint):** the jersey number, first name over last
   name (shrinks to fit), and position over class year at the right, over a
-  faded team logo.
+  faded team logo. The full-colour sponsor logo (50 high) closes the row on a
+  200 x 84 white chip.
 - **Body row (84 high, dark glass):** `bodyMode` `STATS` shows up to four stat
   cells, value over label; a blank value hides its cell and the rest share the
   row evenly. `TEXT` shows `bodyText` (Bold 32, two lines, longer copy shrinks
