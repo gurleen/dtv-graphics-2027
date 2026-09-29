@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 39), naming, and a five-step checklist
+the id namespace registry (next free: 40), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -343,6 +343,75 @@ transparent margin cropped. Re-export with
 
 Build the OGraf package with
 `bun run ograf:build:basketball-v2-player-to-watch-lower-third`.
+
+## Halftime statistics card (`halftime_statistics.rml`)
+
+A card comparing the two teams' first halves, presented by Drexel Physical
+Therapy. Card origin 282, 222; size 1356 x 636, centred on the frame. It ends
+at y 858, 32 units above the scorebug (y 890), so the two can be on air
+together. Like the matchup locator, it takes 24 on the outer corners and 6 on
+inner seams.
+
+- **Generated.** `generate_halftime_statistics.ts` writes the `.rml`. Edit the
+  generator, then run
+  `bun graphics/basketball-v2/generate_halftime_statistics.ts`; never edit the
+  `.rml` output by hand.
+- **Team panels (340 x 636, team tint):** away at the left, home at the right,
+  each with the locator's secondary-colour stripe and white hairline along the
+  top. The school (Regular 30, muted) sits over the mascot (Bold 84, on the
+  scores' baseline), then the full-colour logo, about 260 across, over a soft
+  bloom.
+- **Column (668 wide):** cells in three columns, away value (240), label (180)
+  and home value (240), 4 units apart. From the top: the title strip (60 high,
+  `title`); the score row (100 high), the scores in Bold 84 either side of
+  `SCORE`; six statistic rows (60 high); and the sponsor strip (84 high),
+  `PRESENTED BY` and the full-colour sponsor logo on a 216 x 64 white chip,
+  centred as a group.
+- **Statistic text:** the value (Bold 44), then an optional muted detail
+  (Regular 30), for example `12-28  42.9%`. A blank detail also removes the gap,
+  so the value stays centred; `detail_separator.luau` is the converter that
+  does this.
+- **Leader mark.** In the score row and each statistic row, the leading team's
+  cell takes that team's tint. `halftime_statistics_controller.luau` compares
+  the details when both hold a number, and the values otherwise; the figure in
+  a text is its first number, so `12-28` compares as 12. `rowNLeadingValue` says
+  which figure leads: `HIGHER` (the default), `LOWER` (turnovers) or `NONE`,
+  which marks neither team. A tie, or a figure that does not parse, also marks
+  neither. The score row always compares the scores, the higher leading. A
+  change on air crossfades the mark. The controller writes the `_`-prefixed
+  lead opacities the scene binds; those are internal, never send them.
+- **Intro (1.43 s) and outro (0.4 s):** the locator's build. A light ignites at
+  the centre of the card and splits into two leading edges that wipe the glass
+  open outward. The title, labels and values rise in letter by letter, row by
+  row from the top, and each row's leader lights as the row settles. The
+  sponsor strip slides down from under the last row, and one specular sweep
+  crosses the card to finish. Hold and Outro key every property the intro
+  animates at its resting value.
+
+View model `BasketballHalftimeStatisticsV2`, public properties: `isPlaying`,
+`title` (default `HALFTIME STATS`), `awaySchool`/`homeSchool`,
+`awayMascot`/`homeMascot`, `awayScore`/`homeScore`, `rowNLabel`,
+`rowNAwayValue`, `rowNAwayDetail`, `rowNHomeValue`, `rowNHomeDetail` and
+`rowNLeadingValue` for N = 1 to 6, `awayLogo`/`homeLogo`,
+`awayPrimaryColor`/`homePrimaryColor`, `awaySecondaryColor`/`homeSecondaryColor`,
+`sponsorLogo`. The rows default to FG, 3PT, FT, REB, AST and TO, with TO
+leading `LOWER`. The feed sends every figure formatted (`12-28`, `42.9%`) and
+text in capitals. To clear a detail on air, send an empty string: omitting the
+key leaves the detail unchanged.
+
+**Sponsor asset.** `assets/images/sponsors/drexel_physical_therapy.png` is the
+source, downloaded from `https://images.dragonstv.io/sponsors/DrexelPT.png`
+(1920 x 1080, the logo on white). `drexel_physical_therapy_trimmed.png` beside
+it is the 1600 x 447 export the scene uses: cropped to the logo, with the white
+background made transparent and the colours recovered from white so the edges
+stay clean. Re-export from `assets/images/sponsors/` with
+
+```bash
+D='max(max(255-r(X,Y),255-g(X,Y)),255-b(X,Y))' && ffmpeg -y -i drexel_physical_therapy.png -vf "crop=659:184:524:784,scale=1600:-1:flags=lanczos,format=rgba,geq=r='st(0,$D);if(gt(ld(0),0),clip(255-(255-r(X,Y))*255/ld(0),0,255),0)':g='st(0,$D);if(gt(ld(0),0),clip(255-(255-g(X,Y))*255/ld(0),0,255),0)':b='st(0,$D);if(gt(ld(0),0),clip(255-(255-b(X,Y))*255/ld(0),0,255),0)':a='st(0,$D);if(gt(ld(0),4),ld(0),0)'" -pix_fmt rgba drexel_physical_therapy_trimmed.png
+```
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-halftime-statistics`.
 
 ## Test data
 

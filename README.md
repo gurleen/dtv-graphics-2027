@@ -2,8 +2,8 @@
 
 Broadcast graphics for DTV, written as Rive scenes (`.rml`) and shipped
 as [OGraf](https://ograf.ebu.io) packages. The scenes are 1920 x 1080 overlays
-for basketball games: a scorebug, lower thirds, a matchup locator and a
-starting five.
+for basketball games: a scorebug, lower thirds, a matchup locator, a
+starting five and a halftime statistics card.
 
 ## Requirements
 
@@ -49,7 +49,9 @@ The basketball v2 set, each packaged under `ograf/graphics/`:
 - Staff lower third
 - Talent lower third (single, double and triple)
 - Starting five lower third
+- Player to Watch lower third
 - Matchup locator
+- Halftime statistics card
 
 Every graphic follows one design language: tinted glass panels, Zuume type and
 short ease-out motion. The values are in

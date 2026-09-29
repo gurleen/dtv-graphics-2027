@@ -14,6 +14,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A team-themed lower third with a photo | `player_lower_third.rml` |
 | A neutral (no team) lower third | `generate_talent_lower_thirds.ts` output |
 | A mid-screen card | `matchup_locator.rml` |
+| A mid-screen table comparing the teams | `generate_halftime_statistics.ts` output |
 | A persistent corner bug | `basketball_scorebug.rml` |
 
 ## Colour and material
@@ -82,12 +83,13 @@ letter spacing 2; Bold values take 0.5 (1 for short strip values).
 
 | Role | Face | Size | Seen in |
 |---|---|---|---|
-| Card headline | Bold | 84 | Locator school names |
+| Card headline | Bold | 84 | Locator school names, halftime mascots and scores |
 | Jersey number | Bold | 68 | Player lower third |
 | Scorebug score | Bold | 60 | Scorebug, starting five jersey numbers |
 | One-line name, 84 panel | Bold (Regular for a first name) | 52–54 | Staff, talent |
 | Two-line name, 84 panel | Regular over Bold | 24 / 50 | Player lower third |
 | Card secondary | Bold / Regular | 40–42 / 34 | Locator records, venue |
+| Card table value | Bold / Regular | 44 / 30 | Halftime statistic and its detail |
 | Strip value, 44 strip | Bold | 28 | Title, stat line |
 | Strip label, 44 strip | Regular | 22–24 | `TONIGHT`, roles, detail |
 
@@ -116,8 +118,8 @@ can be on air together.
 | Centred origin x | 960 − width / 2 |
 | Gap between panels | 4 (no rules or dividers) |
 | Gap between blocks | 24 (talent blocks; also the minimum clearance from the scorebug, whose right edge is x 526) |
-| Outer corner radius | 12 (24 on the locator card) |
-| Inner seam radius | 3 (6 on the locator card) |
+| Outer corner radius | 12 (24 on the locator and halftime cards) |
+| Inner seam radius | 3 (6 on the locator and halftime cards) |
 | Text inset from panel edge | 20–26 |
 | Square logo panel | 132 × 132 (logo box 118, `Image` scale 0.115 of a 1024 source) |
 
@@ -247,7 +249,8 @@ Namespaces in use:
 | 36 | Staff lower third | 9800 |
 | 37 | Starting five lower third | 11000 |
 | 38 | Player to Watch lower third | 12200 |
-| **39** | **Next free** | **13400** |
+| 39 | Halftime statistics card | 13400 |
+| **40** | **Next free** | **14600** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
