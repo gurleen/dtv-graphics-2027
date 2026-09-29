@@ -246,7 +246,8 @@ Namespaces in use:
 | 33 / 34 / 35 | Talent single / double / triple | 6200 / 7400 / 8600 |
 | 36 | Staff lower third | 9800 |
 | 37 | Starting five lower third | 11000 |
-| **38** | **Next free** | **12200** |
+| 38 | Player to Watch lower third | 12200 |
+| **39** | **Next free** | **13400** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

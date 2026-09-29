@@ -77,6 +77,9 @@ export class FieldBinder {
           if (url) pending.push(this.applyImage(instance, property, url));
           break;
         }
+        case 'mediaUrl':
+          // Played by the graphic class, not the scene; see RiveGraphicElement.onDataApplied.
+          break;
       }
     }
     // One unreachable logo must not fail the whole update.
