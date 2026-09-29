@@ -22,12 +22,28 @@ import { toJsonSchema } from '../shared/schema';
 
 const root = resolve(import.meta.dir, '../..');
 
+// The Rive CLI crashes at random: about 1 run in 20, screenshot or publish, dies with
+// SIGABRT, SIGTRAP or SIGSEGV and no message (a screenshot's log stops at `deferred
+// replay: inline`). A pause between runs does not change the rate. A command that dies
+// by a signal therefore runs again, up to ATTEMPTS runs in all; one that exits with an
+// error code (not logged in, no such project, too many publishes) has failed for a
+// reason and does not.
+const ATTEMPTS = 3;
+
 const run = async (command: string[], options: { cwd?: string; hint?: string } = {}) => {
   const { cwd = root, hint: failureHint } = options;
-  const process = Bun.spawn(command, { cwd, stdout: 'inherit', stderr: 'inherit' });
-  if ((await process.exited) !== 0) {
-    throw new Error(`\`${command.join(' ')}\` failed${failureHint ? `. ${failureHint}` : ''}`);
+  let failure = '';
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    const process = Bun.spawn(command, { cwd, stdout: 'inherit', stderr: 'inherit' });
+    const exitCode = await process.exited;
+    if (exitCode === 0) return;
+    failure = process.signalCode ?? `exit code ${exitCode}`;
+    if (!process.signalCode) break;
+    if (attempt < ATTEMPTS) {
+      console.warn(`\`${command.join(' ')}\` died with ${failure}; retrying (${attempt + 1} of ${ATTEMPTS})`);
+    }
   }
+  throw new Error(`\`${command.join(' ')}\` failed (${failure})${failureHint ? `. ${failureHint}` : ''}`);
 };
 
 const graphicArgument = process.argv[2];
