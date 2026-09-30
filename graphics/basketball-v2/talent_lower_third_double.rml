@@ -36,7 +36,7 @@
     <Fill><SolidColor colorValue="F2FFFFFF"/></Fill>
   </Shape>
   <Node name="Talent 1 Name Content" id="34:101">
-  <Text name="Talent 1 Name" x="26" y="60" originValue="baseline" wrapValue="noWrap" width="408" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:105" fontAssetId="34:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 1 Name Value" styleId="34:105" text="JORDAN ELLIS"><DataBindContext sourcePathIds="34:1000-34:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 1 Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 1 Name Reveal" id="34:103" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Talent 1 Name" x="26" y="60" originValue="baseline" wrapValue="noWrap" width="408" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:105" fontAssetId="34:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 1 Name Value" styleId="34:105" text="ROB BROOKS"><DataBindContext sourcePathIds="34:1000-34:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 1 Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 1 Name Reveal" id="34:103" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Talent 1 Name Glaze" x="0" y="0">
     <Rectangle width="460" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
@@ -54,7 +54,7 @@
     <Fill><SolidColor colorValue="F2FFFFFF"/></Fill>
   </Shape>
   <Node name="Talent 2 Name Content" id="34:121">
-  <Text name="Talent 2 Name" x="26" y="60" originValue="baseline" wrapValue="noWrap" width="408" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:125" fontAssetId="34:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 2 Name Value" styleId="34:125" text="CASEY MORGAN"><DataBindContext sourcePathIds="34:1000-34:1020" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 2 Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 2 Name Reveal" id="34:123" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Talent 2 Name" x="26" y="60" originValue="baseline" wrapValue="noWrap" width="408" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:125" fontAssetId="34:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 2 Name Value" styleId="34:125" text="MIKE TUBEROSA"><DataBindContext sourcePathIds="34:1000-34:1020" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 2 Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 2 Name Reveal" id="34:123" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Talent 2 Name Glaze" x="0" y="0">
     <Rectangle width="460" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
@@ -83,7 +83,7 @@
     <Rectangle width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/>
     <Fill><SolidColor colorValue="E00E1116"/></Fill>
   </Shape>
-  <Text name="Talent 2 Role" x="510" y="31" originValue="baseline" wrapValue="noWrap" width="408" height="30" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:126" fontAssetId="34:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="BFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 2 Role Value" styleId="34:126" text="ANALYST"><DataBindContext sourcePathIds="34:1000-34:1021" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 2 Role Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 2 Role Reveal" id="34:124" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Talent 2 Role" x="510" y="31" originValue="baseline" wrapValue="noWrap" width="408" height="30" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:126" fontAssetId="34:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="BFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 2 Role Value" styleId="34:126" text="COLOR ANALYST"><DataBindContext sourcePathIds="34:1000-34:1021" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 2 Role Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 2 Role Reveal" id="34:124" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Shape name="Talent 2 Role Glaze" x="484" y="0">
     <Rectangle width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/>
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
@@ -465,10 +465,10 @@
 <ViewModelPropertyString name="talent2Role" id="34:1021" componentProps="1"/>
 <ViewModelInstance name="Default" id="34:1001" exports="true">
 <ViewModelInstanceBoolean viewModelPropertyId="34:1002" propertyValue="false"/>
-<ViewModelInstanceString viewModelPropertyId="34:1010" propertyValue="JORDAN ELLIS"/>
+<ViewModelInstanceString viewModelPropertyId="34:1010" propertyValue="ROB BROOKS"/>
 <ViewModelInstanceString viewModelPropertyId="34:1011" propertyValue="PLAY-BY-PLAY"/>
-<ViewModelInstanceString viewModelPropertyId="34:1020" propertyValue="CASEY MORGAN"/>
-<ViewModelInstanceString viewModelPropertyId="34:1021" propertyValue="ANALYST"/>
+<ViewModelInstanceString viewModelPropertyId="34:1020" propertyValue="MIKE TUBEROSA"/>
+<ViewModelInstanceString viewModelPropertyId="34:1021" propertyValue="COLOR ANALYST"/>
 </ViewModelInstance>
 </ViewModel>
 </Rive>

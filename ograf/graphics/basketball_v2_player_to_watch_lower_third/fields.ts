@@ -13,9 +13,9 @@ export const FIELDS: readonly Field[] = [
     name: 'bodyMode', kind: 'select', title: 'Body', options: ['STATS', 'TEXT'], default: 'STATS',
     description: 'STATS shows the stat tiles; TEXT shows the copy.',
   },
-  { name: 'firstName', kind: 'string', title: 'First Name', default: 'JORDAN' },
-  { name: 'lastName', kind: 'string', title: 'Last Name', default: 'MITCHELL' },
-  { name: 'jerseyNumber', kind: 'string', title: 'Jersey Number', default: '12' },
+  { name: 'firstName', kind: 'string', title: 'First Name', default: 'JOSH' },
+  { name: 'lastName', kind: 'string', title: 'Last Name', default: 'REED' },
+  { name: 'jerseyNumber', kind: 'string', title: 'Jersey Number', default: '5' },
   { name: 'position', kind: 'string', title: 'Position', default: 'GUARD' },
   { name: 'classYear', kind: 'string', title: 'Class Year', default: 'JUNIOR' },
   {
