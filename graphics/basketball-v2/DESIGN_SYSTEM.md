@@ -44,7 +44,7 @@ Text colours are white at stepped alphas:
 | 85% | `D9FFFFFF` | A Regular first name beside or above a Bold last name |
 | 75% | `BFFFFFFF` | Talent roles |
 | 70% | `B3FFFFFF` | Secondary labels (player class, locator conference record) |
-| 65% | `A6FFFFFF` | Muted detail after a value (`TONIGHT`, `8TH SEASON`) |
+| 65% | `A6FFFFFF` | Muted detail after a value (`TONIGHT`, `11TH SEASON`) |
 | 60% | `99FFFFFF` | The least emphasis (the `#` before a jersey number) |
 
 ### The glass panel stack

@@ -119,7 +119,7 @@
       <TextStylePaint id="37:2036" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2037" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Home Player 1 Number Sign" styleId="37:2036" text="#"></TextValueRun>
-      <TextValueRun name="Home Player 1 Number Value" styleId="37:2037" text="12"><DataBindContext sourcePathIds="37:1000-37:1070" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Home Player 1 Number Value" styleId="37:2037" text="5"><DataBindContext sourcePathIds="37:1000-37:1070" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Home Player 1 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 1 Number Reveal" id="37:2033" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -136,7 +136,7 @@
       <TextStylePaint id="37:2016" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2017" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Away Player 1 Number Sign" styleId="37:2016" text="#"></TextValueRun>
-      <TextValueRun name="Away Player 1 Number Value" styleId="37:2017" text="1"><DataBindContext sourcePathIds="37:1000-37:1020" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Away Player 1 Number Value" styleId="37:2017" text="0"><DataBindContext sourcePathIds="37:1000-37:1020" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Away Player 1 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 1 Number Reveal" id="37:2013" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -174,7 +174,7 @@
       <TextStylePaint id="37:2136" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2137" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Home Player 2 Number Sign" styleId="37:2136" text="#"></TextValueRun>
-      <TextValueRun name="Home Player 2 Number Value" styleId="37:2137" text="3"><DataBindContext sourcePathIds="37:1000-37:1074" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Home Player 2 Number Value" styleId="37:2137" text="0"><DataBindContext sourcePathIds="37:1000-37:1074" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Home Player 2 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 2 Number Reveal" id="37:2133" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -191,7 +191,7 @@
       <TextStylePaint id="37:2116" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2117" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Away Player 2 Number Sign" styleId="37:2116" text="#"></TextValueRun>
-      <TextValueRun name="Away Player 2 Number Value" styleId="37:2117" text="4"><DataBindContext sourcePathIds="37:1000-37:1024" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Away Player 2 Number Value" styleId="37:2117" text="1"><DataBindContext sourcePathIds="37:1000-37:1024" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Away Player 2 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 2 Number Reveal" id="37:2113" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -229,7 +229,7 @@
       <TextStylePaint id="37:2236" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2237" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Home Player 3 Number Sign" styleId="37:2236" text="#"></TextValueRun>
-      <TextValueRun name="Home Player 3 Number Value" styleId="37:2237" text="24"><DataBindContext sourcePathIds="37:1000-37:1078" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Home Player 3 Number Value" styleId="37:2237" text="23"><DataBindContext sourcePathIds="37:1000-37:1078" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Home Player 3 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 3 Number Reveal" id="37:2233" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -284,7 +284,7 @@
       <TextStylePaint id="37:2336" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2337" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Home Player 4 Number Sign" styleId="37:2336" text="#"></TextValueRun>
-      <TextValueRun name="Home Player 4 Number Value" styleId="37:2337" text="0"><DataBindContext sourcePathIds="37:1000-37:1082" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Home Player 4 Number Value" styleId="37:2337" text="6"><DataBindContext sourcePathIds="37:1000-37:1082" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Home Player 4 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 4 Number Reveal" id="37:2333" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -301,7 +301,7 @@
       <TextStylePaint id="37:2316" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2317" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Away Player 4 Number Sign" styleId="37:2316" text="#"></TextValueRun>
-      <TextValueRun name="Away Player 4 Number Value" styleId="37:2317" text="23"><DataBindContext sourcePathIds="37:1000-37:1032" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Away Player 4 Number Value" styleId="37:2317" text="15"><DataBindContext sourcePathIds="37:1000-37:1032" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Away Player 4 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 4 Number Reveal" id="37:2313" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -339,7 +339,7 @@
       <TextStylePaint id="37:2436" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2437" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Home Player 5 Number Sign" styleId="37:2436" text="#"></TextValueRun>
-      <TextValueRun name="Home Player 5 Number Value" styleId="37:2437" text="15"><DataBindContext sourcePathIds="37:1000-37:1086" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Home Player 5 Number Value" styleId="37:2437" text="11"><DataBindContext sourcePathIds="37:1000-37:1086" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Home Player 5 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 5 Number Reveal" id="37:2433" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -356,7 +356,7 @@
       <TextStylePaint id="37:2416" fontAssetId="37:901" fontSize="28" letterSpacing="0"><Fill><SolidColor colorValue="99FFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="37:2417" fontAssetId="37:900" fontSize="60" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Away Player 5 Number Sign" styleId="37:2416" text="#"></TextValueRun>
-      <TextValueRun name="Away Player 5 Number Value" styleId="37:2417" text="34"><DataBindContext sourcePathIds="37:1000-37:1036" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Away Player 5 Number Value" styleId="37:2417" text="23"><DataBindContext sourcePathIds="37:1000-37:1036" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Away Player 5 Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 5 Number Reveal" id="37:2413" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <!-- The frame covers its cell with any headshot, aligned to the top, and the
          panel shape crops it to the rounded corners. Every layout component joins
@@ -393,11 +393,11 @@
 <ClippingShape name="Player Strips Wipe Clip" sourceId="37:506"/>
 <Node name="Player Strips Sliding Content" id="37:701">
   <Node name="Home Player 1 Strip Content" id="37:2031" opacity="0">
-  <Text name="Home Player 1 Last Name" x="14" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2038" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 1 Last Name Value" styleId="37:2038" text="MITCHELL"><DataBindContext sourcePathIds="37:1000-37:1071" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 1 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 1 Last Name Reveal" id="37:2034" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 1 Last Name" x="14" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2038" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 1 Last Name Value" styleId="37:2038" text="REED"><DataBindContext sourcePathIds="37:1000-37:1071" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 1 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 1 Last Name Reveal" id="37:2034" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Home Player 1 Position" x="142" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2039" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 1 Position Value" styleId="37:2039" text="G"><DataBindContext sourcePathIds="37:1000-37:1072" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 1 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 1 Position Reveal" id="37:2035" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Node name="Away Player 1 Strip Content" id="37:2011" opacity="1">
-  <Text name="Away Player 1 Last Name" x="14" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2018" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 1 Last Name Value" styleId="37:2018" text="CARTER"><DataBindContext sourcePathIds="37:1000-37:1021" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 1 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 1 Last Name Reveal" id="37:2014" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Away Player 1 Last Name" x="14" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2018" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 1 Last Name Value" styleId="37:2018" text="CAREY"><DataBindContext sourcePathIds="37:1000-37:1021" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 1 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 1 Last Name Reveal" id="37:2014" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Away Player 1 Position" x="142" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2019" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 1 Position Value" styleId="37:2019" text="G"><DataBindContext sourcePathIds="37:1000-37:1022" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 1 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 1 Position Reveal" id="37:2015" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Player 1 Strip Glaze" x="0" y="0">
@@ -410,11 +410,11 @@
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Node name="Home Player 2 Strip Content" id="37:2131" opacity="0">
-  <Text name="Home Player 2 Last Name" x="208" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2138" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 2 Last Name Value" styleId="37:2138" text="BENNETT"><DataBindContext sourcePathIds="37:1000-37:1075" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 2 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 2 Last Name Reveal" id="37:2134" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 2 Last Name" x="208" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2138" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 2 Last Name Value" styleId="37:2138" text="HIPPS"><DataBindContext sourcePathIds="37:1000-37:1075" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 2 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 2 Last Name Reveal" id="37:2134" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Home Player 2 Position" x="336" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2139" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 2 Position Value" styleId="37:2139" text="G"><DataBindContext sourcePathIds="37:1000-37:1076" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 2 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 2 Position Reveal" id="37:2135" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Node name="Away Player 2 Strip Content" id="37:2111" opacity="1">
-  <Text name="Away Player 2 Last Name" x="208" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2118" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 2 Last Name Value" styleId="37:2118" text="OKAFOR"><DataBindContext sourcePathIds="37:1000-37:1025" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 2 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 2 Last Name Reveal" id="37:2114" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Away Player 2 Last Name" x="208" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2118" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 2 Last Name Value" styleId="37:2118" text="JOHNSON"><DataBindContext sourcePathIds="37:1000-37:1025" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 2 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 2 Last Name Reveal" id="37:2114" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Away Player 2 Position" x="336" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2119" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 2 Position Value" styleId="37:2119" text="G"><DataBindContext sourcePathIds="37:1000-37:1026" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 2 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 2 Position Reveal" id="37:2115" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Player 2 Strip Glaze" x="194" y="0">
@@ -427,11 +427,11 @@
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Node name="Home Player 3 Strip Content" id="37:2231" opacity="0">
-  <Text name="Home Player 3 Last Name" x="402" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2238" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 3 Last Name Value" styleId="37:2238" text="ALVAREZ"><DataBindContext sourcePathIds="37:1000-37:1079" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 3 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 3 Last Name Reveal" id="37:2234" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Text name="Home Player 3 Position" x="530" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2239" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 3 Position Value" styleId="37:2239" text="F"><DataBindContext sourcePathIds="37:1000-37:1080" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 3 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 3 Position Reveal" id="37:2235" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 3 Last Name" x="402" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2238" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 3 Last Name Value" styleId="37:2238" text="TINGLER"><DataBindContext sourcePathIds="37:1000-37:1079" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 3 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 3 Last Name Reveal" id="37:2234" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 3 Position" x="530" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2239" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 3 Position Value" styleId="37:2239" text="G"><DataBindContext sourcePathIds="37:1000-37:1080" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 3 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 3 Position Reveal" id="37:2235" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Node name="Away Player 3 Strip Content" id="37:2211" opacity="1">
-  <Text name="Away Player 3 Last Name" x="402" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2218" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 3 Last Name Value" styleId="37:2218" text="DELGADO"><DataBindContext sourcePathIds="37:1000-37:1029" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 3 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 3 Last Name Reveal" id="37:2214" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Away Player 3 Last Name" x="402" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2218" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 3 Last Name Value" styleId="37:2218" text="GLOVER-TOSCANO"><DataBindContext sourcePathIds="37:1000-37:1029" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 3 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 3 Last Name Reveal" id="37:2214" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Away Player 3 Position" x="530" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2219" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 3 Position Value" styleId="37:2219" text="G"><DataBindContext sourcePathIds="37:1000-37:1030" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 3 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 3 Position Reveal" id="37:2215" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Player 3 Strip Glaze" x="388" y="0">
@@ -444,11 +444,11 @@
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Node name="Home Player 4 Strip Content" id="37:2331" opacity="0">
-  <Text name="Home Player 4 Last Name" x="596" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2338" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 4 Last Name Value" styleId="37:2338" text="HOLLOWAY"><DataBindContext sourcePathIds="37:1000-37:1083" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 4 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 4 Last Name Reveal" id="37:2334" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 4 Last Name" x="596" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2338" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 4 Last Name Value" styleId="37:2338" text="EDOMWONYIN"><DataBindContext sourcePathIds="37:1000-37:1083" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 4 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 4 Last Name Reveal" id="37:2334" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Home Player 4 Position" x="724" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2339" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 4 Position Value" styleId="37:2339" text="F"><DataBindContext sourcePathIds="37:1000-37:1084" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 4 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 4 Position Reveal" id="37:2335" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Node name="Away Player 4 Strip Content" id="37:2311" opacity="1">
-  <Text name="Away Player 4 Last Name" x="596" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2318" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 4 Last Name Value" styleId="37:2318" text="WHITFIELD"><DataBindContext sourcePathIds="37:1000-37:1033" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 4 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 4 Last Name Reveal" id="37:2314" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Away Player 4 Last Name" x="596" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2318" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 4 Last Name Value" styleId="37:2318" text="LOGAN"><DataBindContext sourcePathIds="37:1000-37:1033" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 4 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 4 Last Name Reveal" id="37:2314" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Away Player 4 Position" x="724" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2319" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 4 Position Value" styleId="37:2319" text="F"><DataBindContext sourcePathIds="37:1000-37:1034" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 4 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 4 Position Reveal" id="37:2315" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Player 4 Strip Glaze" x="582" y="0">
@@ -461,12 +461,12 @@
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Node name="Home Player 5 Strip Content" id="37:2431" opacity="0">
-  <Text name="Home Player 5 Last Name" x="790" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2438" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 5 Last Name Value" styleId="37:2438" text="OKONKWO"><DataBindContext sourcePathIds="37:1000-37:1087" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 5 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 5 Last Name Reveal" id="37:2434" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Text name="Home Player 5 Position" x="918" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2439" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 5 Position Value" styleId="37:2439" text="C"><DataBindContext sourcePathIds="37:1000-37:1088" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 5 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 5 Position Reveal" id="37:2435" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 5 Last Name" x="790" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2438" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 5 Last Name Value" styleId="37:2438" text="DE LAPORTERIE"><DataBindContext sourcePathIds="37:1000-37:1087" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 5 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 5 Last Name Reveal" id="37:2434" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Home Player 5 Position" x="918" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2439" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 5 Position Value" styleId="37:2439" text="F"><DataBindContext sourcePathIds="37:1000-37:1088" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 5 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 5 Position Reveal" id="37:2435" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Node name="Away Player 5 Strip Content" id="37:2411" opacity="1">
-  <Text name="Away Player 5 Last Name" x="790" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2418" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 5 Last Name Value" styleId="37:2418" text="NOVAK"><DataBindContext sourcePathIds="37:1000-37:1037" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 5 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 5 Last Name Reveal" id="37:2414" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Text name="Away Player 5 Position" x="918" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2419" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 5 Position Value" styleId="37:2419" text="C"><DataBindContext sourcePathIds="37:1000-37:1038" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 5 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 5 Position Reveal" id="37:2415" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Away Player 5 Last Name" x="790" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2418" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 5 Last Name Value" styleId="37:2418" text="MARRS"><DataBindContext sourcePathIds="37:1000-37:1037" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 5 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 5 Last Name Reveal" id="37:2414" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Away Player 5 Position" x="918" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2419" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Player 5 Position Value" styleId="37:2419" text="F"><DataBindContext sourcePathIds="37:1000-37:1038" propertyKey="268"/></TextValueRun><TextModifierGroup name="Away Player 5 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Away Player 5 Position Reveal" id="37:2415" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Player 5 Strip Glaze" x="776" y="0">
     <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
@@ -3294,49 +3294,49 @@
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1011" propertyValue="37:911"/>
 <ViewModelInstanceColor viewModelPropertyId="37:1012" propertyValue="FFC2071B"/>
 <ViewModelInstanceColor viewModelPropertyId="37:1013" propertyValue="FFA7A9AC"/>
-<ViewModelInstanceString viewModelPropertyId="37:1020" propertyValue="1"/>
-<ViewModelInstanceString viewModelPropertyId="37:1021" propertyValue="CARTER"/>
+<ViewModelInstanceString viewModelPropertyId="37:1020" propertyValue="0"/>
+<ViewModelInstanceString viewModelPropertyId="37:1021" propertyValue="CAREY"/>
 <ViewModelInstanceString viewModelPropertyId="37:1022" propertyValue="G"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1023" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1024" propertyValue="4"/>
-<ViewModelInstanceString viewModelPropertyId="37:1025" propertyValue="OKAFOR"/>
+<ViewModelInstanceString viewModelPropertyId="37:1024" propertyValue="1"/>
+<ViewModelInstanceString viewModelPropertyId="37:1025" propertyValue="JOHNSON"/>
 <ViewModelInstanceString viewModelPropertyId="37:1026" propertyValue="G"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1027" propertyValue="37:910"/>
 <ViewModelInstanceString viewModelPropertyId="37:1028" propertyValue="11"/>
-<ViewModelInstanceString viewModelPropertyId="37:1029" propertyValue="DELGADO"/>
+<ViewModelInstanceString viewModelPropertyId="37:1029" propertyValue="GLOVER-TOSCANO"/>
 <ViewModelInstanceString viewModelPropertyId="37:1030" propertyValue="G"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1031" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1032" propertyValue="23"/>
-<ViewModelInstanceString viewModelPropertyId="37:1033" propertyValue="WHITFIELD"/>
+<ViewModelInstanceString viewModelPropertyId="37:1032" propertyValue="15"/>
+<ViewModelInstanceString viewModelPropertyId="37:1033" propertyValue="LOGAN"/>
 <ViewModelInstanceString viewModelPropertyId="37:1034" propertyValue="F"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1035" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1036" propertyValue="34"/>
-<ViewModelInstanceString viewModelPropertyId="37:1037" propertyValue="NOVAK"/>
-<ViewModelInstanceString viewModelPropertyId="37:1038" propertyValue="C"/>
+<ViewModelInstanceString viewModelPropertyId="37:1036" propertyValue="23"/>
+<ViewModelInstanceString viewModelPropertyId="37:1037" propertyValue="MARRS"/>
+<ViewModelInstanceString viewModelPropertyId="37:1038" propertyValue="F"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1039" propertyValue="37:910"/>
 <ViewModelInstanceString viewModelPropertyId="37:1060" propertyValue="DREXEL"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1061" propertyValue="37:912"/>
 <ViewModelInstanceColor viewModelPropertyId="37:1062" propertyValue="FF07294D"/>
 <ViewModelInstanceColor viewModelPropertyId="37:1063" propertyValue="FFFFC600"/>
-<ViewModelInstanceString viewModelPropertyId="37:1070" propertyValue="12"/>
-<ViewModelInstanceString viewModelPropertyId="37:1071" propertyValue="MITCHELL"/>
+<ViewModelInstanceString viewModelPropertyId="37:1070" propertyValue="5"/>
+<ViewModelInstanceString viewModelPropertyId="37:1071" propertyValue="REED"/>
 <ViewModelInstanceString viewModelPropertyId="37:1072" propertyValue="G"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1073" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1074" propertyValue="3"/>
-<ViewModelInstanceString viewModelPropertyId="37:1075" propertyValue="BENNETT"/>
+<ViewModelInstanceString viewModelPropertyId="37:1074" propertyValue="0"/>
+<ViewModelInstanceString viewModelPropertyId="37:1075" propertyValue="HIPPS"/>
 <ViewModelInstanceString viewModelPropertyId="37:1076" propertyValue="G"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1077" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1078" propertyValue="24"/>
-<ViewModelInstanceString viewModelPropertyId="37:1079" propertyValue="ALVAREZ"/>
-<ViewModelInstanceString viewModelPropertyId="37:1080" propertyValue="F"/>
+<ViewModelInstanceString viewModelPropertyId="37:1078" propertyValue="23"/>
+<ViewModelInstanceString viewModelPropertyId="37:1079" propertyValue="TINGLER"/>
+<ViewModelInstanceString viewModelPropertyId="37:1080" propertyValue="G"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1081" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1082" propertyValue="0"/>
-<ViewModelInstanceString viewModelPropertyId="37:1083" propertyValue="HOLLOWAY"/>
+<ViewModelInstanceString viewModelPropertyId="37:1082" propertyValue="6"/>
+<ViewModelInstanceString viewModelPropertyId="37:1083" propertyValue="EDOMWONYIN"/>
 <ViewModelInstanceString viewModelPropertyId="37:1084" propertyValue="F"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1085" propertyValue="37:910"/>
-<ViewModelInstanceString viewModelPropertyId="37:1086" propertyValue="15"/>
-<ViewModelInstanceString viewModelPropertyId="37:1087" propertyValue="OKONKWO"/>
-<ViewModelInstanceString viewModelPropertyId="37:1088" propertyValue="C"/>
+<ViewModelInstanceString viewModelPropertyId="37:1086" propertyValue="11"/>
+<ViewModelInstanceString viewModelPropertyId="37:1087" propertyValue="DE LAPORTERIE"/>
+<ViewModelInstanceString viewModelPropertyId="37:1088" propertyValue="F"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1089" propertyValue="37:910"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="37:1100" propertyValue="37:913"/>
 </ViewModelInstance>

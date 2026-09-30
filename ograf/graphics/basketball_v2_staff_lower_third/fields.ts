@@ -1,11 +1,11 @@
 import type { Field } from '../../shared/schema';
 
 export const FIELDS: readonly Field[] = [
-  { name: 'firstName', kind: 'string', title: 'First Name', default: 'MORGAN' },
-  { name: 'lastName', kind: 'string', title: 'Last Name', default: 'HAYES' },
+  { name: 'firstName', kind: 'string', title: 'First Name', default: 'ZACH' },
+  { name: 'lastName', kind: 'string', title: 'Last Name', default: 'SPIKER' },
   { name: 'title', kind: 'string', title: 'Title', default: 'HEAD COACH' },
   {
-    name: 'detail', kind: 'string', title: 'Detail', default: '8TH SEASON',
+    name: 'detail', kind: 'string', title: 'Detail', default: '11TH SEASON',
     description: 'Muted text after the title, such as tenure or department; leave blank to show the title alone.',
   },
   {

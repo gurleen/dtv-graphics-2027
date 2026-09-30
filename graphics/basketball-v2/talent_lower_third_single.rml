@@ -36,7 +36,7 @@
     <Fill><SolidColor colorValue="F2FFFFFF"/></Fill>
   </Shape>
   <Node name="Talent 1 Name Content" id="33:101">
-  <Text name="Talent 1 Name" x="26" y="60" originValue="baseline" wrapValue="noWrap" width="508" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="33:105" fontAssetId="33:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 1 Name Value" styleId="33:105" text="JORDAN ELLIS"><DataBindContext sourcePathIds="33:1000-33:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 1 Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 1 Name Reveal" id="33:103" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Talent 1 Name" x="26" y="60" originValue="baseline" wrapValue="noWrap" width="508" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="33:105" fontAssetId="33:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 1 Name Value" styleId="33:105" text="ROB BROOKS"><DataBindContext sourcePathIds="33:1000-33:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 1 Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 1 Name Reveal" id="33:103" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Talent 1 Name Glaze" x="0" y="0">
     <Rectangle width="560" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
@@ -366,7 +366,7 @@
 <ViewModelPropertyString name="talent1Role" id="33:1011" componentProps="1"/>
 <ViewModelInstance name="Default" id="33:1001" exports="true">
 <ViewModelInstanceBoolean viewModelPropertyId="33:1002" propertyValue="false"/>
-<ViewModelInstanceString viewModelPropertyId="33:1010" propertyValue="JORDAN ELLIS"/>
+<ViewModelInstanceString viewModelPropertyId="33:1010" propertyValue="ROB BROOKS"/>
 <ViewModelInstanceString viewModelPropertyId="33:1011" propertyValue="PLAY-BY-PLAY"/>
 </ViewModelInstance>
 </ViewModel>

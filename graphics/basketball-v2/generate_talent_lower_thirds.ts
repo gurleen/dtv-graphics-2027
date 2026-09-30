@@ -22,21 +22,21 @@ type Variant = {
 const VARIANTS: readonly Variant[] = [
   {
     suffix: 'single', title: 'Single', prefix: 33, artboardY: 6200, columnWidth: 560,
-    talents: [{ name: 'JORDAN ELLIS', role: 'PLAY-BY-PLAY' }],
+    talents: [{ name: 'ROB BROOKS', role: 'PLAY-BY-PLAY' }],
   },
   {
     suffix: 'double', title: 'Double', prefix: 34, artboardY: 7400, columnWidth: 460,
     talents: [
-      { name: 'JORDAN ELLIS', role: 'PLAY-BY-PLAY' },
-      { name: 'CASEY MORGAN', role: 'ANALYST' },
+      { name: 'ROB BROOKS', role: 'PLAY-BY-PLAY' },
+      { name: 'MIKE TUBEROSA', role: 'COLOR ANALYST' },
     ],
   },
   {
     suffix: 'triple', title: 'Triple', prefix: 35, artboardY: 8600, columnWidth: 400,
     talents: [
-      { name: 'JORDAN ELLIS', role: 'PLAY-BY-PLAY' },
-      { name: 'CASEY MORGAN', role: 'ANALYST' },
-      { name: 'TAYLOR REED', role: 'SIDELINE REPORTER' },
+      { name: 'ROB BROOKS', role: 'PLAY-BY-PLAY' },
+      { name: 'MIKE TUBEROSA', role: 'COLOR ANALYST' },
+      { name: 'TESSA PELOSO', role: 'SIDELINE REPORTER' },
     ],
   },
 ];

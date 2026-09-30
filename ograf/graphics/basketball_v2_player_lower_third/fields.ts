@@ -1,9 +1,9 @@
 import type { Field } from '../../shared/schema';
 
 export const FIELDS: readonly Field[] = [
-  { name: 'firstName', kind: 'string', title: 'First Name', default: 'JORDAN' },
-  { name: 'lastName', kind: 'string', title: 'Last Name', default: 'MITCHELL' },
-  { name: 'jerseyNumber', kind: 'string', title: 'Jersey Number', default: '12' },
+  { name: 'firstName', kind: 'string', title: 'First Name', default: 'JOSH' },
+  { name: 'lastName', kind: 'string', title: 'Last Name', default: 'REED' },
+  { name: 'jerseyNumber', kind: 'string', title: 'Jersey Number', default: '5' },
   { name: 'position', kind: 'string', title: 'Position', default: 'GUARD' },
   { name: 'classYear', kind: 'string', title: 'Class Year', default: 'JUNIOR' },
   { name: 'statLabel', kind: 'string', title: 'Stat Label', default: 'TONIGHT' },

@@ -130,7 +130,7 @@ origin 610, 890; size 700 x 132; 84 units clear of the scorebug).
   the first name in Zuume Regular (slightly muted) and the last name in Zuume
   Bold. The line shrinks to fit a 516-unit column.
 - **Title strip (564 x 44, dark glass):** the title (`HEAD COACH`, Zuume Bold,
-  white) followed by a muted detail (`8TH SEASON`, Zuume Regular); the whole
+  white) followed by a muted detail (`11TH SEASON`, Zuume Regular); the whole
   line shrinks to fit. A blank detail leaves the title alone.
 - **Intro (1.2 s):** the player lower third's build. A light ignites at the
   logo/name seam and splits into outward wipes; the logo settles from 112% as

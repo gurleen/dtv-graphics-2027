@@ -31,7 +31,7 @@ const ARTBOARD_Y = 12200;
 
 // Test data: a Drexel guard (see the package README).
 const PLAYER = {
-  firstName: 'JORDAN', lastName: 'MITCHELL', number: '12', position: 'GUARD', classYear: 'JUNIOR',
+  firstName: 'JOSH', lastName: 'REED', number: '5', position: 'GUARD', classYear: 'JUNIOR',
   context: '2026-27 SEASON',
   text: 'LEADS THE CAA IN SCORING AND HAS REACHED 20 POINTS IN FIVE STRAIGHT GAMES, INCLUDING A CAREER-HIGH 31 AT HOFSTRA',
 };

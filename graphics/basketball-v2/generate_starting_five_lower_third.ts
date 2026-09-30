@@ -42,11 +42,11 @@ const TEAMS: readonly Team[] = [
     logoFile: 'assets/images/scorebug/saint-josephs.png', logoName: "Saint Joseph's",
     primary: 'FFC2071B', secondary: 'FFA7A9AC',
     players: [
-      { number: '1', lastName: 'CARTER', position: 'G' },
-      { number: '4', lastName: 'OKAFOR', position: 'G' },
-      { number: '11', lastName: 'DELGADO', position: 'G' },
-      { number: '23', lastName: 'WHITFIELD', position: 'F' },
-      { number: '34', lastName: 'NOVAK', position: 'C' },
+      { number: '0', lastName: 'CAREY', position: 'G' },
+      { number: '1', lastName: 'JOHNSON', position: 'G' },
+      { number: '11', lastName: 'GLOVER-TOSCANO', position: 'G' },
+      { number: '15', lastName: 'LOGAN', position: 'F' },
+      { number: '23', lastName: 'MARRS', position: 'F' },
     ],
   },
   {
@@ -54,11 +54,11 @@ const TEAMS: readonly Team[] = [
     logoFile: 'assets/images/scorebug/drexel.png', logoName: 'Drexel',
     primary: 'FF07294D', secondary: 'FFFFC600',
     players: [
-      { number: '12', lastName: 'MITCHELL', position: 'G' },
-      { number: '3', lastName: 'BENNETT', position: 'G' },
-      { number: '24', lastName: 'ALVAREZ', position: 'F' },
-      { number: '0', lastName: 'HOLLOWAY', position: 'F' },
-      { number: '15', lastName: 'OKONKWO', position: 'C' },
+      { number: '5', lastName: 'REED', position: 'G' },
+      { number: '0', lastName: 'HIPPS', position: 'G' },
+      { number: '23', lastName: 'TINGLER', position: 'G' },
+      { number: '6', lastName: 'EDOMWONYIN', position: 'F' },
+      { number: '11', lastName: 'DE LAPORTERIE', position: 'F' },
     ],
   },
 ];
