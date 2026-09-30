@@ -14,6 +14,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A team-themed lower third with a photo | `player_lower_third.rml` |
 | A team-themed lower third with stats or copy | `generate_team_lower_third.ts` output |
 | A neutral (no team) lower third | `generate_talent_lower_thirds.ts` output |
+| A full-width pre-game lower third with both teams | `generate_matchup_locator_lower_third.ts` output |
 | A mid-screen card | `matchup_locator.rml` |
 | A mid-screen table comparing the teams | `generate_halftime_statistics.ts` output |
 | A full-frame table of the conference's teams | `generate_conference_standings.ts` output |
@@ -74,7 +75,10 @@ neutral panel replaces tint and underlay with one dark-glass fill.
 ```
 
 A faded team logo behind text, or a white radial bloom behind a full-colour
-logo, sits inside the content node and is clipped by the tint shape.
+logo, sits inside the content node and is clipped by the tint shape. A
+full-colour logo larger than its panel, cropped at the panel's outer edge (the
+matchup locator lower third), takes its own node between the content and the
+glaze, also clipped by the tint shape, so it moves independently of the text.
 
 ### Tables
 
@@ -153,7 +157,7 @@ layer. Durations in frames:
 
 | Animation | Frames | Seconds | Loop |
 |---|---|---|---|
-| Intro | 72 (66 scorebug, 86 locator, 90 standings) | 1.2 | oneShot |
+| Intro | 72 (66 scorebug, 84 matchup lower third, 86 locator, 90 standings) | 1.2 | oneShot |
 | Hold | 1 | — | loop |
 | Outro | 24 | 0.4 | oneShot |
 | Hidden | 1 | — | oneShot |
@@ -200,6 +204,12 @@ frames. Text that waits on open glass, like the standings rows rising after
 the wipe has passed them, must start with the ramp wholly before the line:
 key `modifyFrom` −0.4 → 1 and `falloffFrom` 0 → 1.4. From 0 and 0.4, the
 leading glyphs already show part risen before the line's turn.
+
+To build a line from its last glyph instead, run the range backward: at rest
+`modifyFrom="-1" modifyTo="0" falloffFrom="-1" falloffTo="-0.4"`, and the Intro
+keys `modifyTo` 1.4 → 0 and `falloffTo` 1 → −0.4. Hold and Outro key the pair
+the Intro moves, at those rest values. The matchup locator lower third does
+this on the away side, so both teams' text rises from the seam outward.
 
 ### Outro recipe
 
@@ -274,7 +284,8 @@ Namespaces in use:
 | 39 | Halftime statistics card | 13400 |
 | 40 | Team lower third | 14600 |
 | 41 | Conference standings card | 15800 |
-| **42** | **Next free** | **17000** |
+| 42 | Matchup locator lower third | 17000 |
+| **43** | **Next free** | **18200** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
@@ -308,6 +319,8 @@ other with `rive schema <Type>`.
 | 206 | `Image` asset |
 | 634 | Bindable boolean (state machine conditions) |
 | 327 / 317 | `TextModifierRange` modifyFrom / falloffFrom |
+| 336 / 318 | `TextModifierRange` modifyTo / falloffTo (a backward reveal) |
+| 25 | `StraightVertex` y (a shadow outline that follows moving panels) |
 
 ## Building a new graphic
 

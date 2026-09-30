@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 42), naming, and a five-step checklist
+the id namespace registry (next free: 43), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -231,6 +231,73 @@ View model `BasketballMatchupLocatorV2`, public properties: `isPlaying`,
 `awaySecondaryColor`/`homeSecondaryColor`, `venueName` (default
 `DASKALAKIS ATHLETIC CENTER`), `venueLocation` (default `PHILADELPHIA, PA`),
 `sponsorLogo`.
+
+## Matchup locator lower third (`matchup_locator_lower_third.rml`)
+
+The matchup locator recast as a wide pre-game banner, presented by Independence
+Blue Cross. Block origin 96, 782; size 1728 x 240, spanning the action-safe
+width and standing on the scorebug's baseline (y 1022). **It overlaps the
+scorebug, so it is for pre-game only; never put the two on air together.**
+
+- **Generated.** `generate_matchup_locator_lower_third.ts` writes the `.rml`.
+  Edit the generator, then run
+  `bun graphics/basketball-v2/generate_matchup_locator_lower_third.ts`; never
+  edit the `.rml` output by hand.
+- **Band (136 high):** the two team panels (792 wide, team tint) either side of
+  the VS panel (136 wide, dark glass at 88%) on the block's centre. The away
+  panel runs from the block's left end, the home panel to its right end.
+- **Logos:** each sits at its panel's outer end, larger than the band: the 1024
+  source at 0.44 (a mark of about 264 x 189), centred 62 units in from the
+  outer edge. The panel's tint shape clips it, so the panel crops the logo at
+  the outer edge, top and bottom. It sits over a soft white bloom, and a
+  secondary-colour marker (8 wide) runs down the panel's outer edge over it.
+- **Team text:** the school (Zuume Regular 60, 85% white) and the mascot
+  (Bold 60) on one line, over the overall record (Bold 34) and the conference
+  record (Regular 28, muted). The column starts 240 units in from the outer
+  edge, clear of the logo. The away side is left-aligned and the home side
+  right-aligned, so each team's text stands beside its logo. Both lines shrink
+  to fit the 528-unit column.
+- **Event title tab (440 x 44, dark glass):** centred above the VS panel, 4
+  units clear of the band, with `eventTitle` in Bold 28 (shrinks to fit). A
+  blank title fades the tab out; a title sent on air fades it back in.
+- **Strip (1728 x 52, dark glass):** the venue name (Bold 30), ` · ` and the
+  location (Regular 24, muted) at the left; `PRESENTED BY` and the sponsor logo
+  (the scorebug's Independence Blue Cross export at 0.13, 26.5 high) at the
+  right.
+- **Blank values.** A blank mascot, conference record or venue location also
+  removes its gap or dot. `matchup_locator_lower_third_controller.luau` writes
+  those separators and the tab's opacity into `_`-prefixed view model
+  properties the scene binds; those are internal, never send them. To clear a
+  value on air, send an empty string: omitting the key leaves it unchanged.
+- **Intro (1.4 s, 84 frames):** a light ignites at the VS panel and splits into
+  two leading edges that wipe the band open outward (frames 6–40). Each side's
+  text drifts in behind its edge and rises in letter by letter from the seam
+  outward, so the away lines build from their last glyph. The strip slides down
+  from under the band. As each edge reaches its outer end, the logo settles
+  from 112% while drifting 24 units outward, and the marker draws upward; the
+  tab rises from behind the band. One specular sweep crosses the block and the
+  tab to finish. Everything reads by about frame 60 (1.0 s).
+- **Outro (0.4 s):** the logos fade as they swell to 106%, the markers
+  retract, the strip and tab withdraw behind the band, and the edges close the
+  glass toward the seam with a brief edge light.
+- **Motion maintenance:** Hold and Outro key every property the intro animates
+  at its resting value; Hidden turns off the panel groups, edge lights, shadow
+  and sweeps. The block shadow is one outline round the band and the strip,
+  its bottom edge keyed to follow the strip; the tab casts its own. Keep the
+  OGraf durations (1400 / 400 ms) in sync with the timelines.
+- **On air:** `isPlaying`, as on the scorebug.
+
+View model `BasketballMatchupLocatorLowerThirdV2`, public properties:
+`isPlaying`, `eventTitle` (default `COLLEGE BASKETBALL`; blank hides the tab),
+`awaySchool`/`homeSchool`, `awayMascot`/`homeMascot` (blank shows the school
+alone), `awayOverallRecord`/`homeOverallRecord`,
+`awayConferenceRecord`/`homeConferenceRecord` (blank hides it),
+`awayLogo`/`homeLogo`, `awayPrimaryColor`/`homePrimaryColor`,
+`awaySecondaryColor`/`homeSecondaryColor`, `venueName`, `venueLocation` (blank
+hides it), `sponsorLogo`. Send text in capitals.
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-matchup-locator-lower-third`.
 
 ## Talent lower thirds (`talent_lower_third_{single,double,triple}.rml`)
 
