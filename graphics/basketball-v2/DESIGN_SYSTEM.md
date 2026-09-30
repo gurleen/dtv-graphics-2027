@@ -16,6 +16,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A neutral (no team) lower third | `generate_talent_lower_thirds.ts` output |
 | A mid-screen card | `matchup_locator.rml` |
 | A mid-screen table comparing the teams | `generate_halftime_statistics.ts` output |
+| A full-frame table of the conference's teams | `generate_conference_standings.ts` output |
 | A persistent corner bug | `basketball_scorebug.rml` |
 
 ## Colour and material
@@ -79,14 +80,15 @@ logo, sits inside the content node and is clipped by the tint shape.
 
 A table's cells share one panel. Glass on every cell reads as a grid of
 separate blocks, which is too loud; divide the table with hairlines and tone
-instead. From the halftime card:
+instead. From the halftime card and the standings card:
 
 | Part | Value | Use |
 |---|---|---|
 | Panel | one dark-glass stack the size of the table | Under every cell |
 | Row hairline | `1FFFFFFF`, 1 high on a whole unit, full width, in each 4-unit gap | Divides the rows; draws over highlighted cells |
 | Label band | `0AFFFFFF`, from the first hairline to the last | Sets off the label column. It lifts the glass: a darker band is lost over dark video |
-| Highlighted cell | team tint, square, out to the hairlines, with the glaze fill in the same shape | The leader mark; the only cell with a fill of its own |
+| Highlighted cell | team tint, square, out to the hairlines, with the glaze fill in the same shape | The leader mark; the only cell with a fill of its own. On the standings card, a whole row: the night's teams |
+| Logo shade | radial `73000000` → `2E000000` at 0.45 → clear, an ellipse 120 across scaled to the row's height, over the tint | Behind a logo on a highlighted row, so a logo on its own colour still reads (Campbell's orange camel on Campbell orange). A white bloom does not do this |
 
 ## Typography
 
@@ -151,7 +153,7 @@ layer. Durations in frames:
 
 | Animation | Frames | Seconds | Loop |
 |---|---|---|---|
-| Intro | 72 (66 scorebug, 86 locator) | 1.2 | oneShot |
+| Intro | 72 (66 scorebug, 86 locator, 90 standings) | 1.2 | oneShot |
 | Hold | 1 | — | loop |
 | Outro | 24 | 0.4 | oneShot |
 | Hidden | 1 | — | oneShot |
@@ -192,6 +194,12 @@ The letter-by-letter rise is a `TextModifierGroup` (opacity 0, y 14,
 `modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"` at rest). The
 Intro keys `modifyFrom` 0 → 1 and `falloffFrom` 0.4 → 1.4, which sweeps the
 reveal across the line. Copy it from any lower third.
+
+That start suits text that waits behind a leading edge, which hides the first
+frames. Text that waits on open glass, like the standings rows rising after
+the wipe has passed them, must start with the ramp wholly before the line:
+key `modifyFrom` −0.4 → 1 and `falloffFrom` 0 → 1.4. From 0 and 0.4, the
+leading glyphs already show part risen before the line's turn.
 
 ### Outro recipe
 
@@ -265,7 +273,8 @@ Namespaces in use:
 | 38 | Player to Watch lower third | 12200 |
 | 39 | Halftime statistics card | 13400 |
 | 40 | Team lower third | 14600 |
-| **41** | **Next free** | **15800** |
+| 41 | Conference standings card | 15800 |
+| **42** | **Next free** | **17000** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
