@@ -107,8 +107,13 @@
     <TextValueRun name="Jersey Number Sign" styleId="38:220" text="#"></TextValueRun>
     <TextValueRun name="Jersey Number Value" styleId="38:221" text="5"><DataBindContext sourcePathIds="38:1000-38:1012" propertyKey="268"/></TextValueRun>
   <TextModifierGroup name="Jersey Number Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Jersey Number Reveal" id="38:240" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Text name="First Name" x="108" y="30" originValue="baseline" wrapValue="noWrap" width="556" height="30" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="38:222" fontAssetId="38:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="D9FFFFFF"/></Fill></TextStylePaint><TextValueRun name="First Name Value" styleId="38:222" text="JOSH"><DataBindContext sourcePathIds="38:1000-38:1010" propertyKey="268"/></TextValueRun><TextModifierGroup name="First Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="First Name Reveal" id="38:241" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
-  <Text name="Last Name" x="108" y="70" originValue="baseline" wrapValue="noWrap" width="556" height="60" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="38:223" fontAssetId="38:900" fontSize="50" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Last Name Value" styleId="38:223" text="REED"><DataBindContext sourcePathIds="38:1000-38:1011" propertyKey="268"/></TextValueRun><TextModifierGroup name="Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Last Name Reveal" id="38:242" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+  <Text name="Full Name" x="108" y="0" wrapValue="noWrap" width="556" height="84" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle" fitFromBaseline="false">
+    <TextStylePaint id="38:222" fontAssetId="38:901" fontSize="54" letterSpacing="0.5"><Fill><SolidColor colorValue="D9FFFFFF"/></Fill></TextStylePaint>
+    <TextStylePaint id="38:223" fontAssetId="38:900" fontSize="54" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
+    <TextValueRun name="First Name Value" styleId="38:222" text="JOSH"><DataBindContext sourcePathIds="38:1000-38:1010" propertyKey="268"/></TextValueRun>
+    <TextValueRun name="Name Gap" styleId="38:222" text=" "></TextValueRun>
+    <TextValueRun name="Last Name Value" styleId="38:223" text="REED"><DataBindContext sourcePathIds="38:1000-38:1011" propertyKey="268"/></TextValueRun>
+  <TextModifierGroup name="Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Name Reveal" id="38:241" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Position" x="688" y="40" originValue="baseline" wrapValue="noWrap" width="260" height="36" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="38:224" fontAssetId="38:900" fontSize="30" letterSpacing="1"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Position Value" styleId="38:224" text="GUARD"><DataBindContext sourcePathIds="38:1000-38:1013" propertyKey="268"/></TextValueRun><TextModifierGroup name="Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Position Reveal" id="38:243" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Class" x="688" y="68" originValue="baseline" wrapValue="noWrap" width="260" height="26" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="38:225" fontAssetId="38:901" fontSize="22" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Class Value" styleId="38:225" text="JUNIOR"><DataBindContext sourcePathIds="38:1000-38:1014" propertyKey="268"/></TextValueRun><TextModifierGroup name="Class Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Class Reveal" id="38:244" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   </Node>
@@ -317,22 +322,12 @@
   <KeyedObject objectId="38:241"><KeyedProperty propertyKey="327">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
     <KeyFrameDouble frame="18" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="38" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="40" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:241"><KeyedProperty propertyKey="317">
     <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
     <KeyFrameDouble frame="18" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="38" value="1.4" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="38:242"><KeyedProperty propertyKey="327">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-    <KeyFrameDouble frame="20" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="44" value="1" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="38:242"><KeyedProperty propertyKey="317">
-    <KeyFrameDouble frame="0" value="0.4" interpolationType="hold"/>
-    <KeyFrameDouble frame="20" value="0.4" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="44" value="1.4" interpolationType="hold"/>
+    <KeyFrameDouble frame="40" value="1.4" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:243"><KeyedProperty propertyKey="327">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
@@ -604,12 +599,6 @@
   <KeyedObject objectId="38:241"><KeyedProperty propertyKey="317">
     <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="38:242"><KeyedProperty propertyKey="327">
-    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="38:242"><KeyedProperty propertyKey="317">
-    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:243"><KeyedProperty propertyKey="327">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -806,12 +795,6 @@
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:241"><KeyedProperty propertyKey="317">
-    <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="38:242"><KeyedProperty propertyKey="327">
-    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="38:242"><KeyedProperty propertyKey="317">
     <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:243"><KeyedProperty propertyKey="327">
