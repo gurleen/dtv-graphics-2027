@@ -109,7 +109,7 @@
         <Shape name="Away Timeout 3" x="32" y="0"><DataBindContext sourcePathIds="30:1000-30:1030" propertyKey="18" converterId="30:1152"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
         <Shape name="Away Timeout 4" x="48" y="0"><DataBindContext sourcePathIds="30:1000-30:1030" propertyKey="18" converterId="30:1153"/><Rectangle width="12" height="4" originX="0" originY="0" cornerRadiusTL="2"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></Shape>
       </Node>
-      <Text name="Away Acronym" x="20" y="40" originValue="baseline" wrapValue="noWrap" sizingValue="autoWidth"><TextStylePaint id="30:122" fontAssetId="30:900" fontSize="40" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Acronym Value" styleId="30:122" text="JOES"><DataBindContext sourcePathIds="30:1000-30:1010" propertyKey="268"/></TextValueRun>
+      <Text name="Away Acronym" x="20" y="40" originValue="baseline" wrapValue="noWrap" sizingValue="autoWidth"><TextStylePaint id="30:122" fontAssetId="30:900" fontSize="40" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Away Acronym Value" styleId="30:122" text="SJU"><DataBindContext sourcePathIds="30:1000-30:1010" propertyKey="268"/></TextValueRun>
         <TextModifierGroup name="Away Acronym Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="20">
           <TextModifierRange name="Away Acronym Cascade Range" id="30:151" unitsValue="1" modifyFrom="-1" falloffFrom="-1" falloffTo="-0.45" modifyTo="0">
             <CubicInterpolatorComponent name="Away Acronym Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
@@ -851,7 +851,7 @@
 <ViewModelPropertyNumber name="_shotPulse" id="30:1061"/>
 <ViewModelInstance name="Default" id="30:1001" exports="true">
 <ViewModelInstanceBoolean viewModelPropertyId="30:1002" propertyValue="false"/>
-<ViewModelInstanceString viewModelPropertyId="30:1010" propertyValue="JOES"/>
+<ViewModelInstanceString viewModelPropertyId="30:1010" propertyValue="SJU"/>
 <ViewModelInstanceString viewModelPropertyId="30:1011" propertyValue="DREX"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1012" propertyValue="68"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1013" propertyValue="72"/>

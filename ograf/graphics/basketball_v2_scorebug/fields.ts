@@ -1,8 +1,8 @@
 import type { Field } from '../../shared/schema';
 
 export const FIELDS: readonly Field[] = [
-  { name: 'awayAcronym', kind: 'string', title: 'Away Acronym', default: 'JOES' },
-  { name: 'homeAcronym', kind: 'string', title: 'Home Acronym', default: 'DRE' },
+  { name: 'awayAcronym', kind: 'string', title: 'Away Acronym', default: 'SJU' },
+  { name: 'homeAcronym', kind: 'string', title: 'Home Acronym', default: 'DREX' },
   { name: 'awayScore', kind: 'integer', title: 'Away Score', default: 68 },
   { name: 'homeScore', kind: 'integer', title: 'Home Score', default: 72 },
   {
