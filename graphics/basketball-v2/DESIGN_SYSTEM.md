@@ -12,6 +12,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 |---|---|
 | A team-themed lower third with a logo | `staff_lower_third.rml` |
 | A team-themed lower third with a photo | `player_lower_third.rml` |
+| A team-themed lower third with stats or copy | `generate_team_lower_third.ts` output |
 | A neutral (no team) lower third | `generate_talent_lower_thirds.ts` output |
 | A mid-screen card | `matchup_locator.rml` |
 | A mid-screen table comparing the teams | `generate_halftime_statistics.ts` output |
@@ -263,7 +264,8 @@ Namespaces in use:
 | 37 | Starting five lower third | 11000 |
 | 38 | Player to Watch lower third | 12200 |
 | 39 | Halftime statistics card | 13400 |
-| **40** | **Next free** | **14600** |
+| 40 | Team lower third | 14600 |
+| **41** | **Next free** | **15800** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
