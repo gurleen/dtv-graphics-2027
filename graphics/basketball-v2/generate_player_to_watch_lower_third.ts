@@ -11,7 +11,7 @@
  *
  *   Headshot   a full-height panel at the left; the cutout rises above the block.
  *   Header     PLAYER TO WATCH, an optional context tag, and PRESENTED BY over the chip.
- *   Name       jersey number, first over last name, position and class year, then the
+ *   Name       jersey number, first and last name on one line, position and class year, then the
  *              sponsor chip at the right, the full height of the row.
  *   Body       one of two modes, chosen by `bodyMode`:
  *                STATS  up to four value-over-label tiles; a blank value hides its tile
@@ -152,7 +152,7 @@ const SPONSOR_ASSET = id(913);
 const CONTROLLER_ASSET = id(950);
 
 const NAME_REVEAL = {
-  number: id(240), firstName: id(241), lastName: id(242), position: id(243), classYear: id(244),
+  number: id(240), fullName: id(241), position: id(243), classYear: id(244),
 };
 
 // Per-tile elements, 3000 + 100 per tile.
@@ -303,8 +303,13 @@ const namePanel = `<Node name="Name Panel" id="${NAME_PANEL}" x="${COLUMN_X}" y=
     <TextValueRun name="Jersey Number Sign" styleId="${id(220)}" text="#"></TextValueRun>
     <TextValueRun name="Jersey Number Value" styleId="${id(221)}" text="${PLAYER.number}">${bound(P.jerseyNumber, TEXT)}</TextValueRun>
   ${rise('Jersey Number', NAME_REVEAL.number)}</Text>
-  ${text({ name: 'First Name', x: 108, y: 30, width: NAME_TEXT_WIDTH, height: 30, font: FONT_REGULAR, size: 24, spacing: 2, color: 'D9FFFFFF', styleId: id(222), value: PLAYER.firstName, property: P.firstName, reveal: NAME_REVEAL.firstName })}
-  ${text({ name: 'Last Name', x: 108, y: 70, width: NAME_TEXT_WIDTH, height: 60, font: FONT_BOLD, size: 50, spacing: 0.5, color: 'FFFFFFFF', styleId: id(223), value: PLAYER.lastName, property: P.lastName, reveal: NAME_REVEAL.lastName })}
+  <Text name="Full Name" x="108" y="0" wrapValue="noWrap" width="${NAME_TEXT_WIDTH}" height="${NAME_HEIGHT}" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle" fitFromBaseline="false">
+    <TextStylePaint id="${id(222)}" fontAssetId="${FONT_REGULAR}" fontSize="54" letterSpacing="0.5"><Fill><SolidColor colorValue="D9FFFFFF"/></Fill></TextStylePaint>
+    <TextStylePaint id="${id(223)}" fontAssetId="${FONT_BOLD}" fontSize="54" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
+    <TextValueRun name="First Name Value" styleId="${id(222)}" text="${PLAYER.firstName}">${bound(P.firstName, TEXT)}</TextValueRun>
+    <TextValueRun name="Name Gap" styleId="${id(222)}" text=" "></TextValueRun>
+    <TextValueRun name="Last Name Value" styleId="${id(223)}" text="${PLAYER.lastName}">${bound(P.lastName, TEXT)}</TextValueRun>
+  ${rise('Name', NAME_REVEAL.fullName)}</Text>
   ${text({ name: 'Position', x: POSITION_X, y: 40, width: POSITION_WIDTH, height: 36, font: FONT_BOLD, size: 30, spacing: 1, color: 'FFFFFFFF', styleId: id(224), value: PLAYER.position, property: P.position, reveal: NAME_REVEAL.position, extra: ' alignValue="right"' })}
   ${text({ name: 'Class', x: POSITION_X, y: 68, width: POSITION_WIDTH, height: 26, font: FONT_REGULAR, size: 22, spacing: 2, color: 'B3FFFFFF', styleId: id(225), value: PLAYER.classYear, property: P.classYear, reveal: NAME_REVEAL.classYear, extra: ' alignValue="right"' })}
   </Node>
@@ -427,8 +432,7 @@ const intro: Track[] = [
   move(TEAM_LOGO, OPACITY, 0, 0.18, 24, 60, EASE_OUT),
   move(SPONSOR_LOGO, OPACITY, 0, 1, 30, 54, EASE_OUT),
   ...reveal(NAME_REVEAL.number, 14, 34),
-  ...reveal(NAME_REVEAL.firstName, 18, 38),
-  ...reveal(NAME_REVEAL.lastName, 20, 44),
+  ...reveal(NAME_REVEAL.fullName, 18, 40),
   ...reveal(NAME_REVEAL.position, 32, 52),
   ...reveal(NAME_REVEAL.classYear, 36, 56),
   move(HEADER_CONTENT, Y, HEADER_HEIGHT, 0, 20, 44, EASE_OUT),

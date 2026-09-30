@@ -91,10 +91,11 @@ scorebug's baseline and height so the two can be on air together (block origin
   `assets/images/headshots/placeholder.png` is the neutral silhouette used until
   a real headshot is bound (re-export from the `.svg` beside it with
   `rsvg-convert -w 600 <svg> -o <png>`).
-- **Name panel (676 x 84, team tint):** `#` and the jersey number, first name
-  (Zuume Regular) over last name (Zuume Bold), and position over class,
-  right-aligned, over a large faded team logo cropped by the panel. The names
-  shrink to fit a 340-unit column.
+- **Name panel (676 x 84, team tint):** `#` and the jersey number, first and
+  last name on one line at 54 (first name in Zuume Regular, slightly muted;
+  last name in Zuume Bold, as on the staff lower third), and position over
+  class, right-aligned, over a large faded team logo cropped by the panel. The
+  name line is centred in the panel and shrinks to fit a 430-unit column.
 - **Stat strip (676 x 44, dark glass):** a muted label (`TONIGHT`, `SEASON`)
   followed by the stat line; the whole line shrinks to fit.
 - **Intro (1.2 s):** a light ignites at the headshot/name seam and splits into
@@ -407,8 +408,8 @@ is for pre-game only; never put the two on air together.**
   context tag (for example `2026-27 SEASON`) after a secondary-colour `/`; a
   blank tag hides the separator. `PRESENTED BY` sits at the right, centred over
   the sponsor chip.
-- **Name row (84 high, team tint):** the jersey number, first name over last
-  name (shrinks to fit), and position over class year at the right, over a
+- **Name row (84 high, team tint):** the jersey number, first and last name on
+  one line as on the staff lower third (shrinks to fit), and position over class year at the right, over a
   faded team logo. The full-colour sponsor logo (50 high) closes the row on a
   200 x 84 white chip.
 - **Body row (84 high, dark glass):** `bodyMode` `STATS` shows up to four stat
