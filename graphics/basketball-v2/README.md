@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 41), naming, and a five-step checklist
+the id namespace registry (next free: 42), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -454,6 +454,74 @@ D='max(max(255-r(X,Y),255-g(X,Y)),255-b(X,Y))' && ffmpeg -y -i drexel_physical_t
 
 Build the OGraf package with
 `bun run ograf:build:basketball-v2-halftime-statistics`.
+
+## Conference standings card (`conference_standings.rml`)
+
+The CAA standings: the conference's thirteen teams in order, one row per
+place. Card origin 410, 70; size 1100 x 788, centred across the frame. Like
+the halftime card it ends at y 858, clear of the scorebug (y 890), and it
+takes 24 on the outer corners and 6 on inner seams.
+
+- **Generated.** `generate_conference_standings.ts` writes the `.rml`. Edit
+  the generator, then run
+  `bun graphics/basketball-v2/generate_conference_standings.ts`; never edit
+  the `.rml` output by hand.
+- **Title panel (1100 x 70):** the white CAA wordmark
+  (`assets/images/CAAWhite.png`, 35 high) and `STANDINGS` (Bold 50) at the
+  left, the sport (Regular 32, muted) at the right.
+- **Table panel (1100 x 714):** one panel of dark glass; the rows have no
+  glass of their own. A header row (38 high) labels the columns `TEAM`,
+  `CONF`, `OVERALL` and `STREAK` (Regular 24, muted). Under it, one row per
+  place (48 high): the rank (Bold 35, muted) in an 80-wide column set off by
+  a lighter band, the logo in a 55 x 37.5 box, the school (Bold 38), then the
+  conference record, overall record and streak (Bold 38), each centred in a
+  155-wide column. A one-unit hairline in each 4-unit gap divides the rows.
+- **Rows are entered by place.** `rowNTeam` names the team in place N, one of
+  the members in `conference_teams.ts`, and the row takes that team's logo.
+  The rank is the row number, so ties are not marked. The records and streak
+  are text, sent formatted (`15-3`, `L1`).
+  `conference_standings_controller.luau` finds each row's team, matching
+  without regard to case or surrounding spaces; a row naming no member
+  (blank, say) shows no logo. The controller writes the `_`-prefixed row
+  properties the scene binds; those are internal, never send them.
+- **Game night.** The rows of `awayTeam` and `homeTeam` take those teams'
+  tints, and a tinted row's logo stands in a soft dark shade, so a logo on its
+  own colour (Campbell's orange camel on Campbell orange) still reads. `NONE`
+  is a team outside the conference: no row is tinted for it. On air, a tint
+  fades in or out; a new team's logo and text change at once.
+- **Intro (1.5 s) and outro (0.4 s):** the halftime card's build. A light
+  ignites at the centre of the card and splits into two leading edges that
+  wipe the glass open outward. The title rises in letter by letter and the
+  wordmark settles from 112%. The rows then rise in rank order, two frames
+  apart, each logo settling from 112%, and the rows of the night's teams
+  light last. One specular sweep crosses the card to finish. Hold and Outro
+  key every property the intro animates at its resting value.
+
+View model `BasketballConferenceStandingsV2`, public properties: `isPlaying`,
+`sport` (`MEN'S BASKETBALL` or `WOMEN'S BASKETBALL`), `awayTeam`/`homeTeam`
+(default `CAMPBELL`/`DREXEL`), and `rowNTeam`, `rowNConferenceRecord`,
+`rowNOverallRecord` and `rowNStreak` for N = 1 to 13. The defaults are the
+2025-26 final regular-season standings. In the OGraf package the sport and
+every team field are selects, so an operator cannot misspell a team.
+
+**Logos.** `assets/images/caa/` holds one full-colour mark per member, from
+`https://images.dragonstv.io/logos/<NAME>.PNG` (for example `CAMPBELL`,
+`COLLEGE_OF_CHARLESTON`, `NORTH_CAROLINA_AT`, `UNC_WILMINGTON`,
+`WILLIAM_MARY`). Each is cropped to its visible pixels, then fitted and
+centred with a 4 margin in a 176 x 120 transparent canvas, so wide and tall
+marks carry the same weight. Northeastern's keeps only the husky head (source
+rows 340 down): its arched black wordmark vanishes on dark glass.
+
+**Adding a member.** Fairfield joins in 2027-28. Add its entry to
+`conference_teams.ts` and its logo to `assets/images/caa/`, then regenerate.
+Each row adds 52 to the card's height, and the card is anchored at the
+bottom, so a fourteenth row would lift its top to y 18, outside the safe
+area: reduce `ROW_HEIGHT` as well. The generator refuses to write a scene
+whose last row lights after the intro ends; lengthen `INTRO_FRAMES` (and the
+package durations) to match.
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-conference-standings`.
 
 ## Test data
 
