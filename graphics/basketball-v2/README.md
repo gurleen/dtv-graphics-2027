@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 40), naming, and a five-step checklist
+the id namespace registry (next free: 41), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -147,6 +147,44 @@ origin 610, 890; size 700 x 132; 84 units clear of the scorebug).
 View model `BasketballStaffLowerThirdV2`, public properties: `isPlaying`,
 `firstName`, `lastName`, `title`, `detail`, `teamLogo`, `teamPrimaryColor`,
 `teamSecondaryColor`. Send text in capitals.
+
+## Team lower third (`team_lower_third.rml`)
+
+The staff lower third's build for a team as a whole: a school and mascot over
+either up to four stats or one line of copy (for example a record, scoring
+averages or a preseason poll position). Block origin 550, 890; size 820 x 132,
+centred at the bottom of the frame on the scorebug's baseline and height, and
+wide enough to clear it. No sponsor.
+
+- **Generated.** `generate_team_lower_third.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_team_lower_third.ts`;
+  never edit the `.rml` output by hand.
+- **Logo panel (132 x 132, team tint):** the staff lower third's, with the
+  secondary-colour marker and the team logo over a soft bloom.
+- **Name panel (684 x 84, team tint):** `school` in Zuume Regular followed by
+  `mascot` in Zuume Bold, on one line that shrinks to fit.
+- **Body strip (684 x 44, dark glass):** `bodyMode` `STATS` shows up to four
+  cells, each a Bold value, then a muted Regular label (`14-3 OVERALL`),
+  centred, with a hairline divider between cells. A blank value hides its
+  cell; the rest share the strip evenly. A blank label drops the gap. `TEXT`
+  shows `bodyText` on one line (Bold 28, shrinks to fit; the strip is too short
+  for two lines). Changing any of it on air re-spaces or crossfades smoothly.
+- **Controller script.** `team_lower_third_controller.luau` counts the shown
+  cells and writes each cell's x, width, opacity, divider and label gap, and the
+  two body opacities, into `_`-prefixed view model properties the scene binds.
+  Those properties are internal; never send them.
+- **Intro (1.2 s) and outro (0.4 s):** the staff lower third's build. The strip
+  slides down from under the name panel, and the stat cells rise in 3 frames
+  apart. Hold and Outro key every intro property at its resting value.
+- **On air:** `isPlaying`, as on the scorebug.
+
+View model `BasketballTeamLowerThirdV2`, public properties: `isPlaying`,
+`bodyMode` (`STATS` or `TEXT`), `school`, `mascot`, `bodyText`, `statNValue`
+and `statNLabel` for N = 1 to 4, `teamLogo`, `teamPrimaryColor`,
+`teamSecondaryColor`. Send text in capitals.
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-team-lower-third`.
 
 ## Matchup locator (`matchup_locator.rml`)
 
