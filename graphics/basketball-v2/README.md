@@ -397,9 +397,10 @@ stats or a line or two of copy. Block origin 260, 802; size 1400 x 220,
 standing on the scorebug's baseline (y 1022). **It overlaps the scorebug, so it
 is for pre-game only; never put the two on air together.**
 
-- **Generated.** `generate_player_to_watch_lower_third.ts` writes the `.rml`.
-  Edit the generator, then run
-  `bun graphics/basketball-v2/generate_player_to_watch_lower_third.ts`; never
+- **Generated.** `generate_player_feature_lower_thirds.ts` writes this `.rml`
+  and the Player of the Game one below from one description. Edit the
+  generator, then run
+  `bun graphics/basketball-v2/generate_player_feature_lower_thirds.ts`; never
   edit the `.rml` output by hand.
 - **Headshot (220 wide, team tint):** a transparent cutout in a 212 x 304 frame
   whose top 84 units rise above the block, so the head breaks out over the
@@ -413,8 +414,9 @@ is for pre-game only; never put the two on air together.**
   faded team logo. The full-colour sponsor logo (50 high) closes the row on a
   200 x 84 white chip.
 - **Body row (84 high, dark glass):** `bodyMode` `STATS` shows up to four stat
-  cells, value over label; a blank value hides its cell and the rest share the
-  row evenly. `TEXT` shows `bodyText` (Bold 32, two lines, longer copy shrinks
+  cells, value then label on one line (Bold 52, then Regular 30, centred and
+  shrunk to fit); a blank value hides its cell and the rest share the row
+  evenly. `TEXT` shows `bodyText` (Bold 32, two lines, longer copy shrinks
   to fit). Changing either on air crossfades or re-spaces smoothly.
 - **Controller script.** `player_to_watch_controller.luau` counts the shown
   stats and writes each cell's x, width and opacity, the two body opacities and
@@ -449,6 +451,28 @@ transparent margin cropped. Re-export with
 
 Build the OGraf package with
 `bun run ograf:build:basketball-v2-player-to-watch-lower-third`.
+
+## Player of the Game lower third (`player_of_the_game_lower_third.rml`)
+
+The Player to Watch lower third with the title `PLAYER OF THE GAME`, presented
+by Steamfitters Local 420, for after the game. Same block, rows, modes, motion,
+fields and controller script (`player_to_watch_controller.luau`, shared); only
+the title, sponsor, names and test data differ. It overlaps the scorebug in the
+same way, so take the scorebug off air first.
+
+- **Generated** by `generate_player_feature_lower_thirds.ts`, as its second
+  variant; change the shared layout there once and both scenes follow.
+- **Sponsor chip:** `assets/images/steamfitters_local_420_logo.png`, the
+  1187 x 1325 crest, drawn 72 high on the 200 x 84 white chip.
+- **Test data:** game stats (`24 PTS`, `8 REB`, `5 AST`, `9-14 FG`) and the
+  context tag `VS ST. JOHN'S`.
+
+View model `BasketballPlayerOfTheGameLowerThirdV2`, with the same public
+properties as Player to Watch. The OGraf package reuses Player to Watch's
+field table (`featureFields`) and web component, motion headshot included.
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-player-of-the-game-lower-third`.
 
 ## Halftime statistics card (`halftime_statistics.rml`)
 

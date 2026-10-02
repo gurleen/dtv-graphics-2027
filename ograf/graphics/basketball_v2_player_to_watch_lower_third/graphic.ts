@@ -8,10 +8,11 @@
  * Rive screenshots and the package thumbnail therefore never include it.
  */
 
+import type { RiveGraphicDefinition } from '../../shared/definition';
 import { RiveGraphicElement } from '../../shared/rive-graphic-element';
 import { DEFINITION } from './definition';
 
-// The headshot frame in canvas units, from generate_player_to_watch_lower_third.ts:
+// The headshot frame in canvas units, from generate_player_feature_lower_thirds.ts:
 // block origin (260, 802), frame at (8, -84) within it, 212 x 304. The overlay is
 // placed in percentages of the 1920 x 1080 canvas, so it follows the canvas's scaling.
 const CANVAS = { width: 1920, height: 1080 } as const;
@@ -48,7 +49,7 @@ const STYLE = `
 `;
 
 export class BasketballV2PlayerToWatchLowerThird extends RiveGraphicElement {
-  protected readonly definition = DEFINITION;
+  protected readonly definition: RiveGraphicDefinition = DEFINITION;
 
   private frame: HTMLDivElement | null = null;
   private rise: HTMLDivElement | null = null;
