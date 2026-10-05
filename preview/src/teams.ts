@@ -8,6 +8,8 @@ export type Team = {
   id: number;
   abbreviation: string;
   name: string;
+  school: string;
+  mascot: string;
   conference: string;
   primary: string;
   secondary: string;
@@ -18,6 +20,8 @@ type SourceTeam = {
   team_id: number;
   abbreviation: string;
   display_name: string;
+  team: string;
+  mascot: string;
   color?: string;
   alternate_color?: string;
   conference_short_name: string;
@@ -37,6 +41,8 @@ export const TEAMS: Team[] = (source as SourceTeam[])
     id: team.team_id,
     abbreviation: team.abbreviation,
     name: team.display_name,
+    school: team.team,
+    mascot: team.mascot,
     conference: team.conference_short_name,
     primary: toHex(team.color, FALLBACK_PRIMARY),
     secondary: toHex(team.alternate_color, FALLBACK_SECONDARY),

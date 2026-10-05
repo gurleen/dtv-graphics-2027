@@ -492,7 +492,7 @@
         through its asset handler.
     -->
     <ImageAsset file="assets/images/team_knockout_logo.png" name="Team Knockout Logo" id="1:60"/>
-    <ImageAsset file="assets/images/steamfitters_local_420_logo.png" name="Sponsor Logo" id="1:61"/>
+    <ImageAsset file="assets/images/sponsors/steamfitters_local_420_logo.png" name="Sponsor Logo" id="1:61"/>
 
     <ViewModel defaultInstanceId="1:80" name="PlayerToWatch" id="1:70">
         <ViewModelPropertyString name="firstName" id="1:71"/>

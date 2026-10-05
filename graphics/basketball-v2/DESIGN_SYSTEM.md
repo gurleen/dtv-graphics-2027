@@ -286,7 +286,8 @@ Namespaces in use:
 | 41 | Conference standings card | 15800 |
 | 42 | Matchup locator lower third | 17000 |
 | 43 | Player of the Game lower third | 18200 |
-| **44** | **Next free** | **19400** |
+| 44 | Halftime adjustments | 19400 |
+| **45** | **Next free** | **20600** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

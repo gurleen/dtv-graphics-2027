@@ -74,7 +74,7 @@ const VARIANTS: readonly Variant[] = [
     file: 'player_of_the_game_lower_third.rml', prefix: 43, artboardY: 18200,
     title: 'PLAYER OF THE GAME', name: 'Player Of The Game',
     // The Steamfitters Local 420 crest is 1187 x 1325; 72 units tall on the chip.
-    sponsor: { name: 'Steamfitters', file: 'assets/images/steamfitters_local_420_logo.png', scale: 72 / 1325 },
+    sponsor: { name: 'Steamfitters', file: 'assets/images/sponsors/steamfitters_local_420_logo.png', scale: 72 / 1325 },
     player: {
       ...PLAYER,
       context: "VS ST. JOHN'S",

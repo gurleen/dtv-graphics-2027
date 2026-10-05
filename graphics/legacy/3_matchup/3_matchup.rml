@@ -520,7 +520,7 @@
         </StateMachine>
     </Artboard>
 
-    <ImageAsset file="assets/images/sponsor_logo.png" name="Sponsor Logo" id="3:160"/>
+    <ImageAsset file="assets/images/sponsors/belfor.png" name="Sponsor Logo" id="3:160"/>
     <ImageAsset file="assets/images/CAAWhite.png" name="CAA Logo" id="3:161"/>
 
     <ViewModel defaultInstanceId="3:84" name="Matchup" id="3:70">

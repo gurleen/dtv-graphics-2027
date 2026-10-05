@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 43), naming, and a five-step checklist
+the id namespace registry (next free: 45), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -462,7 +462,7 @@ same way, so take the scorebug off air first.
 
 - **Generated** by `generate_player_feature_lower_thirds.ts`, as its second
   variant; change the shared layout there once and both scenes follow.
-- **Sponsor chip:** `assets/images/steamfitters_local_420_logo.png`, the
+- **Sponsor chip:** `assets/images/sponsors/steamfitters_local_420_logo.png`, the
   1187 x 1325 crest, drawn 72 high on the 200 x 84 white chip.
 - **Test data:** game stats (`24 PTS`, `8 REB`, `5 AST`, `9-14 FG`) and the
   context tag `VS ST. JOHN'S`.
@@ -614,6 +614,49 @@ package durations) to match.
 
 Build the OGraf package with
 `bun run ograf:build:basketball-v2-conference-standings`.
+
+## Halftime adjustments (`halftime_adjustments.rml`)
+
+Each team's two halftime adjustments, presented by Rothman Orthopaedics. It
+takes the scorebug's corner and is never on air with it: left on the
+action-safe margin, foot on the lower thirds' foot (block origin 96, 850; size
+1028 x 172). A two-step OGraf graphic, as the starting five: step 0 shows the
+away team, step 1 the home team, and advancing on air changes team without
+taking the glass down.
+
+- **Generated.** `generate_halftime_adjustments.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_halftime_adjustments.ts`;
+  never edit the `.rml` output by hand.
+- **Header (340 x 172, team tint):** a secondary-colour marker down the whole
+  block's left edge, the team logo over a soft white bloom, and the school
+  (Zuume Bold 48) over the mascot (muted Regular 30, letter-spaced), each
+  shrinking to fit a 186-unit column.
+- **Lines panel (480 x 172, team tint):** `HALFTIME ADJUSTMENTS` (muted Regular
+  24) over two lines (Bold 36), each after a right-pointing bullet in the team's
+  secondary colour. Each line has a 406-unit column and shrinks to fit; the
+  33-character test line holds full size.
+- **Sponsor cell (200 x 172, dark glass):** `PRESENTED BY` over a cream
+  (`#F0E5C8`, from the logo's inner circle) chip holding the vertical Rothman
+  lockup. The grey wordmark needs a light ground. The chip's logo frame
+  contains any sponsor image. `assets/images/sponsors/rothman_orthopaedics.png`
+  is the logo as supplied.
+- **Intro (1.2 s) and outro (0.4 s):** the starting five's build. A light
+  ignites at the header/lines seam and splits into outward wipes, text rises
+  in letter by letter, the chip settles from 90% once the wipe reaches it, and
+  one sheen finishes the glass. The outro closes the panels toward the seam.
+- **Team change (0.8 s):** the glass stays up. The header (school and mascot together), then each line, 6
+  frames apart, sinks and fades; the tints crossfade to the other team's
+  primary colour; the incoming school and lines rise in; the marker and logo
+  swap; and one sweep crosses the block. Off air, a step change snaps.
+- **State machine:** the starting five's two layers, Display (`isPlaying`) and
+  Team (`step`). Keep the OGraf durations (`introDuration`, `outroDuration`,
+  `steps.transitionDuration`) in sync with the timelines.
+
+View model `BasketballHalftimeAdjustmentsV2`, public properties: `isPlaying`,
+`step` (0 away, 1 home), `sponsorLogo`, and for each of `away` and `home`:
+`{team}School`, `{team}Mascot`, `{team}Line1`, `{team}Line2`, `{team}Logo`, `{team}PrimaryColor`, `{team}SecondaryColor`. Send text
+in capitals. A blank line leaves its bullet showing. To review a team change:
+`bun scripts/render_frames.ts graphics/basketball-v2/halftime_adjustments.rml --on-air --data=step=1 --frames=0-48:4 --out=build/frames/halftime/change --sheet=4`.
 
 ## Test data
 
