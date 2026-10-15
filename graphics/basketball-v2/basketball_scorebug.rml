@@ -217,32 +217,32 @@
   <Node name="Clock Content" id="30:350" x="0" y="0">
     <!-- Drawn round the shot clock cell during the intro, then faded out;
          invisible at rest. -->
-    <Shape name="Shot Clock Trace" id="30:360" x="163" y="51" opacity="0">
-      <Rectangle width="54" height="94" originX="0.5" originY="0.5" cornerRadiusTL="10"/>
+    <Shape name="Shot Clock Trace" id="30:360" x="157" y="65" opacity="0">
+      <Rectangle width="66" height="62" originX="0.5" originY="0.5" cornerRadiusTL="10"/>
       <Stroke thickness="1.5" cap="round"><SolidColor colorValue="E6FFFFFF"/><TrimPath name="Shot Clock Trace Trim" id="30:361" start="0" end="1"/></Stroke>
     </Shape>
-    <Node name="Shot Clock Value" x="163" y="51"><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="16"/><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="17"/>
-    <Text name="Shot Clock" x="-23" y="16" originValue="baseline" wrapValue="noWrap" width="46" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:320" fontAssetId="30:900" fontSize="44" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Shot Clock Value" styleId="30:320" text="24"><DataBindContext sourcePathIds="30:1000-30:1042" propertyKey="268"/></TextValueRun>
+    <Node name="Shot Clock Value" x="157" y="65"><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="16"/><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="17"/>
+    <Text name="Shot Clock" x="-29" y="23" originValue="baseline" wrapValue="noWrap" width="58" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:320" fontAssetId="30:901" fontSize="62" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Shot Clock Value" styleId="30:320" text="24"><DataBindContext sourcePathIds="30:1000-30:1042" propertyKey="268"/></TextValueRun>
       <!-- The clock panel cascades run the other way: from the start of the text
            to its end, and at rest the range lies past the last glyph. -->
-      <TextModifierGroup name="Shot Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="20">
+      <TextModifierGroup name="Shot Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="26">
         <TextModifierRange name="Shot Clock Cascade Range" id="30:353" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
           <CubicInterpolatorComponent name="Shot Clock Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
         </TextModifierRange>
       </TextModifierGroup>
     </Text></Node>
-    <Shape name="Shot Clock Alert" id="30:310" x="140" y="8" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1060" propertyKey="18"/>
-      <Rectangle width="46" height="86" originX="0" originY="0" cornerRadiusTL="6"/>
+    <Shape name="Shot Clock Alert" id="30:310" x="128" y="38" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1060" propertyKey="18"/>
+      <Rectangle width="58" height="54" originX="0" originY="0" cornerRadiusTL="6"/>
       <Fill><SolidColor colorValue="FFE5322D"/></Fill>
     </Shape>
-    <Text name="Game Clock" x="2" y="88" originValue="baseline" wrapValue="noWrap" width="134" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:322" fontAssetId="30:900" fontSize="62" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Game Clock Value" styleId="30:322" text="13:59"><DataBindContext sourcePathIds="30:1000-30:1041" propertyKey="268"/></TextValueRun>
+    <Text name="Game Clock" x="0" y="88" originValue="baseline" wrapValue="noWrap" width="124" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:322" fontAssetId="30:900" fontSize="62" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Game Clock Value" styleId="30:322" text="13:59"><DataBindContext sourcePathIds="30:1000-30:1041" propertyKey="268"/></TextValueRun>
       <TextModifierGroup name="Game Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="26">
         <TextModifierRange name="Game Clock Cascade Range" id="30:352" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
           <CubicInterpolatorComponent name="Game Clock Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
         </TextModifierRange>
       </TextModifierGroup>
     </Text>
-    <Text name="Period" x="2" y="33" originValue="baseline" wrapValue="noWrap" width="134" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:323" fontAssetId="30:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="CCFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Period Value" styleId="30:323" text="2ND"><DataBindContext sourcePathIds="30:1000-30:1040" propertyKey="268"/></TextValueRun>
+    <Text name="Period" x="0" y="33" originValue="baseline" wrapValue="noWrap" width="194" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:323" fontAssetId="30:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="CCFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Period Value" styleId="30:323" text="2ND PERIOD"><DataBindContext sourcePathIds="30:1000-30:1040" propertyKey="268"/></TextValueRun>
       <TextModifierGroup name="Period Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14">
         <TextModifierRange name="Period Cascade Range" id="30:351" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
           <CubicInterpolatorComponent name="Period Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
@@ -250,8 +250,8 @@
       </TextModifierGroup>
     </Text>
     <Image name="Sponsor Logo" id="30:362" x="97" y="116.5" scaleX="0.105" scaleY="0.105" assetId="30:912"><DataBindContext sourcePathIds="30:1000-30:1043" propertyKey="206"/></Image>
-    <Shape name="Shot Clock Cell" x="140" y="8">
-      <Rectangle width="46" height="86" originX="0" originY="0" cornerRadiusTL="6"/>
+    <Shape name="Shot Clock Cell" x="128" y="38">
+      <Rectangle width="58" height="54" originX="0" originY="0" cornerRadiusTL="6"/>
       <Fill><SolidColor colorValue="1AFFFFFF"/></Fill>
     </Shape>
     <!-- Anchored at its seam end, so the intro draws it outward. -->
@@ -867,7 +867,7 @@
 <ViewModelInstanceBoolean viewModelPropertyId="30:1033" propertyValue="true"/>
 <ViewModelInstanceBoolean viewModelPropertyId="30:1034" propertyValue="false"/>
 <ViewModelInstanceBoolean viewModelPropertyId="30:1035" propertyValue="true"/>
-<ViewModelInstanceString viewModelPropertyId="30:1040" propertyValue="2ND"/>
+<ViewModelInstanceString viewModelPropertyId="30:1040" propertyValue="2ND PERIOD"/>
 <ViewModelInstanceString viewModelPropertyId="30:1041" propertyValue="13:59"/>
 <ViewModelInstanceString viewModelPropertyId="30:1042" propertyValue="24"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="30:1043" propertyValue="30:912"/>

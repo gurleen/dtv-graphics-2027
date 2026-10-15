@@ -22,7 +22,7 @@ A summary; `DESIGN_SYSTEM.md` has the values.
   separation from bright video.
 - **Typeface: Zuume.** `assets/fonts/Zuume-Bold.ttf` for acronyms, scores and
   the game clock; `assets/fonts/Zuume-Regular.ttf` for labels (period, `SHOT`,
-  `BONUS`).
+  `BONUS`) and the shot clock digits.
 - **Corners:** 12 on the outer corners of a block, 3 on inner seams. Panels are
   separated by 4-unit gaps, not by rules.
 - **Motion:** decisive and short, no overshoot. Intros run about 1.2 s but
@@ -41,8 +41,9 @@ action-safe margin (block origin 96, 890; size 430 x 132).
   right: a secondary-colour marker strip, the acronym over a large faded team
   logo cropped by the row, up to four timeout pips beneath the acronym, the `BONUS` tag, the possession chevron, and the
   score, right-aligned.
-- **Clock panel (194 x 132, dark glass):** period over the game clock, the shot
-  clock digits (no label) in their own sub-cell at the right, and a sponsor strip along the bottom.
+- **Clock panel (194 x 132, dark glass):** the period centred across the top,
+  then the game clock beside the shot clock digits (no label, same size) in their
+  own sub-cell at the right, and a sponsor strip along the bottom.
 - **Sponsor:** Independence Blue Cross, white wordmark directly on the dark
   glass. `assets/images/sponsors/independence_blue_cross.svg` is the source (the
   IBX "Live Fearless" lockup with the tagline removed); the `.png` beside it is

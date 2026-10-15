@@ -23,7 +23,7 @@ export const FIELDS: readonly Field[] = [
   { name: 'homeBonus', kind: 'boolean', title: 'Home Bonus', default: true },
   { name: 'awayPossession', kind: 'boolean', title: 'Away Possession', default: false },
   { name: 'homePossession', kind: 'boolean', title: 'Home Possession', default: true },
-  { name: 'period', kind: 'select', title: 'Period', options: ['1ST', '2ND', 'OT', '2OT', '3OT', 'HALF', 'FINAL'], default: '2ND' },
+  { name: 'period', kind: 'select', title: 'Period', options: ['1ST PERIOD', '2ND PERIOD', 'OT', '2OT', '3OT', 'HALF', 'FINAL'], default: '2ND PERIOD' },
   { name: 'clock', kind: 'string', title: 'Game Clock', description: 'Pre-formatted, e.g. "13:59" or "0:04.3".', default: '13:59' },
   { name: 'shotClock', kind: 'string', title: 'Shot Clock', description: 'Pre-formatted seconds; send an empty string to blank it.', default: '24' },
   {
