@@ -11,12 +11,22 @@ interface CatalogEntry {
   id: string;
   name: string;
   placement: 'scorebug' | 'with-scorebug' | 'full-frame';
+  /** Keys of the sponsors whose logos the graphic carries. */
+  sponsors: string[];
   manifest: string;
   thumbnail?: string;
 }
 
+interface Sponsor {
+  key: string;
+  name: string;
+  logo: string;
+  chip: 'light' | 'dark';
+}
+
 interface Catalog {
   scorebug: string | null;
+  sponsors: Sponsor[];
   graphics: CatalogEntry[];
 }
 
@@ -77,6 +87,8 @@ const SECTION_TITLES: Record<CatalogEntry['placement'], string> = {
 };
 
 let current: CatalogEntry | null = null;
+/** The sponsor the list is narrowed to, or null for every graphic. */
+let sponsorFilter: string | null = null;
 let primary: Loaded | null = null;
 let scorebug: Loaded | null = null;
 let onAir = false;
@@ -86,14 +98,42 @@ let generation = 0;
 
 // --- list --------------------------------------------------------------------------
 
+const renderSponsors = () => {
+  if (!catalog.sponsors.length) return [];
+  const heading = document.createElement('h3');
+  heading.textContent = 'Sponsors';
+  const grid = document.createElement('div');
+  grid.className = 'sponsors';
+  for (const sponsor of catalog.sponsors) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.sponsor = sponsor.key;
+    button.dataset.chip = sponsor.chip;
+    button.title = sponsor.name;
+    button.setAttribute('aria-pressed', 'false');
+    const image = document.createElement('img');
+    image.src = sponsor.logo;
+    image.alt = sponsor.name;
+    button.appendChild(image);
+    // Tapping the selected sponsor again shows every graphic.
+    button.onclick = () => {
+      sponsorFilter = sponsorFilter === sponsor.key ? null : sponsor.key;
+      applySponsorFilter();
+    };
+    grid.appendChild(button);
+  }
+  return [heading, grid];
+};
+
 const renderList = () => {
-  const nodes: Node[] = [];
+  const nodes: Node[] = renderSponsors();
   let section: CatalogEntry['placement'] | null = null;
   for (const entry of catalog.graphics) {
     if (entry.placement !== section) {
       section = entry.placement;
       const heading = document.createElement('h3');
       heading.textContent = SECTION_TITLES[section];
+      heading.dataset.section = section;
       nodes.push(heading);
     }
     const link = document.createElement('a');
@@ -112,6 +152,18 @@ const renderList = () => {
     nodes.push(link);
   }
   list.replaceChildren(...nodes);
+};
+
+/** Hides the graphics without the chosen sponsor, and any section left empty. */
+const applySponsorFilter = () => {
+  for (const button of list.querySelectorAll<HTMLButtonElement>('[data-sponsor]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.sponsor === sponsorFilter));
+  }
+  const visible = (entry: CatalogEntry) => sponsorFilter === null || entry.sponsors.includes(sponsorFilter);
+  for (const link of list.querySelectorAll<HTMLAnchorElement>('a')) link.hidden = !visible(catalogEntry(link.dataset.id!));
+  for (const heading of list.querySelectorAll<HTMLElement>('h3[data-section]')) {
+    heading.hidden = !catalog.graphics.some((entry) => entry.placement === heading.dataset.section && visible(entry));
+  }
 };
 
 // --- content form ------------------------------------------------------------------

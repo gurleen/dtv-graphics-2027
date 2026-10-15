@@ -8,6 +8,7 @@
  *
  *   index.html, app.js, style.css   the viewer
  *   graphics.json                   the catalog the viewer reads
+ *   sponsors/                       the logos of the sponsors filter
  *   graphics/<id>/                  each package as built: manifest, index.mjs, .riv, thumbnail
  *
  * wrangler.jsonc at the repository root serves build/site/ as Workers static assets;
@@ -16,19 +17,43 @@
 
 import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
-import { COMPANION_IDS, PLACEMENT_ORDER, SCOREBUG_ID, placementOf } from '../catalog';
+import type { GraphicSource } from '../../ograf/shared/definition';
+import { COMPANION_IDS, PLACEMENT_ORDER, SCOREBUG_ID, SPONSORS, placementOf } from '../catalog';
 
 const root = resolve(import.meta.dir, '../..');
 const packagesDirectory = join(root, 'build', 'ograf');
 const siteDirectory = join(root, 'build', 'site');
 const appDirectory = join(root, 'site', 'app');
+const graphicSourcesDirectory = join(root, 'ograf', 'graphics');
+const sponsorLogosDirectory = join(root, 'assets', 'images', 'sponsors');
 
-// --- 1. read the built packages ----------------------------------------------------
+// --- 1. find each graphic's sponsors in its scene ----------------------------------
+
+/** Sponsor keys by package id, from the sponsor images each scene embeds. */
+const sponsorsById = new Map<string, string[]>();
+for (const entry of await readdir(graphicSourcesDirectory)) {
+  const directory = join(graphicSourcesDirectory, entry);
+  const { id } = JSON.parse(await readFile(join(directory, 'manifest.base.json'), 'utf8'));
+  const { SOURCE } = (await import(join(directory, 'definition.ts'))) as { SOURCE: GraphicSource };
+  const sceneDirectory = join(root, SOURCE.sceneDirectory);
+  const sceneFile = SOURCE.sceneFile ?? (await readdir(sceneDirectory)).find((file) => file.endsWith('.rml'))!;
+  const scene = await readFile(join(sceneDirectory, sceneFile), 'utf8');
+  const keys = new Set<string>();
+  for (const [, file] of scene.matchAll(/file="assets\/images\/sponsors\/([^"]+)"/g)) {
+    const sponsor = SPONSORS.find((candidate) => file.startsWith(candidate.key));
+    if (sponsor) keys.add(sponsor.key);
+    else console.warn(`${sceneFile} embeds sponsors/${file}, which no sponsor in site/catalog.ts claims.`);
+  }
+  sponsorsById.set(id, [...keys]);
+}
+
+// --- 2. read the built packages ----------------------------------------------------
 
 interface CatalogEntry {
   id: string;
   name: string;
   placement: string;
+  sponsors: string[];
   manifest: string;
   thumbnail?: string;
 }
@@ -46,6 +71,7 @@ for (const entry of await readdir(packagesDirectory).catch(() => [] as string[])
     id: entry,
     name: manifest.name,
     placement: placementOf(entry),
+    sponsors: sponsorsById.get(entry) ?? [],
     manifest: `graphics/${entry}/${manifestFile}`,
     thumbnail: manifest.thumbnails?.[0]?.file ? `graphics/${entry}/${manifest.thumbnails[0].file}` : undefined,
   });
@@ -66,7 +92,7 @@ entries.sort(
     a.name.localeCompare(b.name),
 );
 
-// --- 2. write the site -------------------------------------------------------------
+// --- 3. write the site -------------------------------------------------------------
 
 await rm(siteDirectory, { recursive: true, force: true });
 await mkdir(join(siteDirectory, 'graphics'), { recursive: true });
@@ -87,9 +113,25 @@ for (const weight of [400, 500, 600]) {
   const file = `ibm-plex-sans-latin-${weight}-normal.woff2`;
   await cp(join(fontSource, file), join(siteDirectory, 'fonts', file));
 }
+
+// Only sponsors some built graphic carries get a logo in the filter.
+const sponsors = SPONSORS.filter((sponsor) => entries.some((entry) => entry.sponsors.includes(sponsor.key)));
+await mkdir(join(siteDirectory, 'sponsors'), { recursive: true });
+for (const sponsor of sponsors) {
+  await cp(join(sponsorLogosDirectory, sponsor.logo), join(siteDirectory, 'sponsors', sponsor.logo));
+}
+
 await writeFile(
   join(siteDirectory, 'graphics.json'),
-  `${JSON.stringify({ scorebug: packageIds.includes(SCOREBUG_ID) ? SCOREBUG_ID : null, graphics: entries }, null, 2)}\n`,
+  `${JSON.stringify(
+    {
+      scorebug: packageIds.includes(SCOREBUG_ID) ? SCOREBUG_ID : null,
+      sponsors: sponsors.map(({ key, name, logo, chip }) => ({ key, name, logo: `sponsors/${logo}`, chip })),
+      graphics: entries,
+    },
+    null,
+    2,
+  )}\n`,
 );
 
 const bundle = await Bun.build({
@@ -105,8 +147,11 @@ if (!bundle.success) {
   throw new Error('Bundling the site failed');
 }
 
-// --- 3. report ---------------------------------------------------------------------
+// --- 4. report ---------------------------------------------------------------------
 
 console.log(`Built ${relative(root, siteDirectory)}/ with ${entries.length} graphics:`);
-for (const entry of entries) console.log(`  ${entry.placement.padEnd(14)} ${entry.name}`);
+for (const entry of entries) {
+  const sponsorNames = entry.sponsors.map((key) => SPONSORS.find((sponsor) => sponsor.key === key)!.name);
+  console.log(`  ${entry.placement.padEnd(14)} ${entry.name}${sponsorNames.length ? `  [${sponsorNames.join(', ')}]` : ''}`);
+}
 console.log('\nPreview locally: bun run site:preview   Publish: bun run site:deploy');

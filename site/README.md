@@ -28,7 +28,8 @@ deliberately.
 ```
 index.html, app.js, style.css   the viewer
 fonts/                          IBM Plex Sans, self-hosted (@fontsource/ibm-plex-sans)
-graphics.json                   the catalog: name, placement, paths
+graphics.json                   the catalog: name, placement, sponsors, paths
+sponsors/                       the logos of the sponsors filter
 graphics/<id>/                  each OGraf package as built (manifest, index.mjs, .riv, thumbnail)
 ```
 
@@ -46,11 +47,17 @@ Nothing to edit: a package built into `build/ograf/` appears on the site under
 "Full frame". If it is meant to share the screen with the scorebug, add its id
 to `COMPANION_IDS` in `catalog.ts`.
 
+The sponsor logos at the top of the sidebar filter the list. A graphic is listed
+under a sponsor when its scene embeds that sponsor's image from
+`assets/images/sponsors/`, so no tagging is needed. A new sponsor needs one row
+in `SPONSORS` in `catalog.ts`; the build warns about a sponsor image no row
+claims.
+
 ## Files
 
 | Path | |
 |---|---|
-| `catalog.ts` | Which graphic is the scorebug and which sit beside it |
+| `catalog.ts` | Which graphic is the scorebug, which sit beside it, and the sponsors |
 | `scripts/build_site.ts` | Assembles `build/site/` from `build/ograf/` |
 | `app/` | The viewer: `index.html`, `style.css`, `app.ts` (bundled to `app.js`) |
 
