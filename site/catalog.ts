@@ -11,16 +11,18 @@
 export const SCOREBUG_ID = 'dtv-basketball-v2-scorebug';
 
 /**
- * Graphics designed to be on air together with the scorebug (they share its baseline
- * and height and clear it horizontally). The site puts the scorebug on air behind
- * each of these. The double and triple talent lower thirds overlap the scorebug and
- * the matchup locator is a mid-screen card, so none of those belong here.
+ * Graphics designed to be on air together with the scorebug (they stand on its baseline
+ * and clear it horizontally; all but the Burning Question, in the opposite corner, share
+ * its height too). The site puts the scorebug on air behind each of these. The double
+ * and triple talent lower thirds overlap the scorebug and the matchup locator is a
+ * mid-screen card, so none of those belong here.
  */
 export const COMPANION_IDS: readonly string[] = [
   'dtv-basketball-v2-player-lower-third',
   'dtv-basketball-v2-staff-lower-third',
   'dtv-basketball-v2-starting-five-lower-third',
   'dtv-basketball-v2-talent-lower-third-single',
+  'dtv-basketball-v2-burning-question',
 ];
 
 export type Placement = 'scorebug' | 'with-scorebug' | 'full-frame';

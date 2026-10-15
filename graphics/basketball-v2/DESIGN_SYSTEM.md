@@ -18,6 +18,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A mid-screen card | `matchup_locator.rml` |
 | A mid-screen table comparing the teams | `generate_halftime_statistics.ts` output |
 | A full-frame table of the conference's teams | `generate_conference_standings.ts` output |
+| A bottom-right lower third, or a panel a toggle opens on air | `generate_burning_question.ts` output |
 | A persistent corner bug | `basketball_scorebug.rml` |
 
 ## Colour and material
@@ -33,7 +34,8 @@ Colours are written `AARRGGBB` in RML.
 | Glaze fill | linear `00000000` → `4D000000`, top to bottom | Over every panel |
 | Hairline stroke | linear `73FFFFFF` at 0 → `0FFFFFFF` at 0.6, thickness 1 | The glaze's stroke; light from above |
 | Block shadow | stroke `99000000`, thickness 10, feather 18, shape opacity 0.6, offset y 4 | Behind the whole block |
-| Marker | team secondary, 8 wide (6 on neutral graphics, white) | Left edge of the first panel |
+| Marker | team secondary, 8 wide (6 on neutral graphics, white) | Left edge of the first panel; the outer (right) edge on a bottom-right block |
+| Edge light | line `E6FFFFFF`, 2 wide; glow `30FFFFFF` → clear, 44 wide, trailing the edge | The ignition and leading edges (the scorebug's: `F2FFFFFF`, glow `38FFFFFF`, 32 wide). The Burning Question alone burns ember (`F2FFB066`, glow `4DFF7A1F`) |
 | Alert | `FFE5322D` | Shot clock at 5 or fewer |
 | Default team | primary `FF07294D`, secondary `FFFFC600` | Drexel; view model defaults |
 
@@ -287,7 +289,8 @@ Namespaces in use:
 | 42 | Matchup locator lower third | 17000 |
 | 43 | Player of the Game lower third | 18200 |
 | 44 | Halftime adjustments | 19400 |
-| **45** | **Next free** | **20600** |
+| 45 | Burning Question | 20600 |
+| **46** | **Next free** | **21800** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

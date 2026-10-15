@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 45), naming, and a five-step checklist
+the id namespace registry (next free: 46), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -657,6 +657,75 @@ View model `BasketballHalftimeAdjustmentsV2`, public properties: `isPlaying`,
 `{team}School`, `{team}Mascot`, `{team}Line1`, `{team}Line2`, `{team}Logo`, `{team}PrimaryColor`, `{team}SecondaryColor`. Send text
 in capitals. A blank line leaves its bullet showing. To review a team change:
 `bun scripts/render_frames.ts graphics/basketball-v2/halftime_adjustments.rml --on-air --data=step=1 --frames=0-48:4 --out=build/frames/halftime/change --sheet=4`.
+
+## Burning Question (`burning_question.rml`)
+
+A trivia question presented by Steamfitters Local 420, with an answer the operator
+reveals on air. It stands in the bottom-right corner: right edge on the action-safe
+margin (x 1824), foot on the scorebug's baseline (y 1022), 760 wide from x 1064. It
+clears the scorebug, so the two can be on air together. The block is 248 high with the
+answer hidden (origin 1064, 774) and 308 with it shown. It mirrors the other lower
+thirds: the text is right-aligned, and the sponsor chip and the marker sit on the outer
+(right) edge.
+
+- **Generated.** `generate_burning_question.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_burning_question.ts`;
+  never edit the `.rml` output by hand.
+- **Title row (84 high):** the fixed title on dark glass (644 wide), `THE` in Zuume
+  Regular (85% white) then `BURNING QUESTION` in Bold, 54, right-aligned against the
+  chip. The sponsor sits on a 112 x 84 white chip at the outer end, contained within
+  its padding; the Steamfitters crest by default. There is no `PRESENTED BY`.
+- **Question panel (760 x 160, team tint):** the question in Bold 40, right-aligned
+  and centred in the panel, on up to three lines (about 150 characters) at full size.
+  Longer copy shrinks to fit, and a word is never broken. The team logo is a large
+  faded mark at the inner end, cropped by the panel. A secondary-colour marker (8 wide)
+  runs down the outer edge; the tint clips it, so it follows the panel's corners.
+- **Answer strip (760 x 56, dark glass):** a muted `ANSWER` (Regular 24), then the
+  answer in Bold 38 in the team's secondary colour, right-aligned with the question.
+  One line; it shrinks to fit.
+- **Showing the answer.** `showAnswer` opens the strip. The strip never moves: it
+  stands at the block's foot, behind the question, and showing the answer lifts the
+  title and question by 60, so the block grows upward and its foot stays on the
+  baseline. The question's lower corners turn from outer (12) to seam (3). On air,
+  the reveal (0.6 s) lifts the glass with the intro's ease-out, the answer rises in
+  from its last glyph and one sweep crosses the glass. The conceal (0.4 s) fades the
+  answer and settles the glass back with the same ease-out, since it stays on screen.
+  Off air the change snaps, so playing with the answer shown builds it in the intro.
+  Leaving air does not reset it: untick it before the next question.
+- **Intro (1.2 s):** the lower thirds' build, mirrored. A light ignites at the
+  title/chip seam and splits: the left edge wipes the title, question and answer open
+  toward the inner end, the right edge opens the chip and the panel's outer end. The
+  ignition and edge lights burn ember orange (`F2FFB066` line, `4DFF7A1F` glow), a nod
+  to the title and the one departure from the white lights elsewhere. Content drifts
+  in behind the edge; the title and answer rise from their last glyph, so text builds
+  from the seam outward, and the question rises line by line. The crest and the faded
+  logo settle from 112%, the marker draws down, and one sheen crosses the glass right
+  to left. Everything reads by about 0.8 s.
+- **Outro (0.4 s):** the edges close the glass toward the seam with a brief ember edge
+  light, the content drifts toward the seam, the marker retracts and the faded logo
+  swells and fades. The crest holds until the right edge closes over its chip.
+- **State machine:** two layers. Display (Hidden → Intro → Hold → Outro) follows
+  `isPlaying`. Answer (Answer Hidden, Answer Shown, the reveal and the conceal)
+  follows `showAnswer` and animates only while `isPlaying` is true. It keys the lift
+  and everything that follows it (the question's lower corners, the shadow outline,
+  the sweeps' silhouette and the edge-light spans), the answer's fade and its own
+  sweep. The layers share only the answer's reveal range, which the Answer layer, the
+  later one, wins during the reveal. Hold and Outro key every property the intro
+  animates at its resting value. Keep the OGraf durations (1200 / 400 ms) in sync.
+- **Going on air.** The package's `playAction` waits two frames before setting
+  `isPlaying`, so a `showAnswer` sent in the same tick snaps first and the intro builds
+  the strip. Without the wait the scene sees both flags at once and plays the reveal
+  over the intro.
+
+View model `BasketballBurningQuestionV2`, public properties: `isPlaying`,
+`showAnswer`, `question`, `answer`, `teamLogo`, `teamPrimaryColor`,
+`teamSecondaryColor`, `sponsorLogo`. Send text in capitals. The test data is a Drexel
+question (`TAYLOR WOOTTON` scored her 1000th point in the 2013 WNIT championship game).
+To review the reveal:
+`bun scripts/render_frames.ts graphics/basketball-v2/burning_question.rml --on-air --data=showAnswer=true --frames=0-36:3 --out=build/frames/burning_question/reveal --sheet=4`.
+
+Build the OGraf package with
+`bun run ograf:build:basketball-v2-burning-question`.
 
 ## Test data
 
