@@ -409,15 +409,17 @@ is for pre-game only; never put the two on air together.**
   context tag (for example `2026-27 SEASON`) after a secondary-colour `/`; a
   blank tag hides the separator. `PRESENTED BY` sits at the right, centred over
   the sponsor chip.
-- **Name row (84 high, team tint):** the jersey number, first and last name on
+- **Name row (972 x 84, team tint):** the jersey number, first and last name on
   one line as on the staff lower third (shrinks to fit), and position over class year at the right, over a
-  faded team logo. The full-colour sponsor logo (50 high) closes the row on a
-  200 x 84 white chip.
-- **Body row (84 high, dark glass):** `bodyMode` `STATS` shows up to four stat
-  cells, value then label on one line (Bold 52, then Regular 30, centred and
-  shrunk to fit); a blank value hides its cell and the rest share the row
-  evenly. `TEXT` shows `bodyText` (Bold 32, two lines, longer copy shrinks
-  to fit). Changing either on air crossfades or re-spaces smoothly.
+  faded team logo.
+- **Body row (972 x 84, dark glass):** `bodyMode` `STATS` shows up to four stat
+  cells (240 wide), value then label on one line (Bold 52, then Regular 30,
+  centred and shrunk to fit); a blank value hides its cell and the rest share
+  the row evenly. `TEXT` shows `bodyText` (Bold 32, two lines, longer copy
+  shrinks to fit). Changing either on air crossfades or re-spaces smoothly.
+- **Sponsor chip (200 x 172, white):** right of the name and body rows, from
+  the header down to the foot of the block, taking the block's bottom-right
+  corner. The full-colour sponsor logo (160 wide) sits at its centre.
 - **Controller script.** `player_to_watch_controller.luau` counts the shown
   stats and writes each cell's x, width and opacity, the two body opacities and
   the context separator into `_`-prefixed view model properties the scene
@@ -463,7 +465,7 @@ same way, so take the scorebug off air first.
 - **Generated** by `generate_player_feature_lower_thirds.ts`, as its second
   variant; change the shared layout there once and both scenes follow.
 - **Sponsor chip:** `assets/images/sponsors/steamfitters_local_420_logo.png`, the
-  1187 x 1325 crest, drawn 72 high on the 200 x 84 white chip.
+  1187 x 1325 crest, drawn 132 high on the 200 x 172 white chip.
 - **Test data:** game stats (`24 PTS`, `8 REB`, `5 AST`, `9-14 FG`) and the
   context tag `VS ST. JOHN'S`.
 

@@ -3,9 +3,9 @@
        Basketball Player To Watch lower third v2: a tinted-glass block, 1400 x 220, at the
        bottom of a transparent 1920 x 1080 canvas (origin 260, 802), on the scorebug's
        baseline. A headshot panel whose cutout rises 84 above the block; to its right
-       the header (title, context, sponsor label), the name panel and sponsor chip, and the body: stat tiles
-       or a line of copy. Sibling draw order is front to back; within one shape the last
-       paint declared is on top. -->
+       the header (title, context, sponsor label), the name panel over the body (stat tiles or a
+       line of copy), and the sponsor chip beside both. Sibling draw order is front to back;
+       within one shape the last paint declared is on top. -->
   <Artboard name="Basketball Player To Watch Lower Third v2" id="38:2" x="0" y="12200" width="1920" height="1080" viewModelId="38:1000" viewModelInstanceId="38:1001" defaultStateMachineId="38:7" styleId="38:5">
   <LayoutComponentStyle name="Player To Watch Lower Third v2 Style" id="38:5"/>
   <Fill><SolidColor colorValue="00000000"/></Fill>
@@ -132,14 +132,14 @@
       <Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
       <Fill><SolidColor colorValue="59000000"/></Fill>
     </Shape>
-    <!-- The sponsor in full colour on a white chip, the full height of the row. -->
-    <Node name="Sponsor Chip" id="38:170" x="976" y="0">
-      <Image name="Sponsor Logo" id="38:171" x="100" y="42" scaleX="0.09345794392523364" scaleY="0.09345794392523364" assetId="38:913"><DataBindContext sourcePathIds="38:1000-38:1024" propertyKey="206"/></Image>
-      <Shape name="Sponsor Chip Body" x="0" y="0">
-        <Rectangle width="200" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-        <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
-      </Shape>
-    </Node>
+  </Node>
+  <Node name="Sponsor Chip" id="38:170" x="1200" y="48">
+    <ClippingShape name="Sponsor Reveal Clip" sourceId="38:506"/>
+    <Image name="Sponsor Logo" id="38:171" x="100" y="86" scaleX="0.1" scaleY="0.1" assetId="38:913"><DataBindContext sourcePathIds="38:1000-38:1024" propertyKey="206"/></Image>
+    <Shape name="Sponsor Chip Body" x="0" y="0">
+      <Rectangle width="200" height="172" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="172"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
+    </Shape>
   </Node>
   <Node name="Body" id="38:300" x="224" y="136">
     <ClippingShape name="Body Slide Clip" sourceId="38:621"/>
@@ -147,7 +147,7 @@
     <Node name="Stats" id="38:301" x="0" y="0"><DataBindContext sourcePathIds="38:1000-38:1072" propertyKey="18"/>
   <Node name="Stat 1 Tile" id="38:3000" x="0" y="0"><DataBindContext sourcePathIds="38:1000-38:1050" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1052" propertyKey="18"/>
     <Node name="Stat 1 Slide" id="38:3001" x="0" y="0">
-    <Text name="Stat 1" x="0" y="0" wrapValue="noWrap" width="291" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1051" propertyKey="285"/>
+    <Text name="Stat 1" x="0" y="0" wrapValue="noWrap" width="240" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1051" propertyKey="285"/>
       <TextStylePaint id="38:3002" fontAssetId="38:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="38:3003" fontAssetId="38:901" fontSize="30" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Stat 1 Value" id="38:3006" styleId="38:3002" text="18.4"><DataBindContext sourcePathIds="38:1000-38:1030" propertyKey="268"/></TextValueRun>
@@ -155,19 +155,19 @@
       <TextValueRun name="Stat 1 Label" id="38:3007" styleId="38:3003" text="PPG"><DataBindContext sourcePathIds="38:1000-38:1031" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Stat 1 Value Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 1 Value Reveal" id="38:3004" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3006"/></TextModifierGroup><TextModifierGroup name="Stat 1 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 1 Label Reveal" id="38:3005" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3007"/></TextModifierGroup></Text>
     <Shape name="Stat 1 Glaze" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1051" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1051" propertyKey="20"/></Rectangle>
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
     <Shape name="Stat 1 Body" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1051" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1051" propertyKey="20"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
   </Node>
-<Node name="Stat 2 Tile" id="38:3100" x="295" y="0"><DataBindContext sourcePathIds="38:1000-38:1054" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1056" propertyKey="18"/>
+<Node name="Stat 2 Tile" id="38:3100" x="244" y="0"><DataBindContext sourcePathIds="38:1000-38:1054" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1056" propertyKey="18"/>
     <Node name="Stat 2 Slide" id="38:3101" x="0" y="0">
-    <Text name="Stat 2" x="0" y="0" wrapValue="noWrap" width="291" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1055" propertyKey="285"/>
+    <Text name="Stat 2" x="0" y="0" wrapValue="noWrap" width="240" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1055" propertyKey="285"/>
       <TextStylePaint id="38:3102" fontAssetId="38:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="38:3103" fontAssetId="38:901" fontSize="30" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Stat 2 Value" id="38:3106" styleId="38:3102" text="7.2"><DataBindContext sourcePathIds="38:1000-38:1032" propertyKey="268"/></TextValueRun>
@@ -175,19 +175,19 @@
       <TextValueRun name="Stat 2 Label" id="38:3107" styleId="38:3103" text="RPG"><DataBindContext sourcePathIds="38:1000-38:1033" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Stat 2 Value Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 2 Value Reveal" id="38:3104" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3106"/></TextModifierGroup><TextModifierGroup name="Stat 2 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 2 Label Reveal" id="38:3105" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3107"/></TextModifierGroup></Text>
     <Shape name="Stat 2 Glaze" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1055" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1055" propertyKey="20"/></Rectangle>
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
     <Shape name="Stat 2 Body" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1055" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1055" propertyKey="20"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
   </Node>
-<Node name="Stat 3 Tile" id="38:3200" x="590" y="0"><DataBindContext sourcePathIds="38:1000-38:1058" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1060" propertyKey="18"/>
+<Node name="Stat 3 Tile" id="38:3200" x="488" y="0"><DataBindContext sourcePathIds="38:1000-38:1058" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1060" propertyKey="18"/>
     <Node name="Stat 3 Slide" id="38:3201" x="0" y="0">
-    <Text name="Stat 3" x="0" y="0" wrapValue="noWrap" width="291" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1059" propertyKey="285"/>
+    <Text name="Stat 3" x="0" y="0" wrapValue="noWrap" width="240" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1059" propertyKey="285"/>
       <TextStylePaint id="38:3202" fontAssetId="38:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="38:3203" fontAssetId="38:901" fontSize="30" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Stat 3 Value" id="38:3206" styleId="38:3202" text="3.1"><DataBindContext sourcePathIds="38:1000-38:1034" propertyKey="268"/></TextValueRun>
@@ -195,19 +195,19 @@
       <TextValueRun name="Stat 3 Label" id="38:3207" styleId="38:3203" text="APG"><DataBindContext sourcePathIds="38:1000-38:1035" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Stat 3 Value Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 3 Value Reveal" id="38:3204" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3206"/></TextModifierGroup><TextModifierGroup name="Stat 3 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 3 Label Reveal" id="38:3205" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3207"/></TextModifierGroup></Text>
     <Shape name="Stat 3 Glaze" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1059" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1059" propertyKey="20"/></Rectangle>
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
     <Shape name="Stat 3 Body" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1059" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1059" propertyKey="20"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
   </Node>
-<Node name="Stat 4 Tile" id="38:3300" x="885" y="0"><DataBindContext sourcePathIds="38:1000-38:1062" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1064" propertyKey="18"/>
+<Node name="Stat 4 Tile" id="38:3300" x="732" y="0"><DataBindContext sourcePathIds="38:1000-38:1062" propertyKey="13"/><DataBindContext sourcePathIds="38:1000-38:1064" propertyKey="18"/>
     <Node name="Stat 4 Slide" id="38:3301" x="0" y="0">
-    <Text name="Stat 4" x="0" y="0" wrapValue="noWrap" width="291" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1063" propertyKey="285"/>
+    <Text name="Stat 4" x="0" y="0" wrapValue="noWrap" width="240" height="84" sizingValue="fixed" overflowValue="fitFontSize" alignValue="center" verticalAlignValue="middle" fitFromBaseline="false"><DataBindContext sourcePathIds="38:1000-38:1063" propertyKey="285"/>
       <TextStylePaint id="38:3302" fontAssetId="38:900" fontSize="52" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
       <TextStylePaint id="38:3303" fontAssetId="38:901" fontSize="30" letterSpacing="2"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint>
       <TextValueRun name="Stat 4 Value" id="38:3306" styleId="38:3302" text="48.2%"><DataBindContext sourcePathIds="38:1000-38:1036" propertyKey="268"/></TextValueRun>
@@ -215,12 +215,12 @@
       <TextValueRun name="Stat 4 Label" id="38:3307" styleId="38:3303" text="FG%"><DataBindContext sourcePathIds="38:1000-38:1037" propertyKey="268"/></TextValueRun>
     <TextModifierGroup name="Stat 4 Value Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 4 Value Reveal" id="38:3304" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3306"/></TextModifierGroup><TextModifierGroup name="Stat 4 Label Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Stat 4 Label Reveal" id="38:3305" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2" runId="38:3307"/></TextModifierGroup></Text>
     <Shape name="Stat 4 Glaze" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1063" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1063" propertyKey="20"/></Rectangle>
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
     <Shape name="Stat 4 Body" x="0" y="0">
-      <Rectangle width="291" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1063" propertyKey="20"/></Rectangle>
+      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="38:1000-38:1063" propertyKey="20"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -229,14 +229,14 @@
     <Node name="Copy" id="38:302" x="0" y="0" opacity="0"><DataBindContext sourcePathIds="38:1000-38:1073" propertyKey="18"/>
     <Node name="Copy Slide" id="38:303" x="0" y="0">
     <!-- Up to two lines; longer copy shrinks to fit the box, centred on the panel. -->
-    <Text name="Body Copy" x="24" y="6" originValue="top" wrapValue="wrap" width="1128" height="72" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle"><TextStylePaint id="38:305" fontAssetId="38:900" fontSize="32" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Body Copy Value" styleId="38:305" text="LEADS THE CAA IN SCORING AND HAS REACHED 20 POINTS IN FIVE STRAIGHT GAMES, INCLUDING A CAREER-HIGH 31 AT HOFSTRA"><DataBindContext sourcePathIds="38:1000-38:1016" propertyKey="268"/></TextValueRun><TextModifierGroup name="Body Copy Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Body Copy Reveal" id="38:304" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
+    <Text name="Body Copy" x="24" y="6" originValue="top" wrapValue="wrap" width="924" height="72" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle"><TextStylePaint id="38:305" fontAssetId="38:900" fontSize="32" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Body Copy Value" styleId="38:305" text="LEADS THE CAA IN SCORING AND HAS REACHED 20 POINTS IN FIVE STRAIGHT GAMES, INCLUDING A CAREER-HIGH 31 AT HOFSTRA"><DataBindContext sourcePathIds="38:1000-38:1016" propertyKey="268"/></TextValueRun><TextModifierGroup name="Body Copy Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Body Copy Reveal" id="38:304" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
     <Shape name="Copy Glaze" x="0" y="0">
-      <Rectangle width="1176" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
+      <Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
     <Shape name="Copy Body" x="0" y="0">
-      <Rectangle width="1176" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
+      <Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -248,9 +248,9 @@
     <Rectangle width="1400" height="220" originX="0" originY="0" cornerRadiusTL="12"/>
     <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
   </Shape>
-  <Shape name="Block Silhouette" id="38:610"><Rectangle x="0" y="0" width="220" height="220" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/><Rectangle x="224" y="0" width="1176" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="224" y="48" width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="1200" y="48" width="200" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="224" y="136" width="1176" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/></Shape>
+  <Shape name="Block Silhouette" id="38:610"><Rectangle x="0" y="0" width="220" height="220" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/><Rectangle x="224" y="0" width="1176" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="224" y="48" width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="1200" y="48" width="200" height="172" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/><Rectangle x="224" y="136" width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/></Shape>
   <Shape name="Header Slide Mask" id="38:620" x="224" y="0"><Rectangle width="1176" height="44" originX="0" originY="0"/></Shape>
-  <Shape name="Body Slide Mask" id="38:621" x="224" y="136"><Rectangle width="1176" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/></Shape>
+  <Shape name="Body Slide Mask" id="38:621" x="224" y="136"><Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/></Shape>
   </Node>
 
   <!-- Intro: seam ignition, outward glass wipes, a rising headshot, rows sliding out from
@@ -264,6 +264,9 @@
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="38:170"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:300"><KeyedProperty propertyKey="18">
@@ -538,6 +541,9 @@
   <KeyedObject objectId="38:200"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="38:170"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:300"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -706,6 +712,10 @@
     <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:200"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="38:170"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
     <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -905,6 +915,9 @@
   <KeyedObject objectId="38:200"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="38:170"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="38:300"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -1009,16 +1022,16 @@
 <ViewModelInstanceString viewModelPropertyId="38:1036" propertyValue="48.2%"/>
 <ViewModelInstanceString viewModelPropertyId="38:1037" propertyValue="FG%"/>
 <ViewModelInstanceNumber viewModelPropertyId="38:1050" propertyValue="0"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1051" propertyValue="291"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1051" propertyValue="240"/>
 <ViewModelInstanceNumber viewModelPropertyId="38:1052" propertyValue="1"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1054" propertyValue="295"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1055" propertyValue="291"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1054" propertyValue="244"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1055" propertyValue="240"/>
 <ViewModelInstanceNumber viewModelPropertyId="38:1056" propertyValue="1"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1058" propertyValue="590"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1059" propertyValue="291"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1058" propertyValue="488"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1059" propertyValue="240"/>
 <ViewModelInstanceNumber viewModelPropertyId="38:1060" propertyValue="1"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1062" propertyValue="885"/>
-<ViewModelInstanceNumber viewModelPropertyId="38:1063" propertyValue="291"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1062" propertyValue="732"/>
+<ViewModelInstanceNumber viewModelPropertyId="38:1063" propertyValue="240"/>
 <ViewModelInstanceNumber viewModelPropertyId="38:1064" propertyValue="1"/>
 <ViewModelInstanceNumber viewModelPropertyId="38:1070" propertyValue="1"/>
 <ViewModelInstanceString viewModelPropertyId="38:1071" propertyValue="   /   "/>

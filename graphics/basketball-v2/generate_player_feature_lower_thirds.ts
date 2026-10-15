@@ -15,9 +15,10 @@
  *
  *   Headshot   a full-height panel at the left; the cutout rises above the block.
  *   Header     the title, an optional context tag, and PRESENTED BY over the chip.
- *   Name       jersey number, first and last name on one line, position and class year, then the
- *              sponsor chip at the right, the full height of the row.
- *   Body       one of two modes, chosen by `bodyMode`:
+ *   Name       jersey number, first and last name on one line, position and class year.
+ *   Chip       the sponsor logo on a white chip at the right, under the header and beside the
+ *              name and body rows, down to the foot of the block.
+ *   Body       one of two modes, chosen by `bodyMode`, under the name row:
  *                STATS  up to four tiles, value then label on one line; a blank value hides its tile
  *                       and the rest re-space evenly across the row.
  *                TEXT   one or two lines of copy, shrunk to fit when longer.
@@ -56,8 +57,8 @@ const VARIANTS: readonly Variant[] = [
   {
     file: 'player_to_watch_lower_third.rml', prefix: 38, artboardY: 12200,
     title: 'PLAYER TO WATCH', name: 'Player To Watch',
-    // The trimmed Belfor export is 1600 x 535; 50 units tall on the chip.
-    sponsor: { name: 'Belfor', file: 'assets/images/sponsors/belfor_trimmed.png', scale: 50 / 535 },
+    // The trimmed Belfor export is 1600 x 535; 160 units wide on the chip.
+    sponsor: { name: 'Belfor', file: 'assets/images/sponsors/belfor_trimmed.png', scale: 160 / 1600 },
     player: {
       ...PLAYER,
       context: '2026-27 SEASON',
@@ -73,8 +74,8 @@ const VARIANTS: readonly Variant[] = [
   {
     file: 'player_of_the_game_lower_third.rml', prefix: 43, artboardY: 18200,
     title: 'PLAYER OF THE GAME', name: 'Player Of The Game',
-    // The Steamfitters Local 420 crest is 1187 x 1325; 72 units tall on the chip.
-    sponsor: { name: 'Steamfitters', file: 'assets/images/sponsors/steamfitters_local_420_logo.png', scale: 72 / 1325 },
+    // The Steamfitters Local 420 crest is 1187 x 1325; 132 units tall on the chip.
+    sponsor: { name: 'Steamfitters', file: 'assets/images/sponsors/steamfitters_local_420_logo.png', scale: 132 / 1325 },
     player: {
       ...PLAYER,
       context: "VS ST. JOHN'S",
@@ -108,8 +109,14 @@ const COLUMN_X = HEADSHOT_WIDTH + GAP;
 const COLUMN_WIDTH = 1176;
 const BLOCK_WIDTH = COLUMN_X + COLUMN_WIDTH;
 const SEAM = HEADSHOT_WIDTH + GAP / 2;
+// The sponsor chip runs from the top of the name row to the foot of the block; the name
+// and body rows share the column's width left of it.
 const CHIP_WIDTH = 200;
+const CHIP_HEIGHT = BLOCK_HEIGHT - NAME_Y;
 const NAME_WIDTH = COLUMN_WIDTH - GAP - CHIP_WIDTH;
+// player_to_watch_controller.luau lays the stat tiles out across this width; keep its
+// BODY_WIDTH equal.
+const BODY_WIDTH = NAME_WIDTH;
 const CHIP_X = NAME_WIDTH + GAP;
 const OUTER_RADIUS = 12;
 const INNER_RADIUS = 3;
@@ -120,7 +127,7 @@ const TEXT_INSET = 24;
 const LOGO_SCALE = 0.3;
 const SWEEP_START = -120;
 const SWEEP_END = BLOCK_WIDTH + 120;
-const TILE_WIDTH = (COLUMN_WIDTH - (CELL_COUNT - 1) * GAP) / CELL_COUNT;
+const TILE_WIDTH = (BODY_WIDTH - (CELL_COUNT - 1) * GAP) / CELL_COUNT;
 
 // Timeline lengths in frames at 60 fps.
 const INTRO_FRAMES = 84;
@@ -173,6 +180,7 @@ const renderVariant = (variant: Variant) => {
   const HEADER_CONTENT = id(151);
   const TITLE_REVEAL = id(152);
   const SPONSOR_LABEL_REVEAL = id(153);
+  const SPONSOR_CHIP = id(170);
   const SPONSOR_LOGO = id(171);
   const NAME_PANEL = id(200);
   const NAME_CONTENT = id(201);
@@ -278,9 +286,9 @@ const renderVariant = (variant: Variant) => {
   const HEADSHOT_RADII: Radii = [OUTER_RADIUS, INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS];
   const MARKER_RADII: Radii = [OUTER_RADIUS, 0, OUTER_RADIUS, 0];
   const HEADER_RADII: Radii = [INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS];
-  const CHIP_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS];
+  const CHIP_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS];
   const NAME_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS];
-  const BODY_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS];
+  const BODY_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS];
 
   // --- headshot -------------------------------------------------------------------------
 
@@ -368,22 +376,25 @@ const renderVariant = (variant: Variant) => {
     <Image name="Team Logo" id="${TEAM_LOGO}" x="${NAME_WIDTH - 116}" y="${NAME_HEIGHT / 2}" opacity="0.18" scaleX="${LOGO_SCALE}" scaleY="${LOGO_SCALE}" assetId="${LOGO_ASSET}">${bound(P.teamLogo, IMAGE)}<ClippingShape name="Team Logo Clip" sourceId="${NAME_TINT}"/></Image>
     ${teamTint('Name Tint', NAME_TINT, NAME_WIDTH, NAME_HEIGHT, NAME_RADII)}
     ${underlay('Name Underlay', NAME_WIDTH, NAME_HEIGHT, NAME_RADII)}
-    <!-- The sponsor in full colour on a white chip, the full height of the row. -->
-    <Node name="Sponsor Chip" id="${id(170)}" x="${CHIP_X}" y="0">
-      <Image name="Sponsor Logo" id="${SPONSOR_LOGO}" x="${CHIP_WIDTH / 2}" y="${NAME_HEIGHT / 2}" scaleX="${sponsor.scale}" scaleY="${sponsor.scale}" assetId="${SPONSOR_ASSET}">${bound(P.sponsorLogo, IMAGE)}</Image>
-      <Shape name="Sponsor Chip Body" x="0" y="0">
-        ${rectangle(CHIP_WIDTH, NAME_HEIGHT, CHIP_RADII)}
-        <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${NAME_HEIGHT}"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
-      </Shape>
-    </Node>
+  </Node>`;
+
+  // --- sponsor chip ---------------------------------------------------------------------
+
+  // The sponsor in full colour on a white chip, beside the name and body rows.
+  const sponsorChip = `<Node name="Sponsor Chip" id="${SPONSOR_CHIP}" x="${COLUMN_X + CHIP_X}" y="${NAME_Y}">
+    <ClippingShape name="Sponsor Reveal Clip" sourceId="${COLUMN_MASK}"/>
+    <Image name="Sponsor Logo" id="${SPONSOR_LOGO}" x="${CHIP_WIDTH / 2}" y="${CHIP_HEIGHT / 2}" scaleX="${sponsor.scale}" scaleY="${sponsor.scale}" assetId="${SPONSOR_ASSET}">${bound(P.sponsorLogo, IMAGE)}</Image>
+    <Shape name="Sponsor Chip Body" x="0" y="0">
+      ${rectangle(CHIP_WIDTH, CHIP_HEIGHT, CHIP_RADII)}
+      <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${CHIP_HEIGHT}"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
+    </Shape>
   </Node>`;
 
   // --- body -----------------------------------------------------------------------------
 
   // Each tile's x, width and opacity come from the controller, so the visible tiles always
-  // share the row evenly. The body mask carries the block's rounded corner, whichever tile
-  // ends the row. Value and label read left to right on one line, centred on the tile and
-  // shrunk to fit; each run has its own reveal.
+  // share the row evenly. Value and label read left to right on one line, centred on the
+  // tile and shrunk to fit; each run has its own reveal.
   const statTile = (t: (typeof TILES)[number]) => {
     const label = `Stat ${t.index + 1}`;
     const widthBind = bound(P.statWidth(t.index), PATH_WIDTH);
@@ -398,7 +409,7 @@ const renderVariant = (variant: Variant) => {
       <TextValueRun name="${label} Gap" styleId="${t.labelStyle}" text=" "></TextValueRun>
       <TextValueRun name="${label} Label" id="${t.labelRun}" styleId="${t.labelStyle}" text="${stat.label}">${bound(P.statLabel(t.index), TEXT)}</TextValueRun>
     ${rise(`${label} Value`, t.valueReveal, t.valueRun)}${rise(`${label} Label`, t.labelReveal, t.labelRun)}</Text>
-    ${darkGlass(label, TILE_WIDTH, BODY_HEIGHT, NAME_RADII, widthBind)}
+    ${darkGlass(label, TILE_WIDTH, BODY_HEIGHT, BODY_RADII, widthBind)}
     </Node>
   </Node>`;
   };
@@ -413,8 +424,8 @@ const renderVariant = (variant: Variant) => {
     <Node name="Copy" id="${TEXT_NODE}" x="0" y="0" opacity="0">${bound(P.textOpacity, OPACITY)}
     <Node name="Copy Slide" id="${TEXT_SLIDE}" x="0" y="0">
     <!-- Up to two lines; longer copy shrinks to fit the box, centred on the panel. -->
-    <Text name="Body Copy" x="${TEXT_INSET}" y="${(BODY_HEIGHT - BODY_TEXT_HEIGHT) / 2}" originValue="top" wrapValue="wrap" width="${COLUMN_WIDTH - 2 * TEXT_INSET}" height="${BODY_TEXT_HEIGHT}" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle"><TextStylePaint id="${id(305)}" fontAssetId="${FONT_BOLD}" fontSize="32" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Body Copy Value" styleId="${id(305)}" text="${player.text}">${bound(P.bodyText, TEXT)}</TextValueRun>${rise('Body Copy', BODY_TEXT_REVEAL)}</Text>
-    ${darkGlass('Copy', COLUMN_WIDTH, BODY_HEIGHT, BODY_RADII)}
+    <Text name="Body Copy" x="${TEXT_INSET}" y="${(BODY_HEIGHT - BODY_TEXT_HEIGHT) / 2}" originValue="top" wrapValue="wrap" width="${BODY_WIDTH - 2 * TEXT_INSET}" height="${BODY_TEXT_HEIGHT}" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle"><TextStylePaint id="${id(305)}" fontAssetId="${FONT_BOLD}" fontSize="32" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Body Copy Value" styleId="${id(305)}" text="${player.text}">${bound(P.bodyText, TEXT)}</TextValueRun>${rise('Body Copy', BODY_TEXT_REVEAL)}</Text>
+    ${darkGlass('Copy', BODY_WIDTH, BODY_HEIGHT, BODY_RADII)}
     </Node>
     </Node>
   </Node>`;
@@ -423,8 +434,8 @@ const renderVariant = (variant: Variant) => {
     rectangle(HEADSHOT_WIDTH, BLOCK_HEIGHT, HEADSHOT_RADII, ' x="0" y="0"'),
     rectangle(COLUMN_WIDTH, HEADER_HEIGHT, HEADER_RADII, ` x="${COLUMN_X}" y="0"`),
     rectangle(NAME_WIDTH, NAME_HEIGHT, NAME_RADII, ` x="${COLUMN_X}" y="${NAME_Y}"`),
-    rectangle(CHIP_WIDTH, NAME_HEIGHT, CHIP_RADII, ` x="${COLUMN_X + CHIP_X}" y="${NAME_Y}"`),
-    rectangle(COLUMN_WIDTH, BODY_HEIGHT, BODY_RADII, ` x="${COLUMN_X}" y="${BODY_Y}"`),
+    rectangle(CHIP_WIDTH, CHIP_HEIGHT, CHIP_RADII, ` x="${COLUMN_X + CHIP_X}" y="${NAME_Y}"`),
+    rectangle(BODY_WIDTH, BODY_HEIGHT, BODY_RADII, ` x="${COLUMN_X}" y="${BODY_Y}"`),
   ].join('');
 
   // --- timelines ------------------------------------------------------------------------
@@ -461,7 +472,7 @@ const renderVariant = (variant: Variant) => {
     TITLE_REVEAL, SPONSOR_LABEL_REVEAL, ...Object.values(NAME_REVEAL), BODY_TEXT_REVEAL,
     ...TILES.flatMap((t) => [t.valueReveal, t.labelReveal]),
   ];
-  const GROUPS = [HEADSHOT_PANEL, HEADER, NAME_PANEL, BODY];
+  const GROUPS = [HEADSHOT_PANEL, HEADER, NAME_PANEL, SPONSOR_CHIP, BODY];
   const EDGE_LIGHTS = [HEADSHOT_EDGE_LIGHT, COLUMN_EDGE_LIGHT];
   const SLIDES = [TEXT_SLIDE, ...TILES.map((t) => t.slide)];
 
@@ -665,9 +676,9 @@ const renderVariant = (variant: Variant) => {
        Basketball ${name} lower third v2: a tinted-glass block, ${BLOCK_WIDTH} x ${BLOCK_HEIGHT}, at the
        bottom of a transparent 1920 x 1080 canvas (origin ${BLOCK_X}, ${BLOCK_Y}), on the scorebug's
        baseline. A headshot panel whose cutout rises ${HEADSHOT_BREAKOUT} above the block; to its right
-       the header (title, context, sponsor label), the name panel and sponsor chip, and the body: stat tiles
-       or a line of copy. Sibling draw order is front to back; within one shape the last
-       paint declared is on top. -->
+       the header (title, context, sponsor label), the name panel over the body (stat tiles or a
+       line of copy), and the sponsor chip beside both. Sibling draw order is front to back;
+       within one shape the last paint declared is on top. -->
   <Artboard name="Basketball ${name} Lower Third v2" id="${id(2)}" x="0" y="${artboardY}" width="1920" height="1080" viewModelId="${id(1000)}" viewModelInstanceId="${id(1001)}" defaultStateMachineId="${id(7)}" styleId="${id(5)}">
   <LayoutComponentStyle name="${name} Lower Third v2 Style" id="${id(5)}"/>
   <Fill><SolidColor colorValue="00000000"/></Fill>
@@ -698,6 +709,7 @@ const renderVariant = (variant: Variant) => {
   <!-- ============================== Column =================================== -->
   ${header}
   ${namePanel}
+  ${sponsorChip}
   ${body}
 
   <!-- Separation from bright video: a feathered dark stroke around the block. -->
@@ -707,7 +719,7 @@ const renderVariant = (variant: Variant) => {
   </Shape>
   <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
   <Shape name="Header Slide Mask" id="${HEADER_MASK}" x="${COLUMN_X}" y="0"><Rectangle width="${COLUMN_WIDTH}" height="${HEADER_HEIGHT}" originX="0" originY="0"/></Shape>
-  <Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X}" y="${BODY_Y}">${rectangle(COLUMN_WIDTH, BODY_HEIGHT, BODY_RADII)}</Shape>
+  <Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X}" y="${BODY_Y}">${rectangle(BODY_WIDTH, BODY_HEIGHT, BODY_RADII)}</Shape>
   </Node>
 
   <!-- Intro: seam ignition, outward glass wipes, a rising headshot, rows sliding out from

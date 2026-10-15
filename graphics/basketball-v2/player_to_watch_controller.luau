@@ -13,7 +13,9 @@
 -- Changes settle smoothly (exponential approach) rather than jumping, so an operator
 -- can edit the graphic on air. The first frame takes every value directly.
 
-local BODY_WIDTH = 1176
+-- The body row's width, left of the sponsor chip; BODY_WIDTH in
+-- generate_player_feature_lower_thirds.ts.
+local BODY_WIDTH = 972
 local GAP = 4
 local CELL_COUNT = 4
 local SETTLE_TIME = 0.07
