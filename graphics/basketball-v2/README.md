@@ -621,35 +621,36 @@ Build the OGraf package with
 ## Halftime adjustments (`halftime_adjustments.rml`)
 
 Each team's two halftime adjustments, presented by Rothman Orthopaedics. It
-takes the scorebug's corner and is never on air with it: left on the
-action-safe margin, foot on the lower thirds' foot (block origin 96, 850; size
-1028 x 172). A two-step OGraf graphic, as the starting five: step 0 shows the
-away team, step 1 the home team, and advancing on air changes team without
-taking the glass down.
+takes the Burning Question's form, mirrored: the text is left-aligned, and the
+sponsor chip and the marker sit on the outer (left) edge. It takes the
+scorebug's corner and is never on air with it: left on the action-safe margin,
+foot on the lower thirds' foot (block origin 96, 762; size 760 x 260). A
+two-step OGraf graphic, as the starting five: step 0 shows the away team, step
+1 the home team, and advancing on air changes team without taking the glass
+down.
 
 - **Generated.** `generate_halftime_adjustments.ts` writes the `.rml`. Edit the
   generator, then run `bun graphics/basketball-v2/generate_halftime_adjustments.ts`;
   never edit the `.rml` output by hand.
-- **Header (340 x 172, team tint):** a secondary-colour marker down the whole
-  block's left edge, the team logo over a soft white bloom, and the school
-  (Zuume Bold 48) over the mascot (muted Regular 30, letter-spaced), each
-  shrinking to fit a 186-unit column.
-- **Lines panel (480 x 172, team tint):** `HALFTIME ADJUSTMENTS` (muted Regular
-  24) over two lines (Bold 36), each after a right-pointing bullet in the team's
-  secondary colour. Each line has a 406-unit column and shrinks to fit; the
-  33-character test line holds full size.
-- **Sponsor cell (200 x 172, dark glass):** `PRESENTED BY` over a cream
-  (`#F0E5C8`, from the logo's inner circle) chip holding the vertical Rothman
-  lockup. The grey wordmark needs a light ground. The chip's logo frame
-  contains any sponsor image. `assets/images/sponsors/rothman_orthopaedics.png`
-  is the logo as supplied.
-- **Intro (1.2 s) and outro (0.4 s):** the starting five's build. A light
-  ignites at the header/lines seam and splits into outward wipes, text rises
-  in letter by letter, the chip settles from 90% once the wipe reaches it, and
-  one sheen finishes the glass. The outro closes the panels toward the seam.
-- **Team change (0.8 s):** the glass stays up. The header (school and mascot together), then each line, 6
-  frames apart, sinks and fades; the tints crossfade to the other team's
-  primary colour; the incoming school and lines rise in; the marker and logo
+- **Title row (84 high):** the sponsor on a 112 x 84 white chip at the outer
+  end, contained within its padding, then `HALFTIME ADJUSTMENTS` in Zuume Bold
+  54 on dark glass (644 wide), left-aligned against the chip. There is no
+  `PRESENTED BY`.
+- **Team panel (760 x 172, team tint):** a secondary-colour marker on the outer
+  edge, then the school (Bold 32, the team's secondary colour) and the mascot
+  (muted Regular 26, letter-spaced) on one line, over two lines (Bold 40), each
+  after a right-pointing bullet in the team's secondary colour. Every text
+  shrinks to fit its column; the 33-character test line holds full size. The
+  team logo sits as a large faded mark (1024 source at 0.36, opacity 0.16) at
+  the inner end, cropped by the panel, as on the Burning Question.
+- **Intro (1.2 s) and outro (0.4 s):** the Burning Question's build, mirrored.
+  A white light ignites at the chip/title seam and splits into outward wipes,
+  text rises in letter by letter from the seam outward, the chip logo and team
+  logo settle from 112%, and one sheen crosses left to right. The outro closes
+  the panels toward the seam.
+- **Team change (0.8 s):** the glass stays up. The team name, then each line, 6
+  frames apart, sinks and fades; the tint crossfades to the other team's
+  primary colour; the incoming name and lines rise in; the marker and logo
   swap; and one sweep crosses the block. Off air, a step change snaps.
 - **State machine:** the starting five's two layers, Display (`isPlaying`) and
   Team (`step`). Keep the OGraf durations (`introDuration`, `outroDuration`,
