@@ -134,7 +134,6 @@ const SHADOW_OUTLINE = id(21);
 const TITLE_PANEL = id(100);
 const TITLE_CONTENT = id(101);
 const TITLE_REVEAL = id(102);
-const TITLE_LEAD_STYLE = id(103);
 const TITLE_STYLE = id(104);
 const CHIP_PANEL = id(150);
 const CHIP_LOGO = id(151);
@@ -242,13 +241,10 @@ const wipeClips = (name: string) =>
 const titlePanel = `<Node name="Title Panel" id="${TITLE_PANEL}" x="0" y="0">
   ${wipeClips('Title')}
   <Node name="Title Content" id="${TITLE_CONTENT}" x="0" y="0">
-  <!-- Fixed: THE in Regular, then BURNING QUESTION in Bold, set against the chip. -->
+  <!-- Fixed, all in Bold, set against the chip. -->
   <Text name="Title" x="${TEXT_INSET}" y="${TITLE_BASELINE}" originValue="baseline" wrapValue="noWrap" width="${TITLE_WIDTH - 2 * TEXT_INSET}" height="64" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right">
-    <TextStylePaint id="${TITLE_LEAD_STYLE}" fontAssetId="${FONT_REGULAR}" fontSize="${TITLE_SIZE}" letterSpacing="0.5"><Fill><SolidColor colorValue="D9FFFFFF"/></Fill></TextStylePaint>
     <TextStylePaint id="${TITLE_STYLE}" fontAssetId="${FONT_BOLD}" fontSize="${TITLE_SIZE}" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
-    <TextValueRun name="Title Lead" styleId="${TITLE_LEAD_STYLE}" text="THE"></TextValueRun>
-    <TextValueRun name="Title Gap" styleId="${TITLE_LEAD_STYLE}" text=" "></TextValueRun>
-    <TextValueRun name="Title Value" styleId="${TITLE_STYLE}" text="BURNING QUESTION"></TextValueRun>
+    <TextValueRun name="Title Value" styleId="${TITLE_STYLE}" text="THE BURNING QUESTION"></TextValueRun>
   ${rise('Title', TITLE_REVEAL, 'backward')}</Text>
   </Node>
   ${darkGlass('Title', TITLE_WIDTH, TITLE_HEIGHT, TITLE_RADII)}

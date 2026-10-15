@@ -52,13 +52,10 @@
 <Node name="Title Panel" id="45:100" x="0" y="0">
   <ClippingShape name="Title Left Wipe Clip" sourceId="45:501"/><ClippingShape name="Title Right Wipe Clip" sourceId="45:506"/>
   <Node name="Title Content" id="45:101" x="0" y="0">
-  <!-- Fixed: THE in Regular, then BURNING QUESTION in Bold, set against the chip. -->
+  <!-- Fixed, all in Bold, set against the chip. -->
   <Text name="Title" x="24" y="60" originValue="baseline" wrapValue="noWrap" width="596" height="64" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right">
-    <TextStylePaint id="45:103" fontAssetId="45:901" fontSize="54" letterSpacing="0.5"><Fill><SolidColor colorValue="D9FFFFFF"/></Fill></TextStylePaint>
     <TextStylePaint id="45:104" fontAssetId="45:900" fontSize="54" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint>
-    <TextValueRun name="Title Lead" styleId="45:103" text="THE"></TextValueRun>
-    <TextValueRun name="Title Gap" styleId="45:103" text=" "></TextValueRun>
-    <TextValueRun name="Title Value" styleId="45:104" text="BURNING QUESTION"></TextValueRun>
+    <TextValueRun name="Title Value" styleId="45:104" text="THE BURNING QUESTION"></TextValueRun>
   <TextModifierGroup name="Title Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Title Reveal" id="45:102" unitsValue="1" modifyFrom="-1" modifyTo="0" falloffFrom="-1" falloffTo="-0.4"/></TextModifierGroup></Text>
   </Node>
   <Shape name="Title Glaze" x="0" y="0">

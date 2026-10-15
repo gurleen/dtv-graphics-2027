@@ -671,9 +671,8 @@ thirds: the text is right-aligned, and the sponsor chip and the marker sit on th
 - **Generated.** `generate_burning_question.ts` writes the `.rml`. Edit the
   generator, then run `bun graphics/basketball-v2/generate_burning_question.ts`;
   never edit the `.rml` output by hand.
-- **Title row (84 high):** the fixed title on dark glass (644 wide), `THE` in Zuume
-  Regular (85% white) then `BURNING QUESTION` in Bold, 54, right-aligned against the
-  chip. The sponsor sits on a 112 x 84 white chip at the outer end, contained within
+- **Title row (84 high):** the fixed title on dark glass (644 wide),
+  `THE BURNING QUESTION` in Zuume Bold 54, right-aligned against the chip. The sponsor sits on a 112 x 84 white chip at the outer end, contained within
   its padding; the Steamfitters crest by default. There is no `PRESENTED BY`.
 - **Question panel (760 x 160, team tint):** the question in Bold 40, right-aligned
   and centred in the panel, on up to three lines (about 150 characters) at full size.
