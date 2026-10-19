@@ -15,11 +15,11 @@ export const FIELDS: readonly Field[] = [
   },
   {
     name: 'awayLogoUrl', property: 'awayLogo', kind: 'imageUrl', title: 'Away Logo',
-    description: 'Full-colour transparent team logo, contained in its box; uses the embedded Campbell mark when omitted.',
+    description: 'Square transparent team logo (a 1024 source, as the team logo host serves them), set large at the row\'s outer end and cropped by the row; uses the embedded Campbell mark when omitted.',
   },
   {
     name: 'homeLogoUrl', property: 'homeLogo', kind: 'imageUrl', title: 'Home Logo',
-    description: 'Full-colour transparent team logo, contained in its box; uses the embedded Drexel mark when omitted.',
+    description: 'Square transparent team logo (a 1024 source, as the team logo host serves them), set large at the row\'s outer end and cropped by the row; uses the embedded Drexel mark when omitted.',
   },
   { name: 'awayPrimaryColor', kind: 'color', title: 'Away Primary Color', default: '#f58025' },
   { name: 'homePrimaryColor', kind: 'color', title: 'Home Primary Color', default: '#07294d' },
@@ -27,6 +27,6 @@ export const FIELDS: readonly Field[] = [
   { name: 'homeSecondaryColor', kind: 'color', title: 'Home Secondary Color', default: '#ffc600' },
   {
     name: 'sponsorLogoUrl', property: 'sponsorLogo', kind: 'imageUrl', title: 'Sponsor Logo',
-    description: 'White sponsor wordmark for the dark glass, contained along the foot of the clock cell; uses the embedded Independence Blue Cross mark when omitted.',
+    description: 'White sponsor wordmark for the dark glass, contained at the inner end of the strip under the rows; uses the embedded Independence Blue Cross mark when omitted.',
   },
 ];

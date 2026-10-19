@@ -3,7 +3,7 @@
   "id": "dtv-basketball-v2-score-to-break",
   "version": "1.0.0",
   "name": "Basketball v2 Score to Break",
-  "description": "DTV basketball score going into a commercial break, presented by Independence Blue Cross: the away and home rows (logo and score) beside a clock cell with one line of status. Stands bottom-left or, mirrored, bottom-right; a side change sent on air takes effect at the next take. Not for use with the scorebug, which occupies the same corner.",
+  "description": "DTV basketball score going into a commercial break, presented by Independence Blue Cross: the away and home rows (logo and score) over a strip with one line of status and the sponsor. Stands bottom-left or, mirrored, bottom-right; a side change sent on air takes effect at the next take. Not for use with the scorebug, which occupies the same corner.",
   "author": { "name": "Dragons TV", "url": "https://dragonstv.io" },
   "main": "index.mjs",
   "supportsRealTime": true,
