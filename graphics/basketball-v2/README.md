@@ -6,7 +6,7 @@ follows the design language below. Do not copy layouts from `graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 46), naming, and a five-step checklist
+the id namespace registry (next free: 47), naming, and a five-step checklist
 from scene to OGraf package. This README describes the finished graphics.
 
 ## Design language
@@ -729,6 +729,70 @@ To review the reveal:
 
 Build the OGraf package with
 `bun run ograf:build:basketball-v2-burning-question`.
+
+## Score to Break (`score_to_break.rml`)
+
+The score going into a commercial break, presented by Independence Blue Cross. It
+takes the scorebug's corner and is never on air with it. It stands bottom-left (left
+edge on the action-safe margin, x 96) or, mirrored, bottom-right (right edge on x
+1824). Either way the foot is on the lower thirds' foot, y 1022. The block is 520 x
+172: origin (96, 850) on the left, (1304, 850) on the right.
+
+- **Generated.** `generate_score_to_break.ts` writes the `.rml`. Edit the generator,
+  then run `bun graphics/basketball-v2/generate_score_to_break.ts`. Never edit the
+  `.rml` output by hand.
+- **Team rows (272 x 84 each, team tint):** away on top, home below, 4 apart. Each
+  row, from the outer edge inward: the secondary-colour marker (8 wide, clipped to the
+  row's corners), the team logo in full colour, and the score in Zuume Bold 68. The
+  logo is contained in a 96 x 64 box, so square and wide marks carry the same weight.
+  It stands in the logo shade (see `DESIGN_SYSTEM.md` § Tables), so Campbell's orange
+  camel still reads on Campbell orange. There is no acronym, school name or title.
+- **Clock cell (244 x 172, dark glass):** at the inner end, 4 from the rows. One line
+  of status, centred, in Zuume Bold 48 (`8:42 2ND HALF`, `HALFTIME`). Longer copy
+  shrinks to fit: `END OF 1ST HALF` sets at about 44. A hairline divider and the
+  sponsor run along the foot, as on the scorebug's clock cell. The wordmark is
+  contained in a 168 x 22 box.
+- **Corners:** 12 on the block's four outer corners, 3 on every seam.
+- **Intro (1.2 s):** a light ignites at the seam between the rows and the clock cell
+  and splits. One edge wipes the rows open toward the outer edge, the other wipes the
+  clock cell. Content drifts in with its edge. The logos settle from 112%, and the
+  markers draw away from the gap between the rows. The scores and the status rise in
+  letter by letter from the seam outward, the divider draws, the sponsor rises, and one
+  sheen crosses from the outer edge. Everything reads by about 0.77 s.
+- **Outro (0.4 s):** the edges close the glass toward the seam with a brief edge
+  light. The content drifts toward the seam, the markers retract, the logos swell and
+  fade, and the sponsor lowers away. The last frame is empty.
+- **Updates:** scores and status change at once (a snap), on air or off.
+- **Side.** `alignRight` mirrors the whole block. The block is laid out for the left
+  inside a `Side` node at x 960, the midpoint of the two margins. The Side layer scales
+  that node by -1, which puts the block's outer edge on x 1824. Each logo, score, the
+  status and the sponsor sits in a flip node at its own centre, which the Side layer
+  scales by -1 with it, so they still read the right way round. Away stays on top.
+  Wipes, drifts and the sheen mirror with the block, so they still run outward from the
+  seam. Each text carries a forward and a backward reveal. The side turns one of them on
+  by its strength, so text builds from the seam on both sides. The scene changes side
+  at once, even on air. The OGraf package keeps it from jumping, see below.
+- **State machine:** two layers that never key the same property. Display (Hidden →
+  Intro → Hold → Outro) follows `isPlaying`. Side (Left, Right, one-frame poses)
+  follows `alignRight` and keys only the Side node, the flip nodes and the reveal
+  strengths. Hold and Outro key every property the Intro animates at its resting value.
+  A `Presence` node fades with the glass, and its opacity is written out to `_onScreen`
+  (1 from the intro until the outro's last frame, then 0). Keep the OGraf durations
+  (1200 / 400 ms) in sync with the timelines.
+
+View model `BasketballScoreToBreakV2`, public properties: `isPlaying`, `alignRight`
+(false is bottom-left), `awayScore`/`homeScore` (numbers, as on the scorebug),
+`awayLogo`/`homeLogo`, `awayPrimaryColor`/`homePrimaryColor`,
+`awaySecondaryColor`/`homeSecondaryColor`, `status`, `sponsorLogo`. `_onScreen` is
+internal: the scene writes it. Send the status in capitals. The test data is Campbell
+at Drexel. To review the right side, add `--data=alignRight=true` to the screenshot or
+`render_frames.ts` commands.
+
+The OGraf package (`dtv-basketball-v2-score-to-break`) exposes the side as `side`,
+`left` or `right`, and latches it in `graphic.ts`. A side sent off air applies at once.
+A side sent on air is held until the scene reports through `_onScreen` that the outro
+has ended. If the graphic is taken again before then, the side waits for the following
+outro. Build the package with `bun run ograf:build:basketball-v2-score-to-break`.
 
 ## Test data
 

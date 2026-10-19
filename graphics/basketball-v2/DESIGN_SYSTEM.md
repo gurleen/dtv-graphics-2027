@@ -20,6 +20,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A full-frame table of the conference's teams | `generate_conference_standings.ts` output |
 | A bottom-right lower third, or a panel a toggle opens on air | `generate_burning_question.ts` output |
 | A persistent corner bug | `basketball_scorebug.rml` |
+| A corner block the operator can stand on either side | `generate_score_to_break.ts` output |
 
 ## Colour and material
 
@@ -151,6 +152,23 @@ triple do.
 
 `Image` anchors at its centre; `Text` and `Shape` anchor at their origin
 (top-left for rectangles with `originX="0" originY="0"`).
+
+### Mirroring a block
+
+A block that stands on either side is laid out once, for the left, and mirrored by a
+transform. The Score to Break does it this way:
+
+- Put the block in a `Side` node at x 960, the midpoint of the two action-safe
+  margins. Its scaleX -1 puts the block's outer edge on x 1824, whatever its width.
+- Put each leaf that must read the right way round (logos, text, sponsors) in a flip
+  node at its own centre, and scale that node -1 with the `Side` node. Centre the leaf
+  in its box, so the flip leaves its position unchanged.
+- Key all of these in a second state machine layer of one-frame poses, driven by a
+  boolean. The Display layer keys only nodes inside them, so the layers never fight.
+  Wipes, drifts, corner radii and the sheen mirror for free. Top-to-bottom gradients
+  are unaffected.
+- Text that builds from the seam needs a forward and a backward reveal, with the side
+  pose setting each one's `strength` (key 334) to 1 or 0.
 
 ## Motion
 
@@ -290,7 +308,8 @@ Namespaces in use:
 | 43 | Player of the Game lower third | 18200 |
 | 44 | Halftime adjustments | 19400 |
 | 45 | Burning Question | 20600 |
-| **46** | **Next free** | **21800** |
+| 46 | Score to Break | 21800 |
+| **47** | **Next free** | **23000** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
