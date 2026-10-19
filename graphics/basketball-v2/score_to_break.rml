@@ -10,6 +10,10 @@
 <LayoutComponentStyle name="Score to Break v2 Style" id="46:5"/>
 <Fill><SolidColor colorValue="00000000"/></Fill>
 
+<!-- Draws nothing. The Display layer keys its opacity with the glass's, and the bind writes
+     it out (target to source) as _onScreen, so a host can tell when the outro has ended. -->
+<Node name="Presence" id="46:12" opacity="0"><DataBindContext sourcePathIds="46:1000-46:1004" propertyKey="18" direction="true"/></Node>
+
 <!-- The mirror: scaleX -1 (the Side layer) reflects the block about x 960. -->
 <Node name="Side" id="46:11" x="960" y="850">
 <Node name="Score to Break" id="46:10" x="-864" y="0">
@@ -190,6 +194,9 @@
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="46:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="46:12"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="46:500"><KeyedProperty propertyKey="13">
@@ -381,6 +388,9 @@
   <KeyedObject objectId="46:300"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="46:12"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="46:500"><KeyedProperty propertyKey="13">
     <KeyFrameDouble frame="0" value="-8" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -498,6 +508,10 @@
     <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="46:300"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
+    <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="46:12"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
     <KeyFrameDouble frame="24" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -648,6 +662,9 @@
   <KeyedObject objectId="46:300"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="46:12"><KeyedProperty propertyKey="18">
+    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="46:502"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -780,6 +797,7 @@
 <ViewModel name="BasketballScoreToBreakV2" id="46:1000" defaultInstanceId="46:1001">
 <ViewModelPropertyBoolean name="isPlaying" id="46:1002" componentProps="1"/>
 <ViewModelPropertyBoolean name="alignRight" id="46:1003" componentProps="1"/>
+<ViewModelPropertyNumber name="_onScreen" id="46:1004"/>
 <ViewModelPropertyNumber name="awayScore" id="46:1020" componentProps="1"/>
 <ViewModelPropertyAssetImage name="awayLogo" id="46:1021" componentProps="1"/>
 <ViewModelPropertyColor name="awayPrimaryColor" id="46:1022" componentProps="1"/>
@@ -793,6 +811,7 @@
 <ViewModelInstance name="Default" id="46:1001" exports="true">
 <ViewModelInstanceBoolean viewModelPropertyId="46:1002" propertyValue="false"/>
 <ViewModelInstanceBoolean viewModelPropertyId="46:1003" propertyValue="false"/>
+<ViewModelInstanceNumber viewModelPropertyId="46:1004" propertyValue="0"/>
 <ViewModelInstanceNumber viewModelPropertyId="46:1020" propertyValue="58"/>
 <ViewModelInstanceAssetImage viewModelPropertyId="46:1021" propertyValue="46:911"/>
 <ViewModelInstanceColor viewModelPropertyId="46:1022" propertyValue="FFF58025"/>

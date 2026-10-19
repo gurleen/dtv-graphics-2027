@@ -136,6 +136,7 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 
 const ROOT = id(10);
 const SIDE = id(11);
+const PRESENCE = id(12);
 const SHADOW = id(20);
 const LEFT_EDGE = id(500);
 const LEFT_MASK = id(501);
@@ -175,6 +176,7 @@ const CELL = {
 // View model properties.
 const IS_PLAYING = 1002;
 const ALIGN_RIGHT = 1003;
+const ON_SCREEN = 1004;
 const STATUS_PROPERTY = 1010;
 const teamProperty = (team: number) => {
   const base = 1020 + team * 10;
@@ -420,7 +422,8 @@ const revealed = ({ forward, backward }: Reveal): Track[] => [
   hold(backward, MODIFY_TO, 0), hold(backward, FALLOFF_TO, -0.4),
 ];
 
-const GROUPS = [row(0).panel, row(1).panel, CELL.panel];
+// The presence node fades with the glass, so `_onScreen` reads 0 only once the outro ends.
+const GROUPS = [row(0).panel, row(1).panel, CELL.panel, PRESENCE];
 const LIGHTS = [LEFT_LIGHT, RIGHT_LIGHT];
 const ROW_CONTENTS = TEAM_INDICES.map((team) => row(team).content);
 const MARKERS = TEAM_INDICES.map((team) => row(team).marker);
@@ -556,6 +559,7 @@ const stateMachine = `<StateMachine name="Score to Break" id="${id(7)}">
 const viewModelProperties = [
   `<ViewModelPropertyBoolean name="isPlaying" id="${id(IS_PLAYING)}" componentProps="1"/>`,
   `<ViewModelPropertyBoolean name="alignRight" id="${id(ALIGN_RIGHT)}" componentProps="1"/>`,
+  `<ViewModelPropertyNumber name="_onScreen" id="${id(ON_SCREEN)}"/>`,
   ...TEAMS.flatMap((team, index) => {
     const property = teamProperty(index);
     return [
@@ -572,6 +576,7 @@ const viewModelProperties = [
 const viewModelDefaults = [
   `<ViewModelInstanceBoolean viewModelPropertyId="${id(IS_PLAYING)}" propertyValue="false"/>`,
   `<ViewModelInstanceBoolean viewModelPropertyId="${id(ALIGN_RIGHT)}" propertyValue="false"/>`,
+  `<ViewModelInstanceNumber viewModelPropertyId="${id(ON_SCREEN)}" propertyValue="0"/>`,
   ...TEAMS.flatMap((team, index) => {
     const property = teamProperty(index);
     return [
@@ -598,6 +603,10 @@ const document = `<Rive version="1" kind="fragment">
 <Artboard name="Basketball Score to Break v2" id="${id(2)}" x="0" y="${ARTBOARD_Y}" width="1920" height="1080" viewModelId="${id(1000)}" viewModelInstanceId="${id(1001)}" defaultStateMachineId="${id(7)}" styleId="${id(5)}">
 <LayoutComponentStyle name="Score to Break v2 Style" id="${id(5)}"/>
 <Fill><SolidColor colorValue="00000000"/></Fill>
+
+<!-- Draws nothing. The Display layer keys its opacity with the glass's, and the bind writes
+     it out (target to source) as _onScreen, so a host can tell when the outro has ended. -->
+<Node name="Presence" id="${PRESENCE}" opacity="0"><DataBindContext sourcePathIds="${pathTo(ON_SCREEN)}" propertyKey="${OPACITY}" direction="true"/></Node>
 
 <!-- The mirror: scaleX -1 (the Side layer) reflects the block about x ${PIVOT_X}. -->
 <Node name="Side" id="${SIDE}" x="${PIVOT_X}" y="${BLOCK_Y}">
