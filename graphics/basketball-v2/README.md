@@ -735,50 +735,62 @@ Build the OGraf package with
 The score going into a commercial break, presented by Independence Blue Cross. It
 takes the scorebug's corner and is never on air with it. It stands bottom-left (left
 edge on the action-safe margin, x 96) or, mirrored, bottom-right (right edge on x
-1824). Either way the foot is on the lower thirds' foot, y 1022. The block is 520 x
-172: origin (96, 850) on the left, (1304, 850) on the right.
+1824). Either way the foot is on the lower thirds' foot, y 1022. The block is 432 x
+228: origin (96, 794) on the left, (1392, 794) on the right.
 
 - **Generated.** `generate_score_to_break.ts` writes the `.rml`. Edit the generator,
   then run `bun graphics/basketball-v2/generate_score_to_break.ts`. Never edit the
   `.rml` output by hand.
-- **Team rows (272 x 84 each, team tint):** away on top, home below, 4 apart. Each
-  row, from the outer edge inward: the secondary-colour marker (8 wide, clipped to the
-  row's corners), the team logo in full colour, and the score in Zuume Bold 68. The
-  logo is contained in a 96 x 64 box, so square and wide marks carry the same weight.
-  It stands in the logo shade (see `DESIGN_SYSTEM.md` § Tables), so Campbell's orange
-  camel still reads on Campbell orange. There is no acronym, school name or title.
-- **Clock cell (244 x 172, dark glass):** at the inner end, 4 from the rows. One line
-  of status, centred, in Zuume Bold 48 (`8:42 2ND HALF`, `HALFTIME`). Longer copy
-  shrinks to fit: `END OF 1ST HALF` sets at about 44. A hairline divider and the
-  sponsor run along the foot, as on the scorebug's clock cell. The wordmark is
-  contained in a 168 x 22 box.
-- **Corners:** 12 on the block's four outer corners, 3 on every seam.
-- **Intro (1.2 s):** a light ignites at the seam between the rows and the clock cell
-  and splits. One edge wipes the rows open toward the outer edge, the other wipes the
-  clock cell. Content drifts in with its edge. The logos settle from 112%, and the
-  markers draw away from the gap between the rows. The scores and the status rise in
-  letter by letter from the seam outward, the divider draws, the sponsor rises, and one
-  sheen crosses from the outer edge. Everything reads by about 0.77 s.
-- **Outro (0.4 s):** the edges close the glass toward the seam with a brief edge
-  light. The content drifts toward the seam, the markers retract, the logos swell and
-  fade, and the sponsor lowers away. The last frame is empty.
+- **Team rows (432 x 84 each, team tint):** away on top, home below, 4 apart. Each
+  row has the secondary-colour marker (8 wide) on the outer edge, the logo at the
+  outer end, and the score in Zuume Bold 68 at the inner end, 24 in from the edge. The
+  score box holds three digits at full size. There is no acronym, school name or title.
+- **Logos:** the matchup locator lower third's treatment, scaled to the row. The
+  1024 source is drawn at 0.21 (a mark of about 143 x 108), centred 56 units in from
+  the outer edge, over a soft white bloom. The row's tint clips it, so the row crops
+  the logo at the outer edge, top and bottom, and the marker runs over it. The scale
+  is fixed, so send 1024 square logos, as the team logo host serves them.
+- **Strip (432 x 52, dark glass):** 4 under the home row. The status (Zuume Bold 30,
+  `8:42 2ND HALF`, `HALFTIME`) is at the outer end, on the logos' side, and shrinks
+  to fit its 172-unit box. The sponsor wordmark is at the inner end, contained in a
+  192 x 26 box (the Independence Blue Cross export sets at 192 x 24.5). There is no
+  `PRESENTED BY`.
+- **Corners:** 12 on the block's four outer corners (the away row's top, the strip's
+  foot), 3 on every seam.
+- **Intro (1.2 s):** a light ignites at the rows' inner end, and one leading edge
+  wipes the rows open toward the logos (frames 6 to 40). The scores drift in behind
+  it and rise in letter by letter from the inner end. As the edge reaches the outer
+  end, each logo settles from 112% while drifting 16 units outward, and the markers
+  draw away from the gap between the rows. The strip slides down from under the home
+  row, the status rises in, and the sponsor fades up. The shadow fades in and one
+  sheen crosses the glass. Everything reads by about 0.9 s (frame 52). The edge light is clipped
+  to the block, so it never burns outside the glass.
+- **Outro (0.4 s):** the logos fade as they swell to 106%, the markers retract, the
+  strip withdraws behind the rows, and the edge closes the rows toward the inner end
+  with a brief edge light. The last frame is empty.
 - **Updates:** scores and status change at once (a snap), on air or off.
 - **Side.** `alignRight` mirrors the whole block. The block is laid out for the left
   inside a `Side` node at x 960, the midpoint of the two margins. The Side layer scales
   that node by -1, which puts the block's outer edge on x 1824. Each logo, score, the
   status and the sponsor sits in a flip node at its own centre, which the Side layer
   scales by -1 with it, so they still read the right way round. Away stays on top.
-  Wipes, drifts and the sheen mirror with the block, so they still run outward from the
-  seam. Each text carries a forward and a backward reveal. The side turns one of them on
-  by its strength, so text builds from the seam on both sides. The scene changes side
-  at once, even on air. The OGraf package keeps it from jumping, see below.
+  Wipes, drifts and the sheen mirror with the block, so they still run outward from
+  the inner end.
+- **Text alignment on either side.** The flip keeps a text's alignment as written,
+  so a left-aligned status would sit away from the outer end on the right. Text
+  alignment cannot be keyed (`rive schema Text --animatable` has no `alignValue`), and
+  binding it to `alignRight` does nothing. So each score and the status is a pair of
+  twins in one flip node: the left side's twin and the right side's twin, aligned
+  toward the same end of the block. The Side layer keys which twin shows by opacity.
+  The scores' twins also build from the inner end: the left twin from its last glyph,
+  the right twin from its first.
 - **State machine:** two layers that never key the same property. Display (Hidden →
   Intro → Hold → Outro) follows `isPlaying`. Side (Left, Right, one-frame poses)
-  follows `alignRight` and keys only the Side node, the flip nodes and the reveal
-  strengths. Hold and Outro key every property the Intro animates at its resting value.
-  A `Presence` node fades with the glass, and its opacity is written out to `_onScreen`
-  (1 from the intro until the outro's last frame, then 0). Keep the OGraf durations
-  (1200 / 400 ms) in sync with the timelines.
+  follows `alignRight` and keys only the Side node, the flip nodes and the twins'
+  opacity. Hold and Outro key every property the Intro animates at its resting value.
+  A `Presence` node fades with the glass, and its opacity is written out to
+  `_onScreen` (1 from the intro until the outro's last frame, then 0). Keep the OGraf
+  durations (1200 / 400 ms) in sync with the timelines.
 
 View model `BasketballScoreToBreakV2`, public properties: `isPlaying`, `alignRight`
 (false is bottom-left), `awayScore`/`homeScore` (numbers, as on the scorebug),

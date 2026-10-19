@@ -167,8 +167,10 @@ transform. The Score to Break does it this way:
   boolean. The Display layer keys only nodes inside them, so the layers never fight.
   Wipes, drifts, corner radii and the sheen mirror for free. Top-to-bottom gradients
   are unaffected.
-- Text that builds from the seam needs a forward and a backward reveal, with the side
-  pose setting each one's `strength` (key 334) to 1 or 0.
+- The flip keeps a text's alignment as written, and `alignValue` cannot be keyed. Text
+  that hugs one end of the block is therefore a pair of twins in one flip node, one
+  aligned for each side, and the side pose keys which twin shows by opacity. A twin can
+  also carry its own reveal direction, so text builds from the same end on both sides.
 
 ## Motion
 
