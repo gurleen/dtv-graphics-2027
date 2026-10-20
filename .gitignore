@@ -1,5 +1,5 @@
 build/
 node_modules/
-preview-dist/
-preview/public/graphics/
 .wrangler/
+.DS_Store
+.claude/worktrees/

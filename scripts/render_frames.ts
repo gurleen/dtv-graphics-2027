@@ -71,7 +71,7 @@ let scratchDir: string | undefined;
 if (values.outro && values["on-air"]) throw new Error("--outro and --on-air are exclusive");
 if (values.outro || values["on-air"]) {
   scratchDir = await mkdtemp(join(tmpdir(), "render-frames-"));
-  await Bun.$`rsync -a --exclude build --exclude node_modules --exclude preview-dist ${ROOT}/ ${scratchDir}/`.quiet();
+  await Bun.$`rsync -a --exclude build --exclude node_modules ${ROOT}/ ${scratchDir}/`.quiet();
   const scratchScene = join(scratchDir, relative(ROOT, sceneFile));
   const entry = `<StateTransition stateToId="${namespace}:43"/></EntryState>`;
   if (!sceneText.includes(entry)) throw new Error(`${scenePath}: EntryState does not target Hidden (${namespace}:43)`);
