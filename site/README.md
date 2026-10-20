@@ -6,9 +6,8 @@ scorebug are shown with the scorebug on air behind them. Each page has Show and
 Hide, Previous and Next step for the starting five, an editable content form,
 and a dark or transparency backdrop.
 
-It is separate from `preview/`, the Vite page that runs the scorebug during
-development. This site is built from the OGraf packages, so it plays exactly
-what a broadcast renderer would load.
+It is built from the OGraf packages, so it plays exactly what a broadcast
+renderer would load.
 
 ```bash
 bun run site:build      # build every OGraf package, then assemble build/site/

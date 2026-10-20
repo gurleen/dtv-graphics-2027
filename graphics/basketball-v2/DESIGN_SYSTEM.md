@@ -295,7 +295,7 @@ Namespaces in use:
 
 | Namespace | Scene | Artboard y |
 |---|---|---|
-| 0, 1, 3, 8, 9, 19, 20, 21 | Legacy and ported graphics | — |
+| 0–29 | Free. The earlier ports that held 0, 1, 3, 8, 9, 19, 20 and 21 were removed | — |
 | 30 | Scorebug | 2600 |
 | 31 | Player lower third | 3800 |
 | 32 | Matchup locator | 5000 |
@@ -353,7 +353,10 @@ other with `rive schema <Type>`.
 1. **Scene.** Copy the closest scene (table at the top) to a new
    `graphics/basketball-v2/<name>.rml`, replace its namespace with the next free
    one, set the artboard y, and rename per [Names](#names). Test data uses the
-   Drexel Dragons as the home team.
+   Drexel Dragons as the home team. Before a change that must not move a pixel
+   (a generator refactor, a shared asset), capture every scene with
+   `bun scripts/baseline.ts capture build/baseline/before`, make the change,
+   capture again into another directory and `compare` the two.
 2. **Verify.** From the repository root, after every edit:
    `rive . --verify` and `rive inspect . --summary`, then
    `rive . --artboard="<Artboard>" --data=isPlaying=true --advance=120 --screenshot=build/<name>.png`

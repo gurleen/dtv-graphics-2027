@@ -1,9 +1,9 @@
 /**
  * Writes OGraf `data` payloads into a bound Rive view model instance.
  *
- * The property-by-property calls here are the ones preview/src/main.tsx already proves
- * out against this runtime; the only addition is that a missing key is skipped rather
- * than written, which is what makes updateAction() a partial update.
+ * The property-by-property calls are the Rive runtime's own view model calls; the only
+ * addition is that a missing key is skipped rather than written, which is what makes
+ * updateAction() a partial update.
  */
 
 import { decodeImage, type ViewModelInstance } from '@rive-app/canvas-single';

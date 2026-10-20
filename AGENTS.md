@@ -38,7 +38,12 @@ called for. If it is missing or wrong, fix the project and verify again.
 When appearance matters:
 
 - `rive . --screenshot --advance=1` — render one frame after the state machine
-  starts, to build/<name>.png. View it if you can; otherwise ask the user to.
+  starts, to build/dtv-rive.png. It shows the `main:` artboard from
+  `rive.yaml`, the scorebug; add `--artboard=<name>` for another scene. View it
+  if you can; otherwise ask the user to.
+- `bun scripts/baseline.ts capture <dir>` renders every scene's on-air frame and
+  `bun scripts/baseline.ts compare <dirA> <dirB>` diffs two captures. Run both
+  around a change that must not move a pixel.
 
 ## Shipping a scene: OGraf
 

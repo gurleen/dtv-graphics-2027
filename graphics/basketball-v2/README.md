@@ -1,8 +1,9 @@
 # Basketball v2
 
 Broadcast graphics for basketball, version 2. Every graphic in this package
-follows the design language below. Do not copy layouts from `graphics/10_*`,
-`graphics/11_*` or `graphics/legacy/`; they are references for data only.
+follows the design language below. The earlier ports (`graphics/10_*`,
+`graphics/11_*`, `graphics/legacy/`) were removed; their source is in the
+`pre-restructure` git tag, for data only, not layout.
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
@@ -816,17 +817,16 @@ the home team**. The away team can vary as needed for the design and test case.
 Use the existing basketball team data and logo conventions instead of creating
 a parallel team catalog:
 
-- `preview/src/teams.json` is the vendored team dataset.
-- `preview/src/teams.ts` maps its fields to the app's team model, defines the
+- `data/seed/teams.json` is the vendored team dataset.
+- `data/seed/teams.ts` maps its fields to the app's team model, defines the
   logo URL convention (`https://images.dragonstv.io/logos/<logo_name>`), and
   exports `DREXEL_ID` (`2182`). Teams without a `logo_name` have no logo URL.
 - `assets/images/scorebug/` contains local scorebug logo assets, including
   `drexel.png`.
-- Existing Rive graphics show how local team logos are declared as
-  `ImageAsset`s. See `graphics/10_ncaa_basketball_scorebug/` and
-  `graphics/11_ncaa_basketball_locator/`.
+- The scenes in this package show how local team logos are declared as
+  `ImageAsset`s. See `basketball_scorebug.rml` and `matchup_locator.rml`.
 
 For local Rive graphics, prefer the existing local logo assets and follow the
 asset declaration pattern in the relevant existing graphic. For data-driven
-team selection in a preview or companion UI, reuse `preview/src/teams.ts` and
-`preview/src/teams.json`.
+team selection in a companion UI, reuse `data/seed/teams.ts` and
+`data/seed/teams.json`.

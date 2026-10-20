@@ -2,8 +2,10 @@
 
 Broadcast graphics for DTV, written as Rive scenes (`.rml`) and shipped
 as [OGraf](https://ograf.ebu.io) packages. The scenes are 1920 x 1080 overlays
-for basketball games: a scorebug, lower thirds, a matchup locator, a
-starting five and a halftime statistics card.
+for basketball games: a scorebug, lower thirds, matchup locators, a starting
+five, halftime cards and a score to break. Earlier ports and a Vite preview page
+were removed; `git show pre-restructure:<path>` reads them from the
+`pre-restructure` tag.
 
 ## Requirements
 
@@ -19,8 +21,7 @@ Run `bun install` once.
 ```bash
 rive . --verify              # check that the project compiles
 rive inspect . --summary     # problems, plus what got built by type
-rive . --screenshot --advance=1   # render one frame to build/<name>.png
-bun run dev                  # Vite preview of the scorebug
+rive . --screenshot --advance=1   # render the scorebug to build/dtv-rive.png
 bun run ograf:build          # build every OGraf package into build/ograf/
 bun run ograf:harness        # local stand-in renderer on http://localhost:8974
 bun run site:build           # stakeholder preview website in build/site/
@@ -32,11 +33,11 @@ bun run site:deploy          # publish that website to Cloudflare Workers
 | Path | Contents |
 |---|---|
 | `graphics/basketball-v2/` | Current graphics: the `.rml` scenes, Luau controllers and generators |
-| `graphics/10_*`, `graphics/11_*`, `graphics/legacy/` | Earlier ports. Use them for data, not layout |
 | `ograf/` | Packaging: build script, shared web component, local harness, one directory per package |
 | `site/` | Stakeholder preview website: build script and viewer, published as static assets (`wrangler.jsonc`) |
-| `preview/` | Vite and React page that runs the scorebug in the Rive web runtime |
+| `data/seed/` | The vendored team dataset (`teams.json`) and the module that normalizes it (`teams.ts`) |
 | `scripts/render_frames.ts` | Renders frames and contact sheets for reviewing motion |
+| `scripts/baseline.ts` | Captures every scene's on-air frame and compares two captures, to prove a change left the pixels alone |
 | `docs/` | Porting tracker and the vendored OGraf specification |
 | `assets/` | Fonts and logos |
 
@@ -47,11 +48,18 @@ The basketball v2 set, each packaged under `ograf/graphics/`:
 - Scorebug
 - Player lower third
 - Staff lower third
+- Team lower third
 - Talent lower third (single, double and triple)
 - Starting five lower third
 - Player to Watch lower third
+- Player of the Game lower third
 - Matchup locator
+- Matchup locator lower third
 - Halftime statistics card
+- Halftime adjustments
+- Conference standings
+- Burning question
+- Score to Break
 
 Every graphic follows one design language: tinted glass panels, Zuume type and
 short ease-out motion. The values are in
@@ -85,4 +93,3 @@ the Rive workspace, so do it deliberately.
 - [`docs/GRAPHICS_PORTING.md`](docs/GRAPHICS_PORTING.md): porting tracker and OGraf packaging notes
 - [`docs/ograf/`](docs/ograf/): the OGraf specification
 - [`site/README.md`](site/README.md): the stakeholder preview website and how to publish it
-- [`preview/README.md`](preview/README.md): how the preview page works
