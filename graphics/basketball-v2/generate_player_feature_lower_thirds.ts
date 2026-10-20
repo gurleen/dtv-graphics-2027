@@ -743,7 +743,7 @@ const renderVariant = (variant: Variant) => {
   <ImageAsset name="${name} Lower Third v2 Headshot Placeholder" id="${HEADSHOT_ASSET}" file="assets/images/headshots/placeholder.png"/>
   <ImageAsset name="${name} Lower Third v2 Drexel" id="${LOGO_ASSET}" file="${TEAM.logoFile}"/>
   <ImageAsset name="${name} Lower Third v2 ${sponsor.name}" id="${SPONSOR_ASSET}" file="${sponsor.file}"/>
-  <ScriptAsset name="player_to_watch_controller" folderPath="graphics/basketball-v2" id="${CONTROLLER_ASSET}" file="graphics/basketball-v2/player_to_watch_controller.luau"/>
+  <ScriptAsset name="${name.toLowerCase().replaceAll(' ', '_')}_controller" folderPath="graphics/basketball-v2" id="${CONTROLLER_ASSET}" file="graphics/basketball-v2/player_to_watch_controller.luau"/>
 
   <ViewModel name="${viewModelName}" id="${id(1000)}" defaultInstanceId="${id(1001)}">
   ${viewModelProperties.join('\n')}

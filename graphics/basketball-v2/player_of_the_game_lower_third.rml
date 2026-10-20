@@ -957,7 +957,7 @@
   <ImageAsset name="Player Of The Game Lower Third v2 Headshot Placeholder" id="43:910" file="assets/images/headshots/placeholder.png"/>
   <ImageAsset name="Player Of The Game Lower Third v2 Drexel" id="43:911" file="assets/images/scorebug/drexel.png"/>
   <ImageAsset name="Player Of The Game Lower Third v2 Steamfitters" id="43:913" file="assets/images/sponsors/steamfitters_local_420_logo.png"/>
-  <ScriptAsset name="player_to_watch_controller" folderPath="graphics/basketball-v2" id="43:950" file="graphics/basketball-v2/player_to_watch_controller.luau"/>
+  <ScriptAsset name="player_of_the_game_controller" folderPath="graphics/basketball-v2" id="43:950" file="graphics/basketball-v2/player_to_watch_controller.luau"/>
 
   <ViewModel name="BasketballPlayerOfTheGameLowerThirdV2" id="43:1000" defaultInstanceId="43:1001">
   <ViewModelPropertyBoolean name="isPlaying" id="43:1002" componentProps="1"/>
