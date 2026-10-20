@@ -1,5 +1,5 @@
 name: dtv-rive
-main: Team Wipe — Futura
+main: Basketball Scorebug v2
 
 artboard:
   width: 1920
@@ -8,8 +8,6 @@ artboard:
 exclude:
   - docs
   - ograf
-  - preview
-  - preview-dist
 
 logs:
   file: build/rive.log
