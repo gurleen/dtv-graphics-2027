@@ -322,6 +322,13 @@ is one reducer step and one transaction that nothing interleaves with.
 | A and B both press toggle on the scorebug | It goes on, then off. A surface that knows the state sends `air` or `clear`. |
 | A person edits a player while a feed writes stats | Different documents and different writers. Both land. |
 
+### Keyboard, mouse, and other control surfaces
+
+Every way of running the show sends the same `show.command` calls. The controller binds keys and clicks to them
+for now. A Stream Deck plugin or another surface later is one more client of `@dtv/api`, with no server change. A
+surface that shows the on-air state sends `air` and `clear`. A surface with no display of its own sends `toggle`,
+which the server decides against the current program. Phase 4 designs the key map with the controller prototypes.
+
 ### The clock
 
 The server keeps one timer, set to the earliest `nextChange` across live games. That is the next second change
