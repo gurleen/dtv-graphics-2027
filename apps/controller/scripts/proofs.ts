@@ -165,7 +165,7 @@ async function main() {
   const { api, close } = connect({ url: `ws://localhost:${port}/rpc`, client: 'controller-proof' });
   browser = await chromium.launch();
   try {
-    await provesTwoOperators(api);
+    await provesTwoOperators();
     await provesRunThrough(api);
     await provesProblems(api);
     await provesRestart();
@@ -183,7 +183,7 @@ async function main() {
 let alex: { context: BrowserContext; page: Page };
 let sam: { context: BrowserContext; page: Page };
 
-async function provesTwoOperators(_api: unknown) {
+async function provesTwoOperators() {
   console.log('two operators');
   alex = await operatorPage('alex');
   await alex.page.getByRole('button', { name: 'Activate' }).click();
