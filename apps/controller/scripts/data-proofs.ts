@@ -136,7 +136,7 @@ async function lockProof() {
   const tip = page.getByRole('tooltip');
   await tip.waitFor();
   console.log(`     tooltip: ${await tip.innerText()}`);
-  check(/Locked/.test(await tip.innerText()), 'hovering the lock says who locked it and when');
+  check(/^Locked by \S+, /.test(await tip.innerText()), 'hovering the lock says who locked it and when');
   await shoot(page, 'lock-hover');
 
   await row.locator('.lock-mark').first().click();

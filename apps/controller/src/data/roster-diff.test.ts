@@ -15,7 +15,7 @@ const world = indexWorld({
     ...snapshot.entities,
     player: [player('hipp-kobe', '0', 'Kobe', 'Hipp'), player('reed-josh', '5', 'Josh', 'Reid'), player('reynolds-erik', '11', 'Erik', 'Reynolds', { classYear: 'JR' }), player('walker-ty', '32', 'Ty', 'Walker')],
   },
-  locks: { ...snapshot.locks, player: { 'drexel-mbb@2026-27/reed-josh': ['lastName'] } },
+  locks: { ...snapshot.locks, player: { 'drexel-mbb@2026-27/reed-josh': [{ field: 'lastName', actor: 'alex', at: null }] } },
 });
 
 const HEADER = 'jersey,first_name,last_name,position,class_year';

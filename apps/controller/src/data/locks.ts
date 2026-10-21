@@ -1,20 +1,10 @@
-/**
- * The data page's one view of field locks. The World lists only which fields are locked;
- * who locked them and when is arriving in `world.locks`, and the coordinator switches
- * `locksOf` to it at merge. Everything else reads locks through this file.
- */
+/** The data page's one view of field locks: who locked each field and when, from `world.locks`. */
 
-import type { EntityKind, EpochMs, World } from '@dtv/domain';
+import type { EntityKind, Lock, World } from '@dtv/domain';
 
-export interface Lock {
-  readonly field: string;
-  /** Null for a lock made before who-and-when was recorded. */
-  readonly actor: string | null;
-  readonly at: EpochMs | null;
-}
+export type { Lock };
 
-export const locksOf = (world: World, kind: EntityKind, id: string): readonly Lock[] =>
-  world.locked(kind, id).map((field) => ({ field, actor: null, at: null }));
+export const locksOf = (world: World, kind: EntityKind, id: string): readonly Lock[] => world.locks(kind, id);
 
 const WHEN = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
