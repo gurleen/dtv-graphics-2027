@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Two renderers</title>
+    <style>
+      body {
+        margin: 20px;
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+      }
+      .monitor {
+        outline: 1px dashed #888;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="monitor" id="program" style="width: 640px; height: 360px"></div>
+    <div class="monitor" id="preview" style="width: 480px; height: 270px"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
