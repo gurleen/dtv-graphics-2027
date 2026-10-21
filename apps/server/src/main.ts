@@ -79,6 +79,9 @@ const staticFiles = (prefix: string, dir: string) => async (request: Request) =>
 
 const server = Bun.serve({
   port: PORT,
+  // Hot reloading reloads every open page when this server restarts: each controller loses its
+  // unsaved edits and every monitor and /renderer replays its intros. A restart must change nothing on screen.
+  development: { hmr: false },
   routes: {
     '/': controllerPage,
     '/renderer': rendererPage,
