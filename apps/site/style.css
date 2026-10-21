@@ -79,7 +79,7 @@ body {
 #list a[aria-current="page"] { border-color: var(--accent); background: #38bdf81a; }
 #list img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; background: #05080c; }
 #list span { display: block; padding: 6px 2px 0; font-size: 13px; }
-#list [hidden] { display: none; }
+[hidden] { display: none !important; }
 
 /* Sponsor logos, two to a row; the pressed one narrows the list to its graphics. */
 .sponsors { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

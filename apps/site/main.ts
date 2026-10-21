@@ -188,8 +188,22 @@ const select = (entry: AnyGraphic) => {
 
 // --- wiring ------------------------------------------------------------------------
 
+/** Links shared before the move off OGraf name the old package: `#dtv-basketball-v2-scorebug`. */
+const OLD_LINK_RENAMES: Readonly<Record<string, string>> = {
+  'player-of-the-game-lower-third': 'player-of-the-game',
+  'player-to-watch-lower-third': 'player-to-watch',
+  'starting-five-lower-third': 'starting-five',
+};
+
+const idFromHash = (hash: string) => {
+  const old = /^#dtv-basketball-v2-(.+)$/.exec(hash)?.[1];
+  return old ? `basketball-v2/${OLD_LINK_RENAMES[old] ?? old}` : hash.slice(1);
+};
+
 const routeFromHash = () => {
-  const entry = entries.find((candidate) => `#${candidate.id}` === location.hash) ?? scorebugEntry ?? entries[0];
+  const id = idFromHash(location.hash);
+  const entry = entries.find((candidate) => candidate.id === id) ?? scorebugEntry ?? entries[0];
+  if (entry && location.hash !== `#${entry.id}` && id === entry.id) history.replaceState(null, '', `#${entry.id}`);
   if (!entry) status.textContent = 'No graphics have been built.';
   else if (entry !== selection?.entry) select(entry);
 };
