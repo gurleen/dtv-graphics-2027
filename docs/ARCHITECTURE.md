@@ -405,16 +405,20 @@ site. Each layer runs this table, as a pure function of state and event that ret
 | State | Event | Next state and effects |
 |---|---|---|
 | empty | a frame | loading: create the instance, write values, decode images, wait two frames |
-| loading | a frame for another slot | loading, with the new frame pending |
-| loading | loaded | entering (set `isPlaying`), or straight to the pending frame if one arrived |
-| loading | load failed | empty. The layer does not load that slot again until a new slot arrives. |
-| entering | a frame for the same slot | entering, writing the changed values |
+| loading | any frame | loading, with the newest frame pending |
+| loading | loaded | entering (set `isPlaying`) after writing a pending frame for the same slot, or straight to a pending frame for another slot |
+| loading | load failed | empty. The layer does not load that slot again until a new slot arrives. A pending frame for another slot loads. |
+| entering | a frame for the same slot | entering, writing the changed values except `frozenOnAir` ones. A step change waits. |
 | entering | another slot or none | entering, with the change pending. The intro finishes first. |
 | entering | intro done | on, or leaving if a change is pending |
-| on | a frame for the same slot | on, writing changed values except `frozenOnAir` ones, and steps |
+| on | a frame for the same slot | on, writing changed values except `frozenOnAir` ones. A step change writes the step's values and enters again for `steps.transition`. |
 | on | another slot or none | leaving (clear `isPlaying`) |
 | leaving | any frame | leaving, keeping only the newest pending frame |
 | leaving | exited (the exit signal, or the outro's length) | dispose, then loading the pending frame, or empty |
+| any | a frame whose bind failed | unchanged. The layer keeps what it shows, whatever slot the frame names. |
+
+`entering` covers any animation that must land before the next change: the Intro, or a step's transition timeline.
+A step change during one is held and played when it lands.
 
 The intro finishes before an outro starts because of how the scenes are built. In `basketball_scorebug.rml`,
 clearing `isPlaying` during the Intro jumps to the Outro state with no exit time, and the Outro resets to its own
