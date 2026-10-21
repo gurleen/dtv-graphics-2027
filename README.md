@@ -42,8 +42,9 @@ bun run db:backup            # copy the file to data/db/backups/; the newest 30 
 bun run check                # typecheck, check package imports, run the tests
 ```
 
-Run `db:seed` with the server stopped, because the server is the only process
-that writes the file. A second seed writes nothing, and it never resets a row
+`DTV_DB` names another database file, as it does for the server, and its backups
+go in `backups/` beside it. Run `db:seed` with the server stopped, because the
+server is the only process that writes the file. A second seed writes nothing, and it never resets a row
 that someone changed. [`data/seed/README.md`](data/seed/README.md) describes the
 seed files and the roster CSV header.
 

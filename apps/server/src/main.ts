@@ -13,15 +13,14 @@
 
 import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { backup, migrate, openDb, seed } from '@dtv/db';
+import { backup, dbLocation, migrate, openDb, seed } from '@dtv/db';
 import { GRAPHICS } from '@dtv/graphics';
 import { rpcWebSocket } from './router';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
 const PORT = Number(process.env.PORT ?? 8975);
-const DB_PATH = resolve(process.env.DTV_DB ?? join(ROOT, 'data/db/dtv.sqlite'));
-const BACKUPS = join(dirname(DB_PATH), 'backups');
+const { path: DB_PATH, backups: BACKUPS } = dbLocation();
 
 mkdirSync(dirname(DB_PATH), { recursive: true });
 const db = openDb(DB_PATH);

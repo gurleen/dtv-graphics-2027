@@ -1,10 +1,9 @@
 import { mkdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { backup, migrate, type MigrationReport, openDb, seed } from '../src/index';
+import { dirname, join, resolve } from 'node:path';
+import { backup, dbLocation, migrate, type MigrationReport, openDb, seed } from '../src/index';
 
 const ROOT = resolve(import.meta.dir, '../../..');
-const DB_DIR = join(ROOT, 'data/db');
-const BACKUPS = join(DB_DIR, 'backups');
+const { path, backups: BACKUPS } = dbLocation();
 
 const describe = (report: MigrationReport) =>
   [
@@ -22,8 +21,8 @@ if (command !== 'migrate' && command !== 'seed' && command !== 'backup') {
   process.exit(1);
 }
 
-mkdirSync(DB_DIR, { recursive: true });
-const db = openDb(join(DB_DIR, 'dtv.sqlite'));
+mkdirSync(dirname(path), { recursive: true });
+const db = openDb(path);
 if (command === 'backup') {
   console.log(`backup: ${backup(db, BACKUPS, 'manual')}`);
 } else {
