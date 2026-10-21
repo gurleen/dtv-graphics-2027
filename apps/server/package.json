@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@dtv/api": "workspace:*",
+    "@dtv/controller": "workspace:*",
     "@dtv/db": "workspace:*",
     "@dtv/domain": "workspace:*",
     "@dtv/graphics": "workspace:*",

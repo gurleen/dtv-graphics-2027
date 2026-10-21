@@ -37,8 +37,8 @@ apps/site               the stakeholder site: build script and viewer
 | `@dtv/graphics` | basketball-v2, playout, domain, zod |
 | `@dtv/renderer` | playout, domain, `@rive-app/canvas-single` |
 | `@dtv/api` | playout, domain, zod, `@orpc/*`, partysocket |
-| `apps/server` | api, db, graphics, playout, domain, zod, `@orpc/server` |
-| `apps/controller` | api, renderer, graphics, playout, domain, react |
+| `apps/server` | api, db, graphics, playout, domain, zod, `@orpc/server`, and the controller and `/renderer` pages as HTML imports |
+| `apps/controller` | api, renderer, graphics, playout, domain, react, React Aria Components, `@fontsource`; its proofs may import playwright |
 | `apps/renderer` | api, renderer, graphics |
 | `apps/site` | its build script may import db; its browser code may not |
 | `packages/live-*` | api, domain |
@@ -104,7 +104,9 @@ SQLite cannot make" below).
 Every id is a branded slug (`PlayerId = z.string().regex(SLUG).brand<'PlayerId'>()`), so a `TeamId` cannot go where
 a `SchoolId` belongs. Seeded and imported rows get deterministic ids from their natural key (`idFor.player(team,
 season, first, last)`), so a seed or an import that runs twice writes the same rows. An id never changes after
-creation, even when the name it came from is edited. The 361 team names in teams.json produce no slug collisions.
+creation, even when the name it came from is edited. Each id schema that names a row carries `.meta({ ref: '<kind>' })`, so `paramForm` in
+`@dtv/playout` turns a graphic's params schema into a form with a picker for each id, and the controller needs no
+form code per graphic. The 361 team names in teams.json produce no slug collisions.
 
 ### Live game state
 

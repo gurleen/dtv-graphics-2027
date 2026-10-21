@@ -1,3 +1,5 @@
-/** The controller as a Bun HTML import. The shell (index.html and src/main.tsx) lands with phase 4. */
+/** The controller as a Bun HTML import: the server routes `/` to it, and Bun bundles src/main.tsx on request. */
 
-export {};
+import page from './index.html';
+
+export default page;

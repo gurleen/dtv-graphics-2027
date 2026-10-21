@@ -1,0 +1,499 @@
+/* The show page, laid out as Show A: two equal columns and an inspector, a rail of monitors, the game along the bottom. */
+
+.show-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr var(--rail);
+  grid-template-rows: auto 1fr minmax(150px, auto) var(--scorebar);
+  grid-template-areas:
+    'free rundown rail'
+    'onair rundown rail'
+    'inspector inspector rail'
+    'score score score';
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.panel-header .actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-faint);
+}
+
+.tag {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius);
+  font: 500 var(--text-xs) / 16px var(--mono);
+  color: var(--on-color);
+}
+
+.tag.pgm {
+  background: var(--pgm);
+}
+
+.tag.pvw {
+  background: var(--pvw);
+}
+
+.cue-error {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--warn);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Free panel */
+
+.free {
+  grid-area: free;
+}
+
+.free-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.free-button {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 40px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.free-button[data-pgm] {
+  border: 2px solid var(--pgm);
+  background: color-mix(in srgb, var(--pgm) 14%, var(--panel-raised));
+}
+
+.free-button[data-focus-visible] {
+  outline: 2px solid var(--focus);
+}
+
+.free-button .cue-error {
+  grid-column: 1 / -1;
+}
+
+/* On air by layer */
+
+.on-air {
+  grid-area: onair;
+}
+
+.layers {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layer-row {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 30px;
+  border-bottom: 1px solid var(--border);
+}
+
+.layer-name {
+  font: 500 var(--text-xs) var(--mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.layer-row[data-pgm] .layer-name {
+  color: var(--pgm);
+}
+
+/* Rundown */
+
+.rundown {
+  grid-area: rundown;
+}
+
+.rundown-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  outline: none;
+}
+
+.cue-row {
+  display: grid;
+  grid-template-columns: 20px 22px 1fr auto auto auto 22px;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 30px;
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-bottom-color: var(--border);
+  outline: none;
+  cursor: default;
+}
+
+.cue-row[data-selected] {
+  border-color: var(--focus);
+  background: var(--selected);
+}
+
+.cue-row[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.cue-row[data-dragging] {
+  opacity: 0.5;
+}
+
+.cue-row[data-pgm] .index {
+  color: var(--pgm);
+}
+
+.cue-row[data-pvw] .index {
+  color: var(--pvw);
+}
+
+.cue-row .index {
+  font: var(--text-sm) var(--mono);
+  color: var(--text-faint);
+}
+
+.cue-label {
+  min-width: 0;
+}
+
+.drag,
+.remove {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: grab;
+}
+
+.remove {
+  cursor: pointer;
+  opacity: 0.4;
+}
+
+.cue-row[data-hovered] .remove,
+.cue-row[data-selected] .remove {
+  opacity: 1;
+}
+
+.drag[data-focus-visible],
+.remove[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  opacity: 1;
+}
+
+.react-aria-DropIndicator[data-drop-target] {
+  outline: 1px solid var(--pvw);
+}
+
+.dots {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--text-muted);
+  border-radius: 50%;
+}
+
+.dot[data-on] {
+  background: var(--text);
+}
+
+/* Inspector */
+
+.inspector {
+  grid-area: inspector;
+  overflow: auto;
+}
+
+.cue-fields,
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.cue-fields {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.picker {
+  width: 220px;
+}
+
+.note {
+  width: 160px;
+}
+
+.override {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+/* Rail */
+
+.rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rail-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 500;
+}
+
+.rail-head .caption {
+  margin-left: auto;
+  overflow: hidden;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.monitor {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--monitor);
+  overflow: hidden;
+}
+
+.monitor.pvw {
+  border-color: var(--pvw);
+}
+
+.monitor.pgm {
+  border-color: var(--pgm);
+}
+
+.monitor-screen {
+  position: absolute;
+  inset: 0;
+}
+
+.monitor-problem {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--scrim);
+  color: var(--warn);
+  font-size: var(--text-xs);
+}
+
+.take-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.button.take {
+  height: 34px;
+  border-color: var(--pgm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.button.take:not([data-disabled]) {
+  background: color-mix(in srgb, var(--pgm) 30%, var(--panel-raised));
+}
+
+/* Always there, so a problem never moves the program monitor. */
+.problem-slot {
+  position: relative;
+  flex: none;
+  height: 34px;
+}
+
+.problem-strip {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--warn) 12%, var(--panel));
+  color: var(--warn);
+}
+
+.others {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+}
+
+.other {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 140px;
+  flex: none;
+}
+
+.other .caption {
+  overflow: hidden;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.monitor.thumb {
+  border-width: 1px;
+}
+
+/* Score bar */
+
+.scorebar {
+  grid-area: score;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin: 0 calc(-1 * var(--space-4));
+  padding: 0 var(--space-5);
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.scorebar.empty {
+  color: var(--text-muted);
+}
+
+.scorebar .team,
+.scorebar .clocks,
+.scorebar .fouls,
+.scorebar .timeouts,
+.scorebar .possession,
+.scorebar .shot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.scorebar .abbr {
+  font-weight: 600;
+}
+
+.scorebar .score {
+  min-width: 2.2ch;
+  font: 500 var(--text-score) var(--mono);
+}
+
+.scorebar .clock {
+  min-width: 5ch;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: 500 var(--text-score) var(--mono);
+  cursor: text;
+}
+
+.clock-edit input {
+  width: 7ch;
+  height: 30px;
+  font: 500 var(--text-lg) var(--mono);
+}
+
+.timeout {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 1px solid var(--text-muted);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.timeout[data-on] {
+  background: var(--text);
+}
+
+.period .select-button {
+  min-width: 90px;
+}
+
+/* No active show */
+
+.picker-page {
+  max-width: 520px;
+  margin: var(--space-6) auto;
+}
+
+.show-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.show-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

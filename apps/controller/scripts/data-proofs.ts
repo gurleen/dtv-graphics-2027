@@ -5,7 +5,7 @@
  *
  *   bun apps/controller/scripts/data-proofs.ts [--only=lock,conflicts,import,edits] [--out=build/controller/data-proofs]
  *
- * It uses ports 8992 (server) and 8993 (the dev page).
+ * It serves the controller on port 8992; run `bun run riv:build` first so the shell's monitors load.
  */
 
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -15,11 +15,9 @@ import { type Api, connect, first } from '@dtv/api';
 import { type EntityOf, indexWorld, type PlayerId, ShowId, type World } from '@dtv/domain';
 import { CommandId } from '@dtv/playout';
 import { type Browser, chromium, type Page } from 'playwright';
-import { serveDataDev } from './data-dev/serve';
 
 const ROOT = resolve(import.meta.dir, '../../..');
 const SERVER_PORT = 8992;
-const PAGE_PORT = 8993;
 const flag = (name: string) => process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
 const out = join(ROOT, flag('out') ?? 'build/controller/data-proofs');
 const only = flag('only')?.split(',');
@@ -51,21 +49,22 @@ for await (const chunk of server.stdout) {
   if (/dtv server on/.test(started)) break;
 }
 if (!/dtv server on/.test(started)) throw new Error(`the server exited before serving:\n${started}`);
-const dev = serveDataDev({ port: PAGE_PORT });
 const connection = connect({ url: `ws://localhost:${SERVER_PORT}/rpc`, client: 'proofs' });
 const api: Api = connection.api;
 const browser: Browser = await chromium.launch();
 
 const world = async (): Promise<World> => indexWorld(await first((signal) => api.data.watch(undefined, { signal })));
-const pageUrl = (operator: string) => `${dev.origin}/?operator=${operator}&rpc=ws://localhost:${SERVER_PORT}/rpc`;
+const pageUrl = `http://localhost:${SERVER_PORT}/#/data`;
 
 async function openPage(operator: string): Promise<Page> {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+  await context.addInitScript((name) => localStorage.setItem('dtv.operator', name), operator);
+  const page = await context.newPage();
   page.on('console', (message) => {
     if (message.type() === 'error' || message.type() === 'warning') console.log(`  ${operator} ${message.type()}: ${message.text()}`);
   });
   page.on('pageerror', (error) => console.log(`  ${operator} page error: ${error.message}`));
-  await page.goto(pageUrl(operator));
+  await page.goto(pageUrl);
   await page.waitForSelector('.data-page');
   return page;
 }
@@ -347,7 +346,6 @@ try {
 } finally {
   connection.close();
   await browser.close();
-  await dev.stop();
   server.kill('SIGTERM');
   await server.exited;
   rmSync(dir, { recursive: true, force: true });

@@ -7,7 +7,8 @@
  *
  * `PORT` and `DTV_DB` override the port and the database file.
  *
- *   /                   a plain status page
+ *   /                   the controller: the show page (#/show) and the data page (#/data)
+ *   /status             a plain status page
  *   /rpc                the oRPC WebSocket
  *   /renderer           the page OBS loads; it draws program
  *   /riv/<stem>.riv     the signed scenes, from build/riv (`bun run riv:build`)
@@ -17,6 +18,7 @@
 import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { backup, dbLocation, migrate, openDb, seed } from '@dtv/db';
+import controllerPage from '@dtv/controller';
 import { GRAPHICS } from '@dtv/graphics';
 import rendererPage from '@dtv/renderer-page';
 import { rpcWebSocket } from './router';
@@ -77,7 +79,11 @@ const staticFiles = (prefix: string, dir: string) => async (request: Request) =>
 
 const server = Bun.serve({
   port: PORT,
+  // Hot reloading reloads every open page when this server restarts: each controller loses its
+  // unsaved edits and every monitor and /renderer replays its intros. A restart must change nothing on screen.
+  development: { hmr: false },
   routes: {
+    '/': controllerPage,
     '/renderer': rendererPage,
     '/riv/*': staticFiles('riv', join(ROOT, 'build/riv')),
     '/assets/*': staticFiles('assets', join(ROOT, 'assets')),
@@ -88,7 +94,7 @@ const server = Bun.serve({
       if (server.upgrade(request, { data: { client: url.searchParams.get('client') ?? 'anonymous' } })) return;
       return new Response('Expected a WebSocket upgrade', { status: 426 });
     }
-    if (url.pathname === '/') return statusPage();
+    if (url.pathname === '/status') return statusPage();
     return new Response('Not found', { status: 404 });
   },
   websocket: rpcWebSocket(store),

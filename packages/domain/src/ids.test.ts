@@ -1,4 +1,7 @@
 import { describe, expect, test } from 'bun:test';
+import { z } from 'zod';
+import { ENTITY_KINDS } from './entities';
+import * as ids from './ids';
 import { idFor, PlayerId, SeasonId, slugify, TeamId } from './index';
 
 describe('slugify', () => {
@@ -36,4 +39,15 @@ describe('idFor', () => {
     expect(PlayerId.safeParse('drexel--mbb').success).toBe(false);
     expect(SeasonId.safeParse('2026').success).toBe(false);
   });
+});
+
+test('every id that names a row says which kind, for a form’s picker', () => {
+  const refs = Object.entries(ids).flatMap(([name, schema]) => {
+    const ref = schema instanceof z.ZodType ? (schema.meta() as { ref?: string } | undefined)?.ref : undefined;
+    return ref ? [[name, ref] as const] : [];
+  });
+  for (const [, ref] of refs) expect(ENTITY_KINDS as readonly string[]).toContain(ref);
+  expect(refs.map(([name]) => name).sort()).toEqual(
+    ['ConferenceId', 'GameId', 'PlayerId', 'SchoolId', 'SeasonId', 'ShowId', 'SponsorId', 'StaffId', 'TalentId', 'TeamId', 'TeamSeasonId', 'VenueId'],
+  );
 });

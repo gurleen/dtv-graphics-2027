@@ -5,7 +5,7 @@
 
 import type { Api, WatchStatus } from '@dtv/api';
 import type { Revision, World } from '@dtv/domain';
-import type { OperatorId, Registry } from '@dtv/playout';
+import type { OperatorId, Registry, ShowView } from '@dtv/playout';
 import { createContext, useContext } from 'react';
 
 export interface Controller {
@@ -19,6 +19,8 @@ export interface Controller {
   /** 'reconnecting' while any stream is being restored; the shell shows the badge. */
   readonly status: WatchStatus;
   readonly registry: Registry;
+  /** The active show as this operator sees it, from `show.watch`; null until the first view arrives. */
+  readonly show: ShowView | null;
 }
 
 export const ControllerContext = createContext<Controller | null>(null);

@@ -23,6 +23,8 @@
         "@dtv/graphics": "workspace:*",
         "@dtv/playout": "workspace:*",
         "@dtv/renderer": "workspace:*",
+        "@fontsource/ibm-plex-mono": "^5.2.7",
+        "@fontsource/ibm-plex-sans": "^5.3.0",
         "react": "^19.3.1",
         "react-aria-components": "^1.22.1",
         "react-dom": "^19.3.1",
@@ -52,6 +54,7 @@
       "name": "@dtv/server",
       "dependencies": {
         "@dtv/api": "workspace:*",
+        "@dtv/controller": "workspace:*",
         "@dtv/db": "workspace:*",
         "@dtv/domain": "workspace:*",
         "@dtv/graphics": "workspace:*",

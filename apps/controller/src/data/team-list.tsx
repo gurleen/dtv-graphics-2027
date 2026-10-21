@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Button, Header, Input, ListBox, ListBoxItem, ListBoxSection, SearchField } from 'react-aria-components';
 import { useController } from '../app/context';
-import { useActiveShow } from './active-show';
 import { pinnedTeams, readRecent, searchTeams, teamEntries, touchRecent, writeRecent } from './teams';
 import { LISTS, type ListId, type View } from './types';
 
@@ -11,7 +10,7 @@ const keyOfView = (view: View | null) => (view?.type === 'team' ? `team:${view.t
 
 export function TeamList({ view, onView }: { readonly view: View | null; readonly onView: (view: View) => void }) {
   const { world } = useController();
-  const show = useActiveShow();
+  const show = useController().show?.show ?? null;
   const [query, setQuery] = useState('');
   const [recent, setRecent] = useState(() => readRecent(localStorage));
   const entries = useMemo(() => (world ? teamEntries(world) : []), [world]);

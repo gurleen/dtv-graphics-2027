@@ -1,0 +1,235 @@
+/**
+ * The show page (Show A): the free panel and what is on air by layer on the left, the
+ * rundown in the middle, the selected cue's inspector under both, my preview, Take and
+ * program on the right rail with the other operators' previews, and the game along the
+ * bottom.
+ */
+
+import { type CueId, resolveGame, type Show } from '@dtv/domain';
+import { type Bus, LAYERS, type OperatorId, type Registry, type ShowView } from '@dtv/playout';
+import './show.css';
+import { useState } from 'react';
+import { Button } from 'react-aria-components';
+import { useCommands } from '../app/commands';
+import { useController } from '../app/context';
+import { useStream } from '../app/streams';
+import { type ShowActions, slotLabel, stepsOf, useShowActions } from './actions';
+import { AddCueDialog, Inspector } from './inspector';
+import { type KeyAction, useKeys } from './keys';
+import { Monitor } from './monitor';
+import { Rundown } from './rundown';
+import { cueIdOf } from './rundown-edits';
+import { ScoreBar } from './scorebar';
+
+export function ShowPage() {
+  const { show: view } = useController();
+  if (!view) return <p className="loading">Connecting…</p>;
+  if (!view.show) return <ShowPicker />;
+  return <Console view={view} show={view.show} />;
+}
+
+function ShowPicker() {
+  const { world } = useController();
+  const { send } = useCommands();
+  const shows = world?.all('show') ?? [];
+  return (
+    <section className="panel picker-page" aria-label="Choose a show">
+      <h2>No show is active</h2>
+      <p className="muted">Activating a show empties every preview; program stays on air.</p>
+      <ul className="show-list">
+        {shows.map((show) => (
+          <li key={show.id}>
+            <span>{show.name}</span>
+            <Button className="button primary" onPress={() => void send({ type: 'activate', show: show.id })}>
+              Activate
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Console(props: { readonly view: ShowView; readonly show: Show }) {
+  const { view, show } = props;
+  const { api, world } = useController();
+  const { clearAll } = useCommands();
+  const ids = view.rundown.map((cue) => cueIdOf(cue)!);
+  const [chosen, setChosen] = useState<CueId | null>(null);
+  const selectedId = chosen && ids.includes(chosen) ? chosen : (ids[0] ?? null);
+  const selected = view.rundown.find((cue) => cueIdOf(cue) === selectedId);
+  const actions = useShowActions(selected)!;
+  const [adding, setAdding] = useState(false);
+  const [dragging, setDragging] = useState(false);
+
+  const gameId = show.gameId;
+  const live = useStream(gameId ? (signal) => api.game.watch({ game: gameId }, { signal }) : null, [api, gameId]);
+  const game = world && gameId ? resolveGame(world, gameId) : undefined;
+  const basketball = live?.sport === 'basketball' ? live : null;
+
+  const run = (action: KeyAction) => {
+    switch (action.type) {
+      case 'take':
+        return actions.take();
+      case 'cue':
+        return selected && actions.cue(selected);
+      case 'move': {
+        const at = selectedId ? ids.indexOf(selectedId) : -1;
+        const next = ids[Math.min(ids.length - 1, Math.max(0, at + action.by))];
+        if (next) setChosen(next);
+        return;
+      }
+      case 'next':
+        return actions.next();
+      case 'clearPreview':
+        return actions.clearPreview();
+      case 'clearLower':
+        return actions.clearLayer('lower');
+      case 'clearAll':
+        return clearAll.down();
+      case 'free': {
+        const cue = view.free[action.index];
+        return cue && actions.free(cue);
+      }
+    }
+  };
+  useKeys({ run, clearAllUp: clearAll.up, paused: adding || dragging });
+
+  return (
+    <div className="show-page">
+      <FreePanel view={view} actions={actions} />
+      <OnAir view={view} actions={actions} />
+      <Rundown view={view} selected={selectedId} onSelect={setChosen} onCue={actions.cue} onAdd={() => setAdding(true)} onDragging={setDragging} />
+      <Inspector cue={selected} live={live} onCue={actions.cue} />
+      <Rail view={view} actions={actions} />
+      <ScoreBar game={game} live={basketball} />
+      {adding && (
+        <AddCueDialog
+          at={selectedId ? ids.indexOf(selectedId) + 1 : ids.length}
+          live={live}
+          onClose={(added) => {
+            setAdding(false);
+            if (added) setChosen(added.id);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function FreePanel(props: { readonly view: ShowView; readonly actions: ShowActions }) {
+  return (
+    <section className="panel free" aria-label="Free panel">
+      <h2>
+        Free panel <span className="muted">· air directly</span>
+      </h2>
+      <div className="free-grid">
+        {props.view.free.map((cue, index) => (
+          <Button key={cue.graphic} className="free-button" data-pgm={!!cue.onProgram || undefined} data-error={!!cue.error || undefined} onPress={() => props.actions.free(cue)}>
+            <span className="free-label">{cue.label}</span>
+            {cue.onProgram && <span className="tag pgm">PGM</span>}
+            {index < 9 && <kbd>{index + 1}</kbd>}
+            {cue.error && <span className="cue-error">{cue.error}</span>}
+          </Button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const LAYER_NAMES = { bug: 'Bug', lower: 'Lower', card: 'Card' } as const;
+
+function OnAir(props: { readonly view: ShowView; readonly actions: ShowActions }) {
+  const { registry } = useController();
+  const { view, actions } = props;
+  return (
+    <section className="panel on-air" aria-label="On air by layer">
+      <h2>On air by layer</h2>
+      <ul className="layers">
+        {LAYERS.map((layer) => {
+          const slot = view.program[layer];
+          const steps = slot && stepsOf(registry, slot);
+          return (
+            <li key={layer} className="layer-row" data-layer={layer} data-pgm={!!slot || undefined}>
+              <span className="layer-name">{LAYER_NAMES[layer]}</span>
+              <span className="layer-slot">
+                {slot ? slotLabel(view, registry, slot) : <span className="muted">empty</span>}
+                {steps && (
+                  <span className="muted">
+                    {' '}
+                    (step {steps.step + 1} of {steps.count})
+                  </span>
+                )}
+              </span>
+              <Button className="button small" isDisabled={!slot} onPress={() => actions.clearLayer(layer)}>
+                Clear{layer === 'lower' && <kbd>⇧Esc</kbd>}
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+const busLabel = (view: ShowView, registry: Registry, bus: Bus) =>
+  LAYERS.flatMap((layer) => (bus[layer] ? [slotLabel(view, registry, bus[layer])] : [])).join(' + ');
+
+function Rail(props: { readonly view: ShowView; readonly actions: ShowActions }) {
+  const { operator, registry } = useController();
+  const { problem, dismiss } = useCommands();
+  const { view, actions } = props;
+  const others = [...new Set<OperatorId>([...view.operators, ...(Object.keys(view.otherPreviews) as OperatorId[])])].filter((each) => each !== operator).sort();
+  const previewEmpty = Object.keys(view.preview).length === 0;
+  return (
+    <aside className="rail" aria-label="Monitors">
+      <div className="rail-head">
+        My preview <span className="tag pvw">PVW</span>
+        <span className="caption">{busLabel(view, registry, view.preview)}</span>
+      </div>
+      <Monitor name="preview" bus={{ kind: 'preview', operator }} className="pvw" />
+      <div className="take-row">
+        <Button className="button take" isDisabled={previewEmpty} onPress={actions.take}>
+          Take <kbd>Space</kbd>
+        </Button>
+        <Button className="button" onPress={actions.next}>
+          Next <kbd>N</kbd>
+        </Button>
+        <Button className="button" isDisabled={previewEmpty} onPress={actions.clearPreview}>
+          Clear PVW <kbd>Esc</kbd>
+        </Button>
+      </div>
+      <div className="problem-slot">
+        {problem && (
+          <div className="problem-strip" role="alert" key={problem.at}>
+            <span>{problem.message}</span>
+            <Button className="button small" aria-label="Dismiss" onPress={dismiss}>
+              ✕
+            </Button>
+          </div>
+        )}
+      </div>
+      <div className="rail-head">
+        Program <span className="tag pgm">PGM</span>
+        <span className="caption">{busLabel(view, registry, view.program)}</span>
+      </div>
+      <Monitor name="program" bus={{ kind: 'program' }} className="pgm" />
+      <div className="rail-head">Others' previews</div>
+      <div className="others">
+        {others.length === 0 && <span className="muted">Nobody else is connected.</span>}
+        {others.map((other) => {
+          const bus = Object.hasOwn(view.otherPreviews, other) ? view.otherPreviews[other]! : {};
+          return (
+            <div key={other} className="other" data-operator={other}>
+              <Monitor name={`other:${other}`} bus={{ kind: 'preview', operator: other }} className="thumb" />
+              <span className="caption">
+                {other}: {busLabel(view, registry, bus) || 'empty'}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </aside>
+  );
+}
+
