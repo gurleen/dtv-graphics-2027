@@ -1,4 +1,6 @@
 import { describe, expect, test } from 'bun:test';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { CueId, GraphicId, Revision, ShowId, Sponsor, Sponsorship } from '@dtv/domain';
 import { FALLBACK_IMAGES, flatten, project } from './project';
 import { fixtureContext, fixtureWorld, REGISTRY } from './registry.fixture';
@@ -96,6 +98,10 @@ describe('project', () => {
     const other = fixtureContext(fixtureWorld(), ShowId.parse('other'));
     expect(frame({ bug: slot('bug', 'test/bug', {}) }, other).layers[0]?.values.title).toBe('OTHER SHOW');
   });
+});
+
+test('each fallback image is a file the server can serve from the repo', () => {
+  for (const url of Object.values(FALLBACK_IMAGES)) expect(existsSync(join(import.meta.dir, '../../..', url))).toBe(true);
 });
 
 describe('flatten', () => {
