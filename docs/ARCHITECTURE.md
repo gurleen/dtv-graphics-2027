@@ -215,6 +215,8 @@ on every write and refuses the batch with `INCONSISTENT`.
 - A `game.apply` names only players of the game's teams that season, and starters only of their side's team. It
   fails with `NOT_IN_GAME` otherwise, so a typo cannot grow the live player lines.
 - Every rundown cue names a graphic in the registry, and its params and overrides fit that graphic.
+- The active show is not deleted. The store holds the active show, so it refuses the batch with `INCONSISTENT` and
+  names the show. Another show must be activated first.
 
 ## 3. The API
 

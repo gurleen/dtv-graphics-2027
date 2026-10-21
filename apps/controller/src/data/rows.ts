@@ -10,14 +10,17 @@ export const personName = (person: { readonly firstName: string; readonly lastNa
 
 const GAME_DAY = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
-/** `Drexel at Saint Joseph's · Oct 21`. */
-export function gameLabel(world: World, game: Game): string {
+/** `Drexel at Saint Joseph's`. */
+export function matchupLabel(world: World, game: Pick<Game, 'awayTeamId' | 'homeTeamId'>): string {
   const name = (teamId: Game['homeTeamId']) => {
     const team = world.get('team', teamId);
     return (team && world.get('school', team.schoolId)?.shortName) ?? teamId;
   };
-  return `${name(game.awayTeamId)} at ${name(game.homeTeamId)} · ${GAME_DAY.format(new Date(game.startsAt))}`;
+  return `${name(game.awayTeamId)} at ${name(game.homeTeamId)}`;
 }
+
+/** `Drexel at Saint Joseph's · Oct 21`. */
+export const gameLabel = (world: World, game: Game): string => `${matchupLabel(world, game)} · ${GAME_DAY.format(new Date(game.startsAt))}`;
 
 /** A value as a person reads it in a diff: empty is a dash, a boolean is yes or no. */
 export const showValue = (value: unknown): string =>
