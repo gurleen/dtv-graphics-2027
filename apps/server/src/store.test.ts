@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type Db, migrate, openDb, seed } from '@dtv/db';
-import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, ShowId, SourceId, TeamId } from '@dtv/domain';
+import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, SeasonId, ShowId, SourceId, TeamId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import { CommandId, OperatorId, type OutputFrame, type Registry, type ShowCommand } from '@dtv/playout';
 import { type Clock, createStore, type Store } from './store';
@@ -139,6 +139,15 @@ describe('data', () => {
     const rundown = [{ id: CueId.parse('x'), graphic: GraphicId.parse('constructor'), params: {}, overrides: {}, note: '' }];
     const result = store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown } }] });
     expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue x: No graphic constructor' });
+  });
+
+  test('planRoster reports a name an id cannot be made from as a bad row', () => {
+    const store = open();
+    const csv = 'jersey,first_name,last_name\n8,,王';
+    expect(store.planRoster({ team: TeamId.parse('drexel-mbb'), season: SeasonId.parse('2026-27'), csv, prune: false })).toEqual({
+      ok: false,
+      errors: [{ line: 2, message: 'the name "王" has no letters a-z or digits for an id' }],
+    });
   });
 
   test('a stale basis is a CONFLICT', () => {

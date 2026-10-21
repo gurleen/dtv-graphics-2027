@@ -12,7 +12,7 @@
 
 import { type ImportEdit, mergePut } from '../edits';
 import { ClassYear, parseEntity, Player } from '../entities';
-import { idFor, type PlayerId, type SeasonId, type TeamId } from '../ids';
+import { idFor, personSlug, type PlayerId, type SeasonId, type TeamId } from '../ids';
 import { Url } from '../primitives';
 import type { World } from '../world';
 
@@ -198,6 +198,7 @@ export function parseRosterCsv(text: string): RosterParse {
       [firstName, lastName] = rest.length ? [first, rest.join(' ')] : ['', first];
     }
     if (!lastName) problems.push('no last name');
+    else if (!personSlug(firstName, lastName)) problems.push(`the name "${[firstName, lastName].filter(Boolean).join(' ')}" has no letters a-z or digits for an id`);
 
     const position = parsePosition(cell('position'));
     if (typeof position !== 'string') problems.push(position.error);

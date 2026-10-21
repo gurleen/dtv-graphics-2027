@@ -73,6 +73,16 @@ describe('parseRosterCsv', () => {
     });
   });
 
+  test('a name an id cannot be made from is a bad row, and an accented one is fine', () => {
+    expect(parseRosterCsv([HEADER, '7,,Müller,G,,,,,,', '8,,王,G,,,,,,', '9,Иван,Петров,F,,,,,,'].join('\n'))).toEqual({
+      ok: false,
+      errors: [
+        { line: 3, message: 'the name "王" has no letters a-z or digits for an id' },
+        { line: 4, message: 'the name "Иван Петров" has no letters a-z or digits for an id' },
+      ],
+    });
+  });
+
   test('a header without a jersey or a name column is refused at line 1', () => {
     expect(parseRosterCsv('first,pos\nJosh,G')).toEqual({ ok: false, errors: [{ line: 1, message: 'missing column jersey and last_name (or name)' }] });
   });

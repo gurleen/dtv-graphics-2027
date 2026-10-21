@@ -56,8 +56,8 @@ export const slugify = (text: string): string =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-/** A person's slug is last name first, so a roster sorts by family name. */
-const personSlug = (firstName: string, lastName: string) => slugify(`${lastName} ${firstName}`);
+/** A person's slug is last name first, so a roster sorts by family name. Empty for a name with no a-z or digits. */
+export const personSlug = (firstName: string, lastName: string) => slugify(`${lastName} ${firstName}`);
 
 export const idFor = {
   school: (name: string) => SchoolId.parse(slugify(name)),
