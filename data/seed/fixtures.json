@@ -91,7 +91,41 @@
         "name": "Saint Joseph's at Drexel",
         "gameId": "2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb",
         "crew": [{ "talentId": "rob-brooks" }, { "talentId": "mike-tuberosa" }, { "talentId": "tessa-peloso" }],
-        "rundown": []
+        "rundown": [
+          { "id": "matchup-locator", "graphic": "basketball-v2/matchup-locator", "params": {} },
+          { "id": "starting-five", "graphic": "basketball-v2/starting-five", "params": {} },
+          { "id": "matchup-locator-lower-third", "graphic": "basketball-v2/matchup-locator-lower-third", "params": {} },
+          { "id": "player-to-watch", "graphic": "basketball-v2/player-to-watch", "params": { "player": "drexel-mbb@2026-27/reed-josh" } },
+          {
+            "id": "player-lower-third",
+            "graphic": "basketball-v2/player-lower-third",
+            "params": { "player": "drexel-mbb@2026-27/reed-josh", "line": { "kind": "game", "stats": ["pts", "reb", "ast", "threes"] } }
+          },
+          { "id": "staff-lower-third", "graphic": "basketball-v2/staff-lower-third", "params": { "staff": "drexel-mbb@2026-27/spiker-zach" } },
+          {
+            "id": "burning-question",
+            "graphic": "basketball-v2/burning-question",
+            "params": {
+              "question": "What Drexel women's basketball player scored her 1000th point in the 2013 WNIT championship game?",
+              "answer": "Taylor Wootton",
+              "team": "drexel-wbb"
+            }
+          },
+          { "id": "team-lower-third", "graphic": "basketball-v2/team-lower-third", "params": { "team": "drexel-mbb" } },
+          { "id": "halftime-statistics", "graphic": "basketball-v2/halftime-statistics", "params": {} },
+          {
+            "id": "halftime-adjustments",
+            "graphic": "basketball-v2/halftime-adjustments",
+            "params": {
+              "adjustments": {
+                "away": ["Push the pace in transition", "Limit second-chance points"],
+                "home": ["Attack the paint early", "Close out on three-point shooters"]
+              }
+            }
+          },
+          { "id": "conference-standings", "graphic": "basketball-v2/conference-standings", "params": { "season": "2025-26" } },
+          { "id": "player-of-the-game", "graphic": "basketball-v2/player-of-the-game", "params": { "player": "drexel-mbb@2026-27/reed-josh" } }
+        ]
       }
     ]
   },

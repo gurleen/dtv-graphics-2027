@@ -9,7 +9,7 @@ import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
 import { loadLive, loadSnapshot, migrate, openDb, seed } from '@dtv/db';
 import { GraphicId, indexWorld, PlayerId, ShowId, Url } from '@dtv/domain';
-import { type AnyGraphic, bindValues, showContext } from '@dtv/playout';
+import { type AnyGraphic, bindValues, EMPTY_SHOW, OperatorId, showContext, viewShow } from '@dtv/playout';
 import { BASKETBALL_V2, SCENES } from './index';
 
 /** One reason for several properties of one graphic. */
@@ -116,4 +116,12 @@ describe('what the entries do beyond their values', async () => {
       expect(entry.overlay?.source(entry.params.parse({ player: REED }), { ...context, sponsor: undefined })).toBeNull();
     }
   });
+});
+
+test('the demo show’s rundown cues every graphic the free panel lacks, each ready to air', async () => {
+  const context = await seededContext();
+  const view = viewShow({ registry: BASKETBALL_V2, state: EMPTY_SHOW, operator: OperatorId.parse('golden'), operators: [], revision: context.world.revision, context });
+  const aired = [...view.free, ...view.rundown].map((cue) => cue.graphic).sort();
+  expect(aired).toEqual(ENTRIES.map((entry) => entry.id).sort());
+  expect(view.rundown.filter((cue) => cue.error).map((cue) => `${cue.graphic}: ${cue.error}`)).toEqual([]);
 });
