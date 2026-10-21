@@ -167,7 +167,7 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
     world: () => world,
 
     applyEdits(actor, batch) {
-      const problems = [...checkEdits(world, batch).map((problem) => problem.message), ...rundownProblems(registry, batch)];
+      const problems = [...checkEdits(world, batch).map((problem) => problem.message), ...rundownProblems(registry, batch), ...activeShowDeletions(show, batch)];
       if (problems.length) return { ok: false, reason: 'inconsistent', detail: problems.join('\n') };
       const result = commitEdits(db, { actor, at: clock.now(), batch });
       if (!result.ok) return result;
@@ -283,6 +283,13 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       cancelTimer = null;
     },
   };
+}
+
+/** The show on air is not deletable: its rundown is what the operators' cues resolve against. */
+function activeShowDeletions(state: ShowState, batch: EditBatch): string[] {
+  return batch.edits.flatMap((edit) =>
+    edit.op === 'delete' && edit.kind === 'show' && edit.id === state.showId ? [`Show ${edit.id} is active; make another show active before deleting it`] : [],
+  );
 }
 
 /** Rundown cues must name a graphic and fit its params, which SQLite cannot check. */

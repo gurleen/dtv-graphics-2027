@@ -79,6 +79,7 @@ export const idFor = {
   talent: (firstName: string, lastName: string) => TalentId.parse(slugify(`${firstName} ${lastName}`)),
   sponsor: (name: string) => SponsorId.parse(slugify(name)),
   venue: (name: string) => VenueId.parse(slugify(name)),
+  show: (name: string) => ShowId.parse(slugify(name)),
   /** `date` is the local game day, `YYYY-MM-DD`. */
   game: (season: SeasonId, date: string, away: TeamId, home: TeamId) => GameId.parse(`${season}/${date}/${away}.at.${home}`),
 };
