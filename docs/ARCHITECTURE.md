@@ -138,7 +138,8 @@ Most data arrives prefilled, and people correct it on the data page. These rules
 - A put with `onExisting: 'keep'` writes a row only when the row is missing. The seed uses it, so `bun run db:seed`
   never resets a record that a feed or an import updated since.
 - A manual batch carries `basis`, the World revision its writer read. A put or delete of a row written after that
-  revision fails the whole batch with `CONFLICT`, so one editor never overwrites another.
+  revision fails the whole batch with `CONFLICT`, so one editor never overwrites another. A delete is a write. The
+  store finds it in the journal, so a stale put cannot bring a deleted row back.
 - Importers return warnings for the data page to show. On teams.json they report what we measured on the vendored
   file: `conference_id` 7 is both the Big Ten and the EIWA, `conference_id` 10 carries two names for the CAA, 12
   logo files are shared by 31 schools, 35 records have no valid alternate colour, 38 have no logo, and the CAA list

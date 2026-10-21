@@ -138,6 +138,22 @@ describe('basis', () => {
     expect(commit(manual([{ op: 'delete', kind: 'player', id: reed.id }], read))).toMatchObject({ ok: false, reason: 'conflict' });
   });
 
+  test('a put of a row deleted after the basis is a conflict, and does not bring it back', () => {
+    const read = revision();
+    ok(commit(manual([{ op: 'delete', kind: 'player', id: reed.id }], read)));
+    expect(commit(manual([{ op: 'put', kind: 'player', value: { ...reed, firstName: 'Joshua' } }], read))).toMatchObject({
+      ok: false,
+      reason: 'conflict',
+      detail: expect.stringContaining(`player ${reed.id} was deleted at revision`),
+    });
+    expect(loadSnapshot(db).entities.player).toEqual([]);
+    expect(ok(commit(manual([{ op: 'put', kind: 'player', value: reed }]))).inserted).toBe(1);
+  });
+
+  test('a batch that deletes a row and puts it again lands', () => {
+    expect(ok(commit(manual([{ op: 'delete', kind: 'player', id: reed.id }, { op: 'put', kind: 'player', value: reed }])))).toMatchObject({ inserted: 1, deleted: 1 });
+  });
+
   test('a batch that read the latest revision lands, even when it writes one row twice', () => {
     const result = ok(commit(manual([
       { op: 'put', kind: 'school', value: { ...sju, mascot: 'Hawk' } },

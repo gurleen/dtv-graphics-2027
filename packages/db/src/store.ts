@@ -103,6 +103,19 @@ function danglingReference(db: Db): string | null {
   return `${dangling.table} ${row?.id ?? `rowid ${dangling.rowid}`} refers to a missing row of ${dangling.parent}`;
 }
 
+/** The data commit after `basis`, other than `seq`, that deleted `kind` `id`: a delete leaves no row, but the journal keeps it. */
+function deletedSince(db: Db, input: { readonly basis: number; readonly seq: number; readonly kind: EntityKind; readonly id: string }): number | null {
+  const row = db.sqlite
+    .query<{ seq: number }, [number, number, string, string]>(
+      `SELECT journal.seq FROM journal, json_each(journal.payload, '$.edits') AS edit
+       WHERE journal.kind = 'data' AND journal.seq > ? AND journal.seq != ?
+         AND edit.value ->> '$.op' = 'delete' AND edit.value ->> '$.kind' = ? AND edit.value ->> '$.id' = ?
+       ORDER BY journal.seq DESC LIMIT 1`,
+    )
+    .get(input.basis, input.seq, input.kind, input.id);
+  return row?.seq ?? null;
+}
+
 /** Every game has live state: the transaction that inserts a game inserts its sport's `initial` too. */
 function insertInitialLive(db: Db, game: Game, seq: number) {
   const live = SPORT_MODULES[PROGRAMS[game.program].sport].initial(game.id, game.program);
@@ -111,7 +124,7 @@ function insertInitialLive(db: Db, game: Game, seq: number) {
 
 /**
  * One batch, one transaction, one journal row; a batch that changes nothing writes none.
- * With a basis, a put or delete of a row written after it refuses the whole batch. The
+ * With a basis, a put or delete of a row written or deleted after it refuses the whole batch. The
  * caller reloads the snapshot afterwards rather than patching memory, so a cascaded
  * delete can never leave the in-memory World behind the file.
  */
@@ -126,8 +139,12 @@ export function commitEdits(db: Db, input: { readonly actor: string; readonly at
         const table = ENTITIES[edit.kind].table;
         const id = edit.op === 'put' ? edit.value.id : edit.id;
         const row = db.sqlite.query<{ doc: string; seq: number; locked: string }, [string]>(`SELECT doc, seq, locked FROM "${table}" WHERE id = ?`).get(id);
-        if (row && batch.basis !== undefined && row.seq > batch.basis && row.seq !== seq) {
-          throw new Refusal('conflict', `${edit.kind} ${id} was written at revision ${row.seq}, after this batch's basis ${batch.basis}`);
+        if (batch.basis !== undefined) {
+          if (row && row.seq > batch.basis && row.seq !== seq) {
+            throw new Refusal('conflict', `${edit.kind} ${id} was written at revision ${row.seq}, after this batch's basis ${batch.basis}`);
+          }
+          const deleted = row ? null : deletedSince(db, { basis: batch.basis, seq, kind: edit.kind, id });
+          if (deleted !== null) throw new Refusal('conflict', `${edit.kind} ${id} was deleted at revision ${deleted}, after this batch's basis ${batch.basis}`);
         }
         if (edit.op === 'delete') {
           if (!row) continue;
