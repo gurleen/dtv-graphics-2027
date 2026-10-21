@@ -36,6 +36,7 @@ export function createRouter(store: Store) {
         const result = store.applyGame(context.client, input);
         if (result.ok) return { revision: result.revision, live: result.live };
         if (result.reason === 'not-authority') throw errors.NOT_AUTHORITY({ data: { group: result.group } });
+        if (result.reason === 'not-in-game') throw errors.NOT_IN_GAME({ data: { player: result.player } });
         throw errors.NO_GAME();
       }),
     },

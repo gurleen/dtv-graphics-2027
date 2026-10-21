@@ -43,6 +43,7 @@ export const contract = {
       .output(type<{ revision: Revision; live: GameLive }>())
       .errors({
         NOT_AUTHORITY: { message: 'Another source writes this field group', data: z.object({ group: z.string() }) },
+        NOT_IN_GAME: { message: 'A command names a player who is not on that team in this game', data: z.object({ player: z.string() }) },
         NO_GAME: { message: 'No such game, or not that sport' },
       }),
   },

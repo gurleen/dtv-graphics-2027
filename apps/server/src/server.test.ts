@@ -164,6 +164,11 @@ describe('rules over the wire', () => {
     expect(result.live.sport === 'basketball' && result.live.score.home).toBe(75);
   });
 
+  test('a player line for a player on neither team fails with NOT_IN_GAME', async () => {
+    const line: GameApplyInput = { sport: 'basketball', gameId: GAME, source: SourceId.parse('operator'), commands: [{ type: 'playerLine', player: PlayerId.parse('drexel-mbb@2026-27/nobody'), line: { pts: 2 } }] };
+    expect(await rejection(a.api.game.apply(line))).toMatchObject({ code: 'NOT_IN_GAME', data: { player: 'drexel-mbb@2026-27/nobody' } });
+  });
+
   test('a data edit that puts another program’s team in a game fails with INCONSISTENT and writes nothing', async () => {
     const world = await first((signal) => a.api.data.watch(undefined, { signal }));
     const game = world.entities.game.find((row) => row.id === GAME)!;

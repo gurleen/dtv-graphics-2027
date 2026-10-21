@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { type Db, migrate, openDb, seed } from '@dtv/db';
+import { type Db, loadLive, migrate, openDb, seed } from '@dtv/db';
 import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, SeasonId, ShowId, SourceId, TeamId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import { CommandId, OperatorId, type OutputFrame, type Registry, type ShowCommand } from '@dtv/playout';
@@ -173,6 +173,18 @@ describe('live', () => {
     const result = store.applyGame('statcrew', game('statcrew', { type: 'possession', side: 'away' }, { type: 'score', side: 'home', value: 80 }));
     expect(result).toMatchObject({ ok: false });
     expect(open().applyGame('alex', game('operator', { type: 'possession', side: 'home' }))).toMatchObject({ ok: true, live: { possession: 'home', score: { home: 72 } } });
+  });
+
+  test('a player line or starters naming a player who is not on that team in this game are refused, and nothing is written', () => {
+    const store = open();
+    const nobody = PlayerId.parse('drexel-mbb@2026-27/nobody');
+    expect(store.applyGame('alex', game('operator', { type: 'playerLine', player: nobody, line: { pts: 2 } }))).toEqual({ ok: false, reason: 'not-in-game', player: nobody });
+    const home = store.world().roster(TeamId.parse('drexel-mbb'), SeasonId.parse('2026-27')).slice(0, 5).map((player) => player.id);
+    expect(store.applyGame('alex', game('operator', { type: 'starters', side: 'away', players: home }))).toEqual({ ok: false, reason: 'not-in-game', player: home[0]! });
+    expect(store.applyGame('alex', game('operator', { type: 'starters', side: 'home', players: home }))).toMatchObject({ ok: true });
+    expect(store.applyGame('alex', game('operator', { type: 'playerLine', player: REED, line: { pts: 20 } }))).toMatchObject({ ok: true });
+    const live = loadLive(db).get(GAME);
+    expect(live?.sport === 'basketball' && Object.keys(live.players)).not.toContain(nobody);
   });
 
   test('an unknown game is NO_GAME', () => {

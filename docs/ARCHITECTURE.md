@@ -203,6 +203,8 @@ on every write and refuses the batch with `INCONSISTENT`.
 - Both teams of a game play in the game's program.
 - `TeamSeason.stats` and `PlayerSeasonStats.stats` have the sport of their team's program.
 - A `game.apply` names the sport of its game.
+- A `game.apply` names only players of the game's teams that season, and starters only of their side's team. It
+  fails with `NOT_IN_GAME` otherwise, so a typo cannot grow the live player lines.
 - Every rundown cue names a graphic in the registry, and its params and overrides fit that graphic.
 
 ## 3. The API
@@ -219,7 +221,7 @@ SQLite.
 | `data.apply` | `EditBatch` | `{ revision, skipped }` | `CONFLICT`, `INVALID_REFERENCE`, `DUPLICATE`, `INCONSISTENT` |
 | `data.planRoster` | team, season, csv, prune | the plan, or the bad rows | none |
 | `game.watch` | game | stream of `GameLive` | none |
-| `game.apply` | `GameApplyInput` | `{ revision, live }` | `NOT_AUTHORITY`, `NO_GAME` |
+| `game.apply` | `GameApplyInput` | `{ revision, live }` | `NOT_AUTHORITY`, `NOT_IN_GAME`, `NO_GAME` |
 | `show.watch` | operator | stream of `ShowView` | none |
 | `show.command` | `{ id, command }` | `{ revision, changed }` | `REJECTED` |
 | `output.watch` | bus | stream of `OutputFrame` | none |

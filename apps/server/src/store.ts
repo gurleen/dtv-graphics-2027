@@ -14,7 +14,7 @@ import {
 } from '@dtv/db';
 import {
   checkEdits, type EditBatch, type EpochMs, type GameApplyInput, type GameId, type GameLive, indexWorld, parseRosterCsv, planRoster,
-  PROGRAMS, type Revision, type RosterError, type RosterPlan, sameJson, type SeasonId, SPORT_MODULES, type TeamId, type World,
+  type PlayerId, playerOutsideGame, PROGRAMS, type Revision, type RosterError, type RosterPlan, sameJson, type SeasonId, SPORT_MODULES, type TeamId, type World,
   type WorldSnapshot,
 } from '@dtv/domain';
 import {
@@ -47,6 +47,7 @@ export type DataResult =
 export type GameResult =
   | { readonly ok: true; readonly revision: Revision; readonly live: GameLive }
   | { readonly ok: false; readonly reason: 'not-authority'; readonly group: string }
+  | { readonly ok: false; readonly reason: 'not-in-game'; readonly player: PlayerId }
   | { readonly ok: false; readonly reason: 'no-game' };
 
 export type CommandResult = { readonly ok: true; readonly revision: Revision; readonly changed: boolean } | { readonly ok: false; readonly reason: string };
@@ -193,6 +194,8 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       const now = clock.now();
       const before = lives.get(game.id);
       if (!before) return { ok: false, reason: 'no-game' };
+      const outsider = playerOutsideGame(world, game, input);
+      if (outsider) return { ok: false, reason: 'not-in-game', player: outsider };
       let live = before;
       for (const command of input.commands) {
         const result = sport.apply(live, command, { source: input.source, now });
