@@ -83,7 +83,9 @@ const openTeam = async (page: Page, label: string | RegExp) => {
   await page.getByRole('option', { name: label, exact: typeof label === 'string' }).first().click();
   await page.waitForSelector('.data-table');
 };
-const cell = (page: Page, field: string, value: string) => page.getByRole('button', { name: `${field}: ${value}. Edit` });
+const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/** A cell's button is named `<field> of <row>: <value>. Edit`. */
+const cell = (page: Page, field: string, value: string) => page.getByRole('button', { name: new RegExp(`^${escape(field)} of .*: ${escape(value)}\\. Edit$`) });
 /** Moves the mouse in from outside, as a hand does: the tooltips open on movement, not on a jump. */
 const hover = async (page: Page, target: ReturnType<Page['locator']>) => {
   const box = (await target.boundingBox())!;
@@ -194,17 +196,17 @@ async function conflictProof() {
 
   console.log(' pick per field');
   const target = PLAYER(DREXEL, 'de-laporterie');
-  const jersey = (page: Page, number: string) => page.locator('.data-row').filter({ has: page.getByRole('button', { name: `#: ${number}. Edit` }) });
-  await jersey(sam, '11').getByRole('button', { name: /^Last:/ }).click();
+  const jersey = (page: Page, number: string) => page.locator('.data-row').filter({ has: page.getByRole('button', { name: new RegExp(`^# of #${number} `) }) });
+  await jersey(sam, '11').getByRole('button', { name: /^Last of / }).click();
   await sam.keyboard.press('Escape');
   const panel = sam.locator('.record-fields');
   await panel.getByRole('textbox', { name: 'Last' }).fill('Delaporterie-Yours');
   await panel.getByRole('textbox', { name: 'Pos' }).fill('G');
-  await jersey(alex, '11').getByRole('button', { name: /^Last:/ }).click();
+  await jersey(alex, '11').getByRole('button', { name: /^Last of / }).click();
   await alex.locator('.cell-input').fill('Delaporterie-Theirs');
   await alex.keyboard.press('Enter');
   await waitFor('alex last-name save', async () => player(await world(), DREXEL, 'de-laporterie').lastName === 'Delaporterie-Theirs');
-  await jersey(alex, '11').getByRole('button', { name: /^Class:/ }).click();
+  await jersey(alex, '11').getByRole('button', { name: /^Class of / }).click();
   await alex.locator('.cell-input').fill('so');
   await alex.keyboard.press('Enter');
   await waitFor('alex class save', async () => player(await world(), DREXEL, 'de-laporterie').classYear === 'SO');
@@ -286,6 +288,8 @@ async function importProof() {
   check((await page.locator('.import [role="status"]').innerText()).includes('Nothing to do'), 'the same file planned again has nothing to do');
   check(await page.getByRole('button', { name: 'Apply' }).isDisabled(), 'Apply is disabled when there is nothing to do');
   await shoot(page, 'import-plan-again');
+  await page.setViewportSize({ width: 1728, height: 1117 });
+  await shoot(page, 'import-plan-again-1728');
   await page.close();
 }
 
@@ -306,7 +310,7 @@ async function editsProof() {
   await page.locator('.cell-input').fill('#123456');
   await page.keyboard.press('Enter');
   await waitFor('the branding override', async () => (await world()).get('team', DREXEL as never)?.branding.primaryColor === '#123456');
-  await page.locator('.data-row', { hasText: 'Primary colour' }).getByRole('button', { name: /Primary colour: #123456/ }).waitFor();
+  await page.locator('.data-row', { hasText: 'Primary colour' }).getByRole('button', { name: /^Primary colour of .*: #123456\. Edit$/ }).waitFor();
   await shoot(page, 'branding-edited');
 
   await cell(page, 'Abbreviation', 'DREX').click();

@@ -237,5 +237,6 @@ export function EditingProvider({ children }: { readonly children: ReactNode }) 
     };
   }, [put, drop]);
 
+  // The sessions live in a ref, so the context value is a new object per change to make consumers render again.
   return <EditingContext.Provider value={useMemo(() => ({ ...editing }), [editing, sessions])}>{children}</EditingContext.Provider>;
 }

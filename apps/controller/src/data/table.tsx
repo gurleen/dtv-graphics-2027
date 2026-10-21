@@ -6,6 +6,7 @@ import { type Field, lockFieldOf, readText } from './fields';
 import { LockMark } from './lock-mark';
 import { locksOf } from './locks';
 import type { Doc } from './paths';
+import { rowLabel } from './rows';
 import { isDirty } from './session';
 import { type RowRef, sameTarget, type Target } from './types';
 
@@ -129,7 +130,7 @@ export function EditableCell({ target, field, cell, editing, onSelect }: { targe
       <Button
         ref={button}
         className={field.mono ? 'cell-value mono' : 'cell-value'}
-        aria-label={`${field.label}: ${value || 'empty'}. Edit`}
+        aria-label={`${field.label} of ${world ? rowLabel(world, target.kind, doc) : target.id}: ${value || 'empty'}. Edit`}
         onPress={() => {
           onSelect(target);
           edits.open(target.kind, doc);

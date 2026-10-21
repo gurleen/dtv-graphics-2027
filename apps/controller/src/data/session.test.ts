@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { Revision } from '@dtv/domain';
 import { fieldOf } from './fields';
-import { defaultSide, disagreements, isDirty, mergeChoices, openNewSession, openSession, problemsOf, readyToSave, typeInto } from './session';
+import { defaultSide, disagreements, isDirty, mergeChoices, openNewSession, openSession, problemsOf, readyToSave, shownProblems, typeInto } from './session';
 
 const reed = {
   id: 'drexel-mbb@2026-27/reed-josh', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5',
@@ -32,7 +32,14 @@ describe('a session', () => {
     expect(readyToSave(session, idFor)).toEqual({ ok: false, message: 'Give it a name no other row has' });
     session = typeInto(typeInto(session, field('lastName'), 'House'), field('jersey'), '14');
     expect(readyToSave(session, idFor)).toMatchObject({ ok: true, doc: { id: 'drexel-mbb@2026-27/house', lastName: 'House', jersey: '14' } });
-    expect(problemsOf(openNewSession('player', blank, rev(3)))).toMatchObject({ lastName: expect.any(String), jersey: 'one or two digits' });
+    expect(problemsOf(openNewSession('player', blank, rev(3)))).toMatchObject({ lastName: 'required', jersey: 'one or two digits' });
+  });
+
+  test('a new row names an error only on the fields typed into', () => {
+    const blank = { teamId: 'drexel-mbb', seasonId: '2026-27', firstName: '', lastName: '', jersey: '' };
+    const fresh = openNewSession('player', blank, rev(3));
+    expect(shownProblems(fresh)).toEqual({});
+    expect(shownProblems(typeInto(fresh, field('jersey'), '123'))).toEqual({ jersey: 'one or two digits' });
   });
 });
 

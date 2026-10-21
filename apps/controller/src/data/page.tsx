@@ -41,7 +41,7 @@ function Page() {
       <div className="middle">
         {view?.type === 'team' && current && (
           <TeamWorkspace
-            key={view.team}
+            key={`${view.team}@${current}`}
             team={view.team}
             season={current}
             tab={tab}
