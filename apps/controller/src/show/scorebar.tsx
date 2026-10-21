@@ -1,7 +1,9 @@
 /**
  * The game along the bottom: score, clocks, period, phase, possession, timeouts, fouls and
  * bonus. Score, clocks and possession have keys, shown on their buttons; timeouts, fouls,
- * period and phase are by mouse. A value still on its way to the server is marked pending.
+ * period and phase are by mouse. A value still on its way to the server is marked pending:
+ * `data-pending` on what shows it, or React Aria's `isPending` on a button, which owns that
+ * attribute and would drop ours.
  */
 
 import { basketball, type GameView, type Side, SIDES } from '@dtv/domain';
@@ -108,7 +110,7 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
         <Button
           className="button small toggle"
           data-on={live.bonus[side] || undefined}
-          data-pending={waiting((command) => command.type === 'bonus' && command.side === side)}
+          isPending={!!waiting((command) => command.type === 'bonus' && command.side === side)}
           onPress={() => apply({ type: 'bonus', side, value: !live.bonus[side] })}
         >
           Bonus
@@ -126,7 +128,6 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
             className="clock mono"
             aria-label="Set the game clock"
             data-testid="game-clock"
-            data-pending={waiting((command) => command.type === 'clock' || command.type === 'clockSet')}
             onPress={() => setClockText(basketball.formatGameClock(remaining))}
           >
             {basketball.formatGameClock(remaining)}
@@ -150,7 +151,12 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
             <Input className="mono" />
           </TextField>
         )}
-        <Button className="button small toggle keyed" data-on={live.clock.running || undefined} onPress={actions.clock}>
+        <Button
+          className="button small toggle keyed"
+          data-on={live.clock.running || undefined}
+          isPending={!!waiting((command) => command.type === 'clock' || command.type === 'clockSet')}
+          onPress={actions.clock}
+        >
           {live.clock.running ? 'Stop' : 'Start'}
           <Key action={{ type: 'clock' }} />
         </Button>

@@ -93,13 +93,15 @@ export class NoAnswer extends Error {
  */
 export async function untilAnswered<T>(call: (signal: AbortSignal) => Promise<T>, options: { readonly withinMs: number }): Promise<T> {
   const deadline = AbortSignal.timeout(options.withinMs);
-  while (!deadline.aborted) {
+  // A call waiting for the socket to open may not settle on its own, so the deadline is raced, not polled.
+  const late = new Promise<never>((_, reject) => deadline.addEventListener('abort', () => reject(new NoAnswer(options.withinMs)), { once: true }));
+  late.catch(() => {});
+  for (;;) {
     try {
-      return await call(deadline);
+      return await Promise.race([call(deadline), late]);
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
+      if (error instanceof ORPCError || error instanceof NoAnswer) throw error;
     }
-    await new Promise((resolve) => setTimeout(resolve, RETRY_MS));
+    await Promise.race([new Promise((resolve) => setTimeout(resolve, RETRY_MS)), late]);
   }
-  throw new NoAnswer(options.withinMs);
 }

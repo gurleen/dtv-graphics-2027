@@ -147,7 +147,7 @@ function FreePanel(props: { readonly view: ShowView; readonly actions: ShowActio
             className="free-button"
             data-pgm={!!cue.onProgram || undefined}
             data-error={!!cue.error || undefined}
-            data-pending={pending.some((command) => (command.type === 'air' && sameJson(command.ref, cue.ref)) || (command.type === 'clear' && command.slot === cue.onProgram)) || undefined}
+            isPending={pending.some((command) => (command.type === 'air' && sameJson(command.ref, cue.ref)) || (command.type === 'clear' && command.slot === cue.onProgram))}
             onPress={() => props.actions.free(cue)}
           >
             <span className="free-label">{cue.label}</span>
@@ -189,7 +189,7 @@ function OnAir(props: { readonly view: ShowView; readonly actions: ShowActions }
               <Button
                 className="button small"
                 isDisabled={!slot}
-                data-pending={pending.some((command) => (command.type === 'clear' && command.layer === layer) || command.type === 'clearAll') || undefined}
+                isPending={pending.some((command) => (command.type === 'clear' && command.layer === layer) || command.type === 'clearAll')}
                 onPress={() => actions.clearLayer(layer)}
               >
                 Clear{layer === 'lower' && <kbd>⇧Esc</kbd>}
@@ -209,7 +209,7 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
   const { operator, registry } = useController();
   const { problem, dismiss, pending } = useCommands();
   const { view, actions } = props;
-  const waiting = (type: ShowCommand['type']) => pending.some((command) => command.type === type) || undefined;
+  const waiting = (type: ShowCommand['type']) => pending.some((command) => command.type === type);
   const others = [...new Set<OperatorId>([...view.operators, ...(Object.keys(view.otherPreviews) as OperatorId[])])].filter((each) => each !== operator).sort();
   const previewEmpty = Object.keys(view.preview).length === 0;
   return (
@@ -220,13 +220,13 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
       </div>
       <Monitor name="preview" bus={{ kind: 'preview', operator }} className="pvw" />
       <div className="take-row">
-        <Button className="button take" isDisabled={previewEmpty && !waiting('take')} data-pending={waiting('take')} onPress={actions.take}>
+        <Button className="button take" isDisabled={previewEmpty} isPending={waiting('take')} onPress={actions.take}>
           Take <kbd>Space</kbd>
         </Button>
-        <Button className="button" data-pending={waiting('step')} onPress={actions.next}>
+        <Button className="button" isPending={waiting('step')} onPress={actions.next}>
           Next <kbd>N</kbd>
         </Button>
-        <Button className="button" isDisabled={previewEmpty} data-pending={waiting('uncue')} onPress={actions.clearPreview}>
+        <Button className="button" isDisabled={previewEmpty} isPending={waiting('uncue')} onPress={actions.clearPreview}>
           Clear PVW <kbd>Esc</kbd>
         </Button>
       </div>
