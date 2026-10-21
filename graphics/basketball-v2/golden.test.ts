@@ -12,11 +12,19 @@ import { GraphicId, indexWorld, ShowId } from '@dtv/domain';
 import { type AnyGraphic, bindValues, showContext } from '@dtv/playout';
 import { BASKETBALL_V2, SCENES } from './index';
 
+/** One reason for several properties of one graphic. */
+const drift = (graphic: string, properties: readonly string[], reason: string) => properties.map((name) => [`basketball-v2/${graphic} ${name}`, reason] as const);
+
 /** Each disagreement with a scene's Default instance, by `<graphic> <property>`, and why it stands. */
-const KNOWN_DRIFT: Readonly<Record<string, string>> = {
-  'basketball-v2/scorebug period':
+const KNOWN_DRIFT: Readonly<Record<string, string>> = Object.fromEntries([
+  ...drift(
+    'scorebug',
+    ['period'],
     'The scene says 2ND PERIOD; periodLabel says 2ND HALF for men’s games, as Score to Break does. Open question in docs/ARCHITECTURE.md section 7.',
-};
+  ),
+  ...drift('team-lower-third', ['stat1Value', 'stat2Value'], 'The scene’s placeholder record (14-3, 8-1) is not the 14-6, 6-3 the matchup scenes and the seed agree on.'),
+  ...drift('team-lower-third', ['bodyText'], 'Placeholder copy; the bind blanks it in stats mode.'),
+]);
 
 /** Scenes whose registry entries land in phase 3. Delete each line as its entry lands. */
 const PENDING = [
@@ -24,17 +32,13 @@ const PENDING = [
   'conference_standings.rml',
   'halftime_adjustments.rml',
   'halftime_statistics.rml',
-  'matchup_locator.rml',
-  'matchup_locator_lower_third.rml',
   'player_of_the_game_lower_third.rml',
   'player_to_watch_lower_third.rml',
   'score_to_break.rml',
-  'staff_lower_third.rml',
   'starting_five_lower_third.rml',
   'talent_lower_third_double.rml',
   'talent_lower_third_single.rml',
   'talent_lower_third_triple.rml',
-  'team_lower_third.rml',
 ];
 
 const ENTRIES: readonly AnyGraphic[] = Object.values(BASKETBALL_V2);

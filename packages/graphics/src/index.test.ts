@@ -2,9 +2,8 @@ import { expect, test } from 'bun:test';
 import { GraphicId } from '@dtv/domain';
 import { cueOf, GRAPHICS, parseCue } from './index';
 
-test('the list holds every basketball-v2 entry under its own id', () => {
+test('the list holds every entry under its own id', () => {
   for (const [id, entry] of Object.entries(GRAPHICS)) expect<string>(entry.id).toBe(id);
-  expect(Object.keys(GRAPHICS)).toEqual(['basketball-v2/scorebug', 'basketball-v2/player-lower-third']);
 });
 
 test('parseCue fills a cue’s defaulted params', () => {

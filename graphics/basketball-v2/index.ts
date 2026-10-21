@@ -4,10 +4,14 @@
  */
 
 import type { Registry } from '@dtv/playout';
+import { matchupLocator } from './graphics/matchup-locator';
+import { matchupLocatorLowerThird } from './graphics/matchup-locator-lower-third';
 import { playerLowerThird } from './graphics/player-lower-third';
 import { scorebug } from './graphics/scorebug';
+import { staffLowerThird } from './graphics/staff-lower-third';
+import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird] as const;
 
 type Entry = (typeof ENTRIES)[number];
 
