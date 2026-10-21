@@ -1,9 +1,5 @@
 import { Database } from 'bun:sqlite';
 
-/**
- * The SQLite file. bun:sqlite is synchronous and the server is one process, so each
- * commit is one transaction that no other write can interleave with.
- */
 export interface Db {
   readonly sqlite: Database;
   readonly path: string;

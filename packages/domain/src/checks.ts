@@ -1,9 +1,3 @@
-/**
- * Rules that span rows, which the document tables cannot state as SQL CHECKs. The store
- * runs these on every batch and refuses it with INCONSISTENT. Each rule reads the World
- * as it will be after the batch, with field locks applied by the same rule the store uses.
- */
-
 import { type EditBatch, mergePut } from './edits';
 import { type EntityKind, type EntityOf, parseEntity } from './entities';
 import type { GameId, TeamId } from './ids';

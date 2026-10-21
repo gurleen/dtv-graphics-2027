@@ -1,13 +1,3 @@
-/**
- * The database commands, on data/db/dtv.sqlite:
- *
- *   bun run db:migrate   bring the file to the schema the code expects
- *   bun run db:seed      migrate, then fill in the prefilled data from data/seed/
- *   bun run db:backup    write a copy to data/db/backups/
- *
- * Run db:seed with the server stopped: the server is the file's one writer.
- */
-
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { backup, migrate, type MigrationReport, openDb, seed } from '../src/index';

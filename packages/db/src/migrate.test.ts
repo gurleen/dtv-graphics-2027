@@ -53,7 +53,6 @@ describe('migrate', () => {
 
   test('a table made by an older spec is rebuilt with its rows intact, after a backup', () => {
     migrate(db, { backupDir: backups() });
-    // The file as it was before the players' natural key existed: no source_key column, no index.
     const current = tableSql('player');
     const older = current.create.replace(", source_key TEXT GENERATED ALWAYS AS (doc ->> '$.sourceKey') STORED", '');
     expect(older).not.toBe(current.create);

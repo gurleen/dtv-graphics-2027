@@ -1,9 +1,3 @@
-/**
- * The one way data changes: a batch of puts and deletes, applied atomically by the store.
- * The data page, the roster importer, the seed and every live-data package write through
- * this, and `mergePut` is the one statement of how their writes share a row.
- */
-
 import { z } from 'zod';
 import { ENTITIES, ENTITY_KINDS, type EntityKind, type EntityOf, type FieldOf, type IdOf } from './entities';
 import { Revision } from './primitives';
@@ -14,13 +8,12 @@ export type Origin = 'manual' | 'import';
 type Put<K extends EntityKind> = { readonly op: 'put'; readonly kind: K; readonly value: EntityOf<K> };
 type Delete<K extends EntityKind> = { readonly op: 'delete'; readonly kind: K; readonly id: IdOf<K> };
 
-/** `onExisting: 'keep'` writes the row only when it is missing: how the seed fills gaps without undoing edits. */
+/** `onExisting: 'keep'` writes the row only when it is missing. */
 export type ImportEdit = { [K in EntityKind]: (Put<K> & { readonly onExisting?: 'keep' }) | Delete<K> }[EntityKind];
 /** `unlock` clears field locks, so the next import writes those fields again. */
 export type ManualEdit = { [K in EntityKind]: (Put<K> & { readonly unlock?: readonly FieldOf<K>[] }) | Delete<K> }[EntityKind];
 export type DataEdit = ImportEdit | ManualEdit;
 
-/** Every edit union pairs a kind with that kind's value, so checking the kind narrows the value. */
 export const isPutOf = <K extends EntityKind>(edit: { readonly op: 'put' | 'delete'; readonly kind: EntityKind }, kind: K): edit is Put<K> =>
   edit.op === 'put' && edit.kind === kind;
 
@@ -33,7 +26,7 @@ export const importPut = <K extends EntityKind>(kind: K, value: EntityOf<K>, onE
 
 /**
  * `basis` is the World revision the writer read. A put or delete of a row written after
- * it fails the whole batch, so one editor never overwrites another. A person always has one.
+ * it fails the whole batch, so one editor never overwrites another.
  */
 export type EditBatch =
   | { readonly origin: 'import'; readonly basis?: Revision; readonly edits: readonly ImportEdit[] }
@@ -77,7 +70,6 @@ export const EditBatch = z.discriminatedUnion('origin', [
   z.strictObject({ origin: z.literal('manual'), basis: Revision, edits: z.array(manualEdit).min(1) }),
 ]) as unknown as z.ZodType<EditBatch>;
 
-/** A stored row as the lock rule sees it: the document and the fields a person locked. */
 export interface Row {
   readonly doc: Readonly<Record<string, unknown>>;
   readonly locked: readonly string[];

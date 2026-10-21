@@ -1,9 +1,4 @@
 /**
- * The SQL schema, derived from ENTITIES. Each entity is a table of JSON documents with the
- * referencing and unique fields lifted into STORED generated columns, so SQLite enforces
- * foreign keys and natural keys while the zod schema stays the one definition. Foreign
- * keys are deferred, so a batch may put a team before its school.
- *
  * Names are quoted because `ALTER TABLE ... RENAME` writes the name back quoted: a table
  * rebuilt by `migrate` must read back exactly as `tableSql` writes it.
  */
@@ -51,7 +46,6 @@ export function tableSql(kind: EntityKind): TableSql {
   };
 }
 
-/** Tables that are not entities. Their shapes are fixed, so they are written out. */
 const SYSTEM_TABLES: readonly TableSql[] = [
   {
     table: 'journal',
@@ -74,5 +68,4 @@ const SYSTEM_TABLES: readonly TableSql[] = [
   },
 ];
 
-/** Every table the code expects, in the form `migrate` compares with the file. */
 export const TABLES: readonly TableSql[] = [...ENTITY_KINDS.map(tableSql), ...SYSTEM_TABLES];

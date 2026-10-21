@@ -30,7 +30,6 @@ const storedColumns = (db: Db, table: string) =>
     .filter((column) => column.hidden === 0)
     .map((column) => column.name);
 
-/** SQLite's documented rebuild: create the new shape, copy the columns both share, drop, rename. */
 function rebuild(db: Db, table: TableSql) {
   const staging = `${table.table}_new`;
   db.sqlite.run(table.create.replace(`CREATE TABLE "${table.table}"`, `CREATE TABLE "${staging}"`));

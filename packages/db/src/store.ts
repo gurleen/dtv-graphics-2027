@@ -1,5 +1,3 @@
-/** Reads and writes of the document tables, the live state and the show state. */
-
 import { SQLiteError } from 'bun:sqlite';
 import {
   type EditBatch, emptySnapshot, ENTITIES, type EntityKind, type EntityOf, GameLive, type GameId,
@@ -17,7 +15,7 @@ const parseRow = <K extends EntityKind>(kind: K, id: string, doc: string): Entit
   }
 };
 
-/** The revision of the last data commit. Live and show commits do not move the World. */
+/** Live and show commits do not move the World, so its revision is the last data commit. */
 const dataRevision = (db: Db): Revision =>
   Revision.parse(db.sqlite.query<{ seq: number }, []>(`SELECT coalesce(max(seq), 0) AS seq FROM journal WHERE kind = 'data'`).get()!.seq);
 
@@ -184,7 +182,7 @@ export function commitLive(db: Db, input: { readonly actor: string; readonly at:
   })();
 }
 
-/** Program and the operators' previews. Its shape belongs to the playout package, so it is opaque here. */
+/** Its shape belongs to the playout package, so it is opaque here. */
 export function loadShowState(db: Db): unknown {
   const row = db.sqlite.query<{ doc: string }, []>('SELECT doc FROM show_state WHERE id = 1').get();
   return row ? JSON.parse(row.doc) : null;
