@@ -5,6 +5,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": { "lib": ["ES2023", "DOM", "DOM.Iterable"], "jsx": "react-jsx" },
-  "include": ["packages/renderer", "apps/renderer/*.ts", "apps/renderer/scripts/monitors/main.ts", "apps/site/*.ts", "apps/controller/src"],
+  "include": ["packages/renderer", "apps/renderer/*.ts", "apps/renderer/scripts/monitors/main.ts", "apps/site/*.ts", "apps/controller/src", "apps/controller/scripts/data-dev/main.tsx"],
   "exclude": []
 }

@@ -28,6 +28,8 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'apps/server': ['@dtv/api', '@dtv/db', '@dtv/graphics', '@dtv/playout', '@dtv/domain', '@dtv/renderer-page', '@orpc/server', 'zod', 'node:fs', 'node:path'],
   'apps/controller': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', 'react-aria-components'],
   'apps/renderer': ['@dtv/api', '@dtv/renderer', '@dtv/graphics'],
+  // The data page's dev stand-in and its proofs: a page that renders it on the real server, and a Chromium that drives it.
+  'apps/controller/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', '@fontsource/*', 'playwright', 'pngjs', 'node:*'],
   // The page's proofs: they drive a real server and a real Chromium, and decode its screenshots.
   'apps/renderer/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'playwright', 'pngjs', 'node:*'],
   // The two-renderer proof page draws with the renderer, as the controller's monitors will.
