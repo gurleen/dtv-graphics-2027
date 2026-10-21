@@ -235,13 +235,13 @@ describe('step', () => {
     expect(state().program).toEqual({});
   });
 
-  test('a step for a replaced slot changes nothing; a graphic without steps is rejected', () => {
+  test('a step for a replaced slot changes nothing; Next on a graphic without steps takes it off air', () => {
     const { send, state } = harness();
     send({ type: 'air', operator: alex, ref: rundown('starters') });
     expect(changed(send({ type: 'step', layer: 'lower', slot: SlotId.parse('slot-9'), to: 1 }))).toBe(false);
     send({ type: 'air', operator: alex, ref: rundown('brooks') });
-    expect(send({ type: 'step', layer: 'lower', slot: SlotId.parse('slot-2'), to: 1 })).toEqual({ ok: false, error: 'Name has no steps' });
-    expect(state().program.lower?.step).toBe(0);
+    expect(changed(send({ type: 'step', layer: 'lower', slot: SlotId.parse('slot-2'), to: 1 }))).toBe(true);
+    expect(state().program.lower).toBeUndefined();
   });
 });
 

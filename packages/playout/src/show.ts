@@ -159,10 +159,10 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
     case 'step': {
       const slot = onAir(command.layer, command.slot);
       if (!slot) return unchanged;
-      const entry = entryOf(registry, slot.graphic);
-      if (!entry?.steps) return rejected(`${entry?.name ?? slot.graphic} has no steps`);
+      // A graphic without steps has one, so Next takes it off air.
+      const count = entryOf(registry, slot.graphic)?.steps?.count ?? 1;
       if (command.to === slot.step) return unchanged;
-      if (command.to >= entry.steps.count) return next({ program: without(state.program, command.layer) });
+      if (command.to >= count) return next({ program: without(state.program, command.layer) });
       return next({ program: { ...state.program, [command.layer]: { ...slot, step: command.to } } });
     }
     case 'refresh': {

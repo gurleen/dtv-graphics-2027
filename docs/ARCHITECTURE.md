@@ -334,7 +334,7 @@ layer is what tells a renderer to play out and then in.
 | `toggle operator ref` | Clear it if it is on program, else air it. |
 | `clear layer slot?` | Off air. With a slot id, only if the layer still holds that slot. |
 | `clearAll` | Everything off air. |
-| `step layer slot to` | Moves a stepped graphic to step `to`. A step past the last takes it off air. |
+| `step layer slot to` | Moves a graphic to step `to`. A step past the last takes it off air; a graphic without steps has one, so Next takes it off. |
 | `refresh layer slot` | Re-reads the on-air cue's params from the rundown. Refused if the cue now names another graphic. |
 | `patch layer slot overrides` | Replaces the on-air overrides, for a last-second text fix. A resend changes nothing. |
 | `activate show` | Makes a show active, takes a backup, and empties previews. Program stays on air. |
@@ -373,7 +373,7 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
   the middle, and the selected record on the right. Each locked field shows who locked it and when, and unlocks
   with a click. A roster import shows a diff table before it applies. A refused edit shows theirs beside yours.
 - Keyboard first, with every action also on a click. Space takes, Enter cues the selected rundown row, Up and Down
-  select, N is Next, Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
+  select, N is Next (it takes a one-step graphic off air), Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
   Keys do nothing while typing. Only Clear All is guarded, by a hold or a second press.
 - The game keys (phase 5): Q, W, E score 1, 2, 3 for away and I, O, P for home; Shift+Q and Shift+I take one
   back. C starts or stops the game clock, R and T reset the shot clock to 30 and 20, and [ and ] give possession

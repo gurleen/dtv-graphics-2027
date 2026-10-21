@@ -23,17 +23,18 @@ export function stepsOf(registry: Registry, slot: Slot): { readonly step: number
 }
 
 /**
- * The stepped graphic Next moves: the selected cue if it is on program and stepped, else
- * the topmost stepped layer on program.
+ * The graphic Next moves: the selected cue if it is on program, else the topmost rundown
+ * graphic on program. Past its last step it leaves air, so Next takes a one-step graphic
+ * off. Free-panel graphics have their own keys, so Next never reaches them unselected.
  */
-export function nextTarget(registry: Registry, program: Bus, selected: CueView | undefined): { readonly layer: LayerId; readonly slot: Slot } | null {
+export function nextTarget(program: Bus, selected: CueView | undefined): { readonly layer: LayerId; readonly slot: Slot } | null {
   if (selected?.onProgram && selected.layer) {
     const slot = program[selected.layer];
-    if (slot && slot.id === selected.onProgram && stepsOf(registry, slot)) return { layer: selected.layer, slot };
+    if (slot && slot.id === selected.onProgram) return { layer: selected.layer, slot };
   }
   for (const layer of [...LAYERS].reverse()) {
     const slot = program[layer];
-    if (slot && stepsOf(registry, slot)) return { layer, slot };
+    if (slot && slot.origin.kind === 'rundown') return { layer, slot };
   }
   return null;
 }
@@ -41,7 +42,7 @@ export function nextTarget(registry: Registry, program: Bus, selected: CueView |
 export interface ShowActions {
   take(): void;
   cue(cue: CueView): void;
-  /** Next on the stepped graphic on program; past its last step it leaves air. */
+  /** Next on the graphic on program; past its last step, or at once for a one-step graphic, it leaves air. */
   next(): void;
   clearPreview(): void;
   clearLayer(layer: LayerId): void;
@@ -60,7 +61,7 @@ export function useShowActions(selected: CueView | undefined): ShowActions | nul
     },
     cue: (cue) => void send({ type: 'cue', operator, ref: cue.ref }),
     next() {
-      const target = nextTarget(registry, view.program, selected);
+      const target = nextTarget(view.program, selected);
       if (target) void send({ type: 'step', layer: target.layer, slot: target.slot.id, to: target.slot.step + 1 });
     },
     clearPreview() {

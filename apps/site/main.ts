@@ -128,7 +128,7 @@ const renderControls = () => {
   const stepped = (selection?.entry.steps?.count ?? 1) > 1;
   showButton.disabled = !selection || frame !== undefined;
   hideButton.disabled = frame === undefined;
-  previousButton.hidden = nextButton.hidden = !stepped;
+  previousButton.hidden = !stepped;
   previousButton.disabled = !frame || frame.step === 0;
   nextButton.disabled = !frame;
 };

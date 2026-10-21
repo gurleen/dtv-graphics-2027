@@ -52,7 +52,7 @@ export const KEY_MAP: readonly KeyLine[] = [
       { code: 'ArrowDown', label: '↓', action: { type: 'move', by: 1 } },
     ],
   },
-  { section: 'Show', what: 'Next on the stepped graphic on program', bindings: [{ code: 'KeyN', label: 'N', action: { type: 'next' } }] },
+  { section: 'Show', what: 'Next on the graphic on program; takes a one-step graphic off', bindings: [{ code: 'KeyN', label: 'N', action: { type: 'next' } }] },
   { section: 'Show', what: 'Clear my preview', bindings: [{ code: 'Escape', shift: false, label: 'Esc', action: { type: 'clearPreview' } }] },
   { section: 'Show', what: 'Clear the program lower third', bindings: [{ code: 'Escape', shift: true, label: '⇧Esc', action: { type: 'clearLower' } }] },
   { section: 'Show', what: 'Clear All, held for 600 ms or pressed twice', bindings: [{ code: 'Backspace', shift: true, label: '⇧⌫', action: { type: 'clearAll' } }] },
