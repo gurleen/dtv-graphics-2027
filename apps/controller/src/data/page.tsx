@@ -2,9 +2,11 @@ import type { SeasonId } from '@dtv/domain';
 import { useEffect, useState } from 'react';
 import { useController } from '../app/context';
 import './data.css';
+import './shows.css';
 import { ConflictPanel } from './conflict-panel';
 import { EditingProvider } from './editing';
 import { ListView } from './lists';
+import { ShowsView } from './shows-view';
 import { RecordPanel } from './record-panel';
 import { TeamList } from './team-list';
 import { SeasonSelect, type TabId, TeamWorkspace } from './team-workspace';
@@ -51,7 +53,8 @@ function Page() {
             header={<SeasonSelect season={current} onSeason={setSeason} />}
           />
         )}
-        {view?.type === 'list' && <ListView key={view.list} list={view.list} selected={selected} onSelect={select} />}
+        {view?.type === 'list' && view.list === 'shows' && <ShowsView selected={selected} onSelect={select} />}
+        {view?.type === 'list' && view.list !== 'shows' && <ListView key={view.list} list={view.list} selected={selected} onSelect={select} />}
         {!view && <section className="panel workspace"><p className="faint empty">Pick a team or a list on the left.</p></section>}
       </div>
       <div className="right">

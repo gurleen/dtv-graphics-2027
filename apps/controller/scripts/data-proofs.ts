@@ -3,9 +3,9 @@
  * the page in Chromium at 1440 x 900, and a second browser for the conflicts. Every check also
  * reads the World back over the API, so a screenshot is never the only evidence. Exits 1 if any check fails.
  *
- *   bun apps/controller/scripts/data-proofs.ts [--only=lock,conflicts,import,edits] [--out=build/controller/data-proofs]
+ *   bun apps/controller/scripts/data-proofs.ts [--only=lock,conflicts,import,edits] [--out=build/controller/data-proofs] [--port=8992]
  *
- * It serves the controller on port 8992; run `bun run riv:build` first so the shell's monitors load.
+ * It serves the controller on port 8992 unless told otherwise; run `bun run riv:build` first so the shell's monitors load.
  */
 
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -17,7 +17,7 @@ import { CommandId } from '@dtv/playout';
 import { type Browser, chromium, type Page } from 'playwright';
 
 const ROOT = resolve(import.meta.dir, '../../..');
-const SERVER_PORT = 8992;
+const SERVER_PORT = Number(process.argv.find((arg) => arg.startsWith('--port='))?.slice(7) ?? 8992);
 const flag = (name: string) => process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
 const out = join(ROOT, flag('out') ?? 'build/controller/data-proofs');
 const only = flag('only')?.split(',');

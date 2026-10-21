@@ -28,6 +28,7 @@ describe('idFor', () => {
     expect<string>(idFor.player(drexel, season, 'Josh', 'Reed')).toBe('drexel-mbb@2026-27/reed-josh');
     expect<string>(idFor.staff(drexel, season, 'Zach', 'Spiker')).toBe('drexel-mbb@2026-27/spiker-zach');
     expect<string>(idFor.game(season, '2026-11-08', sju, drexel)).toBe('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
+    expect<string>(idFor.show("Saint Joseph's at Drexel")).toBe('saint-josephs-at-drexel');
   });
 
   test('an unknown first name still gives a valid player id', () => {

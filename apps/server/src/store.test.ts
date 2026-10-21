@@ -133,6 +133,22 @@ describe('data', () => {
     expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue mystery: No graphic basketball-v2/mystery' });
   });
 
+  test('the active show cannot be deleted; once another show is active it can', () => {
+    const store = open();
+    const drexelSju = ShowId.parse('drexel-sju');
+    const other = { ...store.world().get('show', drexelSju)!, id: ShowId.parse('other'), name: 'Other' };
+    const batch = (edits: EditBatch['edits']): EditBatch => ({ origin: 'manual', basis: store.world().revision, edits } as EditBatch);
+    expect(store.applyEdits('alex', batch([{ op: 'put', kind: 'show', value: other }]))).toMatchObject({ ok: true });
+    send(store, { type: 'activate', show: drexelSju });
+    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'show', id: drexelSju }]))).toEqual({
+      ok: false,
+      reason: 'inconsistent',
+      detail: 'Show drexel-sju is active; make another show active before deleting it',
+    });
+    expect(store.world().get('show', drexelSju)).toBeDefined();
+    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'show', id: other.id }]))).toMatchObject({ ok: true });
+  });
+
   test('a rundown cue naming a property of Object.prototype is INCONSISTENT', () => {
     const store = open();
     const show = store.world().get('show', ShowId.parse('drexel-sju'))!;

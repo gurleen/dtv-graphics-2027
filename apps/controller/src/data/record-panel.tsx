@@ -9,9 +9,11 @@ import { Pick, type Option } from './pick';
 import { gameLabel, personName, rowLabel, rowOf } from './rows';
 import { isDirty, NEW_ID, problemsOf, type Session, shownProblems } from './session';
 import { SHOW_PAGE_HREF } from './links';
+import { DuplicateDialog, MakeActive } from './show-actions';
+import { isFlagged } from './shows';
 import type { Target } from './types';
 
-const DELETABLE: ReadonlySet<EditableKind> = new Set(['player', 'staff', 'talent', 'sponsor', 'venue']);
+const DELETABLE: ReadonlySet<EditableKind> = new Set(['player', 'staff', 'talent', 'sponsor', 'venue', 'show']);
 
 function useOptions(field: Field): readonly Option[] {
   const { world } = useController();
@@ -70,9 +72,10 @@ function CrewEditor({ doc, onChange }: { doc: Doc; onChange(next: readonly { tal
 }
 
 export function RecordPanel({ target, onSelect }: { readonly target: Target | null; readonly onSelect: (target: Target | null) => void }) {
-  const { world } = useController();
+  const { world, show: view } = useController();
   const editing = useEditing();
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [duplicating, setDuplicating] = useState(false);
   if (!target || !world) {
     return <section className="panel record"><h2 className="panel-title">Record</h2><p className="faint empty">Select a row to see it in full.</p></section>;
   }
@@ -99,6 +102,9 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
       </span>
     </div>
   );
+  const isActiveShow = kind === 'show' && view?.show?.id === id;
+  const cues = Array.isArray(doc.rundown) ? (doc.rundown as { note?: string }[]) : [];
+  const toCheck = cues.filter((cue) => isFlagged({ note: cue.note ?? '' })).length;
   const dirty = !!session && isDirty(session);
   const saving = session?.phase === 'saving';
   const save = async () => {
@@ -124,7 +130,10 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
             </div>
             <div className="field">
               <span className="field-label">Rundown</span>
-              <span className="field-body faint">{Array.isArray(doc.rundown) ? doc.rundown.length : 0} cues · <a href={SHOW_PAGE_HREF}>edit it on the show page</a></span>
+              <span className="field-body faint">
+                {cues.length} cues{toCheck > 0 && <span className="warn"> · {toCheck} to check</span>} ·{' '}
+                {isActiveShow ? <a href={SHOW_PAGE_HREF}>edit it on the show page</a> : 'make it active to edit it on the show page'}
+              </span>
             </div>
           </>
         )}
@@ -137,9 +146,11 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
       <div className="actions">
         <Button className="button primary" isDisabled={!dirty || saving || session?.phase === 'conflict' || Object.keys(problems).length > 0} onPress={() => void save()}>{isNew ? 'Create' : 'Save'}</Button>
         <Button className="button" isDisabled={!session || saving} onPress={() => { editing.discard(kind, id); if (isNew) onSelect(null); }}>Discard</Button>
+        {kind === 'show' && !isNew && <MakeActive id={id} name={rowLabel(world, kind, doc)} />}
+        {kind === 'show' && !isNew && <Button className="button" onPress={() => setDuplicating(true)}>Duplicate…</Button>}
         {!isNew && DELETABLE.has(kind) && (
           <DialogTrigger>
-            <Button className="button danger">Delete</Button>
+            <Button className="button danger" isDisabled={isActiveShow} aria-label={isActiveShow ? 'Delete (the active show cannot be deleted)' : 'Delete'}>Delete</Button>
             <Popover className="popover" placement="bottom start">
               <Dialog className="confirm" aria-label="Confirm delete">
                 {({ close }) => (
@@ -153,8 +164,10 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
             </Popover>
           </DialogTrigger>
         )}
+        {isActiveShow && <span className="faint basis">Active shows cannot be deleted; make another active first.</span>}
         {session && <span className="faint basis">{saving ? 'Saving…' : `Editing from revision ${session.basis}`}</span>}
       </div>
+      {duplicating && <DuplicateDialog sourceId={id} onClose={() => setDuplicating(false)} onCreated={onSelect} />}
     </section>
   );
 }
