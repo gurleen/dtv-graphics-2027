@@ -123,18 +123,18 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
     case 'cue': {
       const cue = resolved(command.ref, command.operator);
       if (!cue.ok) return rejected(cue.error);
-      const preview = state.previews[command.operator] ?? {};
+      const preview = previewOf(state, command.operator);
       const existing = preview[cue.layer];
       if (existing && sameCue(existing, cue.slot)) return unchanged;
       return next({ previews: withBus(state.previews, command.operator, { ...preview, [cue.layer]: cue.slot }) });
     }
     case 'uncue': {
-      const preview = state.previews[command.operator];
+      const preview = previewOf(state, command.operator);
       if (!preview?.[command.layer]) return unchanged;
       return next({ previews: withBus(state.previews, command.operator, without(preview, command.layer)) });
     }
     case 'take': {
-      const preview = state.previews[command.operator];
+      const preview = previewOf(state, command.operator);
       if (!preview || !Object.keys(preview).length) return unchanged;
       return next({ program: putOnAir(registry, state.program, preview), previews: withBus(state.previews, command.operator, {}) });
     }
@@ -204,18 +204,19 @@ const withBus = (previews: ShowState['previews'], operator: OperatorId, bus: Bus
   return Object.keys(bus).length ? { ...rest, [operator]: bus } : rest;
 };
 
+/** An operator's preview. Operator ids come from clients, so `constructor` must not reach Object.prototype. */
+export const previewOf = (state: ShowState, operator: OperatorId): Bus => (Object.hasOwn(state.previews, operator) ? state.previews[operator]! : {});
+
 /**
  * The one placement rule, for take, air and toggle: puts each slot of `incoming` on program,
- * then takes off whatever overlaps it. That is a layer an incoming graphic covers, unless
- * `incoming` fills it, and a graphic already on air that covers a layer `incoming` fills.
+ * then takes off whatever overlaps it. That is every layer an incoming graphic covers, even
+ * one `incoming` also fills, and a graphic already on air that covers a layer `incoming` fills.
  */
 function putOnAir(registry: Registry, program: Bus, incoming: Bus): Bus {
   const covers = (slot: Slot) => entryOf(registry, slot.graphic)?.clears ?? [];
   let result: Bus = { ...program, ...incoming };
   for (const slot of Object.values(incoming)) {
-    for (const layer of covers(slot)) {
-      if (!incoming[layer]) result = without(result, layer);
-    }
+    for (const layer of covers(slot)) result = without(result, layer);
   }
   for (const layer of LAYERS) {
     const slot = result[layer];

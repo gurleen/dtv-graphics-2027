@@ -18,7 +18,7 @@ import {
   type WorldSnapshot,
 } from '@dtv/domain';
 import {
-  type BusRef, checkCue, CommandId, EMPTY_SHOW, type OperatorId, type OutputFrame, project, type Registry, reduceShow, type ShowCommand,
+  type BusRef, checkCue, CommandId, EMPTY_SHOW, type OperatorId, type OutputFrame, previewOf, project, type Registry, reduceShow, type ShowCommand,
   showContext, ShowState, type ShowView, SlotId, viewShow,
 } from '@dtv/playout';
 import { z } from 'zod';
@@ -260,7 +260,7 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
         read: () =>
           project({
             registry,
-            bus: bus.kind === 'program' ? show.program : (show.previews[bus.operator] ?? {}),
+            bus: bus.kind === 'program' ? show.program : previewOf(show, bus.operator),
             ref: bus,
             revision: max(world.revision, showRevision, liveRevision),
             context: context(),

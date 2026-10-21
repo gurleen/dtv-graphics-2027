@@ -6,7 +6,7 @@
 import { GraphicId, type Revision, sameJson, type Show } from '@dtv/domain';
 import { entryOf, type LayerId, type Registry, type ShowContext } from './graphic';
 import { bindValues } from './project';
-import { type Bus, type CueRef, type OperatorId, resolveCue, type ShowState, type SlotId } from './show';
+import { type Bus, type CueRef, type OperatorId, previewOf, resolveCue, type ShowState, type SlotId } from './show';
 
 export interface CueView {
   readonly ref: CueRef;
@@ -45,7 +45,8 @@ export function viewShow(input: {
   readonly context: ShowContext;
 }): ShowView {
   const { registry, state, context } = input;
-  const { [input.operator]: preview = {}, ...otherPreviews } = state.previews;
+  const preview = previewOf(state, input.operator);
+  const otherPreviews = Object.fromEntries(Object.entries(state.previews).filter(([operator]) => operator !== input.operator));
   const slotOf = (bus: Bus, ref: CueRef) => Object.values(bus).find((slot) => sameJson(slot.origin, ref));
 
   const view = (ref: CueRef, fallback: { graphic: GraphicId; label: string }): CueView => {

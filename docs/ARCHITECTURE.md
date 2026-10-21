@@ -290,8 +290,8 @@ graphics that would overlap are never on air together.
 
 An entry can name layers it covers in `clears`. The double and triple talent lower thirds clear `bug`, because they
 overlap the scorebug. Take, air, and toggle share one placement rule. Putting a graphic on air takes off the layers
-it covers, and putting a graphic on a covered layer takes off the graphic that covers it. The one exception is a
-take whose preview holds both, which puts both on air.
+it covers, and putting a graphic on a covered layer takes off the graphic that covers it. A take whose preview holds
+both puts only the covering graphic on air, so the two are never on air together.
 
 ### Free panel and rundown
 

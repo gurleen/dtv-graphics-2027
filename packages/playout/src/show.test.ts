@@ -143,12 +143,21 @@ describe('take', () => {
     }
   });
 
-  test('a covered layer stays when the same take puts something on it', () => {
+  test('a take never puts a covering graphic on air with what it covers, even from one preview', () => {
     const { send, state } = harness();
     send({ type: 'cue', operator: alex, ref: free('test/wide') });
     send({ type: 'cue', operator: alex, ref: free('test/bug') });
     send({ type: 'take', operator: alex });
-    expect(Object.keys(state().program).sort()).toEqual(['bug', 'lower']);
+    expect(Object.keys(state().program)).toEqual(['lower']);
+  });
+
+  test('an operator named constructor has an empty preview, not Object.prototype', () => {
+    const { send, state } = harness();
+    const constructor = OperatorId.parse('constructor');
+    expect(changed(send({ type: 'take', operator: constructor }))).toBe(false);
+    send({ type: 'cue', operator: constructor, ref: free('test/bug') });
+    send({ type: 'take', operator: constructor });
+    expect(Object.keys(state().program)).toEqual(['bug']);
   });
 });
 
