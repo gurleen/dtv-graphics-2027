@@ -5,7 +5,7 @@ import {
 } from '@dtv/domain';
 import type { Db } from './db';
 
-type JournalKind = 'data' | 'live' | 'show';
+export type JournalKind = 'data' | 'live' | 'show';
 
 const parseRow = <K extends EntityKind>(kind: K, id: string, doc: string): EntityOf<K> => {
   try {
@@ -180,6 +180,24 @@ export function commitLive(db: Db, input: { readonly actor: string; readonly at:
     ]);
     return seq;
   })();
+}
+
+export interface JournalRow {
+  readonly seq: Revision;
+  readonly at: number;
+  readonly actor: string;
+  readonly payload: unknown;
+}
+
+/** The newest `limit` journal rows of one kind, oldest first. */
+export function loadJournal(db: Db, input: { readonly kind: JournalKind; readonly limit: number }): JournalRow[] {
+  return db.sqlite
+    .query<{ seq: number; at: number; actor: string; payload: string }, [string, number]>(
+      'SELECT seq, at, actor, payload FROM journal WHERE kind = ? ORDER BY seq DESC LIMIT ?',
+    )
+    .all(input.kind, input.limit)
+    .reverse()
+    .map((row) => ({ seq: Revision.parse(row.seq), at: row.at, actor: row.actor, payload: JSON.parse(row.payload) }));
 }
 
 /** Its shape belongs to the playout package, so it is opaque here. */

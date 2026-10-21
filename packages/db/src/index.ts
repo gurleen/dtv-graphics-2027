@@ -4,5 +4,6 @@ export { DOC_MIGRATIONS, type DocMigration, migrate, type MigrationReport } from
 export { TABLES, tableSql, type TableSql } from './schema';
 export { seed, type SeedReport } from './seed';
 export {
-  type CommitResult, commitEdits, commitLive, commitShowState, loadLive, loadShowState, loadSnapshot, type SkippedFields,
+  type CommitResult, commitEdits, commitLive, commitShowState, type JournalKind, type JournalRow, loadJournal, loadLive, loadShowState, loadSnapshot,
+  type SkippedFields,
 } from './store';

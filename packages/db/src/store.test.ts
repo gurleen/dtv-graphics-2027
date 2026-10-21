@@ -6,7 +6,7 @@ import {
   basketball, type EditBatch, GameId, type ImportEdit, Player, Revision, School, Season, Staff, Talent, Team, TeamSeason,
 } from '@dtv/domain';
 import {
-  commitEdits, commitLive, commitShowState, type Db, loadLive, loadShowState, loadSnapshot, migrate, openDb,
+  commitEdits, commitLive, commitShowState, type Db, loadJournal, loadLive, loadShowState, loadSnapshot, migrate, openDb,
 } from './index';
 
 let dir: string;
@@ -216,5 +216,16 @@ describe('live and show state', () => {
     expect(loadShowState(db)).toBeNull();
     commitShowState(db, { actor: 'operator', at: 1, state: { program: { bug: null } }, payload: { type: 'clearAll' } });
     expect(loadShowState(db)).toEqual({ program: { bug: null } });
+  });
+
+  test('loadJournal returns the newest rows of one kind, oldest first', () => {
+    const show = (n: number) => commitShowState(db, { actor: 'alex', at: n, state: {}, payload: { n } });
+    const [one, , three, four] = [show(1), show(2), show(3), show(4)];
+    commitLive(db, { actor: 'feed', at: 5, live, payload: { live: true } });
+    expect(loadJournal(db, { kind: 'show', limit: 2 })).toEqual([
+      { seq: three, at: 3, actor: 'alex', payload: { n: 3 } },
+      { seq: four, at: 4, actor: 'alex', payload: { n: 4 } },
+    ]);
+    expect(loadJournal(db, { kind: 'show', limit: 10 }).map((row) => row.seq)[0]).toBe(one);
   });
 });
