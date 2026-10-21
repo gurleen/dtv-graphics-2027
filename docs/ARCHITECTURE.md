@@ -226,6 +226,9 @@ socket drops, the link ends every open call, and the `watch` helper opens each s
 killed the server, started a new one a second later, and saw the new server's value 1,519 ms after the kill.
 `perMessageDeflate` is on, because a World snapshot is about 430 KB of JSON and 34 KB compressed.
 
+A frame that oRPC cannot decode is logged and dropped, and the server keeps serving. A stream that throws ends
+with an error for its caller only.
+
 The `?client=` label on the socket names the caller in the journal. It is not authentication. The design trusts
 the local network.
 
@@ -250,8 +253,8 @@ because repeating it changes nothing.
 
 ### oRPC version
 
-The design pins `^1.15.7`, which installs 1.16.0. The v2 line is in beta. Four files import oRPC:
-`packages/api/src/contract.ts` and `client.ts`, and `apps/server/src/router.ts` and `main.ts`. Moving to v2 renames
+The design pins `^1.15.7`, which installs 1.16.0. The v2 line is in beta. Three files import oRPC:
+`packages/api/src/contract.ts` and `client.ts`, and `apps/server/src/router.ts`. Moving to v2 renames
 `@orpc/server/bun-ws` and `eventIterator`, and the server and every client must move together because the wire
 format changed.
 

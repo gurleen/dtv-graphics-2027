@@ -175,6 +175,19 @@ describe('rules over the wire', () => {
   });
 });
 
+test('a malformed frame on /rpc is dropped, and the server keeps answering', async () => {
+  for (const frame of ['{}', '[]', 'not json']) {
+    const socket = new WebSocket(`ws://localhost:${server.port}/rpc`);
+    await new Promise((resolve) => (socket.onopen = resolve));
+    socket.send(frame);
+    await Bun.sleep(100);
+    socket.close();
+  }
+  const world = await first((signal) => a.api.data.watch(undefined, { signal }));
+  expect(world.revision).toBeGreaterThan(0);
+  expect(server.child.exitCode).toBeNull();
+});
+
 describe('restart', () => {
   test('streams resume on their own after a restart and show the same program slots; a command id answered before is answered the same after', async () => {
     const toggle: ShowCommand = { type: 'toggle', operator: alex, ref: CueRef.parse({ kind: 'free', graphic: 'basketball-v2/scorebug' }) };
