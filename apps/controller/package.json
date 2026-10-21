@@ -1,0 +1,22 @@
+{
+  "name": "@dtv/controller",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "dependencies": {
+    "@dtv/api": "workspace:*",
+    "@dtv/domain": "workspace:*",
+    "@dtv/graphics": "workspace:*",
+    "@dtv/playout": "workspace:*",
+    "@dtv/renderer": "workspace:*",
+    "react": "^19.3.1",
+    "react-aria-components": "^1.22.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
+  }
+}

@@ -1,0 +1,43 @@
+/*
+ * The controller's design tokens: a dark broadcast console, dense, IBM Plex Sans and Mono,
+ * red for program and green for preview. Every page styles itself with these variables only.
+ */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #1c1e22;
+  --panel: #24272c;
+  --panel-raised: #2c3036;
+  --border: #3a3e45;
+  --border-strong: #50555d;
+  --text: #e3e5e8;
+  --text-muted: #8b9098;
+  --text-faint: #6b7078;
+  --focus: #5b7bb5;
+  --selected: #2e3440;
+
+  --pgm: #d23c3c;
+  --pvw: #2fa84f;
+  --warn: #e0b44c;
+  --lock: #e0b44c;
+  --add: #59c27a;
+  --remove: #d06a6a;
+
+  --font: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 16px;
+  --text-score: 22px;
+
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 12px;
+  --space-6: 16px;
+  --radius: 3px;
+  --row: 26px;
+}
