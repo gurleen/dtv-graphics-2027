@@ -189,7 +189,8 @@ table rebuilt in the same run copies its rows through the pending migrations, so
 renamed field. A document that fails its schema on load stops the server and names its kind and id.
 
 `VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every show
-activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept.
+activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept, and the newest of
+each reason, so a run of show activations never evicts the only backup taken before a migration.
 
 After a data commit the server reloads the World from SQLite instead of patching memory, so a cascaded delete can
 never leave memory behind the file. A candidate measured a median of 1.22 ms to load 2,527 seed-shaped rows.

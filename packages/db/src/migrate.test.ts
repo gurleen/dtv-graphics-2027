@@ -149,4 +149,11 @@ describe('backup', () => {
     expect(copy.sqlite.query('SELECT count(*) AS n FROM players').get()).toEqual({ n: 2 });
     copy.sqlite.close();
   });
+
+  test('keeps the newest of each reason beyond the newest 30', () => {
+    migrate(db, { backupDir: backups() });
+    const premigrate = backup(db, backups(), 'pre-migrate');
+    const shows = Array.from({ length: 31 }, () => backup(db, backups(), 'show'));
+    expect(backupFiles()).toEqual([premigrate, ...shows.slice(1)].map((file) => file.slice(backups().length + 1)));
+  });
 });
