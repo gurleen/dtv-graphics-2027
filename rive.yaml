@@ -7,7 +7,6 @@ artboard:
 
 exclude:
   - docs
-  - ograf
 
 logs:
   file: build/rive.log

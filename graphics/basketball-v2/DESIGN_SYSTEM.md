@@ -264,8 +264,9 @@ These keep a second take identical to the first:
    even when it interrupts an Intro.
 3. Hidden sets the panels, edge lights, shadow and sheen to opacity 0.
 4. A new Intro key therefore needs a matching Hold key and Outro key.
-5. The OGraf `definition.ts` durations and the manifest `actionDurations` equal
-   the Intro and Outro lengths (72 frames = 1200 ms, 24 = 400 ms).
+5. The Intro and Outro lengths are the timelines' own (72 frames = 1200 ms,
+   24 = 400 ms). `bun run codegen` reads them into `scenes.gen.ts`, and the
+   renderer waits that long, so nothing else records them.
 
 ## Identifiers
 
@@ -326,8 +327,8 @@ namespace.
 | View model | `Basketball<Name>V2` | `BasketballStaffLowerThirdV2` |
 | Asset names | `<Name> v2 <Asset>` | `Staff Lower Third v2 Zuume Bold` |
 | View model properties | camelCase; team data as `teamLogo`, `teamPrimaryColor`, `teamSecondaryColor` (or `away…`/`home…`) | |
-| OGraf directory | `ograf/graphics/basketball_v2_<name>/` | `basketball_v2_staff_lower_third` |
-| OGraf id | `dtv-basketball-v2-<name>` | `dtv-basketball-v2-staff-lower-third` |
+| Registry entry file | `graphics/<name>.ts` | `graphics/staff-lower-third.ts` |
+| Registry entry id | `basketball-v2/<name>` | `basketball-v2/staff-lower-third` |
 
 ### Property keys
 
@@ -370,11 +371,13 @@ other with `rive schema <Type>`.
    Add `--crop=w:h:x:y` to tile only the graphic. The last outro frame must be
    empty. For a multi-step graphic, `--on-air` starts in Hold, so
    `--on-air --data=step=1` renders the step change.
-4. **Package.** Add the four files under `ograf/graphics/basketball_v2_<name>/`
-   (see `ograf/README.md`; copy the staff lower third's), add an
-   `ograf:build:basketball-v2-<name>` script to `package.json` and append it to
-   `ograf:build:v2`, then `bun run ograf:build:basketball-v2-<name>` and check
-   the load/play/update/stop cycle with `bun run ograf:harness`.
+4. **Register.** Run `bun run codegen`, then add
+   `graphics/basketball-v2/graphics/<name>.ts` (copy the closest entry: its
+   params, layer, `demo`, `site` and `bind`) and list it in
+   `graphics/basketball-v2/index.ts`. `bun run check` then runs the golden test,
+   which binds the entry's `demo` against the seed and compares it with the
+   scene's Default instance. `bun run riv:build` signs the scene for `/renderer`
+   and the stakeholder site.
 5. **Document.** Add a section to `README.md` (geometry, panels, intro/outro,
    view model properties), take the namespace in the table above, and mark the
    graphic in the tracker in `docs/GRAPHICS_PORTING.md` if it replaces one.

@@ -1,7 +1,8 @@
 # dtv-rive
 
-Broadcast graphics for DTV, written as Rive scenes (`.rml`) and shipped
-as [OGraf](https://ograf.ebu.io) packages. The scenes are 1920 x 1080 overlays
+Broadcast graphics for DTV, written as Rive scenes (`.rml`) and played by a
+show server. OBS loads one page from it, and stakeholders review the same
+graphics on a static site. The scenes are 1920 x 1080 overlays
 for basketball games: a scorebug, lower thirds, matchup locators, a starting
 five, halftime cards and a score to break. Earlier ports and a Vite preview page
 were removed; `git show pre-restructure:<path>` reads them from the
@@ -11,8 +12,8 @@ were removed; `git show pre-restructure:<path>` reads them from the
 
 - [Bun](https://bun.sh)
 - The Rive CLI (`rive`), logged in with `rive login`. Browsers reject unsigned
-  `.riv` files without any error, so every package build publishes through
-  Rive's signing service.
+  `.riv` files without any error, so every scene build (`bun run riv:build`)
+  publishes through Rive's signing service.
 
 Run `bun install` once.
 
@@ -22,9 +23,9 @@ Run `bun install` once.
 rive . --verify              # check that the project compiles
 rive inspect . --summary     # problems, plus what got built by type
 rive . --screenshot --advance=1   # render the scorebug to build/dtv-rive.png
-bun run ograf:build          # build every OGraf package into build/ograf/
-bun run ograf:harness        # local stand-in renderer on http://localhost:8974
-bun run site:build           # stakeholder preview website in build/site/
+bun run riv:build            # sign every scene into build/riv/
+bun run site:build           # sign the scenes, then build the stakeholder site in build/site/
+bun run site:preview         # serve build/site/ on http://localhost:8787 (wrangler dev)
 bun run site:deploy          # publish that website to Cloudflare Workers
 ```
 
@@ -60,32 +61,35 @@ bun run codegen              # regenerate graphics/basketball-v2/scenes.gen.ts f
 ```
 
 `PORT` and `DTV_DB` override the port and the database file. `/` shows a status
-page with the revision, the active show and the connected operators.
+page with the revision, the active show and the connected operators. OBS loads
+`/renderer`, a transparent 1920 x 1080 page that draws program from the signed
+scenes in `build/riv/`, so run `bun run riv:build` first.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `graphics/basketball-v2/` | Current graphics: the `.rml` scenes, Luau controllers and generators |
-| `ograf/` | Packaging: build script, shared web component, local harness, one directory per package |
-| `site/` | Stakeholder preview website: build script and viewer, published as static assets (`wrangler.jsonc`) |
 | `packages/domain/` | `@dtv/domain`: entities, sport rules, edits and importers |
 | `packages/db/` | `@dtv/db`: the SQLite schema, migrations, commits, seed and backups |
 | `packages/playout/` | `@dtv/playout`: scene facts, the registry kit, the show reducer and the projector |
 | `packages/graphics/` | `@dtv/graphics`: `GRAPHICS`, the one list of graphics |
+| `packages/renderer/` | `@dtv/renderer`: draws output frames; the only code that touches the Rive runtime |
 | `packages/api/` | `@dtv/api`: the oRPC contract and the `connect`, `watch` and `first` helpers |
 | `apps/server/` | The server: the store, the oRPC router and `Bun.serve` |
+| `apps/renderer/` | The `/renderer` page for OBS |
+| `apps/site/` | Stakeholder preview website: build script and viewer, published as static assets (`wrangler.jsonc`) |
 | `data/seed/` | The seed: the vendored team dataset (`teams.json`), `fixtures.json` and roster CSVs |
 | `data/db/` | The SQLite file and its backups, not committed |
 | `scripts/check_deps.ts` | Fails `bun run check` when a package imports what its directory may not |
 | `scripts/render_frames.ts` | Renders frames and contact sheets for reviewing motion |
 | `scripts/baseline.ts` | Captures every scene's on-air frame and compares two captures, to prove a change left the pixels alone |
-| `docs/` | Porting tracker and the vendored OGraf specification |
+| `docs/` | The architecture and the porting tracker |
 | `assets/` | Fonts and logos |
 
 ## Graphics
 
-The basketball v2 set, each packaged under `ograf/graphics/`:
+The basketball v2 set, each a scene in `graphics/basketball-v2/` with a registry entry in `graphics/basketball-v2/graphics/`:
 
 - Scorebug
 - Player lower third
@@ -118,13 +122,16 @@ Add `--outro` to render the exit instead.
 
 ## Shipping a graphic
 
-A verified `.rml` is not a deliverable, because no renderer ingests one. The
-build produces `build/ograf/<id>/` (manifest, web component, signed `.riv`,
-thumbnail) and a `.zip` beside it. To add a graphic, follow
-[`ograf/README.md`](ograf/README.md). A new scene starts from
+A verified `.rml` is not a deliverable. A scene ships as a scene plus a registry
+entry: run `bun run codegen`, add the entry (`graphics/basketball-v2/graphics/`),
+and `bun run check` runs the golden test that binds the entry against the seed.
+`bun run riv:build` signs the scene into `build/riv/`. `/renderer` plays it for
+OBS and the stakeholder site lists it. The steps are in [`AGENTS.md`](AGENTS.md),
+and the entry's shape is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+section 5. A new scene starts from
 [`graphics/basketball-v2/DESIGN_SYSTEM.md`](graphics/basketball-v2/DESIGN_SYSTEM.md).
 
-Until `rive push` binds the project to a Rive file, published output carries a
+Until `rive push` binds the project to a Rive file, signed output carries a
 watermark. `rive.yaml` already has a `push:` block. Pushing creates a file in
 the Rive workspace, so do it deliberately.
 
@@ -132,6 +139,6 @@ the Rive workspace, so do it deliberately.
 
 - [`AGENTS.md`](AGENTS.md): working rules for the Rive CLI and RML
 - [`graphics/basketball-v2/README.md`](graphics/basketball-v2/README.md): the finished graphics and their fields
-- [`docs/GRAPHICS_PORTING.md`](docs/GRAPHICS_PORTING.md): porting tracker and OGraf packaging notes
-- [`docs/ograf/`](docs/ograf/): the OGraf specification
-- [`site/README.md`](site/README.md): the stakeholder preview website and how to publish it
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): the packages, the data model, the API, the show and the renderer
+- [`docs/GRAPHICS_PORTING.md`](docs/GRAPHICS_PORTING.md): porting tracker and RML gotchas
+- [`apps/site/README.md`](apps/site/README.md): the stakeholder preview website and how to publish it

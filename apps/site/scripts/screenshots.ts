@@ -78,8 +78,8 @@ try {
   const visible = await filtered.locator('#list a:visible').allTextContents();
   if (visible.join() !== 'Player To Watch') problems.push(`the Belfor filter lists ${JSON.stringify(visible)}`);
   await filtered.click('#list a:visible');
+  await filtered.waitForFunction(`document.title.startsWith('Player To Watch')`, null, { timeout: 5_000 });
   await settled(filtered);
-  if (!(await filtered.title()).startsWith('Player To Watch')) problems.push(`opening a graphic from the list left the title as ${await filtered.title()}`);
   await shoot(filtered, 'sponsor-filter');
   await filtered.close();
 } finally {

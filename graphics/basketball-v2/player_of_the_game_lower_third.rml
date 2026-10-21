@@ -44,7 +44,7 @@
   <Node name="Headshot Panel" id="43:101" x="0" y="0">
     <ClippingShape name="Headshot Reveal Clip" sourceId="43:501"/>
     <Node name="Headshot Rise" id="43:102" x="0" y="0">
-    <!-- Hidden (opacity 0) by the OGraf component while motion media plays over it. -->
+    <!-- Hidden (opacity 0) by the renderer while motion media plays over it. -->
     <Node name="Headshot Placement" id="43:103" x="8" y="-84"><DataBindContext sourcePathIds="43:1000-43:1070" propertyKey="18"/>
       <!-- Layout components join the artboard's flow through plain nodes, so the frame is
            pinned absolute at this node's origin. -->

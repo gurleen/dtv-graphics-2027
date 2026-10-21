@@ -833,7 +833,7 @@
 
 <!-- Display: isPlaying true takes the graphic on air (Intro then Hold), false dismisses it
      (Outro then Hidden). Side: alignRight mirrors the block to the bottom right; it snaps,
-     and the OGraf package changes it only off air. Both default off/left. -->
+     and the renderer writes it only before the intro. Both default off/left. -->
 <StateMachine name="Score to Break" id="46:7">
 <StateMachineLayer name="Display">
   <AnyState x="820" y="-120"/><ExitState x="940" y="-120"/>
