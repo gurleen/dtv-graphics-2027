@@ -4,7 +4,7 @@
  */
 
 import { GraphicId, type Revision, sameJson, type Show } from '@dtv/domain';
-import type { LayerId, Registry, ShowContext } from './graphic';
+import { entryOf, type LayerId, type Registry, type ShowContext } from './graphic';
 import { bindValues } from './project';
 import { type Bus, type CueRef, type OperatorId, resolveCue, type ShowState, type SlotId } from './show';
 
@@ -52,7 +52,7 @@ export function viewShow(input: {
     const onAir = { onProgram: slotOf(state.program, ref)?.id ?? null, inMyPreview: slotOf(preview, ref) !== undefined };
     const cue = resolveCue(registry, ref, context);
     if (!cue.ok) {
-      const entry = registry[fallback.graphic];
+      const entry = entryOf(registry, fallback.graphic);
       return { ref, graphic: fallback.graphic, name: entry?.name ?? fallback.graphic, label: fallback.label, layer: entry?.layer ?? null, steps: null, error: cue.error, ...onAir };
     }
     const { entry } = cue;

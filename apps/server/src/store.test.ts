@@ -133,6 +133,14 @@ describe('data', () => {
     expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue mystery: No graphic basketball-v2/mystery' });
   });
 
+  test('a rundown cue naming a property of Object.prototype is INCONSISTENT', () => {
+    const store = open();
+    const show = store.world().get('show', ShowId.parse('drexel-sju'))!;
+    const rundown = [{ id: CueId.parse('x'), graphic: GraphicId.parse('constructor'), params: {}, overrides: {}, note: '' }];
+    const result = store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown } }] });
+    expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue x: No graphic constructor' });
+  });
+
   test('a stale basis is a CONFLICT', () => {
     const store = open();
     const stale = renamed(store, 'Joshua');

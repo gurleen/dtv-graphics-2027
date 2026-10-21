@@ -93,6 +93,7 @@ describe('project', () => {
 
   test('a slot for a graphic the registry lacks carries an error', () => {
     expect(frame({ bug: slot('bug', 'test/gone', {}) }).layers[0]?.error).toBe('No graphic test/gone');
+    expect(frame({ bug: slot('bug', 'constructor', {}) }).layers[0]?.error).toBe('No graphic constructor');
   });
 
   test('a graphic with an overlay carries the media its source picks', () => {

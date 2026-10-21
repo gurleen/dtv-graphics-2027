@@ -76,6 +76,7 @@ describe('cue and uncue', () => {
     expect(send({ type: 'cue', operator: alex, ref: rundown('nope') })).toEqual({ ok: false, error: 'The rundown has no cue nope' });
     expect(send({ type: 'cue', operator: alex, ref: free('test/name') })).toEqual({ ok: false, error: 'Name is not on the free panel' });
     expect(send({ type: 'cue', operator: alex, ref: free('test/unknown') })).toEqual({ ok: false, error: 'No graphic test/unknown' });
+    expect(send({ type: 'cue', operator: alex, ref: free('constructor') })).toEqual({ ok: false, error: 'No graphic constructor' });
     expect(state()).toEqual(ShowState.parse({ ...EMPTY_SHOW, showId: 'demo' }));
   });
 

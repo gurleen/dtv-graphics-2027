@@ -5,7 +5,7 @@
 
 import { type GraphicId, type Revision, Url } from '@dtv/domain';
 import { z } from 'zod';
-import { type AnyGraphic, type BindContext, LAYERS, type LayerId, type Registry, type ShowContext } from './graphic';
+import { type AnyGraphic, type BindContext, entryOf, LAYERS, type LayerId, type Registry, type ShowContext } from './graphic';
 import { boundProps, groupPropName, type PropKind, type SceneFacts, type WireValue } from './scene';
 import { type Bus, OperatorId, type Overrides, type SlotId } from './show';
 
@@ -52,7 +52,7 @@ export function project(input: {
     const slot = input.bus[layer];
     if (!slot) return [];
     const base = { layer, slot: slot.id, graphic: slot.graphic, step: slot.step };
-    const entry = input.registry[slot.graphic];
+    const entry = entryOf(input.registry, slot.graphic);
     if (!entry) return [{ ...base, values: {}, media: null, error: `No graphic ${slot.graphic}` }];
     try {
       const params = entry.params.parse(slot.params);
