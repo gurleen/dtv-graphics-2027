@@ -6,4 +6,5 @@ export * from './edits';
 export * from './world';
 export * from './checks';
 export * from './imports/espn';
+export * from './imports/roster';
 export { basketball, GameApplyInput, GameLive, SPORT_MODULES } from './sports';
