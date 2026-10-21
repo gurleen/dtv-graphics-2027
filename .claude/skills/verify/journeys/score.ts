@@ -29,7 +29,7 @@ await s.run(async () => {
   const home = alex.getByTestId('score-home');
   const before = Number(await home.innerText());
   await s.shoot(alex, 'before');
-  await bar.locator('[data-side="home"]').getByRole('button', { name: '+3', exact: true }).click();
+  await bar.locator('[data-side="home"]').getByRole('button', { name: /^\+3\b/ }).click();
   await s.until(`the score bar reads ${before + 3}`, async () => Number(await home.innerText()), (value) => value === before + 3);
   const live = await s.live(GAME);
   s.check(live.sport === 'basketball' && live.score.home === before + 3, `the live game's home score is ${before + 3} over the API`);

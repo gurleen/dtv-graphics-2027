@@ -37,9 +37,5 @@ Each feature file starts with an H1 and a paragraph on what the user sees. Then 
 - [Renderer output](./renderer-output.md) covers `/renderer` program and preview buses, reload mid-show, steps and Score to Break.
 - [Server restart recovery](./restart-recovery.md) covers the Reconnecting badge, program and show surviving a restart, and pages that do not reload.
 - [Frame comparison](./frame-comparison.md) covers every graphic on `/renderer` against the phase 0 captures.
-- [Score and clock](./score-and-clock.md) covers the score bar's clicks and their effect on the scorebug.
+- [Score and clock](./score-and-clock.md) covers the score bar's clicks and keys, the shot clock at the buzzer, and the scripted tip-off-to-final game.
 - [Stakeholder site](./site.md) covers the static preview site built from the same renderer.
-
-## Coming
-
-- Game keys and a scripted game land from another branch. The keys are Q W E and I O P for score, C for the clock, R and T for the shot clock, and `[` and `]` for possession. They are not in this checkout. Add them to `score-and-clock.md` and `show-take.md` when they merge, and prove them before you list them.
