@@ -44,7 +44,7 @@ The values come from the generators and hand-written scenes in `graphics/basketb
 | Rob Brooks, Mike Tuberosa and Tessa Peloso | `generate_talent_lower_thirds.ts` |
 | The five sponsors and the graphics they present | Every scene that shows a sponsor |
 | Daskalakis Athletic Center, Philadelphia, PA | `matchup_locator.rml` |
-| The live state: 68-72, 13:59 in the 2nd half, shot clock 24, timeouts 3 and 4, home bonus and possession, both starting fives, Reed's line tonight | `basketball_scorebug.rml`, `generate_starting_five_lower_third.ts`, `player_lower_third.rml` |
+| The live state: 68-72, 13:59 in the 2nd half, shot clock 24, timeouts 3 and 4, home bonus and possession, both starting fives, both teams' halftime shooting, rebounds, assists and turnovers, Reed's line tonight | `basketball_scorebug.rml`, `generate_starting_five_lower_third.ts`, `halftime_statistics.rml`, `player_lower_third.rml` |
 
 The games played (20) come from Drexel's 14-6 record, because the scenes give only averages. The date and time of the demo game are placeholders.
 

@@ -6,6 +6,8 @@
 
 import { defineGraphic } from '@dtv/playout';
 import { z } from 'zod';
+import { halftimeAdjustments } from './graphics/halftime-adjustments';
+import { playerToWatch } from './graphics/player-to-watch';
 import { scorebug } from './graphics/scorebug';
 import { SCENES } from './scenes.gen';
 
@@ -56,4 +58,42 @@ export const badFrozenName = defineGraphic(head)({
   bind: (params, context) => scorebug.bind(params, context),
   // @ts-expect-error `alignRight` is a Score to Break property, not a scorebug one
   frozenOnAir: ['alignRight'],
+});
+
+const featureHead = { id: 'check/feature', scene: SCENES.player_to_watch_lower_third, params: playerToWatch.params };
+const featureRest = { ...rest, layer: 'lower', demo: { player: 'x' } } as const;
+
+export const overlayCompiles = defineGraphic(featureHead)({ ...featureRest, bind: (params, context) => playerToWatch.bind(params, context), overlay: playerToWatch.overlay });
+
+export const badStillOpacity = defineGraphic(featureHead)({
+  ...featureRest,
+  bind: (params, context) => playerToWatch.bind(params, context),
+  // @ts-expect-error `_headshotOpacty` is not a Player To Watch property
+  overlay: { ...playerToWatch.overlay!, stillOpacity: '_headshotOpacty' },
+});
+
+export const stringInternalAsStillOpacity = defineGraphic(featureHead)({
+  ...featureRest,
+  bind: (params, context) => playerToWatch.bind(params, context),
+  // @ts-expect-error `_contextSeparator` is a string; the still's opacity is a number
+  overlay: { ...playerToWatch.overlay!, stillOpacity: '_contextSeparator' },
+});
+
+const stepsHead = { id: 'check/steps', scene: SCENES.halftime_adjustments, params: halftimeAdjustments.params };
+const stepsRest = { ...rest, demo: halftimeAdjustments.demo } as const;
+
+export const stepsCompile = defineGraphic(stepsHead)({ ...stepsRest, bind: (params, context) => halftimeAdjustments.bind(params, context), steps: { count: 2, values: (step) => ({ step }), transition: 'Away To Home' } });
+
+export const badTransition = defineGraphic(stepsHead)({
+  ...stepsRest,
+  bind: (params, context) => halftimeAdjustments.bind(params, context),
+  // @ts-expect-error `Away To Hom` is not a Halftime Adjustments timeline
+  steps: { count: 2, values: (step) => ({ step }), transition: 'Away To Hom' },
+});
+
+export const stepWritesWrongKind = defineGraphic(stepsHead)({
+  ...stepsRest,
+  bind: (params, context) => halftimeAdjustments.bind(params, context),
+  // @ts-expect-error `step` is a number property
+  steps: { count: 2, values: () => ({ step: 'home' }), transition: 'Away To Home' },
 });

@@ -5,6 +5,7 @@
 
 import type { Registry } from '@dtv/playout';
 import { burningQuestion } from './graphics/burning-question';
+import { conferenceStandings } from './graphics/conference-standings';
 import { halftimeAdjustments } from './graphics/halftime-adjustments';
 import { halftimeStatistics } from './graphics/halftime-statistics';
 import { matchupLocator } from './graphics/matchup-locator';
@@ -21,7 +22,7 @@ import { talentLowerThirdSingle } from './graphics/talent-lower-third-single';
 import { talentLowerThirdTriple } from './graphics/talent-lower-third-triple';
 import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings] as const;
 
 type Entry = (typeof ENTRIES)[number];
 
