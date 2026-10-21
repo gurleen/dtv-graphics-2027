@@ -305,7 +305,8 @@ are `{}`. The talent lower thirds take the first one, two, or three members of t
 
 Program is one shared bus, because there is one output. Each operator has their own preview. A take sends the
 taker's preview and nobody else's, so one operator can never put another operator's half-built cue on air. Every
-operator still sees every preview.
+operator still sees every preview. There is no shared preview bus: a multiviewer or a second screen follows one operator with
+`/renderer?bus=preview&operator=<id>` (the owner's answer of 2026-10-21).
 
 A slot is a cue on a bus, frozen when it was cued. It holds the graphic, the params, the overrides, the ref it
 came from, and its step. It does not hold a `Cue`, because a free-panel graphic has no cue id. Binds still read
@@ -469,8 +470,6 @@ Each phase ends in a check that runs on the real artifact.
 
 ## 7. Open questions for the owner
 
-- Per-operator previews mean a multiviewer must pick whose preview to show. Should there also be one shared
-  preview that follows a named operator?
 - Is a Player as one roster spot per season right, or do career stats across seasons matter soon?
 - Should the scorebug say `2ND HALF` (as Score to Break does) or `2ND PERIOD` (as its own scene does)? Women's
   games have quarters.
