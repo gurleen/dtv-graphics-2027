@@ -66,7 +66,7 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
             +{points}
           </Button>
         ))}
-        <Button className="button small" aria-label={`Take a point off ${side}`} isDisabled={score === 0} onPress={() => apply({ type: 'score', side, value: score - 1 })}>
+        <Button className="button small" aria-label={`${game.sides[side].brand.abbreviation} minus one`} isDisabled={score === 0} onPress={() => apply({ type: 'score', side, value: score - 1 })}>
           −
         </Button>
         <span className="timeouts" aria-label={`${live.timeouts[side]} timeouts left`}>

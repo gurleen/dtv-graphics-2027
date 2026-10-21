@@ -210,18 +210,18 @@
 
 .remove {
   cursor: pointer;
-  visibility: hidden;
+  opacity: 0.4;
 }
 
 .cue-row[data-hovered] .remove,
 .cue-row[data-selected] .remove {
-  visibility: visible;
+  opacity: 1;
 }
 
 .drag[data-focus-visible],
 .remove[data-focus-visible] {
   outline: 2px solid var(--focus);
-  visibility: visible;
+  opacity: 1;
 }
 
 .react-aria-DropIndicator[data-drop-target] {
@@ -356,12 +356,23 @@
   background: color-mix(in srgb, var(--pgm) 30%, var(--panel-raised));
 }
 
+/* Always there, so a problem never moves the program monitor. */
+.problem-slot {
+  position: relative;
+  flex: none;
+  height: 34px;
+}
+
 .problem-strip {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--warn);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--warn) 12%, var(--panel));

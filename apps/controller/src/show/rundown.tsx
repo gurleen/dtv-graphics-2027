@@ -1,7 +1,7 @@
 /**
  * The rundown: the show's cues in order, each with its tally and step dots and why it
- * cannot air. Rows reorder by drag and drop, which React Aria also runs from the keyboard
- * (focus a row's handle, Enter, arrows, Enter).
+ * cannot air. Rows reorder by drag and drop, which React Aria also runs from the keyboard:
+ * Right from a row to its handle, Enter, Up or Down to the place, Enter.
  */
 
 import type { CueId } from '@dtv/domain';

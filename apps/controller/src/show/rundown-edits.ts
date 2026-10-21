@@ -28,12 +28,12 @@ export function useRundownEdits(): RundownEdits | null {
   const show = view?.show && world?.get('show', view.show.id);
   if (!show || revision === null) return null;
 
-  const write = async (rundown: readonly Cue[], basis: Revision) => {
+  const write = async (rundown: readonly Cue[], basis: Revision, onConflict = 'The rundown changed just now; nothing was saved. Try again.') => {
     try {
       await api.data.apply({ origin: 'manual', basis, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [...rundown] } }] });
       return true;
     } catch (error) {
-      fail(`Rundown not saved: ${reasonOf(error)}`);
+      fail((error as { code?: unknown }).code === 'CONFLICT' ? onConflict : `Rundown not saved: ${reasonOf(error)}`);
       return false;
     }
   };
@@ -41,7 +41,9 @@ export function useRundownEdits(): RundownEdits | null {
   return {
     async save(cue, basis) {
       const before = view.rundown.find((each) => each.ref.kind === 'rundown' && each.ref.cue === cue.id);
-      if (!(await write(show.rundown.map((each) => (each.id === cue.id ? cue : each)), basis))) return false;
+      const replaced = show.rundown.map((each) => (each.id === cue.id ? cue : each));
+      const conflict = 'Someone changed the rundown while you edited this cue; nothing was saved. Your edit is still here: Save again to write over their change, or Revert.';
+      if (!(await write(replaced, basis, conflict))) return false;
       if (before?.onProgram && before.layer) void send({ type: 'refresh', layer: before.layer, slot: before.onProgram });
       if (before?.inMyPreview) void send({ type: 'cue', operator, ref: before.ref });
       return true;

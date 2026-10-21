@@ -199,14 +199,16 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
           Clear PVW <kbd>Esc</kbd>
         </Button>
       </div>
-      {problem && (
-        <div className="problem-strip" role="alert" key={problem.at}>
-          <span>{problem.message}</span>
-          <Button className="button small" aria-label="Dismiss" onPress={dismiss}>
-            ✕
-          </Button>
-        </div>
-      )}
+      <div className="problem-slot">
+        {problem && (
+          <div className="problem-strip" role="alert" key={problem.at}>
+            <span>{problem.message}</span>
+            <Button className="button small" aria-label="Dismiss" onPress={dismiss}>
+              ✕
+            </Button>
+          </div>
+        )}
+      </div>
       <div className="rail-head">
         Program <span className="tag pgm">PGM</span>
         <span className="caption">{busLabel(view, registry, view.program)}</span>
