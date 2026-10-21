@@ -22,23 +22,23 @@ const KNOWN_DRIFT: Readonly<Record<string, string>> = Object.fromEntries([
     ['period'],
     'The scene says 2ND PERIOD; periodLabel says 2ND HALF for men’s games, as Score to Break does. Open question in docs/ARCHITECTURE.md section 7.',
   ),
+  ...drift(
+    'score-to-break',
+    ['awayScore', 'homeScore', 'status', 'awayPrimaryColor', 'awaySecondaryColor'],
+    'The scene’s placeholder game is Campbell at Drexel, 58-61 with 8:42 left; the demo game is Saint Joseph’s at Drexel, 68-72 with 13:59 left.',
+  ),
   ...drift('team-lower-third', ['stat1Value', 'stat2Value'], 'The scene’s placeholder record (14-3, 8-1) is not the 14-6, 6-3 the matchup scenes and the seed agree on.'),
   ...drift('team-lower-third', ['bodyText'], 'Placeholder copy; the bind blanks it in stats mode.'),
 ]);
 
 /** Scenes whose registry entries land in phase 3. Delete each line as its entry lands. */
 const PENDING = [
-  'burning_question.rml',
   'conference_standings.rml',
   'halftime_adjustments.rml',
   'halftime_statistics.rml',
   'player_of_the_game_lower_third.rml',
   'player_to_watch_lower_third.rml',
-  'score_to_break.rml',
   'starting_five_lower_third.rml',
-  'talent_lower_third_double.rml',
-  'talent_lower_third_single.rml',
-  'talent_lower_third_triple.rml',
 ];
 
 const ENTRIES: readonly AnyGraphic[] = Object.values(BASKETBALL_V2);

@@ -3,7 +3,7 @@
 import { type basketball, type GameView, type Player, type PlayerId, resolveTeam, type Staff, type StaffId, type TeamId, type TeamView, type WinLoss, type World } from '@dtv/domain';
 import type { ShowContext } from '@dtv/playout';
 
-const fail = (message: string): never => {
+export const fail = (message: string): never => {
   throw new Error(message);
 };
 
