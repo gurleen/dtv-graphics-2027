@@ -132,9 +132,10 @@ Most data arrives prefilled, and people correct it on the data page. These rules
 
 - Every batch names its origin. `manual` is a person on the data page. `import` is the seed, an importer, or a
   live-data package.
-- Each row keeps a `locked` list beside its document. A manual put locks the fields it changed. An import put
-  writes only unlocked fields and reports the fields it skipped. The data page can unlock a field, and the next
-  import updates it again.
+- Each row keeps a `locked` list beside its document. A manual put locks the fields it changed. A manual insert
+  locks the fields it sets to something other than null or the field's schema default, so `position: ''` or
+  `redshirt: false` that nobody typed stays open to imports. An import put writes only unlocked fields and reports
+  the fields it skipped. The data page can unlock a field, and the next import updates it again.
 - A put with `onExisting: 'keep'` writes a row only when the row is missing. The seed uses it, so `bun run db:seed`
   never resets a record that a feed or an import updated since.
 - A manual batch carries `basis`, the World revision its writer read. A put or delete of a row written after that
