@@ -118,8 +118,12 @@ export async function loadInstance(options: {
         image = await IMAGES.acquire(url);
       } catch (error) {
         console.error(`renderer: ${name} could not load ${url}; binding the blank image`, error);
-        bound = blankImage;
-        image = await IMAGES.acquire(blankImage);
+        try {
+          image = await IMAGES.acquire(blankImage);
+          bound = blankImage;
+        } catch {
+          return;
+        }
       }
       if (disposed || latestImage.get(name) !== url) {
         IMAGES.release(bound);
