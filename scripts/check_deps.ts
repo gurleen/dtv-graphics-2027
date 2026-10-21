@@ -17,7 +17,10 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'packages/domain': ['zod'],
   'packages/db': ['@dtv/domain', 'bun:sqlite', 'node:fs', 'node:path'],
   'packages/playout': ['@dtv/domain', 'zod'],
-  'graphics/basketball-v2': ['@dtv/playout', '@dtv/domain'],
+  // The codegen's template writes an import of @dtv/playout into scenes.gen.ts, which this scan also reads.
+  'packages/playout/scripts': ['@dtv/playout', 'node:fs', 'node:path'],
+  'graphics/basketball-v2': ['@dtv/playout', '@dtv/domain', 'zod'],
+  'graphics/basketball-v2/generate_': ['node:path'],
   'packages/graphics': ['@dtv/basketball-v2', '@dtv/playout', '@dtv/domain'],
   'packages/renderer': ['@dtv/playout', '@dtv/domain', '@rive-app/canvas-single'],
   'packages/api': ['@dtv/playout', '@dtv/domain', '@orpc/*', 'partysocket'],
@@ -30,6 +33,11 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
 };
 
 const TEST_ALLOWED = ['bun:test', 'node:*'];
+
+/** What a directory's tests may import beyond its own rules: the golden test binds against the seeded database. */
+const TEST_EXTRA: Readonly<Record<string, readonly string[]>> = {
+  'graphics/basketball-v2': ['@dtv/db'],
+};
 
 const IMPORT = /\bfrom\s*['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)|^\s*import\s*['"]([^'"]+)['"]/gm;
 
@@ -65,7 +73,8 @@ for (const workspace of workspaces.sort()) {
       problems.push(`${file}: no rule in scripts/check_deps.ts`);
       continue;
     }
-    const allowed = /\.test\.tsx?$/.test(file) ? [...rules, ...TEST_ALLOWED] : rules;
+    const testExtra = Object.entries(TEST_EXTRA).flatMap(([prefix, extra]) => (file.startsWith(prefix) ? extra : []));
+    const allowed = /\.test\.tsx?$/.test(file) ? [...rules, ...TEST_ALLOWED, ...testExtra] : rules;
     const source = await Bun.file(join(ROOT, file)).text();
     for (const match of source.matchAll(IMPORT)) {
       const specifier = (match[1] ?? match[2] ?? match[3])!;

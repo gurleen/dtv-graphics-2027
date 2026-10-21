@@ -4,10 +4,12 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "graphics/*"
   ],
   "scripts": {
-    "check": "tsc -p . && bun scripts/check_deps.ts && bun test",
+    "check": "tsc -p . && bun scripts/check_deps.ts && bun run codegen --check && bun test",
+    "codegen": "bun packages/playout/scripts/scene-codegen.ts graphics/basketball-v2",
     "db:migrate": "bun packages/db/scripts/db.ts migrate",
     "db:seed": "bun packages/db/scripts/db.ts seed",
     "db:backup": "bun packages/db/scripts/db.ts backup",
