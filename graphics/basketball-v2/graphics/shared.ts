@@ -59,3 +59,15 @@ export const matchupValues = ({ sides, venue }: GameView) => ({
   venueName: venue?.name ?? '',
   venueLocation: venue ? `${venue.city}, ${venue.state}` : '',
 });
+
+/** The keys of a stat catalogue, as the non-empty tuple `z.enum` takes. */
+export const keysOf = <K extends string>(stats: Record<K, unknown>) => Object.keys(stats) as [K, ...K[]];
+
+/** The player's basketball season totals, if the world has them. */
+export const seasonStatsOf = (world: World, id: PlayerId) => {
+  const stats = world.get('playerStats', id)?.stats;
+  return stats?.sport === 'basketball' ? stats : undefined;
+};
+
+/** The player's line in tonight's game, if there is one. */
+export const tonightOf = (context: ShowContext, id: PlayerId) => (context.live?.sport === 'basketball' ? context.live.players[id] : undefined);

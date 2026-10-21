@@ -26,6 +26,12 @@ const KNOWN_DRIFT: Readonly<Record<string, string>> = Object.fromEntries([
     drift(graphic, ['awaySecondaryColor'], 'This scene says #a7a9ac for Saint Joseph’s; the seed says #101010, as three other scenes do. Open question in docs/ARCHITECTURE.md section 7.'),
   ),
   ...drift('halftime-statistics', ['awayScore', 'homeScore'], 'The scene shows a halftime score (31-34); the demo game is in the 2nd half at 68-72.'),
+  ...drift('player-to-watch', ['bodyText'], 'Placeholder copy; the bind blanks it in stats mode.'),
+  ...drift(
+    'player-of-the-game',
+    ['contextLabel', 'stat1Value', 'stat2Value', 'stat3Value', 'stat4Value', 'bodyText'],
+    'The scene’s placeholder is a finished game against St. John’s (24 PTS, 8 REB, 5 AST, 9-14 FG) with copy for text mode; the demo game is Saint Joseph’s at Drexel, mid-game.',
+  ),
   ...drift(
     'score-to-break',
     ['awayScore', 'homeScore', 'status', 'awayPrimaryColor', 'awaySecondaryColor'],
@@ -38,8 +44,6 @@ const KNOWN_DRIFT: Readonly<Record<string, string>> = Object.fromEntries([
 /** Scenes whose registry entries land in phase 3. Delete each line as its entry lands. */
 const PENDING = [
   'conference_standings.rml',
-  'player_of_the_game_lower_third.rml',
-  'player_to_watch_lower_third.rml',
 ];
 
 const ENTRIES: readonly AnyGraphic[] = Object.values(BASKETBALL_V2);
