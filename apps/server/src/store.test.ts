@@ -174,6 +174,23 @@ describe('live', () => {
   });
 });
 
+describe('a second game', () => {
+  const OTHER = GameId.parse('2026-27/2026-11-20/saint-josephs-mbb.at.drexel-mbb');
+  const addOther = (store: Store) =>
+    store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'game', value: { ...store.world().get('game', GAME)!, id: OTHER } }] });
+
+  test('a game stream sends nothing when a data commit and another game’s change leave its game as it was', async () => {
+    const store = open();
+    const stream = collect((signal) => store.watchGame(GAME, signal));
+    await flush();
+    expect(addOther(store)).toMatchObject({ ok: true });
+    store.applyGame('alex', { ...game('operator', { type: 'score', side: 'home', value: 3 }), gameId: OTHER });
+    await flush();
+    await stream.stop();
+    expect(stream.values).toHaveLength(1);
+  });
+});
+
 describe('show commands', () => {
   test('a repeated command id answers with the first result and applies once, also after a restart', async () => {
     const store = open();

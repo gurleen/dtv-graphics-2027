@@ -225,7 +225,8 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
 
     watchData: (signal) => stream({ topics: ['data'], signal, read: () => world.snapshot, key: (snapshot) => snapshot.revision }),
 
-    watchGame: (game, signal) => stream({ topics: ['live'], signal, read: () => lives.get(game), key: (live) => live }),
+    // A data commit reloads every live state as a new object, so identity would resend unchanged games.
+    watchGame: (game, signal) => stream({ topics: ['live'], signal, read: () => lives.get(game), key: (live) => JSON.stringify(live) }),
 
     async *watchShow(operator, signal) {
       presence.set(operator, (presence.get(operator) ?? 0) + 1);
