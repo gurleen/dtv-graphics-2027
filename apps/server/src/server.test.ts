@@ -146,6 +146,15 @@ describe('two clients over one real WebSocket each', () => {
   });
 });
 
+test('an operator counts as connected while their show stream is open', async () => {
+  const controller = new AbortController();
+  void watch((signal) => a.api.show.watch({ operator: alex }, { signal }), () => {}, { signal: controller.signal });
+  await until('B to see alex connect', () => bShow.values.at(-1)?.operators.includes(alex) === true);
+  expect(bShow.values.at(-1)?.operators).toEqual([bob, alex]);
+  controller.abort();
+  await until('B to see alex leave', () => bShow.values.at(-1)?.operators.includes(alex) === false);
+});
+
 describe('rules over the wire', () => {
   test('a feed writing the score before the operator hands it the group gets NOT_AUTHORITY; after the handoff it succeeds', async () => {
     const score: GameApplyInput = { sport: 'basketball', gameId: GAME, source: SourceId.parse('statcrew'), commands: [{ type: 'score', side: 'home', value: 75 }] };
