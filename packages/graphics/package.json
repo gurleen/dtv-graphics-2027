@@ -1,0 +1,14 @@
+{
+  "name": "@dtv/graphics",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@dtv/basketball-v2": "workspace:*",
+    "@dtv/domain": "workspace:*",
+    "@dtv/playout": "workspace:*",
+    "zod": "^4.6.7"
+  }
+}

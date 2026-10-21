@@ -39,6 +39,15 @@
         "zod": "^4.6.7",
       },
     },
+    "packages/graphics": {
+      "name": "@dtv/graphics",
+      "dependencies": {
+        "@dtv/basketball-v2": "workspace:*",
+        "@dtv/domain": "workspace:*",
+        "@dtv/playout": "workspace:*",
+        "zod": "^4.6.7",
+      },
+    },
     "packages/playout": {
       "name": "@dtv/playout",
       "dependencies": {
@@ -69,6 +78,8 @@
     "@dtv/db": ["@dtv/db@workspace:packages/db"],
 
     "@dtv/domain": ["@dtv/domain@workspace:packages/domain"],
+
+    "@dtv/graphics": ["@dtv/graphics@workspace:packages/graphics"],
 
     "@dtv/playout": ["@dtv/playout@workspace:packages/playout"],
 
