@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { CueId, GraphicId, Revision, ShowId, Sponsor, Sponsorship } from '@dtv/domain';
+import { CueId, GraphicId, Revision, ShowId, Sponsor, Sponsorship, Url } from '@dtv/domain';
 import { FALLBACK_IMAGES, flatten, project } from './project';
 import { fixtureContext, fixtureWorld, REGISTRY } from './registry.fixture';
 import type { SceneFacts } from './scene';
@@ -33,6 +33,7 @@ describe('project', () => {
           graphic: GraphicId.parse('test/name'),
           step: 0,
           values: { name: 'ROB BROOKS', role: 'PLAY-BY-PLAY', color: '#07294d', headshot: FALLBACK_IMAGES.blank, live: true },
+          media: null,
           error: null,
         },
       ],
@@ -92,6 +93,20 @@ describe('project', () => {
 
   test('a slot for a graphic the registry lacks carries an error', () => {
     expect(frame({ bug: slot('bug', 'test/gone', {}) }).layers[0]?.error).toBe('No graphic test/gone');
+  });
+
+  test('a graphic with an overlay carries the media its source picks', () => {
+    const name = REGISTRY['test/name']!;
+    const overlay = {
+      kind: 'motion-media', frame: { x: 0, y: 0, width: 10, height: 10, corner: 0 }, rise: 0, stillOpacity: '_still',
+      intro: { wipe: [0, 1], rise: [0, 1], fade: [0, 1] }, outro: { wipe: [0, 1], sink: [0, 1], fade: [0, 1] },
+      source: () => Url.parse('/media/reed.mp4'),
+    } as const;
+    const registry = { ...REGISTRY, 'test/name': { ...name, overlay } };
+    const bus = { lower: slot('lower', 'test/name', { talent: 'rob-brooks' }) };
+    const projected = project({ registry, bus, ref: { kind: 'program' }, revision: Revision.parse(7), context: fixtureContext() });
+    expect(projected.layers[0]?.media).toBe(Url.parse('/media/reed.mp4'));
+    expect(frame(bus).layers[0]?.media).toBeNull();
   });
 
   test('the bind reads the active show', () => {

@@ -22,6 +22,8 @@ export interface LayerFrame {
   readonly step: number;
   /** Every public property but `isPlaying`, strings in capitals, every image a URL. */
   readonly values: Readonly<Record<string, WireValue>>;
+  /** The entry's overlay media, or null. */
+  readonly media: Url | null;
   /** Set when the bind failed, as when a row it reads was deleted. The renderer keeps what it shows. */
   readonly error: string | null;
 }
@@ -51,12 +53,14 @@ export function project(input: {
     if (!slot) return [];
     const base = { layer, slot: slot.id, graphic: slot.graphic, step: slot.step };
     const entry = input.registry[slot.graphic];
-    if (!entry) return [{ ...base, values: {}, error: `No graphic ${slot.graphic}` }];
+    if (!entry) return [{ ...base, values: {}, media: null, error: `No graphic ${slot.graphic}` }];
     try {
-      const values = bindValues(entry, { graphic: slot.graphic, params: entry.params.parse(slot.params), step: slot.step, overrides: slot.overrides }, input.context);
-      return [{ ...base, values, error: null }];
+      const params = entry.params.parse(slot.params);
+      const values = bindValues(entry, { graphic: slot.graphic, params, step: slot.step, overrides: slot.overrides }, input.context);
+      const media = entry.overlay ? entry.overlay.source(params, { ...input.context, sponsor: undefined }) : null;
+      return [{ ...base, values, media, error: null }];
     } catch (error) {
-      return [{ ...base, values: {}, error: error instanceof Error ? error.message : String(error) }];
+      return [{ ...base, values: {}, media: null, error: error instanceof Error ? error.message : String(error) }];
     }
   });
   return { bus: input.ref, revision: input.revision, layers };
