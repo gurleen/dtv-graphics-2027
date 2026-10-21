@@ -18,6 +18,8 @@ export interface Rig {
   readonly origin: string;
   readonly api: Api;
   readonly page: Page;
+  /** Another 1920 x 1080 page on the same server, once its output stream is live. */
+  open(path: string): Promise<Page>;
   command(command: ShowCommand): Promise<{ changed: boolean }>;
   /** The newest program frame. */
   program(): Promise<OutputFrame>;
@@ -47,19 +49,24 @@ export async function startRig(options: { readonly port: number }): Promise<Rig>
 
   const connection = connect({ url: `ws://localhost:${options.port}/rpc`, client: 'renderer-proof' });
   const browser: Browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
-  page.on('console', (message) => {
-    if (message.type() === 'error' || message.type() === 'warning') console.log(`  page ${message.type()}: ${message.text()}`);
-  });
-  page.on('pageerror', (error) => console.log(`  page error: ${error.message}`));
-  await page.goto(`${origin}/renderer`);
-  await waitLive(page);
+  const open = async (path: string) => {
+    const opened = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+    opened.on('console', (message) => {
+      if (message.type() === 'error' || message.type() === 'warning') console.log(`  page ${message.type()}: ${message.text()}`);
+    });
+    opened.on('pageerror', (error) => console.log(`  page error: ${error.message}`));
+    await opened.goto(`${origin}${path}`);
+    await waitLive(opened);
+    return opened;
+  };
+  const page = await open('/renderer');
 
   const { api } = connection;
   return {
     origin,
     api,
     page,
+    open,
     command: (command) => api.show.command({ id: CommandId.parse(`proof-${process.pid}-${++commands}`), command }),
     program: () => first((signal) => api.output.watch({ bus: { kind: 'program' } }, { signal })),
     async settle(on) {

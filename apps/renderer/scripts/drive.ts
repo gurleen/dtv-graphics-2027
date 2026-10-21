@@ -12,6 +12,7 @@ import { first } from '@dtv/api';
 import { GameId, PlayerId, ShowId, SourceId } from '@dtv/domain';
 import { cueOf } from '@dtv/graphics';
 import { CueRef, OperatorId } from '@dtv/playout';
+import { PNG } from 'pngjs';
 import { pageLayers, ROOT, startRig, waitForLayer, waitLive } from './harness';
 
 const flag = (name: string, fallback: string) => process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
@@ -68,6 +69,11 @@ try {
   await rig.command({ type: 'cue', operator, ref: CueRef.parse({ kind: 'rundown', cue: 'reed' }) });
   const previewOnly = await shot('2-lower-third-in-preview');
   check(previewOnly.lower === 0, 'a cue in preview does not reach program');
+  const previewPage = await rig.open(`/renderer?bus=preview&operator=${operator}`);
+  await previewPage.waitForFunction(`dtvRenderer.layers().lower.phase === 'on' && dtvRenderer.layers().bug.phase === 'empty'`);
+  const preview = PNG.sync.read(await previewPage.screenshot({ omitBackground: true, path: join(out, '2b-preview-bus.png') }));
+  check(coverage(preview, LOWER) > 0.3 && coverage(preview, BUG) === 0, `/renderer?bus=preview&operator=${operator} draws that preview: the lower third alone`);
+  await previewPage.close();
   await rig.command({ type: 'take', operator });
   await rig.settle({ bug: 'on', lower: 'on' });
   const both = await shot('3-lower-third-taken');
