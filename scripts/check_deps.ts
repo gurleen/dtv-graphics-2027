@@ -16,7 +16,7 @@ const ROOT = resolve(import.meta.dir, '..');
 const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'packages/domain': ['zod'],
   'packages/db': ['@dtv/domain', 'bun:sqlite', 'node:fs', 'node:path'],
-  'packages/playout': ['@dtv/domain'],
+  'packages/playout': ['@dtv/domain', 'zod'],
   'graphics/basketball-v2': ['@dtv/playout', '@dtv/domain'],
   'packages/graphics': ['@dtv/basketball-v2', '@dtv/playout', '@dtv/domain'],
   'packages/renderer': ['@dtv/playout', '@dtv/domain', '@rive-app/canvas-single'],
