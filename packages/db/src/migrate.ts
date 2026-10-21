@@ -1,4 +1,4 @@
-import { ENTITIES, ENTITY_KINDS, type EntityKind, parseEntity } from '@dtv/domain';
+import { ENTITIES, ENTITY_KINDS, type EntityKind, Lock, parseEntity } from '@dtv/domain';
 import { backup } from './backup';
 import type { Db } from './db';
 import { TABLES, type TableSql } from './schema';
@@ -28,7 +28,13 @@ export const renameField = (version: number, kind: EntityKind, from: string, to:
   renames: { [from]: to },
 });
 
-export const DOC_MIGRATIONS: readonly DocMigration[] = [];
+/**
+ * Version 1 gives each lock its author: before it a lock was a bare field name. The
+ * documents do not change; sending every row through `migrateRow` rewrites its locks.
+ */
+const lockAuthors = ENTITY_KINDS.map((kind): DocMigration => ({ version: 1, kind, up: (doc) => doc }));
+
+export const DOC_MIGRATIONS: readonly DocMigration[] = [...lockAuthors];
 
 export interface MigrationReport {
   readonly created: readonly string[];
@@ -51,15 +57,18 @@ interface Row {
   readonly locked: string;
 }
 
+/** A lock from before version 1 is a bare field name, with no author. */
+const storedLock = (lock: unknown): Lock => (typeof lock === 'string' ? { field: lock, actor: null, at: null } : Lock.parse(lock));
+
 /** A row through `migrations` in order: its document reshaped and checked, its locks renamed. */
 function migrateRow(kind: EntityKind, migrations: readonly DocMigration[], row: Row): Row {
   let doc: unknown = JSON.parse(row.doc);
-  let locked: string[] = JSON.parse(row.locked);
+  let locks = (JSON.parse(row.locked) as unknown[]).map(storedLock);
   for (const migration of migrations) {
     doc = migration.up(doc);
-    locked = locked.map((field) => migration.renames?.[field] ?? field);
+    locks = locks.map((lock) => ({ ...lock, field: migration.renames?.[lock.field] ?? lock.field }));
   }
-  return { ...row, doc: JSON.stringify(parseEntity(kind, doc)), locked: JSON.stringify(locked) };
+  return { ...row, doc: JSON.stringify(parseEntity(kind, doc)), locked: JSON.stringify(locks) };
 }
 
 /** SQLite's documented rebuild. `reshape` rewrites each row on the way, so generated columns read the new documents. */
@@ -152,7 +161,7 @@ export function migrate(
   return {
     created: create.map((table) => table.table),
     rebuilt: rebuilt.map((table) => table.table),
-    docMigrations: pending.map((migration) => migration.version),
+    docMigrations: [...new Set(pending.map((migration) => migration.version))],
     backup: backupFile,
   };
 }

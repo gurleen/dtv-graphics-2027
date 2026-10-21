@@ -13,9 +13,11 @@ const parsed = (text: string): readonly RosterRow[] => {
   return result.rows;
 };
 
+/** `locks` names the locked fields of each player. */
 const worldOf = (players: readonly Player[], locks: Record<string, string[]> = {}) => {
   const empty = emptySnapshot();
-  return indexWorld({ ...empty, entities: { ...empty.entities, player: players }, locks: { ...empty.locks, player: locks } });
+  const player = Object.fromEntries(Object.entries(locks).map(([id, fields]) => [id, fields.map((field) => ({ field, actor: 'alex', at: 0 }))]));
+  return indexWorld({ ...empty, entities: { ...empty.entities, player: players }, locks: { ...empty.locks, player } });
 };
 
 const plan = (players: readonly Player[], csv: string, options: { prune?: boolean; locks?: Record<string, string[]> } = {}) =>

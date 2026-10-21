@@ -1,7 +1,7 @@
 import { SQLiteError } from 'bun:sqlite';
 import {
-  type EditBatch, emptySnapshot, ENTITIES, type EntityKind, type EntityOf, type Game, GameLive, type GameId,
-  mergePut, parseEntity, PROGRAMS, Revision, SPORT_MODULES, type WorldSnapshot,
+  type EditBatch, emptySnapshot, ENTITIES, type EntityKind, type EntityOf, type Game, GameLive, type GameId, Lock,
+  mergePut, parseEntity, PROGRAMS, Revision, SPORT_MODULES, type Writer, type WorldSnapshot,
 } from '@dtv/domain';
 import type { Db } from './db';
 
@@ -13,6 +13,12 @@ const parseRow = <K extends EntityKind>(kind: K, id: string, doc: string): Entit
   } catch (error) {
     throw new Error(`${kind} ${id} does not match its schema; a shape change shipped without its DocMigration`, { cause: error });
   }
+};
+
+const parseLocks = (kind: EntityKind, id: string, locked: string): readonly Lock[] => {
+  const locks = Lock.array().safeParse(JSON.parse(locked));
+  if (!locks.success) throw new Error(`${kind} ${id} has malformed locks; a lock format change shipped without its DocMigration`, { cause: locks.error });
+  return locks.data;
 };
 
 /** Live and show commits do not move the World, so its revision is the last data commit. */
@@ -31,15 +37,15 @@ const journal = (db: Db, input: { readonly at: number; readonly actor: string; r
  * names its kind and id.
  */
 export function loadSnapshot(db: Db): WorldSnapshot {
-  const locks: Record<EntityKind, Record<string, readonly string[]>> = emptySnapshot().locks;
+  const locks: Record<EntityKind, Record<string, readonly Lock[]>> = emptySnapshot().locks;
   const load = <K extends EntityKind>(kind: K): EntityOf<K>[] => {
-    const lockedById: Record<string, readonly string[]> = locks[kind];
+    const locksById: Record<string, readonly Lock[]> = locks[kind];
     return db.sqlite
       .query<{ id: string; doc: string; locked: string }, []>(`SELECT id, doc, locked FROM "${ENTITIES[kind].table}" ORDER BY id`)
       .all()
       .map((row) => {
-        const locked: string[] = JSON.parse(row.locked);
-        if (locked.length) lockedById[row.id] = locked;
+        const rowLocks = parseLocks(kind, row.id, row.locked);
+        if (rowLocks.length) locksById[row.id] = rowLocks;
         return parseRow(kind, row.id, row.doc);
       });
   };
@@ -130,6 +136,7 @@ function insertInitialLive(db: Db, game: Game, seq: number) {
  */
 export function commitEdits(db: Db, input: { readonly actor: string; readonly at: number; readonly batch: EditBatch }): CommitResult {
   const { batch } = input;
+  const writer: Writer = batch.origin === 'manual' ? { origin: 'manual', actor: input.actor, at: input.at } : { origin: 'import' };
   const skipped: SkippedFields[] = [];
   const counts = { inserted: 0, updated: 0, deleted: 0 };
   try {
@@ -152,12 +159,12 @@ export function commitEdits(db: Db, input: { readonly actor: string; readonly at
           counts.deleted++;
           continue;
         }
-        const existing = row ? { doc: parseRow(edit.kind, id, row.doc), locked: JSON.parse(row.locked) } : undefined;
-        const merge = mergePut(batch.origin, existing, edit);
+        const existing = row ? { doc: parseRow(edit.kind, id, row.doc), locks: parseLocks(edit.kind, id, row.locked) } : undefined;
+        const merge = mergePut(writer, existing, edit);
         if (merge.skipped.length) skipped.push({ kind: edit.kind, id, fields: merge.skipped });
         if (merge.change === 'none') continue;
         try {
-          const values = [JSON.stringify(merge.row.doc), seq, JSON.stringify(merge.row.locked), id];
+          const values = [JSON.stringify(merge.row.doc), seq, JSON.stringify(merge.row.locks), id];
           if (merge.change === 'insert') db.sqlite.run(`INSERT INTO "${table}" (doc, seq, locked, id) VALUES (?, ?, ?, ?)`, values);
           else db.sqlite.run(`UPDATE "${table}" SET doc = ?, seq = ?, locked = ? WHERE id = ?`, values);
           if (merge.change === 'insert' && edit.kind === 'game') insertInitialLive(db, edit.value, seq);

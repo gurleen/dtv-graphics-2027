@@ -311,7 +311,7 @@ export function planRoster(
       continue;
     }
     const value = applyRow(before, row);
-    const merge = mergePut('import', { doc: before, locked: world.locked('player', before.id) }, { kind: 'player', value });
+    const merge = mergePut({ origin: 'import' }, { doc: before, locks: world.locks('player', before.id) }, { kind: 'player', value });
     if (merge.change === 'none') {
       unchanged++;
       continue;
