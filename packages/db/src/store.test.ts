@@ -39,7 +39,8 @@ const BASE: ImportEdit[] = [
   { op: 'put', kind: 'staff', value: spiker },
 ];
 
-const commit = (batch: EditBatch) => commitEdits(db, { actor: 'test', at: 1_700_000_000_000, batch });
+const AT = 1_700_000_000_000;
+const commit = (batch: EditBatch, by: { readonly actor: string; readonly at: number } = { actor: 'test', at: AT }) => commitEdits(db, { ...by, batch });
 const imported = (...edits: ImportEdit[]): EditBatch => ({ origin: 'import', edits });
 const revision = () => loadSnapshot(db).revision;
 const manual = (edits: Extract<EditBatch, { origin: 'manual' }>['edits'], basis = revision()): EditBatch => ({ origin: 'manual', basis, edits });
@@ -78,10 +79,21 @@ describe('field locks', () => {
     ok(commit(imported(...BASE)));
   });
 
-  test('a manual edit locks the fields it changed', () => {
-    ok(commit(manual([{ op: 'put', kind: 'school', value: { ...sju, abbreviation: 'SJU' } }])));
+  test('a manual edit locks the fields it changed, recording who committed it and when', () => {
+    ok(commit(manual([{ op: 'put', kind: 'school', value: { ...sju, abbreviation: 'SJU' } }]), { actor: 'alex', at: AT }));
     expect(school('saint-josephs')?.abbreviation).toBe('SJU');
-    expect(loadSnapshot(db).locks.school).toEqual({ 'saint-josephs': ['abbreviation'] });
+    expect(loadSnapshot(db).locks.school).toEqual({ 'saint-josephs': [{ field: 'abbreviation', actor: 'alex', at: AT }] });
+  });
+
+  test('a second manual edit by someone else takes the lock over', () => {
+    ok(commit(manual([{ op: 'put', kind: 'school', value: { ...sju, abbreviation: 'SJU', mascot: 'Hawk' } }]), { actor: 'alex', at: AT }));
+    ok(commit(manual([{ op: 'put', kind: 'school', value: { ...sju, abbreviation: 'SJ', mascot: 'Hawk' } }]), { actor: 'sam', at: AT + 60_000 }));
+    expect(loadSnapshot(db).locks.school).toEqual({
+      'saint-josephs': [
+        { field: 'abbreviation', actor: 'sam', at: AT + 60_000 },
+        { field: 'mascot', actor: 'alex', at: AT },
+      ],
+    });
   });
 
   test('a later import skips the locked fields, reports them, and still updates the others', () => {

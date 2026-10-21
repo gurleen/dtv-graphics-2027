@@ -111,6 +111,7 @@ describe('two clients over one real WebSocket each', () => {
     expect(revision).toBeGreaterThan(world.revision);
     await until('B to see the edit', () => bData.values.at(-1)?.revision === revision);
     expect(bData.values.at(-1)?.entities.player.find((player) => player.id === REED)?.firstName).toBe('Joshua');
+    expect(bData.values.at(-1)?.locks.player[REED]).toEqual([{ field: 'firstName', actor: 'client-a', at: expect.any(Number) }]);
   });
 
   test('A cues and takes the player lower third; B sees it on program, and B’s program output carries the name in capitals', async () => {

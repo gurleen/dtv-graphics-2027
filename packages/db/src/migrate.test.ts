@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { backup, type Db, migrate, openDb, renameField, TABLES, tableSql } from './index';
+import { backup, type Db, loadSnapshot, migrate, openDb, renameField, TABLES, tableSql } from './index';
 
 let dir: string;
 let db: Db;
@@ -24,7 +24,7 @@ afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
 });
 
-const insert = (table: string, doc: object, seq = 1, locked: string[] = []) =>
+const insert = (table: string, doc: object, seq = 1, locked: unknown[] = []) =>
   db.sqlite.run(`INSERT INTO "${table}" (id, doc, seq, locked) VALUES (?, ?, ?, ?)`, ['id' in doc ? String(doc.id) : '', JSON.stringify(doc), seq, JSON.stringify(locked)]);
 
 const rows = (table: string) => db.sqlite.query(`SELECT id, doc, seq, locked FROM "${table}" ORDER BY id`).all();
@@ -33,7 +33,9 @@ const seedRoster = () => {
   insert('seasons', { id: '2026-27', name: '2026-27' });
   insert('schools', { id: 'drexel', name: 'Drexel', shortName: 'Drexel', mascot: 'Dragons', abbreviation: 'DREX', primaryColor: '#07294d', secondaryColor: '#ffc600', logo: null, website: null, espnId: '2182' });
   insert('teams', { id: 'drexel-mbb', schoolId: 'drexel', program: 'mbb', branding: {} });
-  insert('players', { id: 'drexel-mbb@2026-27/reed-josh', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5', sourceKey: 'a' }, 4, ['hometown']);
+  insert('players', { id: 'drexel-mbb@2026-27/reed-josh', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5', sourceKey: 'a' }, 4, [
+    { field: 'hometown', actor: 'alex', at: 1 },
+  ]);
   insert('players', { id: 'drexel-mbb@2026-27/hipps', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: '', lastName: 'Hipps', jersey: '0', sourceKey: null }, 7);
 };
 
@@ -77,26 +79,27 @@ describe('migrate', () => {
   test('a document migration runs once, under user_version', () => {
     migrate(db, { backupDir: backups() });
     insert('venues', { id: 'daskalakis-athletic-center', title: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
-    const renameTitle = { version: 1, kind: 'venue', up: (doc: unknown) => (doc !== null && typeof doc === 'object' && 'title' in doc ? { ...doc, name: doc.title } : doc) } as const;
+    const renameTitle = { version: 2, kind: 'venue', up: (doc: unknown) => (doc !== null && typeof doc === 'object' && 'title' in doc ? { ...doc, name: doc.title } : doc) } as const;
 
-    expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] }).docMigrations).toEqual([1]);
+    expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] }).docMigrations).toEqual([2]);
     expect(JSON.parse(String(rows('venues').map((row) => (row as { doc: string }).doc)[0]))).toEqual({
       id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA',
     });
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 2 });
     expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
   });
 
   test('a rename moves the field’s lock with it', () => {
     migrate(db, { backupDir: backups() });
-    insert('venues', { id: 'daskalakis-athletic-center', title: 'The DAC', city: 'Philadelphia', state: 'PA' }, 1, ['title', 'city']);
-    expect(migrate(db, { backupDir: backups(), migrations: [renameField(1, 'venue', 'title', 'name')] }).docMigrations).toEqual([1]);
+    const lock = (field: string) => ({ field, actor: 'alex', at: 1 });
+    insert('venues', { id: 'daskalakis-athletic-center', title: 'The DAC', city: 'Philadelphia', state: 'PA' }, 1, [lock('title'), lock('city')]);
+    expect(migrate(db, { backupDir: backups(), migrations: [renameField(2, 'venue', 'title', 'name')] }).docMigrations).toEqual([2]);
     expect(rows('venues')).toEqual([
       {
         id: 'daskalakis-athletic-center',
         doc: JSON.stringify({ id: 'daskalakis-athletic-center', name: 'The DAC', city: 'Philadelphia', state: 'PA' }),
         seq: 1,
-        locked: JSON.stringify(['name', 'city']),
+        locked: JSON.stringify([lock('name'), lock('city')]),
       },
     ]);
   });
@@ -109,23 +112,44 @@ describe('migrate', () => {
     insert('seasons', { id: '2026-27', name: '2026-27' });
     insert('schools', { id: 'drexel', name: 'Drexel', shortName: 'Drexel', mascot: 'Dragons', abbreviation: 'DREX', primaryColor: '#07294d', secondaryColor: '#ffc600', logo: null, website: null, espnId: '2182' });
     insert('teams', { id: 'drexel-mbb', schoolId: 'drexel', program: 'mbb', branding: {} });
-    insert('players', { id: 'drexel-mbb@2026-27/reed-josh', team: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5' }, 4, ['team']);
+    insert('players', { id: 'drexel-mbb@2026-27/reed-josh', team: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5' }, 4, [
+      { field: 'team', actor: 'alex', at: 1 },
+    ]);
 
-    const report = migrate(db, { backupDir: backups(), migrations: [renameField(1, 'player', 'team', 'teamId')] });
-    expect(report).toMatchObject({ rebuilt: ['players'], docMigrations: [1] });
-    expect(db.sqlite.query('SELECT team_id, seq, locked FROM players').all()).toEqual([{ team_id: 'drexel-mbb', seq: 4, locked: '["teamId"]' }]);
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
-    expect(migrate(db, { backupDir: backups(), migrations: [renameField(1, 'player', 'team', 'teamId')] })).toMatchObject({ rebuilt: [], docMigrations: [] });
+    const report = migrate(db, { backupDir: backups(), migrations: [renameField(2, 'player', 'team', 'teamId')] });
+    expect(report).toMatchObject({ rebuilt: ['players'], docMigrations: [2] });
+    expect(db.sqlite.query('SELECT team_id, seq, locked FROM players').all()).toEqual([
+      { team_id: 'drexel-mbb', seq: 4, locked: JSON.stringify([{ field: 'teamId', actor: 'alex', at: 1 }]) },
+    ]);
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 2 });
+    expect(migrate(db, { backupDir: backups(), migrations: [renameField(2, 'player', 'team', 'teamId')] })).toMatchObject({ rebuilt: [], docMigrations: [] });
   });
 
   test('a document migration that produces an invalid document changes nothing', () => {
     migrate(db, { backupDir: backups() });
     insert('venues', { id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
     const before = rows('venues');
-    const broken = { version: 1, kind: 'venue', up: () => ({ id: 'daskalakis-athletic-center' }) } as const;
+    const broken = { version: 2, kind: 'venue', up: () => ({ id: 'daskalakis-athletic-center' }) } as const;
     expect(() => migrate(db, { backupDir: backups(), migrations: [broken] })).toThrow();
     expect(rows('venues')).toEqual(before);
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 0 });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+  });
+
+  test('a file from before locks had authors gets each lock rewritten with no author, once', () => {
+    migrate(db, { backupDir: backups() });
+    seedRoster();
+    db.sqlite.run(`UPDATE players SET locked = '["hometown","jersey"]' WHERE id = 'drexel-mbb@2026-27/reed-josh'`);
+    db.sqlite.run('PRAGMA user_version = 0');
+
+    expect(migrate(db, { backupDir: backups() })).toMatchObject({ rebuilt: [], docMigrations: [1] });
+    expect(loadSnapshot(db).locks.player).toEqual({
+      'drexel-mbb@2026-27/reed-josh': [
+        { field: 'hometown', actor: null, at: null },
+        { field: 'jersey', actor: null, at: null },
+      ],
+    });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+    expect(migrate(db, { backupDir: backups() })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
   });
 
   test('a new file starts at the latest document migration without running any', () => {

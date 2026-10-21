@@ -8,6 +8,7 @@ import {
   type Conference, type EntityKind, type EntityOf, type Game, type IdOf, type Player, type School,
   type Season, type Sponsor, type Staff, type Team, type TeamSeason, type Venue,
 } from './entities';
+import type { Lock } from './edits';
 import type { ConferenceId, GameId, GraphicId, SeasonId, TeamId } from './ids';
 import { type Color, Revision, type Sides, type Url } from './primitives';
 import type { ProgramCode } from './programs';
@@ -18,8 +19,8 @@ type Entities = { readonly [K in EntityKind]: readonly EntityOf<K>[] };
 export interface WorldSnapshot {
   readonly revision: Revision;
   readonly entities: Entities;
-  /** The fields a person locked, by kind and id. A row without locks has no entry. */
-  readonly locks: { readonly [K in EntityKind]: Readonly<Record<string, readonly string[]>> };
+  /** The locks on each row, by kind and id. A row without locks has no entry. */
+  readonly locks: { readonly [K in EntityKind]: Readonly<Record<string, readonly Lock[]>> };
 }
 
 export interface World {
@@ -27,7 +28,9 @@ export interface World {
   readonly snapshot: WorldSnapshot;
   get<K extends EntityKind>(kind: K, id: IdOf<K>): EntityOf<K> | undefined;
   all<K extends EntityKind>(kind: K): readonly EntityOf<K>[];
+  /** The names of the fields locked on a row. */
   locked(kind: EntityKind, id: string): readonly string[];
+  locks(kind: EntityKind, id: string): readonly Lock[];
   /** Ordered by jersey number. */
   roster(team: TeamId, season: SeasonId): readonly Player[];
   staffOf(team: TeamId, season: SeasonId): readonly Staff[];
@@ -106,7 +109,8 @@ export function indexWorld(snapshot: WorldSnapshot): World {
     snapshot,
     get: (kind, id) => maps[kind].get(id),
     all: (kind) => entities[kind],
-    locked: (kind, id) => snapshot.locks[kind][id] ?? [],
+    locked: (kind, id) => (snapshot.locks[kind][id] ?? []).map((lock) => lock.field),
+    locks: (kind, id) => snapshot.locks[kind][id] ?? [],
     roster: (team, season) => rosters.get(teamSeasonKey(team, season)) ?? [],
     staffOf: (team, season) => staff.get(teamSeasonKey(team, season)) ?? [],
     teamSeason: (team, season) => teamSeasons.get(teamSeasonKey(team, season)),

@@ -1,4 +1,4 @@
-import { type EditBatch, mergePut } from './edits';
+import { type EditBatch, mergePut, type Writer } from './edits';
 import { type EntityKind, type EntityOf, parseEntity } from './entities';
 import type { Game } from './entities';
 import type { GameId, PlayerId, TeamId } from './ids';
@@ -25,9 +25,10 @@ export type Inconsistency =
       readonly message: string;
     };
 
+/** The rows of `kind` once `batch` commits. Only documents matter here, so a manual put's writer stays unknown. */
 function rowsAfter<K extends EntityKind>(world: World, batch: EditBatch, kind: K): ReadonlyMap<string, EntityOf<K>> {
   const rows = new Map<string, EntityOf<K>>(world.all(kind).map((row) => [row.id, row]));
-  const locks = new Map<string, readonly string[]>();
+  const writer: Writer = batch.origin === 'import' ? { origin: 'import' } : { origin: 'manual', actor: null, at: null };
   for (const edit of batch.edits) {
     if (edit.kind !== kind) continue;
     if (edit.op === 'delete') {
@@ -36,11 +37,9 @@ function rowsAfter<K extends EntityKind>(world: World, batch: EditBatch, kind: K
     }
     const id = edit.value.id;
     const existing = rows.get(id);
-    const locked = locks.get(id) ?? world.locked(kind, id);
-    const merge = mergePut(batch.origin, existing && { doc: existing, locked }, edit);
+    const merge = mergePut(writer, existing && { doc: existing, locks: world.locks(kind, id) }, edit);
     if (merge.change === 'none') continue;
     rows.set(id, parseEntity(kind, merge.row.doc));
-    locks.set(id, merge.row.locked);
   }
   return rows;
 }

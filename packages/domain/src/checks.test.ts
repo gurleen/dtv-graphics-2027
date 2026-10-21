@@ -35,7 +35,7 @@ describe('checkEdits: both teams of a game play its program', () => {
     const world = indexWorld({
       ...base,
       entities: { ...base.entities, game: [game('elon-mbb')] },
-      locks: { ...base.locks, team: { 'elon-mbb': ['program'] } },
+      locks: { ...base.locks, team: { 'elon-mbb': [{ field: 'program', actor: null, at: null }] } },
     });
     expect(checkEdits(world, { origin: 'import', edits: [{ op: 'put', kind: 'team', value: { ...elonMbb, program: 'wbb' } }] })).toEqual([]);
     const manual = checkEdits(world, { origin: 'manual', basis: Revision.parse(0), edits: [{ op: 'put', kind: 'team', value: { ...elonMbb, program: 'wbb' } }] });

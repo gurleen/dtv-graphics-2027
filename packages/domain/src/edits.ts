@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ENTITIES, ENTITY_KINDS, type EntityKind, type EntityOf, type FieldOf, type IdOf } from './entities';
-import { Revision } from './primitives';
-
-/** `manual` is a person on the data page; `import` is the seed, an importer, or a live-data package. */
-export type Origin = 'manual' | 'import';
+import { type EpochMs, Revision } from './primitives';
 
 type Put<K extends EntityKind> = { readonly op: 'put'; readonly kind: K; readonly value: EntityOf<K> };
 type Delete<K extends EntityKind> = { readonly op: 'delete'; readonly kind: K; readonly id: IdOf<K> };
@@ -70,9 +67,30 @@ export const EditBatch = z.discriminatedUnion('origin', [
   z.strictObject({ origin: z.literal('manual'), basis: Revision, edits: z.array(manualEdit).min(1) }),
 ]) as unknown as z.ZodType<EditBatch>;
 
+/** A field a person locked, so imports leave it alone. */
+export interface Lock {
+  readonly field: string;
+  /** The client label of the batch that locked it; null for a lock recorded before locks carried one. */
+  readonly actor: string | null;
+  /** When that batch committed; null for a lock recorded before locks carried it. */
+  readonly at: EpochMs | null;
+}
+
+/** A lock as stored beside its row. */
+export const Lock: z.ZodType<Lock> = z.strictObject({ field: z.string(), actor: z.string().nullable(), at: z.number().int().nullable() });
+
+/**
+ * Who writes a put. `manual` is a person on the data page; `import` is the seed, an
+ * importer, or a live-data package. A manual put records `actor` and `at` on each lock it
+ * sets; null for both says the author is unknown, as on a lock recorded before locks
+ * carried one.
+ */
+export type Writer = { readonly origin: 'import' } | { readonly origin: 'manual'; readonly actor: string | null; readonly at: EpochMs | null };
+
 export interface Row {
   readonly doc: Readonly<Record<string, unknown>>;
-  readonly locked: readonly string[];
+  /** Ordered by field. */
+  readonly locks: readonly Lock[];
 }
 
 export type Merge =
@@ -92,19 +110,22 @@ const defaultsOf = (kind: EntityKind): ReadonlyMap<string, unknown> => {
 /** Each field's schema default, for the fields whose schema accepts a missing value. */
 const DEFAULTS = new Map(ENTITY_KINDS.map((kind) => [kind, defaultsOf(kind)]));
 
+const byField = (a: Lock, b: Lock) => (a.field < b.field ? -1 : a.field > b.field ? 1 : 0);
+
 /**
  * What one put does to the row it targets.
  *
- * - A manual put writes and locks every field it changes. On a new row that is every field
- *   it sets to a value other than null or the field's schema default, so an import can
- *   still fill the rest.
+ * - A manual put writes and locks every field it changes, recording its writer on the lock,
+ *   so a second manual edit of a locked field takes the lock over. On a new row that is
+ *   every field it sets to a value other than null or the field's schema default, so an
+ *   import can still fill the rest.
  * - An import put writes only unlocked fields and reports the locked ones it would have
  *   changed in `skipped`.
  * - `unlock` clears locks last, so an explicit unlock wins over the lock a change would add.
  * - `onExisting: 'keep'` leaves an existing row alone.
  */
 export function mergePut(
-  origin: Origin,
+  writer: Writer,
   existing: Row | undefined,
   put: {
     readonly kind: EntityKind;
@@ -114,35 +135,34 @@ export function mergePut(
   },
 ): Merge {
   const unlock = new Set(put.unlock ?? []);
+  const lock = (field: string): Lock | null => (writer.origin === 'manual' ? { field, actor: writer.actor, at: writer.at } : null);
   if (!existing) {
     const defaults = DEFAULTS.get(put.kind)!;
     const typed = (field: string, value: unknown) => value !== null && !(defaults.has(field) && sameJson(value, defaults.get(field)));
-    const locked =
-      origin === 'manual'
-        ? Object.entries(put.value)
-            .filter(([field, value]) => field !== 'id' && typed(field, value) && !unlock.has(field))
-            .map(([field]) => field)
-        : [];
-    return { change: 'insert', row: { doc: put.value, locked: locked.sort() }, skipped: [] };
+    const locks = Object.entries(put.value)
+      .filter(([field, value]) => field !== 'id' && typed(field, value) && !unlock.has(field))
+      .flatMap(([field]) => lock(field) ?? []);
+    return { change: 'insert', row: { doc: put.value, locks: locks.sort(byField) }, skipped: [] };
   }
   if (put.onExisting === 'keep') return { change: 'none', skipped: [] };
 
   const doc: Record<string, unknown> = { ...existing.doc };
-  const locked = new Set(existing.locked);
+  const locks = new Map(existing.locks.map((held) => [held.field, held]));
   const skipped: string[] = [];
   for (const [field, value] of Object.entries(put.value)) {
     if (sameJson(existing.doc[field], value)) continue;
-    if (origin === 'import' && locked.has(field)) {
+    if (writer.origin === 'import' && locks.has(field)) {
       skipped.push(field);
       continue;
     }
     doc[field] = value;
-    if (origin === 'manual') locked.add(field);
+    const taken = lock(field);
+    if (taken) locks.set(field, taken);
   }
-  for (const field of unlock) locked.delete(field);
+  for (const field of unlock) locks.delete(field);
 
-  const row = { doc, locked: [...locked].sort() };
-  const changed = !sameJson(row.doc, existing.doc) || !sameJson(row.locked, [...existing.locked].sort());
+  const row = { doc, locks: [...locks.values()].sort(byField) };
+  const changed = !sameJson(row.doc, existing.doc) || !sameJson(row.locks, [...existing.locks].sort(byField));
   return changed ? { change: 'update', row, skipped } : { change: 'none', skipped };
 }
 
