@@ -11,6 +11,7 @@ import {
   type SeasonId, type TeamId, type World,
 } from '@dtv/domain';
 import { fieldOf } from './fields';
+import { showValue } from './rows';
 
 interface Span {
   readonly line: number;
@@ -84,15 +85,13 @@ export type DiffRow =
   | { readonly kind: 'update'; readonly player: Player; readonly changes: readonly Change[]; readonly skipped: readonly SkippedField[] }
   | { readonly kind: 'missing'; readonly player: Player };
 
-export const show = (value: unknown): string => (value === null || value === undefined || value === '' ? '—' : typeof value === 'boolean' ? (value ? 'yes' : 'no') : String(value));
-
 const changesOf = (before: Player, after: Player): readonly Change[] =>
   Object.keys(after)
     .filter((key) => key !== 'id' && !sameJson((before as Record<string, unknown>)[key], (after as Record<string, unknown>)[key]))
     .map((key) => ({
       label: fieldOf('player', key)?.label ?? key,
-      from: show((before as Record<string, unknown>)[key]),
-      to: show((after as Record<string, unknown>)[key]),
+      from: showValue((before as Record<string, unknown>)[key]),
+      to: showValue((after as Record<string, unknown>)[key]),
     }));
 
 export interface RosterDiff {

@@ -29,7 +29,7 @@ describe('a session', () => {
     const blank = { teamId: 'drexel-mbb', seasonId: '2026-27', firstName: '', lastName: '', jersey: '' };
     const idFor = (_kind: string, draft: Record<string, unknown>) => (draft.lastName ? `drexel-mbb@2026-27/${String(draft.lastName).toLowerCase()}` : null);
     let session = openNewSession('player', blank, rev(3));
-    expect(readyToSave(session, idFor)).toEqual({ ok: false, message: 'Type a name first' });
+    expect(readyToSave(session, idFor)).toEqual({ ok: false, message: 'Give it a name no other row has' });
     session = typeInto(typeInto(session, field('lastName'), 'House'), field('jersey'), '14');
     expect(readyToSave(session, idFor)).toMatchObject({ ok: true, doc: { id: 'drexel-mbb@2026-27/house', lastName: 'House', jersey: '14' } });
     expect(problemsOf(openNewSession('player', blank, rev(3)))).toMatchObject({ lastName: expect.any(String), jersey: 'one or two digits' });

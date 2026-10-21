@@ -175,7 +175,7 @@ export function validate(kind: EditableKind, doc: Doc): Validated {
   for (const issue of parsed.error.issues) {
     const id = issue.path.join('.');
     const spec = fieldOf(kind, id);
-    if (spec) errors[id] ??= spec.hint ?? issue.message;
+    if (spec) errors[id] ??= spec.hint ?? (issue.code === 'too_small' && issue.origin === 'string' ? 'required' : issue.message);
     else general ??= `${id || 'record'}: ${issue.message}`;
   }
   return { ok: false, errors, general };
