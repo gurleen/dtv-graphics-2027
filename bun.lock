@@ -44,6 +44,19 @@
         "zod": "^4.6.7",
       },
     },
+    "apps/site": {
+      "name": "@dtv/site",
+      "dependencies": {
+        "@dtv/domain": "workspace:*",
+        "@dtv/graphics": "workspace:*",
+        "@dtv/playout": "workspace:*",
+        "@dtv/renderer": "workspace:*",
+      },
+      "devDependencies": {
+        "@dtv/db": "workspace:*",
+        "playwright": "1.64.1",
+      },
+    },
     "graphics/basketball-v2": {
       "name": "@dtv/basketball-v2",
       "dependencies": {
@@ -137,6 +150,8 @@
     "@dtv/renderer-page": ["@dtv/renderer-page@workspace:apps/renderer"],
 
     "@dtv/server": ["@dtv/server@workspace:apps/server"],
+
+    "@dtv/site": ["@dtv/site@workspace:apps/site"],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.11.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA=="],
 

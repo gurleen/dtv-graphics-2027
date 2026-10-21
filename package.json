@@ -38,9 +38,11 @@
     "ograf:build:basketball-v2-talent-lower-third-double": "bun ograf/scripts/build_package.ts ograf/graphics/basketball_v2_talent_lower_third_double",
     "ograf:build:basketball-v2-talent-lower-third-triple": "bun ograf/scripts/build_package.ts ograf/graphics/basketball_v2_talent_lower_third_triple",
     "ograf:harness": "bun ograf/harness/serve.ts",
-    "site:build": "bun run ograf:build && bun run site:assemble",
-    "site:assemble": "bun site/scripts/build_site.ts",
+    "site:build": "bun run riv:build && bun run site:assemble",
+    "site:assemble": "bun apps/site/scripts/build.ts",
     "site:preview": "wrangler dev",
+    "site:serve": "bun apps/site/scripts/serve.ts",
+    "site:screenshots": "bun apps/site/scripts/screenshots.ts",
     "site:deploy": "wrangler deploy"
   },
   "dependencies": {

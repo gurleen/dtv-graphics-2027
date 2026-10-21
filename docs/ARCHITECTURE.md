@@ -433,8 +433,13 @@ from a CDN that a venue network may block.
 ### The site
 
 The site build seeds an in-memory database and writes `world.json` with the snapshot, the demo game's live state,
-and a show with one cue per graphic from each entry's `demo`. In the browser, `createLocalShow` runs the same
-reducer and projector as the server, and the same renderer draws it. The site needs no server.
+and a show with one cue per graphic from each entry's `demo`. It copies the signed scenes, the images the cues bind,
+and the fonts. In the browser, `createLocalShow` (in `@dtv/playout`, pure) runs the same reducer and projector as the
+server over that fixed World, and the same renderer draws it. The site needs no server.
+
+A person's edit on the site is a rundown edit: `edit` rewrites the cue's params or overrides in the local show and
+refreshes the slot on air. A property in `frozenOnAir` takes the graphic again, because the scene reads it only
+before the intro.
 
 ## 6. Build order
 
