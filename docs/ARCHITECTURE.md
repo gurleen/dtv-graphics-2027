@@ -505,7 +505,7 @@ Each phase ends in a check that runs on the real artifact.
 | 2.2 Live | `@dtv/api`, the show reducer and projector, the scene codegen with two registry entries, `apps/server` | a second client sees the first client's writes over the WebSocket, streams reconnect after a server restart, the clock re-projects on its boundaries |
 | 3 Renderer and site | the other registry entries, `@dtv/renderer`, `/renderer`, the signed `.riv` build, the site on the new renderer, then `ograf/` deleted | the golden test for all 17 scenes, `/renderer` frames compared with the phase 0 captures, the site build |
 | 4 Controller | wireframes first, then the show page and the data page | two controllers in two browsers stay in sync; every graphic goes through preview, take and program |
-| 5 Show day | a rehearsal in OBS | a full mock show |
+| 5 Show day | game keys, resend through a drop, saved shows, the verify skill | a scripted game from tip-off to final through the controller and `/renderer` in Chromium, with a server kill mid-half (OBS left out at the owner's request) |
 
 ## 7. Open questions for the owner
 
