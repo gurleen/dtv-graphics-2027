@@ -24,7 +24,11 @@ export function connect(options: { readonly url: string; readonly client?: strin
   const websocket = new ReconnectingWebSocket(url.toString(), [], { minReconnectionDelay: 250, maxReconnectionDelay: 2000 });
   // partysocket forwards `send` and `readyState` to a real WebSocket; only its declared types differ from the DOM's.
   const api: Api = createORPCClient(new RPCLink({ websocket: websocket as unknown as WebSocket }));
-  return { api, close: () => websocket.close() };
+  return {
+    api,
+    // Aborting a stream sends its abort message a few microtasks later; closing in the same tick would make that send throw.
+    close: () => setTimeout(() => websocket.close()),
+  };
 }
 
 export type WatchStatus = 'live' | 'reconnecting';
