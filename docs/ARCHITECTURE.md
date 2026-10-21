@@ -183,8 +183,10 @@ Three more tables hold what is not an entity.
 
 `migrate` compares each table's SQL with what `tableSql(kind)` derives and rebuilds the tables that differ, with
 SQLite's documented rebuild. A second run finds nothing to do. An added field needs no migration, because every
-load parses each document and the schema's `.default()` fills it in. A rename is a `DocMigration`, applied once
-under `PRAGMA user_version`. A document that fails its schema on load stops the server and names its kind and id.
+load parses each document and the schema's `.default()` fills it in. A rename is `renameField`, a `DocMigration`
+applied once under `PRAGMA user_version`. It moves the field in each document and in each row's `locked` list. A
+table rebuilt in the same run copies its rows through the pending migrations, so its generated columns read the
+renamed field. A document that fails its schema on load stops the server and names its kind and id.
 
 `VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every show
 activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept.
