@@ -7,23 +7,31 @@ import type { ProgramCode } from './programs';
  * An id never changes after creation, even when the name it was made from is edited.
  */
 const SLUG = /^[a-z0-9]+(?:[-@./][a-z0-9]+)*$/;
-const slugId = <B extends string>() => z.string().regex(SLUG).brand<B>();
+/**
+ * `ref` names the entity kind of the rows an id points at, so a params form offers a picker
+ * of those rows. A string, not EntityKind: the entities are built from these ids.
+ */
+const slugId = <B extends string>(ref?: string) => {
+  const id = z.string().regex(SLUG).brand<B>();
+  return ref ? id.meta({ ref }) : id;
+};
 
-export const ConferenceId = slugId<'ConferenceId'>();
-export const SchoolId = slugId<'SchoolId'>();
-export const TeamId = slugId<'TeamId'>();
+export const ConferenceId = slugId<'ConferenceId'>('conference');
+export const SchoolId = slugId<'SchoolId'>('school');
+export const TeamId = slugId<'TeamId'>('team');
 export const SeasonId = z
   .string()
   .regex(/^\d{4}-\d{2}$/)
-  .brand<'SeasonId'>();
-export const TeamSeasonId = slugId<'TeamSeasonId'>();
-export const PlayerId = slugId<'PlayerId'>();
-export const StaffId = slugId<'StaffId'>();
-export const TalentId = slugId<'TalentId'>();
-export const SponsorId = slugId<'SponsorId'>();
-export const VenueId = slugId<'VenueId'>();
-export const GameId = slugId<'GameId'>();
-export const ShowId = slugId<'ShowId'>();
+  .brand<'SeasonId'>()
+  .meta({ ref: 'season' });
+export const TeamSeasonId = slugId<'TeamSeasonId'>('teamSeason');
+export const PlayerId = slugId<'PlayerId'>('player');
+export const StaffId = slugId<'StaffId'>('staff');
+export const TalentId = slugId<'TalentId'>('talent');
+export const SponsorId = slugId<'SponsorId'>('sponsor');
+export const VenueId = slugId<'VenueId'>('venue');
+export const GameId = slugId<'GameId'>('game');
+export const ShowId = slugId<'ShowId'>('show');
 export const CueId = slugId<'CueId'>();
 /** `<package>/<graphic>`, e.g. `basketball-v2/scorebug`. Checked against the registry at the API boundary. */
 export const GraphicId = slugId<'GraphicId'>();
