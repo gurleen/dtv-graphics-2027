@@ -142,7 +142,8 @@ Most data arrives prefilled, and people correct it on the data page. These rules
   still includes Delaware.
 
 The roster importer runs in two steps. `parseRosterCsv` reports every bad row. `planRoster` matches each row to an
-existing player by `sourceKey`, then by jersey and last name, then by full name. It returns adds, updates, an
+existing player by `sourceKey`, then by the id the row would get, then by jersey and last name, then by full name.
+Ids never change, so the id pass finds a player whose name a person corrected since the file was written. It returns adds, updates, an
 unchanged count, players missing from the file, and the edits. The data page shows the plan, and the operator
 commits it with `data.apply`. Planning the same file again returns an empty plan. Missing players are deleted only
 when the operator asks (`prune`).

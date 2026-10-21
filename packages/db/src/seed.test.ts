@@ -3,7 +3,7 @@ import { cpSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  basketball, ConferenceId, GameId, indexWorld, parseRosterCsv, planRoster, resolveGame, SeasonId, TeamId,
+  basketball, ConferenceId, GameId, indexWorld, parseRosterCsv, planRoster, PlayerId, resolveGame, SeasonId, TeamId,
 } from '@dtv/domain';
 import { commitEdits, type Db, loadLive, loadSnapshot, migrate, openDb, seed } from './index';
 
@@ -51,6 +51,17 @@ describe('seed', () => {
     expect(edited.ok).toBe(true);
     await seed(db, { dir: SEED_DIR, at: 3 });
     expect(world().get('school', drexel.id)?.mascot).toBe('Mario');
+  });
+
+  test('a second run after a person corrects a last name adds no duplicate player', async () => {
+    await seed(db, { dir: SEED_DIR, at: 1 });
+    const hipps = world().get('player', PlayerId.parse('drexel-mbb@2026-27/hipps'))!;
+    const edited = commitEdits(db, { actor: 'data-page', at: 2, batch: { origin: 'manual', basis: loadSnapshot(db).revision, edits: [{ op: 'put', kind: 'player', value: { ...hipps, lastName: 'Hipp' } }] } });
+    expect(edited.ok).toBe(true);
+    expect(await seed(db, { dir: SEED_DIR, at: 3 })).toMatchObject({ inserted: 0, updated: 0 });
+    expect(world().roster(hipps.teamId, hipps.seasonId).filter((player) => player.jersey === '0').map((player) => [player.id, player.lastName])).toEqual([
+      ['drexel-mbb@2026-27/hipps', 'Hipp'],
+    ]);
   });
 
   test('a second run leaves a row a feed updated since alone', async () => {
