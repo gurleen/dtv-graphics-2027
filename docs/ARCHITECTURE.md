@@ -246,8 +246,9 @@ the local network.
 ### Streams send whole values, newest only
 
 Every `watch` yields complete values. A change marks the stream dirty and wakes it. The stream recomputes its value
-and sends it only if it differs from the last one sent. A slow consumer gets the newest value, never a backlog, and
-a client that reconnects has caught up as soon as its first value arrives.
+and sends it only if it differs from the last one sent. Newest-only holds at the stream, which skips the values a
+slow consumer never pulled, not in the socket's send buffer, which still delivers what it holds in order. A client
+that reconnects has caught up as soon as its first value arrives.
 
 Each stream wakes only on the changes its value reads. `data.watch` wakes on data commits and compares revisions.
 `game.watch` wakes on live changes and on data commits, which add and remove games, and compares its game's state.
