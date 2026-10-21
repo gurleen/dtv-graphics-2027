@@ -1,4 +1,5 @@
 build/
+data/db/
 node_modules/
 .wrangler/
 .DS_Store

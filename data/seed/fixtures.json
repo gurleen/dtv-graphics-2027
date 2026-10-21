@@ -1,0 +1,133 @@
+{
+  "teams": { "season": "2026-27", "programs": ["mbb", "wbb"] },
+  "entities": {
+    "season": [
+      { "id": "2025-26", "name": "2025-26" },
+      { "id": "2026-27", "name": "2026-27" }
+    ],
+    "conference": [
+      { "id": "caa", "name": "Coastal Athletic Association", "logo": "/assets/images/CAAWhite.png" },
+      { "id": "a-10", "shortName": "A10" }
+    ],
+    "school": [
+      { "id": "saint-josephs", "abbreviation": "SJU" }
+    ],
+    "teamSeason": [
+      {
+        "id": "drexel-mbb@2026-27",
+        "overall": { "wins": 14, "losses": 6 },
+        "conference": { "wins": 6, "losses": 3 },
+        "stats": { "sport": "basketball", "gp": 20, "totals": { "pts": 1568 }, "opponentPts": 1338 }
+      },
+      { "id": "saint-josephs-mbb@2026-27", "overall": { "wins": 15, "losses": 5 }, "conference": { "wins": 7, "losses": 2 } },
+      { "id": "delaware-mbb@2026-27", "conferenceId": "c-usa" },
+      { "id": "delaware-wbb@2026-27", "conferenceId": "c-usa" },
+      { "id": "unc-wilmington-mbb@2025-26", "teamId": "unc-wilmington-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 1, "conference": { "wins": 15, "losses": 3 }, "overall": { "wins": 27, "losses": 7 }, "streak": "L1" },
+      { "id": "charleston-mbb@2025-26", "teamId": "charleston-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 2, "conference": { "wins": 14, "losses": 4 }, "overall": { "wins": 21, "losses": 11 }, "streak": "L1" },
+      { "id": "hofstra-mbb@2025-26", "teamId": "hofstra-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 3, "conference": { "wins": 12, "losses": 6 }, "overall": { "wins": 24, "losses": 11 }, "streak": "L1" },
+      { "id": "monmouth-mbb@2025-26", "teamId": "monmouth-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 4, "conference": { "wins": 11, "losses": 7 }, "overall": { "wins": 19, "losses": 15 }, "streak": "L1" },
+      { "id": "drexel-mbb@2025-26", "teamId": "drexel-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 5, "conference": { "wins": 10, "losses": 8 }, "overall": { "wins": 17, "losses": 16 }, "streak": "L1" },
+      { "id": "william-mary-mbb@2025-26", "teamId": "william-mary-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 6, "conference": { "wins": 10, "losses": 8 }, "overall": { "wins": 20, "losses": 12 }, "streak": "L1" },
+      { "id": "towson-mbb@2025-26", "teamId": "towson-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 7, "conference": { "wins": 9, "losses": 9 }, "overall": { "wins": 19, "losses": 15 }, "streak": "L1" },
+      { "id": "stony-brook-mbb@2025-26", "teamId": "stony-brook-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 8, "conference": { "wins": 9, "losses": 9 }, "overall": { "wins": 17, "losses": 15 }, "streak": "L4" },
+      { "id": "campbell-mbb@2025-26", "teamId": "campbell-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 9, "conference": { "wins": 8, "losses": 10 }, "overall": { "wins": 16, "losses": 18 }, "streak": "L1" },
+      { "id": "hampton-mbb@2025-26", "teamId": "hampton-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 10, "conference": { "wins": 7, "losses": 11 }, "overall": { "wins": 13, "losses": 19 }, "streak": "L2" },
+      { "id": "elon-mbb@2025-26", "teamId": "elon-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 11, "conference": { "wins": 6, "losses": 12 }, "overall": { "wins": 14, "losses": 18 }, "streak": "L5" },
+      { "id": "north-carolina-a-t-mbb@2025-26", "teamId": "north-carolina-a-t-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 12, "conference": { "wins": 4, "losses": 14 }, "overall": { "wins": 11, "losses": 19 }, "streak": "L4" },
+      { "id": "northeastern-mbb@2025-26", "teamId": "northeastern-mbb", "seasonId": "2025-26", "conferenceId": "caa", "rank": 13, "conference": { "wins": 2, "losses": 16 }, "overall": { "wins": 7, "losses": 24 }, "streak": "L1" }
+    ],
+    "playerStats": [
+      {
+        "id": "drexel-mbb@2026-27/reed-josh",
+        "stats": { "sport": "basketball", "gp": 20, "totals": { "pts": 368, "reb": 144, "ast": 62, "fgm": 132, "fga": 274 } }
+      }
+    ],
+    "staff": [
+      { "id": "drexel-mbb@2026-27/spiker-zach", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Zach", "lastName": "Spiker", "title": "Head Coach", "detail": "11th season" }
+    ],
+    "talent": [
+      { "id": "rob-brooks", "firstName": "Rob", "lastName": "Brooks", "role": "Play-by-Play" },
+      { "id": "mike-tuberosa", "firstName": "Mike", "lastName": "Tuberosa", "role": "Color Analyst" },
+      { "id": "tessa-peloso", "firstName": "Tessa", "lastName": "Peloso", "role": "Sideline Reporter" }
+    ],
+    "sponsor": [
+      { "id": "independence-blue-cross", "name": "Independence Blue Cross", "logoOnDark": "/assets/images/sponsors/independence_blue_cross.png" },
+      { "id": "drexel-physical-therapy", "name": "Drexel Physical Therapy", "logoOnLight": "/assets/images/sponsors/drexel_physical_therapy_trimmed.png" },
+      { "id": "rothman-orthopaedics", "name": "Rothman Orthopaedics", "logoOnLight": "/assets/images/sponsors/rothman_orthopaedics.png" },
+      { "id": "steamfitters-local-420", "name": "Steamfitters Local 420", "logoOnLight": "/assets/images/sponsors/steamfitters_local_420_logo.png" },
+      { "id": "belfor", "name": "Belfor", "logoOnLight": "/assets/images/sponsors/belfor_trimmed.png" }
+    ],
+    "sponsorship": [
+      { "id": "basketball-v2/scorebug", "sponsorId": "independence-blue-cross" },
+      { "id": "basketball-v2/score-to-break", "sponsorId": "independence-blue-cross" },
+      { "id": "basketball-v2/matchup-locator", "sponsorId": "independence-blue-cross" },
+      { "id": "basketball-v2/matchup-locator-lower-third", "sponsorId": "independence-blue-cross" },
+      { "id": "basketball-v2/starting-five", "sponsorId": "independence-blue-cross" },
+      { "id": "basketball-v2/halftime-statistics", "sponsorId": "drexel-physical-therapy" },
+      { "id": "basketball-v2/halftime-adjustments", "sponsorId": "rothman-orthopaedics" },
+      { "id": "basketball-v2/burning-question", "sponsorId": "steamfitters-local-420" },
+      { "id": "basketball-v2/player-of-the-game", "sponsorId": "steamfitters-local-420" },
+      { "id": "basketball-v2/player-to-watch", "sponsorId": "belfor" }
+    ],
+    "venue": [
+      { "id": "daskalakis-athletic-center", "name": "Daskalakis Athletic Center", "city": "Philadelphia", "state": "PA" }
+    ],
+    "game": [
+      {
+        "id": "2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb",
+        "seasonId": "2026-27",
+        "program": "mbb",
+        "awayTeamId": "saint-josephs-mbb",
+        "homeTeamId": "drexel-mbb",
+        "venueId": "daskalakis-athletic-center",
+        "startsAt": "2026-11-08T19:00:00-05:00",
+        "conferenceGame": false,
+        "title": "College Basketball"
+      }
+    ],
+    "show": [
+      {
+        "id": "drexel-sju",
+        "name": "Saint Joseph's at Drexel",
+        "gameId": "2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb",
+        "crew": [{ "talentId": "rob-brooks" }, { "talentId": "mike-tuberosa" }, { "talentId": "tessa-peloso" }],
+        "rundown": []
+      }
+    ]
+  },
+  "live": [
+    {
+      "sport": "basketball",
+      "gameId": "2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb",
+      "phase": "live",
+      "period": 2,
+      "clock": { "running": false, "remainingMs": 839000 },
+      "shotClock": { "running": false, "remainingMs": 24000 },
+      "score": { "away": 68, "home": 72 },
+      "timeouts": { "away": 3, "home": 4 },
+      "bonus": { "away": false, "home": true },
+      "possession": "home",
+      "starters": {
+        "away": [
+          "saint-josephs-mbb@2026-27/carey",
+          "saint-josephs-mbb@2026-27/johnson",
+          "saint-josephs-mbb@2026-27/glover-toscano",
+          "saint-josephs-mbb@2026-27/logan",
+          "saint-josephs-mbb@2026-27/marrs"
+        ],
+        "home": [
+          "drexel-mbb@2026-27/reed-josh",
+          "drexel-mbb@2026-27/hipps",
+          "drexel-mbb@2026-27/tingler",
+          "drexel-mbb@2026-27/edomwonyin",
+          "drexel-mbb@2026-27/de-laporterie"
+        ]
+      },
+      "team": { "away": {}, "home": {} },
+      "players": {
+        "drexel-mbb@2026-27/reed-josh": { "pts": 18, "reb": 7, "ast": 4, "tpm": 3, "tpa": 5 }
+      },
+      "authority": { "clock": "operator", "score": "operator", "stats": "operator" }
+    }
+  ]
+}

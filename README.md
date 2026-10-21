@@ -28,6 +28,25 @@ bun run site:build           # stakeholder preview website in build/site/
 bun run site:deploy          # publish that website to Cloudflare Workers
 ```
 
+## Data
+
+Two Bun workspace packages hold the data model. `@dtv/domain` (`packages/domain/`)
+has the entities, the basketball rules, edits and the importers, and runs in a
+browser. `@dtv/db` (`packages/db/`) owns the SQLite file, `data/db/dtv.sqlite`.
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) describes both.
+
+```bash
+bun run db:seed              # migrate, then fill the file from data/seed/
+bun run db:migrate           # bring the file to the schema the code expects
+bun run db:backup            # copy the file to data/db/backups/; the newest 30 stay
+bun run check                # typecheck, check package imports, run the tests
+```
+
+Run `db:seed` with the server stopped, because the server is the only process
+that writes the file. A second seed writes nothing, and it never resets a row
+that someone changed. [`data/seed/README.md`](data/seed/README.md) describes the
+seed files and the roster CSV header.
+
 ## Layout
 
 | Path | Contents |
@@ -35,7 +54,11 @@ bun run site:deploy          # publish that website to Cloudflare Workers
 | `graphics/basketball-v2/` | Current graphics: the `.rml` scenes, Luau controllers and generators |
 | `ograf/` | Packaging: build script, shared web component, local harness, one directory per package |
 | `site/` | Stakeholder preview website: build script and viewer, published as static assets (`wrangler.jsonc`) |
-| `data/seed/` | The vendored team dataset (`teams.json`) and the module that normalizes it (`teams.ts`) |
+| `packages/domain/` | `@dtv/domain`: entities, sport rules, edits and importers |
+| `packages/db/` | `@dtv/db`: the SQLite schema, migrations, commits, seed and backups |
+| `data/seed/` | The seed: the vendored team dataset (`teams.json`), `fixtures.json` and roster CSVs |
+| `data/db/` | The SQLite file and its backups, not committed |
+| `scripts/check_deps.ts` | Fails `bun run check` when a package imports what its directory may not |
 | `scripts/render_frames.ts` | Renders frames and contact sheets for reviewing motion |
 | `scripts/baseline.ts` | Captures every scene's on-air frame and compares two captures, to prove a change left the pixels alone |
 | `docs/` | Porting tracker and the vendored OGraf specification |

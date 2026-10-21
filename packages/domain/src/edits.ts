@@ -27,6 +27,10 @@ export const isPutOf = <K extends EntityKind>(edit: { readonly op: 'put' | 'dele
 export const putValues = <K extends EntityKind>(edits: readonly DataEdit[], kind: K): EntityOf<K>[] =>
   edits.flatMap((edit) => (isPutOf(edit, kind) ? [edit.value] : []));
 
+/** A put of a kind chosen at run time. The cast only restates that ImportEdit has a member for every kind. */
+export const importPut = <K extends EntityKind>(kind: K, value: EntityOf<K>, onExisting?: 'keep'): ImportEdit =>
+  ({ op: 'put', kind, value, ...(onExisting && { onExisting }) }) as ImportEdit;
+
 /**
  * `basis` is the World revision the writer read. A put or delete of a row written after
  * it fails the whole batch, so one editor never overwrites another. A person always has one.
