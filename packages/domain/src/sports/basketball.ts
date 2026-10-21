@@ -199,8 +199,13 @@ function nextLive(live: BasketballLive, command: BasketballCommand, now: EpochMs
       const move = command.action === 'start' ? startClock : stopClock;
       return { ...live, clock: move(live.clock, now), shotClock: live.shotClock && move(live.shotClock, now) };
     }
-    case 'clockSet':
-      return { ...live, clock: setClock(command.remainingMs, command.running ?? live.clock.running, now) };
+    case 'clockSet': {
+      const clock = setClock(command.remainingMs, command.running ?? live.clock.running, now);
+      if (command.running === undefined) return { ...live, clock };
+      // With `running` it is also a start or a stop, so the shot clock moves as `clock` moves it.
+      const move = command.running ? startClock : stopClock;
+      return { ...live, clock, shotClock: live.shotClock && move(live.shotClock, now) };
+    }
     case 'shotClock':
       // A reset during play keeps running with the game clock unless the command says otherwise.
       return {

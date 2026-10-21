@@ -121,7 +121,9 @@ resent packet changes nothing and two operators who press +2 for one basket agre
 the score. Only the `operator` source can hand a group to a feed or take it back.
 
 A running clock is `{ running: true, remainingMs, since }`, anchored on the server's time. Nothing ticks it.
-Every display is computed from `now` at projection time, so a restart cannot lose time.
+Every display is computed from `now` at projection time, so a restart cannot lose time. A clock command is
+anchored at the server's time when it arrives, so a resent `clockSet` with `running: true` starts again from its
+`remainingMs`, which is safe because `game.apply` never retries on its own and a feed sends its current time.
 
 ### Prefilled data and manual edits
 
