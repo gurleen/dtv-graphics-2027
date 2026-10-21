@@ -1,0 +1,17 @@
+{
+  "name": "@dtv/server",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/main.ts"
+  },
+  "dependencies": {
+    "@dtv/api": "workspace:*",
+    "@dtv/db": "workspace:*",
+    "@dtv/domain": "workspace:*",
+    "@dtv/graphics": "workspace:*",
+    "@dtv/playout": "workspace:*",
+    "@orpc/server": "^1.15.7",
+    "zod": "^4.6.7"
+  }
+}

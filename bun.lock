@@ -16,6 +16,18 @@
         "wrangler": "^4.143.1",
       },
     },
+    "apps/server": {
+      "name": "@dtv/server",
+      "dependencies": {
+        "@dtv/api": "workspace:*",
+        "@dtv/db": "workspace:*",
+        "@dtv/domain": "workspace:*",
+        "@dtv/graphics": "workspace:*",
+        "@dtv/playout": "workspace:*",
+        "@orpc/server": "^1.15.7",
+        "zod": "^4.6.7",
+      },
+    },
     "graphics/basketball-v2": {
       "name": "@dtv/basketball-v2",
       "dependencies": {
@@ -95,6 +107,8 @@
     "@dtv/graphics": ["@dtv/graphics@workspace:packages/graphics"],
 
     "@dtv/playout": ["@dtv/playout@workspace:packages/playout"],
+
+    "@dtv/server": ["@dtv/server@workspace:apps/server"],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.11.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA=="],
 
@@ -216,11 +230,21 @@
 
     "@orpc/contract": ["@orpc/contract@1.16.0", "", { "dependencies": { "@orpc/client": "1.16.0", "@orpc/shared": "1.16.0", "@standard-schema/spec": "^1.1.0", "openapi-types": "^12.1.3" } }, "sha512-c4zIU97j8994J5E0jBT+HFIaY/uIsp/dMD60XYk57HIq+5i41+fb9EH66bijRqjGxSODMpUXkFBgZ4eZSZ722g=="],
 
+    "@orpc/interop": ["@orpc/interop@1.16.0", "", {}, "sha512-A0xvBLi8XcHI141PM4afK97bgjfrdPjuYMK2XAw38CfAPXbNkUHNg7Z4fTEyCd155DlNu8CGrtV0vW4DtbBgaQ=="],
+
+    "@orpc/server": ["@orpc/server@1.16.0", "", { "dependencies": { "@orpc/client": "1.16.0", "@orpc/contract": "1.16.0", "@orpc/interop": "1.16.0", "@orpc/shared": "1.16.0", "@orpc/standard-server": "1.16.0", "@orpc/standard-server-aws-lambda": "1.16.0", "@orpc/standard-server-fastify": "1.16.0", "@orpc/standard-server-fetch": "1.16.0", "@orpc/standard-server-node": "1.16.0", "@orpc/standard-server-peer": "1.16.0", "cookie": "^1.1.1" }, "peerDependencies": { "crossws": ">=0.3.4", "ws": ">=8.18.1" }, "optionalPeers": ["crossws", "ws"] }, "sha512-U3FPnili8i03SLOh19xcqcIE6knuoeKS4lXR28jL4f/M1fzYqbhK9RaiNyHRdvU3GeLxMvMuanULhV3CNAIAUg=="],
+
     "@orpc/shared": ["@orpc/shared@1.16.0", "", { "dependencies": { "radash": "^12.1.1", "type-fest": "^5.4.4" }, "peerDependencies": { "@opentelemetry/api": ">=1.9.0" }, "optionalPeers": ["@opentelemetry/api"] }, "sha512-s7QGO1Qt7V6aLepx4D/63563YK0znxUSsV3w892S3SblSF8eATz+UhTaQtoWPoBKyzSPEoRLJYbBjy8DVQkKvA=="],
 
     "@orpc/standard-server": ["@orpc/standard-server@1.16.0", "", { "dependencies": { "@orpc/shared": "1.16.0" } }, "sha512-WEcaLZoiK7PG5Lf5tDFjws8MO3bKUBB2fDTr1QTjGfAKIrRiZsCcdQS314nRH/hEylI5d2YKaRbvRvq/0xJG5w=="],
 
+    "@orpc/standard-server-aws-lambda": ["@orpc/standard-server-aws-lambda@1.16.0", "", { "dependencies": { "@orpc/shared": "1.16.0", "@orpc/standard-server": "1.16.0", "@orpc/standard-server-fetch": "1.16.0", "@orpc/standard-server-node": "1.16.0" } }, "sha512-tfr9s5QZIn9Va/rGp0x7xKcUEqqzzg4Cvl0vcdvoLJqZ9NZ1XX00Q59Idm+y2ZPf78h0A7dj7Wi6T2y/r9uwNg=="],
+
+    "@orpc/standard-server-fastify": ["@orpc/standard-server-fastify@1.16.0", "", { "dependencies": { "@orpc/shared": "1.16.0", "@orpc/standard-server": "1.16.0", "@orpc/standard-server-node": "1.16.0" }, "peerDependencies": { "fastify": ">=5.6.1" }, "optionalPeers": ["fastify"] }, "sha512-7v58LxEyOv0IPR9R+cZDqG3lko3h3L1xDwryUNOKon6y78VwlluEKuT3QABpYo6+v/w0YkEQ20eCiXiems1rEQ=="],
+
     "@orpc/standard-server-fetch": ["@orpc/standard-server-fetch@1.16.0", "", { "dependencies": { "@orpc/shared": "1.16.0", "@orpc/standard-server": "1.16.0" } }, "sha512-/ETA9l1bClYvlXDuPqC4uOvgtS50bat6XnEbbEyQbRrxqvJDWRz+VCRLPdj861FOR8jOOINAiPMUntn6JPDgYw=="],
+
+    "@orpc/standard-server-node": ["@orpc/standard-server-node@1.16.0", "", { "dependencies": { "@orpc/shared": "1.16.0", "@orpc/standard-server": "1.16.0", "@orpc/standard-server-fetch": "1.16.0" } }, "sha512-5rhAsP0Kb9KqDuc39PMsp5lIjeFAxByslfBz56k484HnV9jbKF6uklarNFrJgAN1erw+4DXTRB8uf5c1bOhdCA=="],
 
     "@orpc/standard-server-peer": ["@orpc/standard-server-peer@1.16.0", "", { "dependencies": { "@orpc/shared": "1.16.0", "@orpc/standard-server": "1.16.0" } }, "sha512-/v4oZKKD4G9TeEEItcJD63RA02mWW+QAxr5+YTAmeEluRPUDQ8Y1uwTMsChfTgX0sSzMEomQj5B19A5sdOshZg=="],
 
