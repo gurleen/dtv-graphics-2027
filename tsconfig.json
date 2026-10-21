@@ -13,5 +13,5 @@
     "noEmit": true
   },
   "include": ["packages", "apps", "graphics", "scripts/check_deps.ts", "scripts/build_riv.ts"],
-  "exclude": ["graphics/*/generate_*.ts", "graphics/*/conference_teams.ts", "packages/renderer", "apps/renderer/*.ts", "apps/renderer/scripts/monitors/main.ts"]
+  "exclude": ["apps/site/*.ts", "graphics/*/generate_*.ts", "graphics/*/conference_teams.ts", "packages/renderer", "apps/renderer/*.ts", "apps/renderer/scripts/monitors/main.ts"]
 }

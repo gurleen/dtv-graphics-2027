@@ -224,7 +224,7 @@ const renderVariant = (variant: Variant) => {
   const TILES = Array.from({ length: CELL_COUNT }, (_, index) => tile(index));
 
   // View model properties. Underscored ones are written by the controller script (and,
-  // for _headshotOpacity, by the OGraf component); operators never set them.
+  // for _headshotOpacity, by the renderer); operators never set them.
   const P = {
     isPlaying: 1002, bodyMode: 1003,
     firstName: 1010, lastName: 1011, jerseyNumber: 1012, position: 1013, classYear: 1014,
@@ -299,8 +299,8 @@ const renderVariant = (variant: Variant) => {
   </Shape>`;
 
   // The frame spans the panel right of the marker and HEADSHOT_BREAKOUT above it; the clip
-  // crops only its sides and bottom, so a cutout's head stands above the block. The OGraf
-  // component lays motion media over exactly this rectangle (see its graphic.ts).
+  // crops only its sides and bottom, so a cutout's head stands above the block. The renderer
+  // lays motion media over exactly this rectangle (the entry's `overlay`).
   const HEADSHOT_FRAME_X = MARKER_WIDTH;
   const HEADSHOT_FRAME_WIDTH = HEADSHOT_WIDTH - MARKER_WIDTH;
   const HEADSHOT_FRAME_HEIGHT = BLOCK_HEIGHT + HEADSHOT_BREAKOUT;
@@ -308,7 +308,7 @@ const renderVariant = (variant: Variant) => {
   const headshotPanel = `<Node name="Headshot Panel" id="${HEADSHOT_PANEL}" x="0" y="0">
     <ClippingShape name="Headshot Reveal Clip" sourceId="${HEADSHOT_MASK}"/>
     <Node name="Headshot Rise" id="${HEADSHOT_RISE_NODE}" x="0" y="0">
-    <!-- Hidden (opacity 0) by the OGraf component while motion media plays over it. -->
+    <!-- Hidden (opacity 0) by the renderer while motion media plays over it. -->
     <Node name="Headshot Placement" id="${HEADSHOT_PLACEMENT}" x="${HEADSHOT_FRAME_X}" y="${-HEADSHOT_BREAKOUT}">${bound(P.headshotOpacity, OPACITY)}
       <!-- Layout components join the artboard's flow through plain nodes, so the frame is
            pinned absolute at this node's origin. -->

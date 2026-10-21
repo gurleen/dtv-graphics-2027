@@ -32,7 +32,7 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'apps/renderer/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'playwright', 'pngjs', 'node:*'],
   // The two-renderer proof page draws with the renderer, as the controller's monitors will.
   'apps/renderer/scripts/monitors': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', 'node:*'],
-  'apps/site/scripts': ['@dtv/db', '@dtv/graphics', '@dtv/playout', '@dtv/domain'],
+  'apps/site/scripts': ['@dtv/db', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'playwright', 'node:*'],
   'apps/site': ['@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain'],
 };
 

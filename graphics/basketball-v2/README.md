@@ -8,7 +8,10 @@ follows the design language below. The earlier ports (`graphics/10_*`,
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
 the id namespace registry (next free: 47), naming, and a five-step checklist
-from scene to OGraf package. This README describes the finished graphics.
+from scene to registry entry. This README describes the finished graphics.
+Intro and outro lengths are not kept by hand: `bun run codegen` reads every
+timeline's length from the scene into `scenes.gen.ts`, and the renderer waits
+that long.
 
 ## Design language
 
@@ -67,8 +70,7 @@ action-safe margin (block origin 96, 890; size 430 x 132).
   The joined seam light contracts to the centre and extinguishes last.
 - **Motion maintenance:** Hold keys every animated property at its resting
   value. Intro and Outro explicitly key the same properties so replay resets
-  the exit pose; Hidden also turns off the edge lights and sweep. Keep
-  the OGraf definition and manifest intro durations in sync with the timeline.
+  the exit pose; Hidden also turns off the edge lights and sweep.
 - **On air:** `isPlaying` true plays Intro then Hold; false plays Outro then
   Hidden. It defaults to false.
 
@@ -108,7 +110,6 @@ scorebug's baseline and height so the two can be on air together (block origin
   and closes the panels toward the seam with a brief edge light.
 - **Motion maintenance:** Hold and Outro key every intro property at its
   resting value. Hidden turns off the panels, shadow, edge lights and sheen.
-  Keep OGraf action durations in sync with the timelines.
 - **On air:** `isPlaying`, as on the scorebug.
 
 Text is shown as entered; Rive has no case transform, so send names in capitals.
@@ -144,7 +145,6 @@ origin 610, 890; size 700 x 132; 84 units clear of the scorebug).
   and closes the panels toward the seam with a brief edge light.
 - **Motion maintenance:** Hold and Outro key every intro property at its
   resting value. Hidden turns off the panels, shadow, edge lights and sheen.
-  Keep OGraf action durations in sync with the timelines.
 - **On air:** `isPlaying`, as on the scorebug.
 
 View model `BasketballStaffLowerThirdV2`, public properties: `isPlaying`,
@@ -185,9 +185,6 @@ View model `BasketballTeamLowerThirdV2`, public properties: `isPlaying`,
 `bodyMode` (`STATS` or `TEXT`), `school`, `mascot`, `bodyText`, `statNValue`
 and `statNLabel` for N = 1 to 4, `teamLogo`, `teamPrimaryColor`,
 `teamSecondaryColor`. Send text in capitals.
-
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-team-lower-third`.
 
 ## Matchup locator (`matchup_locator.rml`)
 
@@ -286,8 +283,7 @@ scorebug, so it is for pre-game only; never put the two on air together.**
 - **Motion maintenance:** Hold and Outro key every property the intro animates
   at its resting value; Hidden turns off the panel groups, edge lights, shadow
   and sweeps. The block shadow is one outline round the band and the strip,
-  its bottom edge keyed to follow the strip; the tab casts its own. Keep the
-  OGraf durations (1400 / 400 ms) in sync with the timelines.
+  its bottom edge keyed to follow the strip; the tab casts its own.
 - **On air:** `isPlaying`, as on the scorebug.
 
 View model `BasketballMatchupLocatorLowerThirdV2`, public properties:
@@ -298,9 +294,6 @@ alone), `awayOverallRecord`/`homeOverallRecord`,
 `awayLogo`/`homeLogo`, `awayPrimaryColor`/`homePrimaryColor`,
 `awaySecondaryColor`/`homeSecondaryColor`, `venueName`, `venueLocation` (blank
 hides it), `sponsorLogo`. Send text in capitals.
-
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-matchup-locator-lower-third`.
 
 ## Talent lower thirds (`talent_lower_third_{single,double,triple}.rml`)
 
@@ -338,7 +331,7 @@ and are meant for shots without it (pregame, halftime, the desk).
   close the blocks toward the centre with a brief edge light.
 - **Motion maintenance:** the generator keys Hold and Outro from the same
   property list as the Intro; Hidden turns off both panel groups, the edge
-  lights, shadow and sheen. Keep the OGraf durations in sync with the timelines.
+  lights, shadow and sheen.
 - **On air:** `isPlaying`, as on the scorebug.
 
 View models `BasketballTalentLowerThirdSingleV2`, `…DoubleV2` and
@@ -350,7 +343,7 @@ N = 1 up to the talent count, numbered left to right. Send text in capitals.
 One team's starting lineup, presented by Independence Blue Cross, on the
 scorebug's baseline and height so the two can be on air together (block origin
 550, 890; size 1274 x 132; 24 units clear of the scorebug, as the player lower
-third). A two-step OGraf graphic: step 0 shows the away team, step 1 the home
+third). A two-step graphic (`steps` in its registry entry): step 0 shows the away team, step 1 the home
 team, and advancing on air changes team without taking the glass down.
 
 - **Generated.** `generate_starting_five_lower_third.ts` writes the `.rml` from
@@ -380,9 +373,7 @@ team, and advancing on air changes team without taking the glass down.
   being played.
 - **State machine:** two layers. Display (Hidden → Intro → Hold → Outro) follows
   `isPlaying`; Team (Away Shown, Home Shown and the two changes) follows `step`
-  and only animates while `isPlaying` is true. Keep the OGraf durations
-  (`introDuration`, `outroDuration`, `steps.transitionDuration`) in sync with
-  the timelines.
+  and only animates while `isPlaying` is true.
 
 View model `BasketballStartingFiveLowerThirdV2`, public properties:
 `isPlaying`, `step` (0 away, 1 home), `sponsorLogo`, and for each of `away` and
@@ -437,24 +428,19 @@ View model `BasketballPlayerToWatchLowerThirdV2`, public properties:
 `statNLabel` for N = 1 to 4, `bodyText`, `headshot`, `teamLogo`,
 `teamPrimaryColor`, `teamSecondaryColor`, `sponsorLogo`. Send text in capitals.
 
-**Motion headshot.** The OGraf package also takes `headshotMediaUrl`: an MP4,
-WebM or animated GIF played muted and looping in place of the still. The Rive
-runtime draws no video, so the package lays a web element over the canvas,
-exactly on the headshot frame, animates it in step with the intro and outro,
-and hides the still (`_headshotOpacity`) while it plays. Media that fails to
-load within 5 s falls back to the still. Rive screenshots, `render_frames.ts`
-and the package thumbnail never show it; test it in `bun run ograf:harness`.
-Send an empty string to go back to the still: omitting the key leaves the media
-unchanged. Crop motion media to 212:304 (portrait); it is scaled to cover the
-frame and anchored at the top.
+**Motion headshot.** When the player has a `motionHeadshot` URL (an MP4, WebM or
+animated GIF), the registry entry's `overlay` plays it muted and looping in
+place of the still. The Rive runtime draws no video, so the renderer lays a web
+element over the canvas, exactly on the headshot frame, animates it in step with
+the intro and outro, and hides the still (`_headshotOpacity`) while it plays.
+Media that fails to load within 5 s falls back to the still. Rive screenshots
+and `render_frames.ts` never show it; check it on `/renderer`. Crop motion media
+to 212:304 (portrait); it is scaled to cover the frame and anchored at the top.
 
 **Sponsor asset.** `assets/images/sponsors/belfor.png` is the source;
 `belfor_trimmed.png` beside it is the 1600-wide export the scene uses, with the
 transparent margin cropped. Re-export with
 `ffmpeg -i belfor.png -vf "crop=7501:2508:251:246,scale=1600:-1:flags=lanczos" -pix_fmt rgba belfor_trimmed.png`.
-
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-player-to-watch-lower-third`.
 
 ## Player of the Game lower third (`player_of_the_game_lower_third.rml`)
 
@@ -472,11 +458,8 @@ same way, so take the scorebug off air first.
   context tag `VS ST. JOHN'S`.
 
 View model `BasketballPlayerOfTheGameLowerThirdV2`, with the same public
-properties as Player to Watch. The OGraf package reuses Player to Watch's
-field table (`featureFields`) and web component, motion headshot included.
-
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-player-of-the-game-lower-third`.
+properties as Player to Watch. Its registry entry shares Player to Watch's
+params and motion headshot overlay (`player-feature.ts`).
 
 ## Halftime statistics card (`halftime_statistics.rml`)
 
@@ -548,9 +531,6 @@ stay clean. Re-export from `assets/images/sponsors/` with
 D='max(max(255-r(X,Y),255-g(X,Y)),255-b(X,Y))' && ffmpeg -y -i drexel_physical_therapy.png -vf "crop=659:184:524:784,scale=1600:-1:flags=lanczos,format=rgba,geq=r='st(0,$D);if(gt(ld(0),0),clip(255-(255-r(X,Y))*255/ld(0),0,255),0)':g='st(0,$D);if(gt(ld(0),0),clip(255-(255-g(X,Y))*255/ld(0),0,255),0)':b='st(0,$D);if(gt(ld(0),0),clip(255-(255-b(X,Y))*255/ld(0),0,255),0)':a='st(0,$D);if(gt(ld(0),4),ld(0),0)'" -pix_fmt rgba drexel_physical_therapy_trimmed.png
 ```
 
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-halftime-statistics`.
-
 ## Conference standings card (`conference_standings.rml`)
 
 The CAA standings: the conference's thirteen teams in order, one row per
@@ -597,8 +577,9 @@ View model `BasketballConferenceStandingsV2`, public properties: `isPlaying`,
 `sport` (`MEN'S BASKETBALL` or `WOMEN'S BASKETBALL`), `awayTeam`/`homeTeam`
 (default `CAMPBELL`/`DREXEL`), and `rowNTeam`, `rowNConferenceRecord`,
 `rowNOverallRecord` and `rowNStreak` for N = 1 to 13. The defaults are the
-2025-26 final regular-season standings. In the OGraf package the sport and
-every team field are selects, so an operator cannot misspell a team.
+2025-26 final regular-season standings. The registry entry's only param is the
+season. It fills the sport, the tinted teams and every row from the show's game
+and the standings data, so an operator cannot misspell a team.
 
 **Logos.** `assets/images/caa/` holds one full-colour mark per member, from
 `https://images.dragonstv.io/logos/<NAME>.PNG` (for example `CAMPBELL`,
@@ -613,11 +594,7 @@ rows 340 down): its arched black wordmark vanishes on dark glass.
 Each row adds 52 to the card's height, and the card is anchored at the
 bottom, so a fourteenth row would lift its top to y 18, outside the safe
 area: reduce `ROW_HEIGHT` as well. The generator refuses to write a scene
-whose last row lights after the intro ends; lengthen `INTRO_FRAMES` (and the
-package durations) to match.
-
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-conference-standings`.
+whose last row lights after the intro ends; lengthen `INTRO_FRAMES` to match.
 
 ## Halftime adjustments (`halftime_adjustments.rml`)
 
@@ -626,7 +603,7 @@ takes the Burning Question's form, mirrored: the text is left-aligned, and the
 sponsor chip and the marker sit on the outer (left) edge. It takes the
 scorebug's corner and is never on air with it: left on the action-safe margin,
 foot on the lower thirds' foot (block origin 96, 762; size 760 x 260). A
-two-step OGraf graphic, as the starting five: step 0 shows the away team, step
+two-step graphic, as the starting five: step 0 shows the away team, step
 1 the home team, and advancing on air changes team without taking the glass
 down.
 
@@ -654,8 +631,7 @@ down.
   primary colour; the incoming name and lines rise in; the marker and logo
   swap; and one sweep crosses the block. Off air, a step change snaps.
 - **State machine:** the starting five's two layers, Display (`isPlaying`) and
-  Team (`step`). Keep the OGraf durations (`introDuration`, `outroDuration`,
-  `steps.transitionDuration`) in sync with the timelines.
+  Team (`step`).
 
 View model `BasketballHalftimeAdjustmentsV2`, public properties: `isPlaying`,
 `step` (0 away, 1 home), `sponsorLogo`, and for each of `away` and `home`:
@@ -715,8 +691,8 @@ thirds: the text is right-aligned, and the sponsor chip and the marker sit on th
   the sweeps' silhouette and the edge-light spans), the answer's fade and its own
   sweep. The layers share only the answer's reveal range, which the Answer layer, the
   later one, wins during the reveal. Hold and Outro key every property the intro
-  animates at its resting value. Keep the OGraf durations (1200 / 400 ms) in sync.
-- **Going on air.** The package's `playAction` waits two frames before setting
+  animates at its resting value.
+- **Going on air.** The renderer waits two frames before setting
   `isPlaying`, so a `showAnswer` sent in the same tick snaps first and the intro builds
   the strip. Without the wait the scene sees both flags at once and plays the reveal
   over the intro.
@@ -727,9 +703,6 @@ View model `BasketballBurningQuestionV2`, public properties: `isPlaying`,
 question (`TAYLOR WOOTTON` scored her 1000th point in the 2013 WNIT championship game).
 To review the reveal:
 `bun scripts/render_frames.ts graphics/basketball-v2/burning_question.rml --on-air --data=showAnswer=true --frames=0-36:3 --out=build/frames/burning_question/reveal --sheet=4`.
-
-Build the OGraf package with
-`bun run ograf:build:basketball-v2-burning-question`.
 
 ## Score to Break (`score_to_break.rml`)
 
@@ -790,8 +763,7 @@ edge on the action-safe margin, x 96) or, mirrored, bottom-right (right edge on 
   follows `alignRight` and keys only the Side node, the flip nodes and the twins'
   opacity. Hold and Outro key every property the Intro animates at its resting value.
   A `Presence` node fades with the glass, and its opacity is written out to
-  `_onScreen` (1 from the intro until the outro's last frame, then 0). Keep the OGraf
-  durations (1200 / 400 ms) in sync with the timelines.
+  `_onScreen` (1 from the intro until the outro's last frame, then 0).
 
 View model `BasketballScoreToBreakV2`, public properties: `isPlaying`, `alignRight`
 (false is bottom-left), `awayScore`/`homeScore` (numbers, as on the scorebug),
@@ -801,11 +773,11 @@ internal: the scene writes it. Send the status in capitals. The test data is Cam
 at Drexel. To review the right side, add `--data=alignRight=true` to the screenshot or
 `render_frames.ts` commands.
 
-The OGraf package (`dtv-basketball-v2-score-to-break`) exposes the side as `side`,
-`left` or `right`, and latches it in `graphic.ts`. A side sent off air applies at once.
-A side sent on air is held until the scene reports through `_onScreen` that the outro
-has ended. If the graphic is taken again before then, the side waits for the following
-outro. Build the package with `bun run ograf:build:basketball-v2-score-to-break`.
+The registry entry exposes the side as `side`, `left` or `right`, and lists
+`alignRight` in `frozenOnAir`. A side sent off air applies at once. A side sent
+on air is held until the scene reports through `_onScreen` (its `exitSignal`)
+that the outro has ended. If the graphic is taken again before then, the side
+waits for the following outro.
 
 ## Test data
 

@@ -45,31 +45,37 @@ When appearance matters:
   `bun scripts/baseline.ts compare <dirA> <dirB>` diffs two captures. Run both
   around a change that must not move a pixel.
 
-## Shipping a scene: OGraf
+## Shipping a scene
 
-A verified `.rml` is not a deliverable — no renderer ingests one. Scenes ship as
-[OGraf](https://ograf.ebu.io) packages: a manifest, a web component wrapping the
-Rive runtime, the signed `.riv`, and a thumbnail.
+A verified `.rml` is not a deliverable. The show system plays a scene through a
+registry entry, and a browser loads only a signed `.riv`. Read
+`docs/ARCHITECTURE.md` section 5 for the entry's shape before writing one.
 
-- `bun run ograf:build` — build the package to `build/ograf/<id>/` plus a `.zip`
-- `bun run ograf:harness` — a local stand-in renderer on port 8974 that drives a
-  built package through `load` / `playAction` / `updateAction` / `stopAction`
+1. The scene (and its generator) in `graphics/basketball-v2/`, from
+   `DESIGN_SYSTEM.md`.
+2. `bun run codegen` writes `scenes.gen.ts` from the `.rml`: artboard, state
+   machine, view model, timeline lengths and every property. `bun run check`
+   fails while it is stale.
+3. One registry entry in `graphics/basketball-v2/graphics/<name>.ts`, added to
+   `graphics/basketball-v2/index.ts`. Its `bind` returns every property of the
+   scene, so a misspelled one fails to compile.
+4. The golden test (`graphics/basketball-v2/golden.test.ts`) binds the entry's
+   `demo` against the seed and compares it with the scene's Default instance. It
+   fails while a scene has no entry, and `KNOWN_DRIFT` records each difference
+   that stands.
+5. `bun run riv:build` signs each scene into `build/riv/<scene>.riv`.
+6. `/renderer` on the server draws program for OBS from those files. `bun run
+   site:build` builds the stakeholder site, which lists the graphic from its
+   entry with no site code.
 
-Read before touching any of it:
+`bun run check` and `rive . --verify` run clean before every commit.
 
-- `ograf/README.md` — the four files a new graphic needs, and the layout of the
-  shared code
-- `docs/ograf/` — the specification, vendored. `Specification.md` is the prose,
-  `json-schemas/` is what the build validates every manifest against, and
-  `graphicsAPI.ts` is the method contract. Prefer these over memory; OGraf
-  postdates your training data too.
-- `docs/GRAPHICS_PORTING.md` § OGraf Packaging — how packaging fits the porting
-  workflow, and the traps
+Two traps will cost you an afternoon otherwise:
 
-Two that will cost you an afternoon otherwise:
-
-- **An unsigned `.riv` fails silently in a browser** — no error, the load promise
-  never settles. Packaging always uses `--publish`, which needs `rive login`.
+- **An unsigned `.riv` fails silently in a browser.** There is no error, and the
+  load promise never settles. `riv:build` always publishes with `rive --publish`,
+  which needs `rive login`. Never point the renderer at the output of a plain
+  `rive .` build.
 - **A publish is watermarked** until `rive push` binds the project to a Rive
-  file. The build warns when `rive.yaml` has no `push:` block. Pushing creates a
-  file in the user's Rive workspace, so ask before running it.
+  file. `riv:build` warns when `rive.yaml` has no `push:` block. Pushing creates
+  a file in the user's Rive workspace, so ask before running it.

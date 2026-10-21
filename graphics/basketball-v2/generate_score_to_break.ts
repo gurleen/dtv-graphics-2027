@@ -679,7 +679,7 @@ ${animation('Side Right', ID.right, 1, 'loop', sidePose('Right'))}
 
 <!-- Display: isPlaying true takes the graphic on air (Intro then Hold), false dismisses it
      (Outro then Hidden). Side: alignRight mirrors the block to the bottom right; it snaps,
-     and the OGraf package changes it only off air. Both default off/left. -->
+     and the renderer writes it only before the intro. Both default off/left. -->
 ${stateMachine}
 </Artboard>
 

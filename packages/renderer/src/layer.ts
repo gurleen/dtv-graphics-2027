@@ -4,7 +4,7 @@
  * an effect, and returns the next state and the effects to run. The renderer runs the
  * effects and feeds their completions back.
  *
- * What the OGraf subclasses did per graphic are rules here, read from the registry entry:
+ * Per-graphic behaviour is a rule here, read from the registry entry:
  * `frozenOnAir` values are not written once `isPlaying` is set, a step change on air plays
  * the entry's step timeline, and the exit signal is the instance's business.
  */
