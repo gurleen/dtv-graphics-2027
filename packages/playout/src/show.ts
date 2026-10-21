@@ -204,13 +204,22 @@ const withBus = (previews: ShowState['previews'], operator: OperatorId, bus: Bus
   return Object.keys(bus).length ? { ...rest, [operator]: bus } : rest;
 };
 
-/** Puts each slot of `incoming` on program, then clears the layers they cover that `incoming` does not fill. */
+/**
+ * The one placement rule, for take, air and toggle: puts each slot of `incoming` on program,
+ * then takes off whatever overlaps it. That is a layer an incoming graphic covers, unless
+ * `incoming` fills it, and a graphic already on air that covers a layer `incoming` fills.
+ */
 function putOnAir(registry: Registry, program: Bus, incoming: Bus): Bus {
+  const covers = (slot: Slot) => entryOf(registry, slot.graphic)?.clears ?? [];
   let result: Bus = { ...program, ...incoming };
   for (const slot of Object.values(incoming)) {
-    for (const layer of entryOf(registry, slot.graphic)?.clears ?? []) {
+    for (const layer of covers(slot)) {
       if (!incoming[layer]) result = without(result, layer);
     }
+  }
+  for (const layer of LAYERS) {
+    const slot = result[layer];
+    if (slot && !incoming[layer] && covers(slot).some((covered) => incoming[covered])) result = without(result, layer);
   }
   return result;
 }

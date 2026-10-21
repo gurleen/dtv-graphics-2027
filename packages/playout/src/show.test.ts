@@ -120,6 +120,29 @@ describe('take', () => {
     expect(Object.keys(state().program)).toEqual(['lower']);
   });
 
+  test('air and toggle clear the layers their graphic covers', () => {
+    for (const type of ['air', 'toggle'] as const) {
+      const { send, state } = harness();
+      send({ type: 'air', operator: alex, ref: free('test/bug') });
+      expect(changed(send({ type, operator: alex, ref: free('test/wide') }))).toBe(true);
+      expect(Object.keys(state().program)).toEqual(['lower']);
+    }
+  });
+
+  test('a graphic going to a layer that the on-air graphic covers takes that graphic off, by take, air or toggle', () => {
+    const cases: [string, (send: ReturnType<typeof harness>['send']) => void][] = [
+      ['take', (send) => (send({ type: 'cue', operator: alex, ref: free('test/bug') }), send({ type: 'take', operator: alex }))],
+      ['air', (send) => send({ type: 'air', operator: alex, ref: free('test/bug') })],
+      ['toggle', (send) => send({ type: 'toggle', operator: alex, ref: free('test/bug') })],
+    ];
+    for (const [name, bring] of cases) {
+      const { send, state } = harness();
+      send({ type: 'air', operator: alex, ref: free('test/wide') });
+      bring(send);
+      expect([name, Object.keys(state().program)]).toEqual([name, ['bug']]);
+    }
+  });
+
   test('a covered layer stays when the same take puts something on it', () => {
     const { send, state } = harness();
     send({ type: 'cue', operator: alex, ref: free('test/wide') });

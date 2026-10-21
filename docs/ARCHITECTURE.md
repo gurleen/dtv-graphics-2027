@@ -287,8 +287,10 @@ graphics that would overlap are never on air together.
 | `lower` | Player, staff, team, and talent lower thirds, Starting Five, Player To Watch, Player Of The Game, Matchup Locator lower third, Burning Question |
 | `card` | Matchup Locator, Halftime Statistics, Conference Standings |
 
-An entry can name layers its take also clears. The double and triple talent lower thirds clear `bug`, because they
-overlap the scorebug.
+An entry can name layers it covers in `clears`. The double and triple talent lower thirds clear `bug`, because they
+overlap the scorebug. Take, air, and toggle share one placement rule. Putting a graphic on air takes off the layers
+it covers, and putting a graphic on a covered layer takes off the graphic that covers it. The one exception is a
+take whose preview holds both, which puts both on air.
 
 ### Free panel and rundown
 
@@ -313,8 +315,8 @@ layer is what tells a renderer to play out and then in.
 |---|---|
 | `cue operator ref` | Into my preview, on the graphic's layer. The same cue with equal params changes nothing. |
 | `uncue operator layer` | Out of my preview. |
-| `take operator` | Each layer of my preview goes to program, plus each entry's `clears`. My preview empties. |
-| `air operator ref` | Straight to program, for free-panel keys. No change if that cue is already on air. |
+| `take operator` | Each layer of my preview goes to program, and what it overlaps comes off. My preview empties. |
+| `air operator ref` | Straight to program, for free-panel keys, and what it overlaps comes off. No change if that cue is already on air. |
 | `toggle operator ref` | Clear it if it is on program, else air it. |
 | `clear layer slot?` | Off air. With a slot id, only if the layer still holds that slot. |
 | `clearAll` | Everything off air. |
