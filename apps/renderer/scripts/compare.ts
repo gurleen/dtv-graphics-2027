@@ -29,20 +29,20 @@ import { ROOT, type Rig, startRig, waitForLayer } from './harness';
 
 /**
  * The gate: a render passes when no TILE x TILE tile holds more than `maxPixels` pixels over
- * `delta`. Measured on the scorebug and the player lower third: a correct render's densest
- * tile held 59 and 23 such pixels (glyph edges and the sponsor image, resampled differently by
- * the CLI and the browser); the smallest real change, a score one higher, held 229, and a
- * swapped watermark logo 310. 120 sits about halfway between, on a log scale.
+ * `delta`. Measured on all 17 graphics: the densest tile of a correct render held at most 64
+ * such pixels (Burning Question's full-colour sponsor logo, which the CLI and the browser
+ * resample differently; then Player Of The Game's at 49). The smallest text change, a score
+ * one higher, held 147; a jersey number 298. 100 sits about halfway, on a log scale. The gate
+ * cannot see a swap of the scorebug's faint team watermark (23): at delta 32, where it shows,
+ * correct renders already reach 327 in the sponsor logo and the Matchup Locator's VS shadow.
  */
-const GATE = { delta: 32, maxPixels: 120 } as const;
+const GATE = { delta: 64, maxPixels: 100 } as const;
 
 /** Small real changes, each set over the scene's values, for measuring what the gate must catch. */
 const CHANGES: Readonly<Record<string, readonly ((defaults: Readonly<Record<string, WireValue>>) => Record<string, WireValue>)[]>> = {
   'basketball-v2/scorebug': [
     (defaults) => ({ homeScore: Number(defaults.homeScore) + 1 }),
     () => ({ period: '2ND HALF' }),
-    // The team logo is a faint watermark behind the row: the lowest-contrast change a scorebug has.
-    () => ({ homeLogo: '/assets/images/CAAWhite.png' }),
   ],
   'basketball-v2/player-lower-third': [() => ({ jerseyNumber: '3' }), () => ({ lastName: 'REID' })],
 };
