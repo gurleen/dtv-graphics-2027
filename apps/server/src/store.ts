@@ -125,15 +125,14 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
 
   /**
    * The newest value of `read`, now and after every change to `topics`, until `signal`
-   * aborts. `key` decides whether a value differs from the last one sent; `send` turns it
-   * into what the stream yields, or undefined to send nothing.
+   * aborts. `key` decides whether a value differs from the last one sent; an undefined
+   * value sends nothing.
    */
-  async function* stream<V, T>(input: {
+  async function* stream<T>(input: {
     readonly topics: readonly Topic[];
     readonly signal: AbortSignal;
-    readonly read: () => V;
-    readonly key: (value: V) => unknown;
-    readonly send: (value: V) => T | undefined;
+    readonly read: () => T | undefined;
+    readonly key: (value: T) => unknown;
   }): AsyncGenerator<T, void> {
     let dirty = true;
     let wake: (() => void) | null = null;
@@ -151,11 +150,11 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
         dirty = false;
         if (input.signal.aborted) break;
         const value = input.read();
+        if (value === undefined) continue;
         const key = input.key(value);
         if (key === sent) continue;
         sent = key;
-        const message = input.send(value);
-        if (message !== undefined) yield message;
+        yield value;
       }
     } finally {
       unsubscribe();
@@ -224,10 +223,9 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       return answer;
     },
 
-    watchData: (signal) =>
-      stream({ topics: ['data'], signal, read: () => world, key: (current) => current.revision, send: (current) => current.snapshot }),
+    watchData: (signal) => stream({ topics: ['data'], signal, read: () => world.snapshot, key: (snapshot) => snapshot.revision }),
 
-    watchGame: (game, signal) => stream({ topics: ['live'], signal, read: () => lives.get(game), key: (live) => live, send: (live) => live }),
+    watchGame: (game, signal) => stream({ topics: ['live'], signal, read: () => lives.get(game), key: (live) => live }),
 
     async *watchShow(operator, signal) {
       presence.set(operator, (presence.get(operator) ?? 0) + 1);
@@ -239,7 +237,6 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
           read: () =>
             viewShow({ registry, state: show, operator, operators: [...presence.keys()], revision: max(world.revision, showRevision), context: context() }),
           key: (view) => JSON.stringify(view),
-          send: (view) => view,
         });
       } finally {
         const count = (presence.get(operator) ?? 1) - 1;
@@ -263,7 +260,6 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
           }),
         // The revision moves on changes this bus does not show, so only the layers decide.
         key: (frame) => JSON.stringify(frame.layers),
-        send: (frame) => frame,
       }),
 
     onChange,
