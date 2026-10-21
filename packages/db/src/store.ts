@@ -1,7 +1,7 @@
 import { SQLiteError } from 'bun:sqlite';
 import {
-  type EditBatch, emptySnapshot, ENTITIES, type EntityKind, type EntityOf, GameLive, type GameId,
-  mergePut, parseEntity, Revision, type WorldSnapshot,
+  type EditBatch, emptySnapshot, ENTITIES, type EntityKind, type EntityOf, type Game, GameLive, type GameId,
+  mergePut, parseEntity, PROGRAMS, Revision, SPORT_MODULES, type WorldSnapshot,
 } from '@dtv/domain';
 import type { Db } from './db';
 
@@ -103,6 +103,12 @@ function danglingReference(db: Db): string | null {
   return `${dangling.table} ${row?.id ?? `rowid ${dangling.rowid}`} refers to a missing row of ${dangling.parent}`;
 }
 
+/** Every game has live state: the transaction that inserts a game inserts its sport's `initial` too. */
+function insertInitialLive(db: Db, game: Game, seq: number) {
+  const live = SPORT_MODULES[PROGRAMS[game.program].sport].initial(game.id, game.program);
+  db.sqlite.run('INSERT INTO live (game_id, doc, seq) VALUES (?, ?, ?) ON CONFLICT (game_id) DO NOTHING', [game.id, JSON.stringify(live), seq]);
+}
+
 /**
  * One batch, one transaction, one journal row; a batch that changes nothing writes none.
  * With a basis, a put or delete of a row written after it refuses the whole batch. The
@@ -137,6 +143,7 @@ export function commitEdits(db: Db, input: { readonly actor: string; readonly at
           const values = [JSON.stringify(merge.row.doc), seq, JSON.stringify(merge.row.locked), id];
           if (merge.change === 'insert') db.sqlite.run(`INSERT INTO "${table}" (doc, seq, locked, id) VALUES (?, ?, ?, ?)`, values);
           else db.sqlite.run(`UPDATE "${table}" SET doc = ?, seq = ?, locked = ? WHERE id = ?`, values);
+          if (merge.change === 'insert' && edit.kind === 'game') insertInitialLive(db, edit.value, seq);
         } catch (error) {
           if (error instanceof SQLiteError && error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
             throw new Refusal('duplicate', `${edit.kind} ${id} repeats a natural key: ${error.message}`);

@@ -111,7 +111,8 @@ creation, even when the name it came from is edited. The 361 team names in teams
 Live state is not an entity. It changes several times a second, so it has its own table and its own stream, and it
 never travels with the World. `SPORT_MODULES` holds one row per sport with its live schema, its command schema,
 `initial`, `apply`, and `nextChange`. The row is checked with `satisfies`, so a sport without a module fails the
-build.
+build. Every game has live state. The transaction that inserts a game also inserts its sport's `initial`, and
+deleting the game deletes it.
 
 `BasketballLive` holds the phase, period, game clock, shot clock, score, timeouts, bonus, possession, starters,
 team and player stat lines, and `authority`. Commands set absolute values (`score home 74`), never deltas, so a
@@ -242,8 +243,10 @@ and sends it only if it differs from the last one sent. A slow consumer gets the
 a client that reconnects has caught up as soon as its first value arrives.
 
 Each stream wakes only on the changes its value reads. `data.watch` wakes on data commits and compares revisions.
-`game.watch` wakes on its game's live state. `show.watch` wakes on data and show changes. `output.watch` wakes on
-data, live, show, and clock changes. A clock tick therefore never serializes the World.
+`game.watch` wakes on live changes and on data commits, which add and remove games, and compares its game's state.
+`show.watch` wakes on data, live, and show changes, because a cue's label and error come from its bind, which may
+read the live game. `output.watch` wakes on data, live, show, and clock changes. A clock tick therefore never
+serializes the World.
 
 ### Show commands carry ids
 

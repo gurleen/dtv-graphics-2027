@@ -199,6 +199,12 @@ describe('live and show state', () => {
     ok(commit(imported(...BASE, { op: 'put', kind: 'team', value: sjuMbb }, { op: 'put', kind: 'game', value: game })));
   });
 
+  test('the batch that inserts a game gives it its sport’s initial live state, and deleting the game deletes it', () => {
+    expect(loadLive(db).get(gameId)).toEqual(basketball.initialBasketball(gameId, 'mbb'));
+    ok(commit(manual([{ op: 'delete', kind: 'game', id: gameId }])));
+    expect(loadLive(db).has(gameId)).toBe(false);
+  });
+
   test('live state round-trips and its commits do not move the World revision', () => {
     const before = revision();
     const first = commitLive(db, { actor: 'operator', at: 1, live, payload: { commands: [] } });

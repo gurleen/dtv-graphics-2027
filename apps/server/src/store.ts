@@ -173,7 +173,8 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       if (result.revision !== world.revision) {
         world = indexWorld(loadSnapshot(db));
         lives = new Map(loadLive(db));
-        notify('data');
+        // A commit can add or remove a game, and its live state with it.
+        notify('data', 'live');
         schedule();
       }
       return { ok: true, revision: result.revision, skipped: result.skipped };
@@ -191,13 +192,14 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       const sport = SPORT_MODULES[input.sport];
       const now = clock.now();
       const before = lives.get(game.id);
-      let live = before ?? sport.initial(game.id, game.program);
+      if (!before) return { ok: false, reason: 'no-game' };
+      let live = before;
       for (const command of input.commands) {
         const result = sport.apply(live, command, { source: input.source, now });
         if (!result.ok) return { ok: false, reason: 'not-authority', group: result.group };
         live = result.live;
       }
-      if (before && sameJson(live, before)) return { ok: true, revision: liveRevision, live };
+      if (sameJson(live, before)) return { ok: true, revision: liveRevision, live };
       liveRevision = commitLive(db, { actor, at: now, live, payload: input });
       lives.set(game.id, live);
       notify('live');
@@ -233,7 +235,8 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       notify('presence');
       try {
         yield* stream({
-          topics: ['data', 'show', 'presence'],
+          // A cue's label and error come from its bind, which may read the live game.
+          topics: ['data', 'live', 'show', 'presence'],
           signal,
           read: () =>
             viewShow({ registry, state: show, operator, operators: [...presence.keys()], revision: max(world.revision, showRevision), context: context() }),

@@ -5,7 +5,7 @@ import {
   layerEdits, parseRosterCsv, planRoster, type Revision, SeasonId, SeedFixtures, TeamId,
 } from '@dtv/domain';
 import type { Db } from './db';
-import { commitEdits, commitLive, loadLive, loadSnapshot } from './store';
+import { commitEdits, commitLive, loadSnapshot } from './store';
 
 export interface SeedReport {
   readonly revision: Revision;
@@ -21,7 +21,8 @@ const ROSTER_FILE = /^(?<team>[a-z0-9-]+)@(?<season>\d{4}-\d{2})\.csv$/;
  * The prefilled data in `dir` (data/seed/): teams.json, then each roster CSV through the
  * roster importer, then fixtures.json, merged by id in that order and committed as one
  * import batch. Every put is `keep`, so a second run writes nothing and a row a person or
- * a feed changed since is never reset. Live states are written only for games without one.
+ * a feed changed since is never reset. A fixture's live state is written only for a game
+ * this run inserted, over the initial state the insert gave it.
  */
 export async function seed(db: Db, options: { readonly dir: string; readonly at?: number }): Promise<SeedReport> {
   const at = options.at ?? Date.now();
@@ -46,15 +47,14 @@ export async function seed(db: Db, options: { readonly dir: string; readonly at?
   const result = commitEdits(db, { actor: 'seed', at, batch });
   if (!result.ok) throw new Error(`the seed was refused as ${result.reason}: ${result.detail}`);
 
-  const existing = loadLive(db);
-  const missing = fixtures.live.filter((live) => !existing.has(live.gameId));
-  for (const live of missing) commitLive(db, { actor: 'seed', at, live, payload: live });
+  const newGames = fixtures.live.filter((live) => !world.get('game', live.gameId));
+  for (const live of newGames) commitLive(db, { actor: 'seed', at, live, payload: live });
 
   return {
     revision: result.revision,
     inserted: result.inserted,
     updated: result.updated,
-    liveInserted: missing.length,
+    liveInserted: newGames.length,
     warnings: [...teams.warnings, ...layered.warnings],
   };
 }
