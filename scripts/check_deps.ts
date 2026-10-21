@@ -25,8 +25,10 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'packages/renderer': ['@dtv/playout', '@dtv/domain', '@rive-app/canvas-single'],
   'packages/api': ['@dtv/playout', '@dtv/domain', '@orpc/*', 'partysocket', 'zod'],
   'packages/live-': ['@dtv/api', '@dtv/domain'],
-  'apps/server': ['@dtv/api', '@dtv/db', '@dtv/graphics', '@dtv/playout', '@dtv/domain', '@dtv/renderer-page', '@orpc/server', 'zod', 'node:fs', 'node:path'],
-  'apps/controller': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', 'react-aria-components'],
+  'apps/server': ['@dtv/api', '@dtv/db', '@dtv/controller', '@dtv/graphics', '@dtv/playout', '@dtv/domain', '@dtv/renderer-page', '@orpc/server', 'zod', 'node:fs', 'node:path'],
+  'apps/controller': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', 'react-aria-components', '@fontsource/*'],
+  // The controller's proofs: two operators in a real Chromium against the real server.
+  'apps/controller/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'playwright', 'node:*'],
   'apps/renderer': ['@dtv/api', '@dtv/renderer', '@dtv/graphics'],
   // The page's proofs: they drive a real server and a real Chromium, and decode its screenshots.
   'apps/renderer/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'playwright', 'pngjs', 'node:*'],

@@ -40,4 +40,12 @@
   --space-6: 16px;
   --radius: 3px;
   --row: 26px;
+
+  --topbar: 40px;
+  --rail: 460px;
+  --scorebar: 56px;
+  --hold-ms: 600ms;
+  --shadow: 0 8px 32px rgb(0 0 0 / 50%);
+  --scrim: rgb(0 0 0 / 55%);
+  --monitor: #000000;
 }
