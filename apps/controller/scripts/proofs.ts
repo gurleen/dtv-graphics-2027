@@ -306,8 +306,8 @@ async function provesRunThrough(api: ReturnType<typeof connect>['api']) {
   await waitDrawn(page, 'program', { lower: { graphic: 'basketball-v2/player-lower-third' } }, 'the player lower third is on air to edit');
   const statLine = () => String((globalThis as PageGlobals).dtvMonitors?.program?.frame?.layers.find((layer) => layer.layer === 'lower')?.values.statLine);
   const before = await page.evaluate(statLine);
-  await page.getByRole('button', { name: /^threes/ }).click();
-  await page.getByRole('button', { name: /^stl/ }).click();
+  await page.getByRole('button', { name: /^3PT/ }).click();
+  await page.getByRole('button', { name: /^STL/ }).click();
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page.waitForFunction(() => String((globalThis as PageGlobals).dtvMonitors?.program?.frame?.layers.find((layer) => layer.layer === 'lower')?.values.statLine).endsWith('STL'));
   const after = await page.evaluate(statLine);

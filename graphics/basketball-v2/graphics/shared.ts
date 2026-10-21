@@ -2,6 +2,7 @@
 
 import { type basketball, type GameView, type Player, type PlayerId, resolveTeam, type Staff, type StaffId, type TeamId, type TeamView, type WinLoss, type World } from '@dtv/domain';
 import type { ShowContext } from '@dtv/playout';
+import { z } from 'zod';
 
 export const fail = (message: string): never => {
   throw new Error(message);
@@ -60,8 +61,9 @@ export const matchupValues = ({ sides, venue }: GameView) => ({
   venueLocation: venue ? `${venue.city}, ${venue.state}` : '',
 });
 
-/** The keys of a stat catalogue, as the non-empty tuple `z.enum` takes. */
-export const keysOf = <K extends string>(stats: Record<K, unknown>) => Object.keys(stats) as [K, ...K[]];
+/** A pick from a stat catalogue: its keys, labelled as the graphic prints them, so a form offers `FG%` and not `fgPct`. */
+export const statKey = <K extends string>(stats: Record<K, { readonly label: string }>) =>
+  z.enum(Object.keys(stats) as [K, ...K[]]).meta({ labels: Object.fromEntries(Object.entries<{ label: string }>(stats).map(([key, stat]) => [key, stat.label])) });
 
 /** The player's basketball season totals, if the world has them. */
 export const seasonStatsOf = (world: World, id: PlayerId) => {

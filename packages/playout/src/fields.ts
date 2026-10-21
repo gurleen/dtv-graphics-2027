@@ -31,11 +31,11 @@ export function paramFields(params: z.ZodType): readonly ParamField[] {
 /** One control of a params form. */
 export type FormNode =
   | { readonly kind: 'text' }
-  | { readonly kind: 'choice'; readonly options: readonly string[] }
+  | { readonly kind: 'choice'; readonly options: readonly string[]; readonly labels: Labels }
   /** An id of a row of `ref`, offered as a picker. */
   | { readonly kind: 'ref'; readonly ref: EntityKind }
   /** Several of a fixed list, in order: the stats a lower third shows. */
-  | { readonly kind: 'choices'; readonly options: readonly string[]; readonly max: number | null }
+  | { readonly kind: 'choices'; readonly options: readonly string[]; readonly labels: Labels; readonly max: number | null }
   | { readonly kind: 'list'; readonly item: FormNode; readonly min: number; readonly max: number | null }
   | { readonly kind: 'group'; readonly fields: readonly FormField[] }
   /** A discriminated union: `key` picks the variant, and each variant has its own fields. */
@@ -64,7 +64,11 @@ const lengthChecks = (schema: z.ZodArray) => {
   return { min, max };
 };
 
+/** What an option reads as on screen, from its enum's `.meta({ labels })`: `fgPct` reads `FG%`. */
+export type Labels = Readonly<Record<string, string>>;
+
 const refOf = (schema: z.ZodType): EntityKind | undefined => (schema.meta() as { ref?: EntityKind } | undefined)?.ref;
+const labelsOf = (schema: z.ZodType): Labels => (schema.meta() as { labels?: Labels } | undefined)?.labels ?? {};
 
 function fieldsOf(shape: Record<string, z.ZodType>, skip?: string): FormField[] {
   return Object.entries(shape)
@@ -80,13 +84,13 @@ function fieldsOf(shape: Record<string, z.ZodType>, skip?: string): FormField[] 
 function nodeOf(schema: z.ZodType): FormNode {
   const ref = refOf(schema);
   if (ref) return { kind: 'ref', ref };
-  if (schema instanceof z.ZodEnum) return { kind: 'choice', options: schema.options.map(String) };
+  if (schema instanceof z.ZodEnum) return { kind: 'choice', options: schema.options.map(String), labels: labelsOf(schema) };
   if (schema instanceof z.ZodString) return { kind: 'text' };
   if (schema instanceof z.ZodObject) return { kind: 'group', fields: fieldsOf(schema.shape as Record<string, z.ZodType>) };
   if (schema instanceof z.ZodArray) {
     const item = nodeOf(innermost(schema.element as z.ZodType));
     const { min, max } = lengthChecks(schema);
-    return item.kind === 'choice' ? { kind: 'choices', options: item.options, max } : { kind: 'list', item, min, max };
+    return item.kind === 'choice' ? { kind: 'choices', options: item.options, labels: item.labels, max } : { kind: 'list', item, min, max };
   }
   if (schema instanceof z.ZodDiscriminatedUnion) {
     const key = schema.def.discriminator;

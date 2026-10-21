@@ -46,7 +46,7 @@ function Control(props: { readonly label: string; readonly node: FormNode; reado
         </TextField>
       );
     case 'choice':
-      return <Choice label={label} options={node.options.map((option) => ({ id: option, label: humanize(option) }))} value={value} onChange={onChange} />;
+      return <Choice label={label} options={node.options.map((option) => ({ id: option, label: node.labels[option] ?? humanize(option) }))} value={value} onChange={onChange} />;
     case 'ref': {
       const options = props.options(node.ref, typeof value === 'string' && value ? value : null);
       return (
@@ -92,7 +92,7 @@ function Control(props: { readonly label: string; readonly node: FormNode; reado
           >
             {node.options.map((option) => (
               <ToggleButton key={option} id={option} className="chip-toggle" isDisabled={full && !chosen.includes(option)}>
-                {option}
+                {node.labels[option] ?? option}
                 {chosen.includes(option) && <span className="order">{chosen.indexOf(option) + 1}</span>}
               </ToggleButton>
             ))}
