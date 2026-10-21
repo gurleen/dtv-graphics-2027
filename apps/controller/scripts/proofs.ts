@@ -280,8 +280,8 @@ async function provesRunThrough(api: ReturnType<typeof connect>['api']) {
   if (!quick) {
     for (const [index, cue] of cues.entries()) await rundownGraphic(page, index, cue.graphic, n++);
     for (const free of Object.values(GRAPHICS).filter((each) => each.free)) await freeGraphic(page, free.id, n++);
+    check(Object.keys(GRAPHICS).every((id) => aired.has(id)), `all ${Object.keys(GRAPHICS).length} graphics reached program (${aired.size})`);
   }
-  check(Object.keys(GRAPHICS).every((id) => aired.has(id)), `all ${Object.keys(GRAPHICS).length} graphics reached program (${aired.size})`);
 
   console.log('rundown edits');
   // Add a cue through the dialog: the single talent lower third, with the crew's first member.
