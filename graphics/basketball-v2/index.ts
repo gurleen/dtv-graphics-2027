@@ -5,18 +5,21 @@
 
 import type { Registry } from '@dtv/playout';
 import { burningQuestion } from './graphics/burning-question';
+import { halftimeAdjustments } from './graphics/halftime-adjustments';
+import { halftimeStatistics } from './graphics/halftime-statistics';
 import { matchupLocator } from './graphics/matchup-locator';
 import { matchupLocatorLowerThird } from './graphics/matchup-locator-lower-third';
 import { playerLowerThird } from './graphics/player-lower-third';
 import { scorebug } from './graphics/scorebug';
 import { scoreToBreak } from './graphics/score-to-break';
+import { startingFive } from './graphics/starting-five';
 import { staffLowerThird } from './graphics/staff-lower-third';
 import { talentLowerThirdDouble } from './graphics/talent-lower-third-double';
 import { talentLowerThirdSingle } from './graphics/talent-lower-third-single';
 import { talentLowerThirdTriple } from './graphics/talent-lower-third-triple';
 import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, burningQuestion] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics] as const;
 
 type Entry = (typeof ENTRIES)[number];
 
