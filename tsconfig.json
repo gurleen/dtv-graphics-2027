@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["packages", "apps", "graphics", "scripts/check_deps.ts"],
-  "exclude": ["graphics/*/generate_*.ts", "graphics/*/conference_teams.ts"]
+  "include": ["packages", "apps", "graphics", "scripts/check_deps.ts", "scripts/build_riv.ts"],
+  "exclude": ["graphics/*/generate_*.ts", "graphics/*/conference_teams.ts", "packages/renderer", "apps/renderer/*.ts"]
 }

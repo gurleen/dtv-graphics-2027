@@ -1,0 +1,20 @@
+{
+  "name": "@dtv/renderer-page",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "dependencies": {
+    "@dtv/api": "workspace:*",
+    "@dtv/graphics": "workspace:*",
+    "@dtv/renderer": "workspace:*"
+  },
+  "devDependencies": {
+    "@dtv/domain": "workspace:*",
+    "@dtv/playout": "workspace:*",
+    "@types/pngjs": "^6.0.5",
+    "playwright": "1.64.1",
+    "pngjs": "^7.0.0"
+  }
+}

@@ -8,7 +8,7 @@
     "graphics/*"
   ],
   "scripts": {
-    "check": "tsc -p . && bun scripts/check_deps.ts && bun run codegen --check && bun test",
+    "check": "tsc -p . && tsc -p tsconfig.browser.json && bun scripts/check_deps.ts && bun run codegen --check && bun test",
     "codegen": "bun packages/playout/scripts/scene-codegen.ts graphics/basketball-v2",
     "dev": "bun --watch apps/server/src/main.ts",
     "start": "bun apps/server/src/main.ts",
@@ -17,6 +17,7 @@
     "db:backup": "bun packages/db/scripts/db.ts backup",
     "rive:dev": "rive .",
     "rive:build": "rive . --publish",
+    "riv:build": "bun scripts/build_riv.ts",
     "ograf:build": "bun run ograf:build:v2",
     "ograf:build:v2": "bun run ograf:build:basketball-v2-scorebug && bun run ograf:build:basketball-v2-lower-third && bun run ograf:build:basketball-v2-staff-lower-third && bun run ograf:build:basketball-v2-matchup-locator && bun run ograf:build:basketball-v2-talent-lower-third-single && bun run ograf:build:basketball-v2-talent-lower-third-double && bun run ograf:build:basketball-v2-talent-lower-third-triple && bun run ograf:build:basketball-v2-starting-five-lower-third && bun run ograf:build:basketball-v2-player-to-watch-lower-third && bun run ograf:build:basketball-v2-player-of-the-game-lower-third && bun run ograf:build:basketball-v2-halftime-statistics && bun run ograf:build:basketball-v2-team-lower-third && bun run ograf:build:basketball-v2-conference-standings && bun run ograf:build:basketball-v2-matchup-locator-lower-third && bun run ograf:build:basketball-v2-halftime-adjustments && bun run ograf:build:basketball-v2-burning-question && bun run ograf:build:basketball-v2-score-to-break",
     "ograf:build:basketball-v2-scorebug": "bun ograf/scripts/build_package.ts ograf/graphics/basketball_v2_scorebug",
