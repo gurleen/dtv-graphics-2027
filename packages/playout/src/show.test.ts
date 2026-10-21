@@ -76,6 +76,7 @@ describe('cue and uncue', () => {
     expect(send({ type: 'cue', operator: alex, ref: rundown('nope') })).toEqual({ ok: false, error: 'The rundown has no cue nope' });
     expect(send({ type: 'cue', operator: alex, ref: free('test/name') })).toEqual({ ok: false, error: 'Name is not on the free panel' });
     expect(send({ type: 'cue', operator: alex, ref: free('test/unknown') })).toEqual({ ok: false, error: 'No graphic test/unknown' });
+    expect(send({ type: 'cue', operator: alex, ref: free('constructor') })).toEqual({ ok: false, error: 'No graphic constructor' });
     expect(state()).toEqual(ShowState.parse({ ...EMPTY_SHOW, showId: 'demo' }));
   });
 
@@ -117,6 +118,29 @@ describe('take', () => {
     send({ type: 'cue', operator: alex, ref: free('test/wide') });
     send({ type: 'take', operator: alex });
     expect(Object.keys(state().program)).toEqual(['lower']);
+  });
+
+  test('air and toggle clear the layers their graphic covers', () => {
+    for (const type of ['air', 'toggle'] as const) {
+      const { send, state } = harness();
+      send({ type: 'air', operator: alex, ref: free('test/bug') });
+      expect(changed(send({ type, operator: alex, ref: free('test/wide') }))).toBe(true);
+      expect(Object.keys(state().program)).toEqual(['lower']);
+    }
+  });
+
+  test('a graphic going to a layer that the on-air graphic covers takes that graphic off, by take, air or toggle', () => {
+    const cases: [string, (send: ReturnType<typeof harness>['send']) => void][] = [
+      ['take', (send) => (send({ type: 'cue', operator: alex, ref: free('test/bug') }), send({ type: 'take', operator: alex }))],
+      ['air', (send) => send({ type: 'air', operator: alex, ref: free('test/bug') })],
+      ['toggle', (send) => send({ type: 'toggle', operator: alex, ref: free('test/bug') })],
+    ];
+    for (const [name, bring] of cases) {
+      const { send, state } = harness();
+      send({ type: 'air', operator: alex, ref: free('test/wide') });
+      bring(send);
+      expect([name, Object.keys(state().program)]).toEqual([name, ['bug']]);
+    }
   });
 
   test('a covered layer stays when the same take puts something on it', () => {

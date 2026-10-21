@@ -1,7 +1,8 @@
-/** The contract, implemented as thin calls into the store. No logic lives here. */
+/** The contract, implemented as thin calls into the store, and the WebSocket that serves it. No logic lives here. */
 
 import { contract } from '@dtv/api';
 import { implement } from '@orpc/server';
+import { RPCHandler } from '@orpc/server/bun-ws';
 import type { Store } from './store';
 
 /** Who sent a call, from the socket's `?client=` label: a name for the journal, not authentication. */
@@ -35,6 +36,7 @@ export function createRouter(store: Store) {
         const result = store.applyGame(context.client, input);
         if (result.ok) return { revision: result.revision, live: result.live };
         if (result.reason === 'not-authority') throw errors.NOT_AUTHORITY({ data: { group: result.group } });
+        if (result.reason === 'not-in-game') throw errors.NOT_IN_GAME({ data: { player: result.player } });
         throw errors.NO_GAME();
       }),
     },
@@ -50,4 +52,23 @@ export function createRouter(store: Store) {
       watch: os.output.watch.handler(({ input, signal }) => store.watchOutput(input.bus, signal ?? NEVER)),
     },
   });
+}
+
+/** `websocket` for `Bun.serve`, upgraded with `data: { client }`. */
+export function rpcWebSocket(store: Store): Bun.WebSocketHandler<CallContext> {
+  const handler = new RPCHandler(createRouter(store));
+  return {
+    data: {} as CallContext,
+    // A World snapshot is about 430 KB of JSON and 34 KB compressed.
+    perMessageDeflate: true,
+    message(ws, message) {
+      // A frame oRPC cannot decode rejects here; it fails that frame, not the server.
+      handler.message(ws, message, { context: ws.data }).catch((error: unknown) => {
+        console.error(`rpc: dropped a frame from ${ws.data.client}:`, error);
+      });
+    },
+    close(ws) {
+      handler.close(ws);
+    },
+  };
 }

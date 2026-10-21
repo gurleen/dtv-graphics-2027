@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { backup, type Db, migrate, openDb, TABLES, tableSql } from './index';
+import { backup, type Db, migrate, openDb, renameField, TABLES, tableSql } from './index';
 
 let dir: string;
 let db: Db;
@@ -87,6 +87,37 @@ describe('migrate', () => {
     expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
   });
 
+  test('a rename moves the field’s lock with it', () => {
+    migrate(db, { backupDir: backups() });
+    insert('venues', { id: 'daskalakis-athletic-center', title: 'The DAC', city: 'Philadelphia', state: 'PA' }, 1, ['title', 'city']);
+    expect(migrate(db, { backupDir: backups(), migrations: [renameField(1, 'venue', 'title', 'name')] }).docMigrations).toEqual([1]);
+    expect(rows('venues')).toEqual([
+      {
+        id: 'daskalakis-athletic-center',
+        doc: JSON.stringify({ id: 'daskalakis-athletic-center', name: 'The DAC', city: 'Philadelphia', state: 'PA' }),
+        seq: 1,
+        locked: JSON.stringify(['name', 'city']),
+      },
+    ]);
+  });
+
+  test('a rename of a lifted field rebuilds the table from the renamed documents', () => {
+    migrate(db, { backupDir: backups() });
+    const current = tableSql('player').create;
+    db.sqlite.run('DROP TABLE "players"');
+    db.sqlite.run(current.replace("'$.teamId'", "'$.team'"));
+    insert('seasons', { id: '2026-27', name: '2026-27' });
+    insert('schools', { id: 'drexel', name: 'Drexel', shortName: 'Drexel', mascot: 'Dragons', abbreviation: 'DREX', primaryColor: '#07294d', secondaryColor: '#ffc600', logo: null, website: null, espnId: '2182' });
+    insert('teams', { id: 'drexel-mbb', schoolId: 'drexel', program: 'mbb', branding: {} });
+    insert('players', { id: 'drexel-mbb@2026-27/reed-josh', team: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5' }, 4, ['team']);
+
+    const report = migrate(db, { backupDir: backups(), migrations: [renameField(1, 'player', 'team', 'teamId')] });
+    expect(report).toMatchObject({ rebuilt: ['players'], docMigrations: [1] });
+    expect(db.sqlite.query('SELECT team_id, seq, locked FROM players').all()).toEqual([{ team_id: 'drexel-mbb', seq: 4, locked: '["teamId"]' }]);
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+    expect(migrate(db, { backupDir: backups(), migrations: [renameField(1, 'player', 'team', 'teamId')] })).toMatchObject({ rebuilt: [], docMigrations: [] });
+  });
+
   test('a document migration that produces an invalid document changes nothing', () => {
     migrate(db, { backupDir: backups() });
     insert('venues', { id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
@@ -117,5 +148,12 @@ describe('backup', () => {
     const copy = openDb(files.at(-1)!);
     expect(copy.sqlite.query('SELECT count(*) AS n FROM players').get()).toEqual({ n: 2 });
     copy.sqlite.close();
+  });
+
+  test('keeps the newest of each reason beyond the newest 30', () => {
+    migrate(db, { backupDir: backups() });
+    const premigrate = backup(db, backups(), 'pre-migrate');
+    const shows = Array.from({ length: 31 }, () => backup(db, backups(), 'show'));
+    expect(backupFiles()).toEqual([premigrate, ...shows.slice(1)].map((file) => file.slice(backups().length + 1)));
   });
 });

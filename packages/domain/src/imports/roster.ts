@@ -12,7 +12,7 @@
 
 import { type ImportEdit, mergePut } from '../edits';
 import { ClassYear, parseEntity, Player } from '../entities';
-import { idFor, type PlayerId, type SeasonId, type TeamId } from '../ids';
+import { idFor, personSlug, type PlayerId, type SeasonId, type TeamId } from '../ids';
 import { Url } from '../primitives';
 import type { World } from '../world';
 
@@ -198,6 +198,7 @@ export function parseRosterCsv(text: string): RosterParse {
       [firstName, lastName] = rest.length ? [first, rest.join(' ')] : ['', first];
     }
     if (!lastName) problems.push('no last name');
+    else if (!personSlug(firstName, lastName)) problems.push(`the name "${[firstName, lastName].filter(Boolean).join(' ')}" has no letters a-z or digits for an id`);
 
     const position = parsePosition(cell('position'));
     if (typeof position !== 'string') problems.push(position.error);
@@ -262,10 +263,12 @@ const applyRow = (player: Player, row: RosterRow): Player => ({
 });
 
 /**
- * Matches each row to a player of the team-season by `sourceKey`, then by jersey and last
- * name, then by full name, each pass over the rows still unmatched. A match keeps its id;
- * a new row gets `idFor.player`. Locked fields are compared as the store will write them,
- * so a difference only in a field a person locked is no change.
+ * Matches each row to a player of the team-season by `sourceKey`, then by the id the row
+ * would be added with, then by jersey and last name, then by full name, each pass over the
+ * rows still unmatched. Ids never change, so the id pass finds a player whose name a person
+ * corrected since. A match keeps its id; a new row gets `idFor.player`, with its jersey
+ * appended when another player has that id. Locked fields are compared as the store will
+ * write them, so a difference only in a field a person locked is no change.
  */
 export function planRoster(
   world: World,
@@ -273,8 +276,11 @@ export function planRoster(
 ): RosterPlan {
   const unmatched = new Set(world.roster(input.team, input.season));
   const matches = new Map<RosterRow, Player>();
+  const idOf = (row: RosterRow): PlayerId => idFor.player(input.team, input.season, row.firstName, row.lastName);
   const passes: ((row: RosterRow, player: Player) => boolean)[] = [
     (row, player) => row.sourceKey !== null && row.sourceKey === player.sourceKey,
+    (row, player) => player.id === `${idOf(row)}-${row.jersey}`,
+    (row, player) => player.id === idOf(row),
     (row, player) => row.jersey === player.jersey && sameName(row.lastName, player.lastName),
     (row, player) => sameName(row.firstName, player.firstName) && sameName(row.lastName, player.lastName),
   ];
@@ -296,7 +302,7 @@ export function planRoster(
   for (const row of input.rows) {
     const before = matches.get(row);
     if (!before) {
-      const base: PlayerId = idFor.player(input.team, input.season, row.firstName, row.lastName);
+      const base = idOf(row);
       const id = taken.has(base) ? `${base}-${row.jersey}` : base;
       taken.add(id);
       const player = applyRow(Player.parse({ id, teamId: input.team, seasonId: input.season, firstName: row.firstName, lastName: row.lastName, jersey: row.jersey }), row);
@@ -305,7 +311,7 @@ export function planRoster(
       continue;
     }
     const value = applyRow(before, row);
-    const merge = mergePut('import', { doc: before, locked: world.locked('player', before.id) }, { value });
+    const merge = mergePut('import', { doc: before, locked: world.locked('player', before.id) }, { kind: 'player', value });
     if (merge.change === 'none') {
       unchanged++;
       continue;

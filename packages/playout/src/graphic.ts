@@ -97,3 +97,6 @@ export const defineGraphic =
 
 export type AnyGraphic = GraphicEntry<string, SceneFacts, z.ZodType>;
 export type Registry = Readonly<Record<string, AnyGraphic>>;
+
+/** Look entries up here, never by indexing: an id from outside such as `constructor` must miss, not find Object.prototype's. */
+export const entryOf = (registry: Registry, id: string): AnyGraphic | undefined => (Object.hasOwn(registry, id) ? registry[id] : undefined);

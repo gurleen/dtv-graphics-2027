@@ -5,8 +5,8 @@
  */
 
 import { z } from 'zod';
-import { GameId, SourceId } from '../ids';
-import type { EpochMs } from '../primitives';
+import { GameId, type PlayerId, SourceId } from '../ids';
+import type { EpochMs, Side } from '../primitives';
 import type { ProgramOf, Sport } from '../programs';
 import * as basketball from './basketball';
 
@@ -17,6 +17,8 @@ interface SportModule<Live, Command, Program> {
   readonly apply: (live: Live, command: Command, context: { source: SourceId; now: EpochMs }) => basketball.ApplyResult<Live>;
   /** The earliest moment any displayed value derived from `live` changes on its own. */
   readonly nextChange: (live: Live, now: EpochMs) => EpochMs | null;
+  /** The players a command names, each with the side it puts them on, or null for either team. */
+  readonly players: (command: Command) => readonly { readonly player: PlayerId; readonly side: Side | null }[];
 }
 
 const earliest = (times: readonly (EpochMs | null)[]): EpochMs | null => {
@@ -35,6 +37,11 @@ export const SPORT_MODULES = {
         basketball.nextDisplayChange(live.clock, now, 'game'),
         live.shotClock && basketball.nextDisplayChange(live.shotClock, now, 'shot'),
       ]),
+    players: (command) => {
+      if (command.type === 'starters') return command.players.map((player) => ({ player, side: command.side }));
+      if (command.type === 'playerLine') return [{ player: command.player, side: null }];
+      return [];
+    },
   },
 } as const satisfies {
   [S in Sport]: SportModule<basketball.BasketballLive, basketball.BasketballCommand, ProgramOf<S>>;

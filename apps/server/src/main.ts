@@ -16,17 +16,15 @@
 
 import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
-import { backup, migrate, openDb, seed } from '@dtv/db';
+import { backup, dbLocation, migrate, openDb, seed } from '@dtv/db';
 import { GRAPHICS } from '@dtv/graphics';
 import rendererPage from '@dtv/renderer-page';
-import { RPCHandler } from '@orpc/server/bun-ws';
-import { type CallContext, createRouter } from './router';
+import { rpcWebSocket } from './router';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
 const PORT = Number(process.env.PORT ?? 8975);
-const DB_PATH = resolve(process.env.DTV_DB ?? join(ROOT, 'data/db/dtv.sqlite'));
-const BACKUPS = join(dirname(DB_PATH), 'backups');
+const { path: DB_PATH, backups: BACKUPS } = dbLocation();
 
 mkdirSync(dirname(DB_PATH), { recursive: true });
 const db = openDb(DB_PATH);
@@ -40,7 +38,6 @@ if (process.argv.includes('--seed')) {
 }
 
 const store = createStore({ db, registry: GRAPHICS, clock: systemClock, backupDir: BACKUPS });
-const handler = new RPCHandler(createRouter(store));
 
 const escape = (text: string) => text.replace(/[&<>"]/g, (character) => `&#${character.charCodeAt(0)};`);
 
@@ -94,17 +91,7 @@ const server = Bun.serve({
     if (url.pathname === '/') return statusPage();
     return new Response('Not found', { status: 404 });
   },
-  websocket: {
-    data: {} as CallContext,
-    // A World snapshot is about 430 KB of JSON and 34 KB compressed.
-    perMessageDeflate: true,
-    message(ws, message) {
-      void handler.message(ws, message, { context: ws.data });
-    },
-    close(ws) {
-      handler.close(ws);
-    },
-  },
+  websocket: rpcWebSocket(store),
 });
 console.info(`dtv server on http://localhost:${server.port} with ${DB_PATH}`);
 

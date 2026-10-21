@@ -79,11 +79,25 @@ export type Merge =
   | { readonly change: 'insert' | 'update'; readonly row: Row; readonly skipped: readonly string[] }
   | { readonly change: 'none'; readonly skipped: readonly string[] };
 
+const defaultsOf = (kind: EntityKind): ReadonlyMap<string, unknown> => {
+  const shape: Readonly<Record<string, z.ZodType>> = ENTITIES[kind].schema.shape;
+  const defaults = new Map<string, unknown>();
+  for (const [field, schema] of Object.entries(shape)) {
+    const parsed = schema.safeParse(undefined);
+    if (parsed.success) defaults.set(field, parsed.data);
+  }
+  return defaults;
+};
+
+/** Each field's schema default, for the fields whose schema accepts a missing value. */
+const DEFAULTS = new Map(ENTITY_KINDS.map((kind) => [kind, defaultsOf(kind)]));
+
 /**
  * What one put does to the row it targets.
  *
  * - A manual put writes and locks every field it changes. On a new row that is every field
- *   it sets to a value (a null is not a value), so an import can still fill the rest.
+ *   it sets to a value other than null or the field's schema default, so an import can
+ *   still fill the rest.
  * - An import put writes only unlocked fields and reports the locked ones it would have
  *   changed in `skipped`.
  * - `unlock` clears locks last, so an explicit unlock wins over the lock a change would add.
@@ -92,14 +106,21 @@ export type Merge =
 export function mergePut(
   origin: Origin,
   existing: Row | undefined,
-  put: { readonly value: Readonly<Record<string, unknown>>; readonly onExisting?: 'keep'; readonly unlock?: readonly string[] },
+  put: {
+    readonly kind: EntityKind;
+    readonly value: Readonly<Record<string, unknown>>;
+    readonly onExisting?: 'keep';
+    readonly unlock?: readonly string[];
+  },
 ): Merge {
   const unlock = new Set(put.unlock ?? []);
   if (!existing) {
+    const defaults = DEFAULTS.get(put.kind)!;
+    const typed = (field: string, value: unknown) => value !== null && !(defaults.has(field) && sameJson(value, defaults.get(field)));
     const locked =
       origin === 'manual'
         ? Object.entries(put.value)
-            .filter(([field, value]) => field !== 'id' && value !== null && !unlock.has(field))
+            .filter(([field, value]) => field !== 'id' && typed(field, value) && !unlock.has(field))
             .map(([field]) => field)
         : [];
     return { change: 'insert', row: { doc: put.value, locked: locked.sort() }, skipped: [] };

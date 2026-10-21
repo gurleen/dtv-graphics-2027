@@ -14,7 +14,7 @@ import {
 } from '@dtv/db';
 import {
   checkEdits, type EditBatch, type EpochMs, type GameApplyInput, type GameId, type GameLive, indexWorld, parseRosterCsv, planRoster,
-  PROGRAMS, type Revision, type RosterError, type RosterPlan, sameJson, type SeasonId, SPORT_MODULES, type TeamId, type World,
+  type PlayerId, playerOutsideGame, PROGRAMS, type Revision, type RosterError, type RosterPlan, sameJson, type SeasonId, SPORT_MODULES, type TeamId, type World,
   type WorldSnapshot,
 } from '@dtv/domain';
 import {
@@ -47,6 +47,7 @@ export type DataResult =
 export type GameResult =
   | { readonly ok: true; readonly revision: Revision; readonly live: GameLive }
   | { readonly ok: false; readonly reason: 'not-authority'; readonly group: string }
+  | { readonly ok: false; readonly reason: 'not-in-game'; readonly player: PlayerId }
   | { readonly ok: false; readonly reason: 'no-game' };
 
 export type CommandResult = { readonly ok: true; readonly revision: Revision; readonly changed: boolean } | { readonly ok: false; readonly reason: string };
@@ -173,7 +174,8 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       if (result.revision !== world.revision) {
         world = indexWorld(loadSnapshot(db));
         lives = new Map(loadLive(db));
-        notify('data');
+        // A commit can add or remove a game, and its live state with it.
+        notify('data', 'live');
         schedule();
       }
       return { ok: true, revision: result.revision, skipped: result.skipped };
@@ -191,13 +193,16 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
       const sport = SPORT_MODULES[input.sport];
       const now = clock.now();
       const before = lives.get(game.id);
-      let live = before ?? sport.initial(game.id, game.program);
+      if (!before) return { ok: false, reason: 'no-game' };
+      const outsider = playerOutsideGame(world, game, input);
+      if (outsider) return { ok: false, reason: 'not-in-game', player: outsider };
+      let live = before;
       for (const command of input.commands) {
         const result = sport.apply(live, command, { source: input.source, now });
         if (!result.ok) return { ok: false, reason: 'not-authority', group: result.group };
         live = result.live;
       }
-      if (before && sameJson(live, before)) return { ok: true, revision: liveRevision, live };
+      if (sameJson(live, before)) return { ok: true, revision: liveRevision, live };
       liveRevision = commitLive(db, { actor, at: now, live, payload: input });
       lives.set(game.id, live);
       notify('live');
@@ -225,14 +230,16 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
 
     watchData: (signal) => stream({ topics: ['data'], signal, read: () => world.snapshot, key: (snapshot) => snapshot.revision }),
 
-    watchGame: (game, signal) => stream({ topics: ['live'], signal, read: () => lives.get(game), key: (live) => live }),
+    // A data commit reloads every live state as a new object, so identity would resend unchanged games.
+    watchGame: (game, signal) => stream({ topics: ['live'], signal, read: () => lives.get(game), key: (live) => JSON.stringify(live) }),
 
     async *watchShow(operator, signal) {
       presence.set(operator, (presence.get(operator) ?? 0) + 1);
       notify('presence');
       try {
         yield* stream({
-          topics: ['data', 'show', 'presence'],
+          // A cue's label and error come from its bind, which may read the live game.
+          topics: ['data', 'live', 'show', 'presence'],
           signal,
           read: () =>
             viewShow({ registry, state: show, operator, operators: [...presence.keys()], revision: max(world.revision, showRevision), context: context() }),

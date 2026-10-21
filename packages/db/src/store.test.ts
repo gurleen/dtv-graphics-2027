@@ -138,6 +138,22 @@ describe('basis', () => {
     expect(commit(manual([{ op: 'delete', kind: 'player', id: reed.id }], read))).toMatchObject({ ok: false, reason: 'conflict' });
   });
 
+  test('a put of a row deleted after the basis is a conflict, and does not bring it back', () => {
+    const read = revision();
+    ok(commit(manual([{ op: 'delete', kind: 'player', id: reed.id }], read)));
+    expect(commit(manual([{ op: 'put', kind: 'player', value: { ...reed, firstName: 'Joshua' } }], read))).toMatchObject({
+      ok: false,
+      reason: 'conflict',
+      detail: expect.stringContaining(`player ${reed.id} was deleted at revision`),
+    });
+    expect(loadSnapshot(db).entities.player).toEqual([]);
+    expect(ok(commit(manual([{ op: 'put', kind: 'player', value: reed }]))).inserted).toBe(1);
+  });
+
+  test('a batch that deletes a row and puts it again lands', () => {
+    expect(ok(commit(manual([{ op: 'delete', kind: 'player', id: reed.id }, { op: 'put', kind: 'player', value: reed }])))).toMatchObject({ inserted: 1, deleted: 1 });
+  });
+
   test('a batch that read the latest revision lands, even when it writes one row twice', () => {
     const result = ok(commit(manual([
       { op: 'put', kind: 'school', value: { ...sju, mascot: 'Hawk' } },
@@ -197,6 +213,12 @@ describe('live and show state', () => {
     const sjuMbb = Team.parse({ id: 'saint-josephs-mbb', schoolId: 'saint-josephs', program: 'mbb' });
     const game = { id: gameId, seasonId: season.id, program: 'mbb', awayTeamId: sjuMbb.id, homeTeamId: drexelMbb.id, venueId: null, startsAt: '2026-11-08T19:00:00-05:00', conferenceGame: false, title: null } as const;
     ok(commit(imported(...BASE, { op: 'put', kind: 'team', value: sjuMbb }, { op: 'put', kind: 'game', value: game })));
+  });
+
+  test('the batch that inserts a game gives it its sport’s initial live state, and deleting the game deletes it', () => {
+    expect(loadLive(db).get(gameId)).toEqual(basketball.initialBasketball(gameId, 'mbb'));
+    ok(commit(manual([{ op: 'delete', kind: 'game', id: gameId }])));
+    expect(loadLive(db).has(gameId)).toBe(false);
   });
 
   test('live state round-trips and its commits do not move the World revision', () => {

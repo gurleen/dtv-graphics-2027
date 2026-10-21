@@ -38,12 +38,13 @@ browser. `@dtv/db` (`packages/db/`) owns the SQLite file, `data/db/dtv.sqlite`.
 ```bash
 bun run db:seed              # migrate, then fill the file from data/seed/
 bun run db:migrate           # bring the file to the schema the code expects
-bun run db:backup            # copy the file to data/db/backups/; the newest 30 stay
+bun run db:backup            # copy the file to data/db/backups/; the newest 30 stay, and the newest of each reason
 bun run check                # typecheck, check package imports, run the tests
 ```
 
-Run `db:seed` with the server stopped, because the server is the only process
-that writes the file. A second seed writes nothing, and it never resets a row
+`DTV_DB` names another database file, as it does for the server, and its backups
+go in `backups/` beside it. Run `db:seed` with the server stopped, because the
+server is the only process that writes the file. A second seed writes nothing, and it never resets a row
 that someone changed. [`data/seed/README.md`](data/seed/README.md) describes the
 seed files and the roster CSV header.
 

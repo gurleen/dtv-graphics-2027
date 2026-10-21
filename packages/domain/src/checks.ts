@@ -1,8 +1,10 @@
 import { type EditBatch, mergePut } from './edits';
 import { type EntityKind, type EntityOf, parseEntity } from './entities';
-import type { GameId, TeamId } from './ids';
+import type { Game } from './entities';
+import type { GameId, PlayerId, TeamId } from './ids';
 import { SIDES, type Side } from './primitives';
 import { PROGRAMS, type ProgramCode, type Sport } from './programs';
+import { type GameApplyInput, SPORT_MODULES } from './sports';
 import type { World } from './world';
 
 export type Inconsistency =
@@ -82,4 +84,17 @@ export function checkEdits(world: World, batch: EditBatch): readonly Inconsisten
     if (player) statsSport('playerStats', row.id, row.stats.sport, sportOf(player.teamId));
   }
   return problems;
+}
+
+/** The first player a live update names who is not on that side's team, or either team, in the game's season. */
+export function playerOutsideGame(world: World, game: Game, input: GameApplyInput): PlayerId | null {
+  const teams = { away: game.awayTeamId, home: game.homeTeamId };
+  for (const command of input.commands) {
+    for (const { player, side } of SPORT_MODULES[input.sport].players(command)) {
+      const row = world.get('player', player);
+      const onTeam = row?.seasonId === game.seasonId && (side ? row.teamId === teams[side] : row.teamId === teams.away || row.teamId === teams.home);
+      if (!onTeam) return player;
+    }
+  }
+  return null;
 }

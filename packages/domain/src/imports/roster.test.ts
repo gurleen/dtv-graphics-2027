@@ -73,6 +73,16 @@ describe('parseRosterCsv', () => {
     });
   });
 
+  test('a name an id cannot be made from is a bad row, and an accented one is fine', () => {
+    expect(parseRosterCsv([HEADER, '7,,Müller,G,,,,,,', '8,,王,G,,,,,,', '9,Иван,Петров,F,,,,,,'].join('\n'))).toEqual({
+      ok: false,
+      errors: [
+        { line: 3, message: 'the name "王" has no letters a-z or digits for an id' },
+        { line: 4, message: 'the name "Иван Петров" has no letters a-z or digits for an id' },
+      ],
+    });
+  });
+
   test('a header without a jersey or a name column is refused at line 1', () => {
     expect(parseRosterCsv('first,pos\nJosh,G')).toEqual({ ok: false, errors: [{ line: 1, message: 'missing column jersey and last_name (or name)' }] });
   });
@@ -107,6 +117,20 @@ describe('planRoster', () => {
     expect(renumbered.update.map(({ after }) => [after.id, after.jersey])).toEqual([['drexel-mbb@2026-27/hipps', '1']]);
     const renamed = plan(players, keyed.replace('5,Josh,Reed', '9,Joshua,Reed-Smith'));
     expect(renamed.update.map(({ after }) => [after.id, after.firstName, after.jersey])).toEqual([['drexel-mbb@2026-27/reed-josh', 'Joshua', '9']]);
+  });
+
+  test('a row matches the player whose id it would get, so a file that still has a corrected name updates nothing', () => {
+    const players = committed([], plan([], ROSTER).edits).map((player) => (player.lastName === 'Hipps' ? { ...player, lastName: 'Hipp' } : player));
+    const result = plan(players, ROSTER, { locks: { 'drexel-mbb@2026-27/hipps': ['lastName'] } });
+    expect(result).toEqual({ add: [], update: [], unchanged: 3, missing: [], edits: [] });
+  });
+
+  test('two players with one name match their own rows by id, in either file order', () => {
+    const csv = `${HEADER}\n3,Chris,Lee,G,FR,,,,,\n4,Chris,Lee,F,SO,,,,,`;
+    const players = committed([], plan([], csv).edits).map((player) => ({ ...player, lastName: 'Li' }));
+    const swapped = [HEADER, ...csv.split('\n').slice(1).reverse()].join('\n');
+    const locks = Object.fromEntries(players.map((player) => [player.id, ['lastName']]));
+    expect(plan(players, swapped, { locks })).toMatchObject({ add: [], update: [], unchanged: 2 });
   });
 
   test('fields the file leaves blank keep their values', () => {

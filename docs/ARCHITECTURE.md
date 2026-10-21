@@ -111,7 +111,8 @@ creation, even when the name it came from is edited. The 361 team names in teams
 Live state is not an entity. It changes several times a second, so it has its own table and its own stream, and it
 never travels with the World. `SPORT_MODULES` holds one row per sport with its live schema, its command schema,
 `initial`, `apply`, and `nextChange`. The row is checked with `satisfies`, so a sport without a module fails the
-build.
+build. Every game has live state. The transaction that inserts a game also inserts its sport's `initial`, and
+deleting the game deletes it.
 
 `BasketballLive` holds the phase, period, game clock, shot clock, score, timeouts, bonus, possession, starters,
 team and player stat lines, and `authority`. Commands set absolute values (`score home 74`), never deltas, so a
@@ -121,7 +122,9 @@ resent packet changes nothing and two operators who press +2 for one basket agre
 the score. Only the `operator` source can hand a group to a feed or take it back.
 
 A running clock is `{ running: true, remainingMs, since }`, anchored on the server's time. Nothing ticks it.
-Every display is computed from `now` at projection time, so a restart cannot lose time.
+Every display is computed from `now` at projection time, so a restart cannot lose time. A clock command is
+anchored at the server's time when it arrives, so a resent `clockSet` with `running: true` starts again from its
+`remainingMs`, which is safe because `game.apply` never retries on its own and a feed sends its current time.
 
 ### Prefilled data and manual edits
 
@@ -129,20 +132,23 @@ Most data arrives prefilled, and people correct it on the data page. These rules
 
 - Every batch names its origin. `manual` is a person on the data page. `import` is the seed, an importer, or a
   live-data package.
-- Each row keeps a `locked` list beside its document. A manual put locks the fields it changed. An import put
-  writes only unlocked fields and reports the fields it skipped. The data page can unlock a field, and the next
-  import updates it again.
+- Each row keeps a `locked` list beside its document. A manual put locks the fields it changed. A manual insert
+  locks the fields it sets to something other than null or the field's schema default, so `position: ''` or
+  `redshirt: false` that nobody typed stays open to imports. An import put writes only unlocked fields and reports
+  the fields it skipped. The data page can unlock a field, and the next import updates it again.
 - A put with `onExisting: 'keep'` writes a row only when the row is missing. The seed uses it, so `bun run db:seed`
   never resets a record that a feed or an import updated since.
 - A manual batch carries `basis`, the World revision its writer read. A put or delete of a row written after that
-  revision fails the whole batch with `CONFLICT`, so one editor never overwrites another.
+  revision fails the whole batch with `CONFLICT`, so one editor never overwrites another. A delete is a write. The
+  store finds it in the journal, so a stale put cannot bring a deleted row back.
 - Importers return warnings for the data page to show. On teams.json they report what we measured on the vendored
   file: `conference_id` 7 is both the Big Ten and the EIWA, `conference_id` 10 carries two names for the CAA, 12
   logo files are shared by 31 schools, 35 records have no valid alternate colour, 38 have no logo, and the CAA list
   still includes Delaware.
 
 The roster importer runs in two steps. `parseRosterCsv` reports every bad row. `planRoster` matches each row to an
-existing player by `sourceKey`, then by jersey and last name, then by full name. It returns adds, updates, an
+existing player by `sourceKey`, then by the id the row would get, then by jersey and last name, then by full name.
+Ids never change, so the id pass finds a player whose name a person corrected since the file was written. It returns adds, updates, an
 unchanged count, players missing from the file, and the edits. The data page shows the plan, and the operator
 commits it with `data.apply`. Planning the same file again returns an empty plan. Missing players are deleted only
 when the operator asks (`prune`).
@@ -178,11 +184,14 @@ Three more tables hold what is not an entity.
 
 `migrate` compares each table's SQL with what `tableSql(kind)` derives and rebuilds the tables that differ, with
 SQLite's documented rebuild. A second run finds nothing to do. An added field needs no migration, because every
-load parses each document and the schema's `.default()` fills it in. A rename is a `DocMigration`, applied once
-under `PRAGMA user_version`. A document that fails its schema on load stops the server and names its kind and id.
+load parses each document and the schema's `.default()` fills it in. A rename is `renameField`, a `DocMigration`
+applied once under `PRAGMA user_version`. It moves the field in each document and in each row's `locked` list. A
+table rebuilt in the same run copies its rows through the pending migrations, so its generated columns read the
+renamed field. A document that fails its schema on load stops the server and names its kind and id.
 
 `VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every show
-activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept.
+activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept, and the newest of
+each reason, so a run of show activations never evicts the only backup taken before a migration.
 
 After a data commit the server reloads the World from SQLite instead of patching memory, so a cascaded delete can
 never leave memory behind the file. A candidate measured a median of 1.22 ms to load 2,527 seed-shaped rows.
@@ -195,6 +204,8 @@ on every write and refuses the batch with `INCONSISTENT`.
 - Both teams of a game play in the game's program.
 - `TeamSeason.stats` and `PlayerSeasonStats.stats` have the sport of their team's program.
 - A `game.apply` names the sport of its game.
+- A `game.apply` names only players of the game's teams that season, and starters only of their side's team. It
+  fails with `NOT_IN_GAME` otherwise, so a typo cannot grow the live player lines.
 - Every rundown cue names a graphic in the registry, and its params and overrides fit that graphic.
 
 ## 3. The API
@@ -211,7 +222,7 @@ SQLite.
 | `data.apply` | `EditBatch` | `{ revision, skipped }` | `CONFLICT`, `INVALID_REFERENCE`, `DUPLICATE`, `INCONSISTENT` |
 | `data.planRoster` | team, season, csv, prune | the plan, or the bad rows | none |
 | `game.watch` | game | stream of `GameLive` | none |
-| `game.apply` | `GameApplyInput` | `{ revision, live }` | `NOT_AUTHORITY`, `NO_GAME` |
+| `game.apply` | `GameApplyInput` | `{ revision, live }` | `NOT_AUTHORITY`, `NOT_IN_GAME`, `NO_GAME` |
 | `show.watch` | operator | stream of `ShowView` | none |
 | `show.command` | `{ id, command }` | `{ revision, changed }` | `REJECTED` |
 | `output.watch` | bus | stream of `OutputFrame` | none |
@@ -226,18 +237,24 @@ socket drops, the link ends every open call, and the `watch` helper opens each s
 killed the server, started a new one a second later, and saw the new server's value 1,519 ms after the kill.
 `perMessageDeflate` is on, because a World snapshot is about 430 KB of JSON and 34 KB compressed.
 
+A frame that oRPC cannot decode is logged and dropped, and the server keeps serving. A stream that throws ends
+with an error for its caller only.
+
 The `?client=` label on the socket names the caller in the journal. It is not authentication. The design trusts
 the local network.
 
 ### Streams send whole values, newest only
 
 Every `watch` yields complete values. A change marks the stream dirty and wakes it. The stream recomputes its value
-and sends it only if it differs from the last one sent. A slow consumer gets the newest value, never a backlog, and
-a client that reconnects has caught up as soon as its first value arrives.
+and sends it only if it differs from the last one sent. Newest-only holds at the stream, which skips the values a
+slow consumer never pulled, not in the socket's send buffer, which still delivers what it holds in order. A client
+that reconnects has caught up as soon as its first value arrives.
 
 Each stream wakes only on the changes its value reads. `data.watch` wakes on data commits and compares revisions.
-`game.watch` wakes on its game's live state. `show.watch` wakes on data and show changes. `output.watch` wakes on
-data, live, show, and clock changes. A clock tick therefore never serializes the World.
+`game.watch` wakes on live changes and on data commits, which add and remove games, and compares its game's state.
+`show.watch` wakes on data, live, and show changes, because a cue's label and error come from its bind, which may
+read the live game. `output.watch` wakes on data, live, show, and clock changes. A clock tick therefore never
+serializes the World.
 
 ### Show commands carry ids
 
@@ -250,8 +267,8 @@ because repeating it changes nothing.
 
 ### oRPC version
 
-The design pins `^1.15.7`, which installs 1.16.0. The v2 line is in beta. Four files import oRPC:
-`packages/api/src/contract.ts` and `client.ts`, and `apps/server/src/router.ts` and `main.ts`. Moving to v2 renames
+The design pins `^1.15.7`, which installs 1.16.0. The v2 line is in beta. Three files import oRPC:
+`packages/api/src/contract.ts` and `client.ts`, and `apps/server/src/router.ts`. Moving to v2 renames
 `@orpc/server/bun-ws` and `eventIterator`, and the server and every client must move together because the wire
 format changed.
 
@@ -271,8 +288,10 @@ graphics that would overlap are never on air together.
 | `lower` | Player, staff, team, and talent lower thirds, Starting Five, Player To Watch, Player Of The Game, Matchup Locator lower third, Burning Question |
 | `card` | Matchup Locator, Halftime Statistics, Conference Standings |
 
-An entry can name layers its take also clears. The double and triple talent lower thirds clear `bug`, because they
-overlap the scorebug.
+An entry can name layers it covers in `clears`. The double and triple talent lower thirds clear `bug`, because they
+overlap the scorebug. Take, air, and toggle share one placement rule. Putting a graphic on air takes off the layers
+it covers, and putting a graphic on a covered layer takes off the graphic that covers it. The one exception is a
+take whose preview holds both, which puts both on air.
 
 ### Free panel and rundown
 
@@ -297,8 +316,8 @@ layer is what tells a renderer to play out and then in.
 |---|---|
 | `cue operator ref` | Into my preview, on the graphic's layer. The same cue with equal params changes nothing. |
 | `uncue operator layer` | Out of my preview. |
-| `take operator` | Each layer of my preview goes to program, plus each entry's `clears`. My preview empties. |
-| `air operator ref` | Straight to program, for free-panel keys. No change if that cue is already on air. |
+| `take operator` | Each layer of my preview goes to program, and what it overlaps comes off. My preview empties. |
+| `air operator ref` | Straight to program, for free-panel keys, and what it overlaps comes off. No change if that cue is already on air. |
 | `toggle operator ref` | Clear it if it is on program, else air it. |
 | `clear layer slot?` | Off air. With a slot id, only if the layer still holds that slot. |
 | `clearAll` | Everything off air. |

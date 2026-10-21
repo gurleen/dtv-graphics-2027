@@ -164,6 +164,11 @@ describe('rules over the wire', () => {
     expect(result.live.sport === 'basketball' && result.live.score.home).toBe(75);
   });
 
+  test('a player line for a player on neither team fails with NOT_IN_GAME', async () => {
+    const line: GameApplyInput = { sport: 'basketball', gameId: GAME, source: SourceId.parse('operator'), commands: [{ type: 'playerLine', player: PlayerId.parse('drexel-mbb@2026-27/nobody'), line: { pts: 2 } }] };
+    expect(await rejection(a.api.game.apply(line))).toMatchObject({ code: 'NOT_IN_GAME', data: { player: 'drexel-mbb@2026-27/nobody' } });
+  });
+
   test('a data edit that puts another program’s team in a game fails with INCONSISTENT and writes nothing', async () => {
     const world = await first((signal) => a.api.data.watch(undefined, { signal }));
     const game = world.entities.game.find((row) => row.id === GAME)!;
@@ -173,6 +178,19 @@ describe('rules over the wire', () => {
     expect(after.revision).toBe(world.revision);
     expect(after.entities.game.find((row) => row.id === GAME)?.awayTeamId).toBe(TeamId.parse('saint-josephs-mbb'));
   });
+});
+
+test('a malformed frame on /rpc is dropped, and the server keeps answering', async () => {
+  for (const frame of ['{}', '[]', 'not json']) {
+    const socket = new WebSocket(`ws://localhost:${server.port}/rpc`);
+    await new Promise((resolve) => (socket.onopen = resolve));
+    socket.send(frame);
+    await Bun.sleep(100);
+    socket.close();
+  }
+  const world = await first((signal) => a.api.data.watch(undefined, { signal }));
+  expect(world.revision).toBeGreaterThan(0);
+  expect(server.child.exitCode).toBeNull();
 });
 
 describe('restart', () => {

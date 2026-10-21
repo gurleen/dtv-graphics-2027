@@ -10,7 +10,7 @@
 
 import { Cue, CueId, GraphicId, sameJson, ShowId } from '@dtv/domain';
 import { z } from 'zod';
-import { type AnyGraphic, LAYERS, type LayerId, type Registry, type ShowContext } from './graphic';
+import { type AnyGraphic, entryOf, LAYERS, type LayerId, type Registry, type ShowContext } from './graphic';
 import { boundProps, type SceneFacts } from './scene';
 
 export const OperatorId = z
@@ -159,7 +159,7 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
     case 'step': {
       const slot = onAir(command.layer, command.slot);
       if (!slot) return unchanged;
-      const entry = registry[slot.graphic];
+      const entry = entryOf(registry, slot.graphic);
       if (!entry?.steps) return rejected(`${entry?.name ?? slot.graphic} has no steps`);
       if (command.to === slot.step) return unchanged;
       if (command.to >= entry.steps.count) return next({ program: without(state.program, command.layer) });
@@ -204,13 +204,22 @@ const withBus = (previews: ShowState['previews'], operator: OperatorId, bus: Bus
   return Object.keys(bus).length ? { ...rest, [operator]: bus } : rest;
 };
 
-/** Puts each slot of `incoming` on program, then clears the layers they cover that `incoming` does not fill. */
+/**
+ * The one placement rule, for take, air and toggle: puts each slot of `incoming` on program,
+ * then takes off whatever overlaps it. That is a layer an incoming graphic covers, unless
+ * `incoming` fills it, and a graphic already on air that covers a layer `incoming` fills.
+ */
 function putOnAir(registry: Registry, program: Bus, incoming: Bus): Bus {
+  const covers = (slot: Slot) => entryOf(registry, slot.graphic)?.clears ?? [];
   let result: Bus = { ...program, ...incoming };
   for (const slot of Object.values(incoming)) {
-    for (const layer of registry[slot.graphic]?.clears ?? []) {
+    for (const layer of covers(slot)) {
       if (!incoming[layer]) result = without(result, layer);
     }
+  }
+  for (const layer of LAYERS) {
+    const slot = result[layer];
+    if (slot && !incoming[layer] && covers(slot).some((covered) => incoming[covered])) result = without(result, layer);
   }
   return result;
 }
@@ -236,7 +245,7 @@ export function resolveCue(registry: Registry, ref: CueRef, context: ShowContext
     if (!cue) return { ok: false, error: `The rundown has no cue ${ref.cue}` };
     return checked(cue.graphic, cue.params, cue.overrides);
   }
-  const entry = registry[ref.graphic];
+  const entry = entryOf(registry, ref.graphic);
   if (!entry) return { ok: false, error: `No graphic ${ref.graphic}` };
   if (!entry.free) return { ok: false, error: `${entry.name} is not on the free panel` };
   const params = entry.free(context);
@@ -250,7 +259,7 @@ export type CueCheck =
 
 /** A graphic, its params and overrides, checked against the registry. Params come back with their defaults. */
 export function checkCue(registry: Registry, cue: { readonly graphic: string; readonly params: unknown; readonly overrides: Overrides }): CueCheck {
-  const entry = registry[cue.graphic];
+  const entry = entryOf(registry, cue.graphic);
   if (!entry) return { ok: false, error: `No graphic ${cue.graphic}` };
   const params = entry.params.safeParse(cue.params);
   if (!params.success) return { ok: false, error: `${entry.name}: ${z.prettifyError(params.error)}` };

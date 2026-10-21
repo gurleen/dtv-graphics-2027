@@ -1,4 +1,4 @@
-import { ENTITIES, type EntityKind, parseEntity } from '@dtv/domain';
+import { ENTITIES, ENTITY_KINDS, type EntityKind, parseEntity } from '@dtv/domain';
 import { backup } from './backup';
 import type { Db } from './db';
 import { TABLES, type TableSql } from './schema';
@@ -12,7 +12,21 @@ export interface DocMigration {
   readonly version: number;
   readonly kind: EntityKind;
   readonly up: (doc: unknown) => unknown;
+  /** Fields `up` renames, old name to new, so each row's locks follow them. */
+  readonly renames?: Readonly<Record<string, string>>;
 }
+
+/** The migration for a rename: the document's field and the row's lock on it both move. */
+export const renameField = (version: number, kind: EntityKind, from: string, to: string): DocMigration => ({
+  version,
+  kind,
+  up: (doc) => {
+    if (doc === null || typeof doc !== 'object' || !(from in doc)) return doc;
+    const { [from]: value, ...rest } = doc as Record<string, unknown>;
+    return { ...rest, [to]: value };
+  },
+  renames: { [from]: to },
+});
 
 export const DOC_MIGRATIONS: readonly DocMigration[] = [];
 
@@ -30,14 +44,41 @@ const storedColumns = (db: Db, table: string) =>
     .filter((column) => column.hidden === 0)
     .map((column) => column.name);
 
-function rebuild(db: Db, table: TableSql) {
+interface Row {
+  readonly id: string;
+  readonly doc: string;
+  readonly seq: number;
+  readonly locked: string;
+}
+
+/** A row through `migrations` in order: its document reshaped and checked, its locks renamed. */
+function migrateRow(kind: EntityKind, migrations: readonly DocMigration[], row: Row): Row {
+  let doc: unknown = JSON.parse(row.doc);
+  let locked: string[] = JSON.parse(row.locked);
+  for (const migration of migrations) {
+    doc = migration.up(doc);
+    locked = locked.map((field) => migration.renames?.[field] ?? field);
+  }
+  return { ...row, doc: JSON.stringify(parseEntity(kind, doc)), locked: JSON.stringify(locked) };
+}
+
+/** SQLite's documented rebuild. `reshape` rewrites each row on the way, so generated columns read the new documents. */
+function rebuild(db: Db, table: TableSql, reshape: ((row: Row) => Row) | null) {
   const staging = `${table.table}_new`;
   db.sqlite.run(table.create.replace(`CREATE TABLE "${table.table}"`, `CREATE TABLE "${staging}"`));
-  const kept = new Set(storedColumns(db, table.table));
-  const shared = storedColumns(db, staging)
-    .filter((name) => kept.has(name))
-    .join(', ');
-  db.sqlite.run(`INSERT INTO "${staging}" (${shared}) SELECT ${shared} FROM "${table.table}"`);
+  if (reshape) {
+    const insert = db.sqlite.prepare(`INSERT INTO "${staging}" (id, doc, seq, locked) VALUES (?, ?, ?, ?)`);
+    for (const row of db.sqlite.query<Row, []>(`SELECT id, doc, seq, locked FROM "${table.table}"`).all()) {
+      const next = reshape(row);
+      insert.run(next.id, next.doc, next.seq, next.locked);
+    }
+  } else {
+    const kept = new Set(storedColumns(db, table.table));
+    const shared = storedColumns(db, staging)
+      .filter((name) => kept.has(name))
+      .join(', ');
+    db.sqlite.run(`INSERT INTO "${staging}" (${shared}) SELECT ${shared} FROM "${table.table}"`);
+  }
   db.sqlite.run(`DROP TABLE "${table.table}"`);
   db.sqlite.run(`ALTER TABLE "${staging}" RENAME TO "${table.table}"`);
   for (const index of table.indexes) db.sqlite.run(index);
@@ -83,12 +124,21 @@ export function migrate(
         db.sqlite.run(table.create);
         for (const index of table.indexes) db.sqlite.run(index);
       }
-      for (const table of rebuilt) rebuild(db, table);
-      for (const migration of pending) {
-        const table = ENTITIES[migration.kind].table;
-        const rows = db.sqlite.query<{ id: string; doc: string }, []>(`SELECT id, doc FROM "${table}"`).all();
-        const update = db.sqlite.prepare(`UPDATE "${table}" SET doc = ? WHERE id = ?`);
-        for (const row of rows) update.run(JSON.stringify(parseEntity(migration.kind, migration.up(JSON.parse(row.doc)))), row.id);
+      const reshapes = new Map<string, (row: Row) => Row>(
+        ENTITY_KINDS.flatMap((kind) => {
+          const own = pending.filter((migration) => migration.kind === kind);
+          return own.length ? [[ENTITIES[kind].table, (row: Row) => migrateRow(kind, own, row)] as const] : [];
+        }),
+      );
+      for (const table of rebuilt) rebuild(db, table, reshapes.get(table.table) ?? null);
+      const rebuiltNames = new Set(rebuilt.map((table) => table.table));
+      for (const [table, reshape] of reshapes) {
+        if (rebuiltNames.has(table)) continue;
+        const update = db.sqlite.prepare(`UPDATE "${table}" SET doc = ?, locked = ? WHERE id = ?`);
+        for (const row of db.sqlite.query<Row, []>(`SELECT id, doc, seq, locked FROM "${table}"`).all()) {
+          const next = reshape(row);
+          update.run(next.doc, next.locked, next.id);
+        }
       }
       db.sqlite.run(`PRAGMA user_version = ${latest}`);
       const dangling = db.sqlite.query<{ table: string; parent: string }, []>('PRAGMA foreign_key_check').all();

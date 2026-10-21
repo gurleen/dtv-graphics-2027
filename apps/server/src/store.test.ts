@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { type Db, migrate, openDb, seed } from '@dtv/db';
-import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, ShowId, SourceId, TeamId } from '@dtv/domain';
+import { type Db, loadLive, migrate, openDb, seed } from '@dtv/db';
+import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, SeasonId, ShowId, SourceId, TeamId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
-import { CommandId, OperatorId, type OutputFrame, type ShowCommand } from '@dtv/playout';
+import { CommandId, OperatorId, type OutputFrame, type Registry, type ShowCommand } from '@dtv/playout';
 import { type Clock, createStore, type Store } from './store';
 
 const SEED = join(import.meta.dir, '../../../data/seed');
@@ -133,6 +133,23 @@ describe('data', () => {
     expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue mystery: No graphic basketball-v2/mystery' });
   });
 
+  test('a rundown cue naming a property of Object.prototype is INCONSISTENT', () => {
+    const store = open();
+    const show = store.world().get('show', ShowId.parse('drexel-sju'))!;
+    const rundown = [{ id: CueId.parse('x'), graphic: GraphicId.parse('constructor'), params: {}, overrides: {}, note: '' }];
+    const result = store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown } }] });
+    expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue x: No graphic constructor' });
+  });
+
+  test('planRoster reports a name an id cannot be made from as a bad row', () => {
+    const store = open();
+    const csv = 'jersey,first_name,last_name\n8,,王';
+    expect(store.planRoster({ team: TeamId.parse('drexel-mbb'), season: SeasonId.parse('2026-27'), csv, prune: false })).toEqual({
+      ok: false,
+      errors: [{ line: 2, message: 'the name "王" has no letters a-z or digits for an id' }],
+    });
+  });
+
   test('a stale basis is a CONFLICT', () => {
     const store = open();
     const stale = renamed(store, 'Joshua');
@@ -158,6 +175,18 @@ describe('live', () => {
     expect(open().applyGame('alex', game('operator', { type: 'possession', side: 'home' }))).toMatchObject({ ok: true, live: { possession: 'home', score: { home: 72 } } });
   });
 
+  test('a player line or starters naming a player who is not on that team in this game are refused, and nothing is written', () => {
+    const store = open();
+    const nobody = PlayerId.parse('drexel-mbb@2026-27/nobody');
+    expect(store.applyGame('alex', game('operator', { type: 'playerLine', player: nobody, line: { pts: 2 } }))).toEqual({ ok: false, reason: 'not-in-game', player: nobody });
+    const home = store.world().roster(TeamId.parse('drexel-mbb'), SeasonId.parse('2026-27')).slice(0, 5).map((player) => player.id);
+    expect(store.applyGame('alex', game('operator', { type: 'starters', side: 'away', players: home }))).toEqual({ ok: false, reason: 'not-in-game', player: home[0]! });
+    expect(store.applyGame('alex', game('operator', { type: 'starters', side: 'home', players: home }))).toMatchObject({ ok: true });
+    expect(store.applyGame('alex', game('operator', { type: 'playerLine', player: REED, line: { pts: 20 } }))).toMatchObject({ ok: true });
+    const live = loadLive(db).get(GAME);
+    expect(live?.sport === 'basketball' && Object.keys(live.players)).not.toContain(nobody);
+  });
+
   test('an unknown game is NO_GAME', () => {
     const store = open();
     expect(store.applyGame('alex', { ...game('operator', { type: 'score', side: 'home', value: 1 }), gameId: GameId.parse('2026-27/2026-11-09/a.at.b') })).toEqual({ ok: false, reason: 'no-game' });
@@ -171,6 +200,39 @@ describe('live', () => {
     await flush();
     await stream.stop();
     expect(stream.values.map((live) => live.sport === 'basketball' && live.score.home)).toEqual([72, 74]);
+  });
+});
+
+describe('a second game', () => {
+  const OTHER = GameId.parse('2026-27/2026-11-20/saint-josephs-mbb.at.drexel-mbb');
+  const addOther = (store: Store) =>
+    store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'game', value: { ...store.world().get('game', GAME)!, id: OTHER } }] });
+
+  test('a new game has live state at once: its game stream sends it, and the scorebug for its show binds', async () => {
+    const store = open();
+    const stream = collect((signal) => store.watchGame(OTHER, signal));
+    await flush();
+    expect(addOther(store)).toMatchObject({ ok: true });
+    await flush();
+    await stream.stop();
+    expect(stream.values.map((live) => live.sport === 'basketball' && live.score)).toEqual([{ away: 0, home: 0 }]);
+
+    const show = { ...store.world().get('show', ShowId.parse('drexel-sju'))!, id: ShowId.parse('second'), gameId: OTHER };
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: show }] })).toMatchObject({ ok: true });
+    send(store, { type: 'activate', show: show.id });
+    const view = await current(store.watchShow(alex, new AbortController().signal));
+    expect(view.free.find((cue) => cue.graphic === scorebug.graphic)?.error).toBeNull();
+  });
+
+  test('a game stream sends nothing when a data commit and another game’s change leave its game as it was', async () => {
+    const store = open();
+    const stream = collect((signal) => store.watchGame(GAME, signal));
+    await flush();
+    expect(addOther(store)).toMatchObject({ ok: true });
+    store.applyGame('alex', { ...game('operator', { type: 'score', side: 'home', value: 3 }), gameId: OTHER });
+    await flush();
+    await stream.stop();
+    expect(stream.values).toHaveLength(1);
   });
 });
 
@@ -213,6 +275,20 @@ describe('show commands', () => {
     await one.stop();
     expect(one.values.at(-1)?.operators).toEqual([alex]);
   });
+});
+
+test('the show stream sends a new view when a live change alters what it shows', async () => {
+  const entry = GRAPHICS['basketball-v2/scorebug'];
+  const registry: Registry = { ...GRAPHICS, [entry.id]: { ...entry, label: (_params, context) => `Scorebug ${context.live?.sport === 'basketball' && context.live.score.home}` } };
+  const store = createStore({ db, registry, clock, backupDir: join(dir, 'backups') });
+  stores.push(store);
+  send(store, { type: 'activate', show: ShowId.parse('drexel-sju') });
+  const stream = collect((signal) => store.watchShow(alex, signal));
+  await flush();
+  store.applyGame('alex', game('operator', { type: 'score', side: 'home', value: 74 }));
+  await flush();
+  await stream.stop();
+  expect(stream.values.map((view) => view.free.find((cue) => cue.graphic === scorebug.graphic)?.label)).toEqual(['Scorebug 72', 'Scorebug 74']);
 });
 
 describe('output and the clock', () => {
