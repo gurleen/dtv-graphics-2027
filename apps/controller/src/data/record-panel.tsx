@@ -151,7 +151,7 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
         {!isNew && DELETABLE.has(kind) && (
           <DialogTrigger>
             <Button className="button danger" isDisabled={isActiveShow} aria-label={isActiveShow ? 'Delete (the active show cannot be deleted)' : 'Delete'}>Delete</Button>
-            <Popover className="popover" placement="bottom start">
+            <Popover className="popover data-portal" placement="bottom start">
               <Dialog className="confirm" aria-label="Confirm delete">
                 {({ close }) => (
                   <>

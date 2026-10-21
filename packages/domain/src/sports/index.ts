@@ -35,7 +35,7 @@ export const SPORT_MODULES = {
     nextChange: (live, now) =>
       earliest([
         basketball.nextDisplayChange(live.clock, now, 'game'),
-        live.shotClock && basketball.nextDisplayChange(live.shotClock, now, 'shot'),
+        basketball.nextShotClockChange(live, now),
       ]),
     players: (command) => {
       if (command.type === 'starters') return command.players.map((player) => ({ player, side: command.side }));

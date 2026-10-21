@@ -26,7 +26,7 @@ export function KeyList(props: { readonly onClose: () => void }) {
     </section>
   );
   return (
-    <ModalOverlay className="overlay" isOpen isDismissable onOpenChange={(open) => !open && props.onClose()}>
+    <ModalOverlay className="overlay show-portal" isOpen isDismissable onOpenChange={(open) => !open && props.onClose()}>
       <Modal className="modal wide">
         <Dialog className="dialog key-list" aria-label="Keys">
           <Heading slot="title">Keys</Heading>

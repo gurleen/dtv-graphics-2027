@@ -15,7 +15,7 @@ export function Pick({ label, value, options, empty, onChange, className }: { re
         <SelectValue />
         <span aria-hidden="true">▾</span>
       </Button>
-      <Popover className="popover select-popover">
+      <Popover className="popover select-popover data-portal">
         <ListBox className="list-box" items={all}>
           {(option) => <ListBoxItem id={option.id} textValue={option.label} className="list-item">{option.label}</ListBoxItem>}
         </ListBox>

@@ -200,7 +200,7 @@ export function SeasonSelect({ season, onSeason }: { season: SeasonId; onSeason(
     <Select className="season-select" aria-label="Season" selectedKey={season} onSelectionChange={(key) => onSeason(String(key) as SeasonId)}>
       <Label className="visually-hidden">Season</Label>
       <Button className="button"><SelectValue /> <span aria-hidden="true">▾</span></Button>
-      <Popover className="popover select-popover">
+      <Popover className="popover select-popover data-portal">
         <ListBox className="list-box">
           {seasons.map((each) => <ListBoxItem key={each.id} id={each.id} textValue={each.name} className="list-item">{each.name}</ListBoxItem>)}
         </ListBox>

@@ -42,7 +42,7 @@ function Choose(props: { readonly label: string; readonly className: string; rea
         <SelectValue />
         <span aria-hidden>▾</span>
       </Button>
-      <Popover className="popover">
+      <Popover className="popover show-portal">
         <ListBox className="listbox" items={props.options}>
           {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
         </ListBox>

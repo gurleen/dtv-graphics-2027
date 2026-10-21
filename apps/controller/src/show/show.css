@@ -14,7 +14,8 @@
   padding: var(--space-4) var(--space-4) 0;
 }
 
-.panel {
+:where(.show-page, .show-portal) .panel,
+.panel:where(.show-portal) {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -25,39 +26,45 @@
   background: var(--panel);
 }
 
-.panel-header {
+:where(.show-page, .show-portal) .panel-header,
+.panel-header:where(.show-portal) {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
 }
 
-.panel-header .actions {
+:where(.show-page, .show-portal) .panel-header .actions {
   display: flex;
   gap: var(--space-3);
 }
 
-.empty {
+:where(.show-page, .show-portal) .empty,
+.empty:where(.show-portal) {
   margin: 0;
   color: var(--text-faint);
 }
 
-.tag {
+:where(.show-page, .show-portal) .tag,
+.tag:where(.show-portal) {
   padding: 0 var(--space-2);
   border-radius: var(--radius);
   font: 500 var(--text-xs) / 16px var(--mono);
   color: var(--on-color);
 }
 
-.tag.pgm {
+:where(.show-page, .show-portal) .tag.pgm,
+.tag.pgm:where(.show-portal) {
   background: var(--pgm);
 }
 
-.tag.pvw {
+:where(.show-page, .show-portal) .tag.pvw,
+.tag.pvw:where(.show-portal) {
   background: var(--pvw);
 }
 
-.cue-error {
+:where(.show-page, .show-portal) .cue-error,
+.cue-error:where(.show-portal) {
   display: block;
   font-size: var(--text-xs);
   color: var(--warn);
@@ -68,17 +75,20 @@
 
 /* Free panel */
 
-.free {
+:where(.show-page, .show-portal) .free,
+.free:where(.show-portal) {
   grid-area: free;
 }
 
-.free-grid {
+:where(.show-page, .show-portal) .free-grid,
+.free-grid:where(.show-portal) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
 }
 
-.free-button {
+:where(.show-page, .show-portal) .free-button,
+.free-button:where(.show-portal) {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
@@ -94,26 +104,30 @@
   cursor: pointer;
 }
 
-.free-button[data-pgm] {
+:where(.show-page, .show-portal) .free-button[data-pgm],
+.free-button[data-pgm]:where(.show-portal) {
   border: 2px solid var(--pgm);
   background: color-mix(in srgb, var(--pgm) 14%, var(--panel-raised));
 }
 
-.free-button[data-focus-visible] {
+:where(.show-page, .show-portal) .free-button[data-focus-visible],
+.free-button[data-focus-visible]:where(.show-portal) {
   outline: 2px solid var(--focus);
 }
 
-.free-button .cue-error {
+:where(.show-page, .show-portal) .free-button .cue-error {
   grid-column: 1 / -1;
 }
 
 /* On air by layer */
 
-.on-air {
+:where(.show-page, .show-portal) .on-air,
+.on-air:where(.show-portal) {
   grid-area: onair;
 }
 
-.layers {
+:where(.show-page, .show-portal) .layers,
+.layers:where(.show-portal) {
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -121,7 +135,8 @@
   list-style: none;
 }
 
-.layer-row {
+:where(.show-page, .show-portal) .layer-row,
+.layer-row:where(.show-portal) {
   display: grid;
   grid-template-columns: 52px 1fr auto;
   align-items: center;
@@ -130,30 +145,34 @@
   border-bottom: 1px solid var(--border);
 }
 
-.layer-name {
+:where(.show-page, .show-portal) .layer-name,
+.layer-name:where(.show-portal) {
   font: 500 var(--text-xs) var(--mono);
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
-.layer-row[data-pgm] .layer-name {
+:where(.show-page, .show-portal) .layer-row[data-pgm] .layer-name {
   color: var(--pgm);
 }
 
 /* Rundown */
 
-.rundown {
+:where(.show-page, .show-portal) .rundown,
+.rundown:where(.show-portal) {
   grid-area: rundown;
 }
 
-.rundown-list {
+:where(.show-page, .show-portal) .rundown-list,
+.rundown-list:where(.show-portal) {
   flex: 1;
   min-height: 0;
   overflow: auto;
   outline: none;
 }
 
-.cue-row {
+:where(.show-page, .show-portal) .cue-row,
+.cue-row:where(.show-portal) {
   display: grid;
   grid-template-columns: 20px 22px 1fr auto auto auto 22px;
   align-items: center;
@@ -166,39 +185,45 @@
   cursor: default;
 }
 
-.cue-row[data-selected] {
+:where(.show-page, .show-portal) .cue-row[data-selected],
+.cue-row[data-selected]:where(.show-portal) {
   border-color: var(--focus);
   background: var(--selected);
 }
 
-.cue-row[data-focus-visible] {
+:where(.show-page, .show-portal) .cue-row[data-focus-visible],
+.cue-row[data-focus-visible]:where(.show-portal) {
   outline: 2px solid var(--focus);
   outline-offset: -2px;
 }
 
-.cue-row[data-dragging] {
+:where(.show-page, .show-portal) .cue-row[data-dragging],
+.cue-row[data-dragging]:where(.show-portal) {
   opacity: 0.5;
 }
 
-.cue-row[data-pgm] .index {
+:where(.show-page, .show-portal) .cue-row[data-pgm] .index {
   color: var(--pgm);
 }
 
-.cue-row[data-pvw] .index {
+:where(.show-page, .show-portal) .cue-row[data-pvw] .index {
   color: var(--pvw);
 }
 
-.cue-row .index {
+:where(.show-page, .show-portal) .cue-row .index {
   font: var(--text-sm) var(--mono);
   color: var(--text-faint);
 }
 
-.cue-label {
+:where(.show-page, .show-portal) .cue-label,
+.cue-label:where(.show-portal) {
   min-width: 0;
 }
 
-.drag,
-.remove {
+:where(.show-page, .show-portal) .drag,
+.drag:where(.show-portal),
+:where(.show-page, .show-portal) .remove,
+.remove:where(.show-portal) {
   width: 20px;
   height: 20px;
   padding: 0;
@@ -208,72 +233,86 @@
   cursor: grab;
 }
 
-.remove {
+:where(.show-page, .show-portal) .remove,
+.remove:where(.show-portal) {
   cursor: pointer;
   opacity: 0.4;
 }
 
-.cue-row[data-hovered] .remove,
-.cue-row[data-selected] .remove {
+:where(.show-page, .show-portal) .cue-row[data-hovered] .remove,
+:where(.show-page, .show-portal) .cue-row[data-selected] .remove {
   opacity: 1;
 }
 
-.drag[data-focus-visible],
-.remove[data-focus-visible] {
+:where(.show-page, .show-portal) .drag[data-focus-visible],
+.drag[data-focus-visible]:where(.show-portal),
+:where(.show-page, .show-portal) .remove[data-focus-visible],
+.remove[data-focus-visible]:where(.show-portal) {
   outline: 2px solid var(--focus);
   opacity: 1;
 }
 
-.react-aria-DropIndicator[data-drop-target] {
+:where(.show-page, .show-portal) .react-aria-DropIndicator[data-drop-target],
+.react-aria-DropIndicator[data-drop-target]:where(.show-portal) {
   outline: 1px solid var(--pvw);
 }
 
-.dots {
+:where(.show-page, .show-portal) .dots,
+.dots:where(.show-portal) {
   display: inline-flex;
   gap: var(--space-2);
 }
 
-.dot {
+:where(.show-page, .show-portal) .dot,
+.dot:where(.show-portal) {
   width: 8px;
   height: 8px;
   border: 1px solid var(--text-muted);
   border-radius: 50%;
 }
 
-.dot[data-on] {
+:where(.show-page, .show-portal) .dot[data-on],
+.dot[data-on]:where(.show-portal) {
   background: var(--text);
 }
 
 /* Inspector */
 
-.inspector {
+:where(.show-page, .show-portal) .inspector,
+.inspector:where(.show-portal) {
   grid-area: inspector;
   overflow: auto;
 }
 
-.cue-fields,
-.form-row {
+:where(.show-page, .show-portal) .cue-fields,
+.cue-fields:where(.show-portal),
+:where(.show-page, .show-portal) .form-row,
+.form-row:where(.show-portal) {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--space-4);
 }
 
-.cue-fields {
+:where(.show-page, .show-portal) .cue-fields,
+.cue-fields:where(.show-portal) {
   flex-direction: column;
   align-items: stretch;
 }
 
-.picker {
+:where(.show-page, .show-portal) .picker,
+.picker:where(.show-portal) {
   width: 220px;
 }
 
-.note {
+:where(.show-page, .show-portal) .note,
+.note:where(.show-portal) {
   flex: 1 1 320px;
   max-width: 480px;
 }
 
-.override {
+:where(.show-page, .show-portal) .override,
+.override:where(.show-portal) {
   display: flex;
   align-items: flex-end;
   gap: var(--space-2);
@@ -281,7 +320,8 @@
 
 /* Rail */
 
-.rail {
+:where(.show-page, .show-portal) .rail,
+.rail:where(.show-portal) {
   grid-area: rail;
   display: flex;
   flex-direction: column;
@@ -290,14 +330,15 @@
   overflow: hidden;
 }
 
-.rail-head {
+:where(.show-page, .show-portal) .rail-head,
+.rail-head:where(.show-portal) {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   font-weight: 500;
 }
 
-.rail-head .caption {
+:where(.show-page, .show-portal) .rail-head .caption {
   margin-left: auto;
   overflow: hidden;
   font-weight: 400;
@@ -306,7 +347,8 @@
   text-overflow: ellipsis;
 }
 
-.monitor {
+:where(.show-page, .show-portal) .monitor,
+.monitor:where(.show-portal) {
   position: relative;
   aspect-ratio: 16 / 9;
   border: 2px solid var(--border);
@@ -315,20 +357,24 @@
   overflow: hidden;
 }
 
-.monitor.pvw {
+:where(.show-page, .show-portal) .monitor.pvw,
+.monitor.pvw:where(.show-portal) {
   border-color: var(--pvw);
 }
 
-.monitor.pgm {
+:where(.show-page, .show-portal) .monitor.pgm,
+.monitor.pgm:where(.show-portal) {
   border-color: var(--pgm);
 }
 
-.monitor-screen {
+:where(.show-page, .show-portal) .monitor-screen,
+.monitor-screen:where(.show-portal) {
   position: absolute;
   inset: 0;
 }
 
-.monitor-problem {
+:where(.show-page, .show-portal) .monitor-problem,
+.monitor-problem:where(.show-portal) {
   position: absolute;
   left: 0;
   right: 0;
@@ -339,13 +385,15 @@
   font-size: var(--text-xs);
 }
 
-.take-row {
+:where(.show-page, .show-portal) .take-row,
+.take-row:where(.show-portal) {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: var(--space-3);
 }
 
-.button.take {
+:where(.show-page, .show-portal) .button.take,
+.button.take:where(.show-portal) {
   height: 34px;
   border-color: var(--pgm);
   font-weight: 600;
@@ -353,18 +401,21 @@
   text-transform: uppercase;
 }
 
-.button.take:not([data-disabled]) {
+:where(.show-page, .show-portal) .button.take:not([data-disabled]),
+.button.take:not([data-disabled]):where(.show-portal) {
   background: color-mix(in srgb, var(--pgm) 30%, var(--panel-raised));
 }
 
 /* Always there, so a problem never moves the program monitor. */
-.problem-slot {
+:where(.show-page, .show-portal) .problem-slot,
+.problem-slot:where(.show-portal) {
   position: relative;
   flex: none;
   height: 34px;
 }
 
-.problem-strip {
+:where(.show-page, .show-portal) .problem-strip,
+.problem-strip:where(.show-portal) {
   position: absolute;
   inset: 0 0 auto;
   z-index: 1;
@@ -381,7 +432,8 @@
 }
 
 /* The others' previews take the rail's free height: each as tall as fits, two abreast, still 16:9. */
-.others {
+:where(.show-page, .show-portal) .others,
+.others:where(.show-portal) {
   flex: 1;
   min-height: 0;
   container-type: size;
@@ -390,7 +442,8 @@
   overflow-x: auto;
 }
 
-.other {
+:where(.show-page, .show-portal) .other,
+.other:where(.show-portal) {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -398,7 +451,7 @@
   flex: none;
 }
 
-.other .caption {
+:where(.show-page, .show-portal) .other .caption {
   height: var(--caption);
   overflow: hidden;
   font-size: var(--text-xs);
@@ -408,13 +461,15 @@
 }
 
 /* Not `.thumb`: the data page styles that class as a 64 px image. */
-.monitor.other-monitor {
+:where(.show-page, .show-portal) .monitor.other-monitor,
+.monitor.other-monitor:where(.show-portal) {
   border-width: 1px;
 }
 
 /* Score bar */
 
-.scorebar {
+:where(.show-page, .show-portal) .scorebar,
+.scorebar:where(.show-portal) {
   grid-area: score;
   display: flex;
   align-items: center;
@@ -426,31 +481,32 @@
   background: var(--panel);
 }
 
-.scorebar.empty {
+:where(.show-page, .show-portal) .scorebar.empty,
+.scorebar.empty:where(.show-portal) {
   color: var(--text-muted);
 }
 
-.scorebar .team,
-.scorebar .clocks,
-.scorebar .fouls,
-.scorebar .timeouts,
-.scorebar .possession,
-.scorebar .shot {
+:where(.show-page, .show-portal) .scorebar .team,
+:where(.show-page, .show-portal) .scorebar .clocks,
+:where(.show-page, .show-portal) .scorebar .fouls,
+:where(.show-page, .show-portal) .scorebar .timeouts,
+:where(.show-page, .show-portal) .scorebar .possession,
+:where(.show-page, .show-portal) .scorebar .shot {
   display: flex;
   align-items: center;
   gap: var(--space-3);
 }
 
-.scorebar .abbr {
+:where(.show-page, .show-portal) .scorebar .abbr {
   font-weight: 600;
 }
 
-.scorebar .score {
+:where(.show-page, .show-portal) .scorebar .score {
   min-width: 2.2ch;
   font: 500 var(--text-score) var(--mono);
 }
 
-.scorebar .clock {
+:where(.show-page, .show-portal) .scorebar .clock {
   min-width: 5ch;
   border: 0;
   background: transparent;
@@ -459,13 +515,14 @@
   cursor: text;
 }
 
-.clock-edit input {
+:where(.show-page, .show-portal) .clock-edit input {
   width: 7ch;
   height: 30px;
   font: 500 var(--text-lg) var(--mono);
 }
 
-.timeout {
+:where(.show-page, .show-portal) .timeout,
+.timeout:where(.show-portal) {
   width: 10px;
   height: 10px;
   padding: 0;
@@ -475,18 +532,20 @@
   cursor: pointer;
 }
 
-.timeout[data-on] {
+:where(.show-page, .show-portal) .timeout[data-on],
+.timeout[data-on]:where(.show-portal) {
   background: var(--text);
 }
 
-.period .select-button,
-.phase .select-button {
+:where(.show-page, .show-portal) .period .select-button,
+:where(.show-page, .show-portal) .phase .select-button {
   min-width: 0;
   gap: var(--space-3);
 }
 
 /* A keyed score-bar button: its key sits under its label, like a legend on a key cap, so the bar fits 1440 px. */
-.button.keyed {
+:where(.show-page, .show-portal) .button.keyed,
+.button.keyed:where(.show-portal) {
   flex-direction: column;
   gap: 0;
   height: 36px;
@@ -495,7 +554,7 @@
   line-height: 1.1;
 }
 
-.button.keyed kbd {
+:where(.show-page, .show-portal) .button.keyed kbd {
   margin: 0;
   padding: 0;
   border: 0;
@@ -505,7 +564,8 @@
 }
 
 /* A command on its way to the server: amber, pulsing, until it is answered or fails. */
-[data-pending] {
+:where(.show-page, .show-portal) [data-pending],
+[data-pending]:where(.show-portal) {
   outline: 1px dashed var(--warn);
   outline-offset: 1px;
   animation: pending 1s ease-in-out infinite;
@@ -519,17 +579,18 @@
 
 /* The key list */
 
-.free .panel-header h2 {
+:where(.show-page, .show-portal) .free .panel-header h2 {
   margin-right: auto;
 }
 
-.key-sections {
+:where(.show-page, .show-portal) .key-sections,
+.key-sections:where(.show-portal) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-6);
 }
 
-.key-section h3 {
+:where(.show-page, .show-portal) .key-section h3 {
   margin: 0 0 var(--space-3);
   font-size: var(--text-sm);
   color: var(--text-muted);
@@ -537,38 +598,41 @@
   letter-spacing: 0.06em;
 }
 
-.key-section dl {
+:where(.show-page, .show-portal) .key-section dl {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--space-3) var(--space-5);
   margin: 0;
 }
 
-.key-line {
+:where(.show-page, .show-portal) .key-line,
+.key-line:where(.show-portal) {
   display: contents;
 }
 
-.key-line dt {
+:where(.show-page, .show-portal) .key-line dt {
   white-space: nowrap;
   color: var(--text-muted);
 }
 
-.key-line dt kbd:first-child {
+:where(.show-page, .show-portal) .key-line dt kbd:first-child {
   margin-left: 0;
 }
 
-.key-line dd {
+:where(.show-page, .show-portal) .key-line dd {
   margin: 0;
 }
 
 /* No active show */
 
-.picker-page {
+:where(.show-page, .show-portal) .picker-page,
+.picker-page:where(.show-portal) {
   max-width: 520px;
   margin: var(--space-6) auto;
 }
 
-.show-list {
+:where(.show-page, .show-portal) .show-list,
+.show-list:where(.show-portal) {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -577,7 +641,7 @@
   list-style: none;
 }
 
-.show-list li {
+:where(.show-page, .show-portal) .show-list li {
   display: flex;
   align-items: center;
   justify-content: space-between;

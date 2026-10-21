@@ -21,7 +21,7 @@ export function MakeActive({ id, name }: { readonly id: string; readonly name: s
   return (
     <DialogTrigger>
       <Button className="button small" aria-label={`Make ${name} active`}>Make active</Button>
-      <Popover className="popover" placement="bottom end">
+      <Popover className="popover data-portal" placement="bottom end">
         <Dialog className="confirm" aria-label={`Make ${name} active`}>
           {({ close }) => (
             <>
@@ -77,7 +77,7 @@ export function DuplicateDialog({ sourceId, onClose, onCreated }: { readonly sou
   };
 
   return (
-    <ModalOverlay className="overlay" isOpen isDismissable onOpenChange={(open) => !open && onClose()}>
+    <ModalOverlay className="overlay data-portal" isOpen isDismissable onOpenChange={(open) => !open && onClose()}>
       <Modal className="modal dlg-modal">
         <Dialog className="dialog" aria-label="Duplicate show">
           <Form onSubmit={(event) => { event.preventDefault(); void create(); }}>

@@ -222,3 +222,27 @@ describe('broadcast formatting', () => {
     expect(PLAYER_GAME_STATS.threes.value(StatLine.parse({ tpm: 3, tpa: 5 }))).toBe('3-5');
   });
 });
+
+describe('the shot clock stops when the game clock expires', () => {
+  const lastSeconds: BasketballLive = { ...BASE, clock: running(5_000), shotClock: running(24_000) };
+
+  test('it reads what it read at the buzzer, not what it would read now', () => {
+    expect(basketball.shotClockAt(lastSeconds, NOW + 3_000)).toBe(21_000);
+    expect(basketball.shotClockAt(lastSeconds, NOW + 8_000)).toBe(19_000);
+  });
+
+  test('it shows nothing at halftime or after the final', () => {
+    expect(basketball.shotClockAt({ ...lastSeconds, phase: 'halftime' }, NOW)).toBeNull();
+    expect(basketball.shotClockAt({ ...lastSeconds, phase: 'final' }, NOW)).toBeNull();
+  });
+
+  test('the server stops re-projecting it at the buzzer', () => {
+    expect(basketball.nextShotClockChange(lastSeconds, NOW + 4_500)).toBe(NOW + 5_000);
+    expect(basketball.nextShotClockChange(lastSeconds, NOW + 5_000)).toBeNull();
+    expect(SPORT_MODULES.basketball.nextChange(lastSeconds, NOW + 6_000)).toBeNull();
+  });
+
+  test('stopping the clocks after the buzzer keeps the shot clock at its buzzer value', () => {
+    expect(applied(lastSeconds, { type: 'clock', action: 'stop' }, NOW + 8_000)).toMatchObject({ clock: stopped(0), shotClock: stopped(19_000) });
+  });
+});

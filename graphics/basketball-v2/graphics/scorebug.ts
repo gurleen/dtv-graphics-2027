@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
 import { requireBasketball, requireGame } from './shared';
 
-const { formatGameClock, formatShotClock, periodLabel, remainingAt } = basketball;
+const { formatGameClock, formatShotClock, periodLabel, remainingAt, shotClockAt } = basketball;
 
 export const scorebug = defineGraphic({
   id: 'basketball-v2/scorebug',
@@ -21,6 +21,7 @@ export const scorebug = defineGraphic({
   bind(_params, context) {
     const { sides, program } = requireGame(context);
     const live = requireBasketball(context);
+    const shot = shotClockAt(live, context.now);
     const { away, home } = sides;
     return {
       awayAcronym: away.brand.abbreviation,
@@ -41,7 +42,7 @@ export const scorebug = defineGraphic({
       homePossession: live.possession === 'home',
       period: live.phase === 'halftime' ? 'Half' : live.phase === 'final' ? 'Final' : periodLabel(program, live.period),
       clock: formatGameClock(remainingAt(live.clock, context.now)),
-      shotClock: live.shotClock ? formatShotClock(remainingAt(live.shotClock, context.now)) : '',
+      shotClock: shot === null ? '' : formatShotClock(shot),
       sponsorLogo: context.sponsor?.logoOnDark ?? null,
     };
   },

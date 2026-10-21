@@ -63,7 +63,7 @@ function Control(props: { readonly label: string; readonly node: FormNode; reado
             <Input placeholder={`Pick a ${node.ref}`} />
             <Button className="combo-button">▾</Button>
           </div>
-          <Popover className="popover">
+          <Popover className="popover show-portal">
             <ListBox className="listbox" items={options}>
               {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
             </ListBox>
@@ -168,7 +168,7 @@ function Choice(props: { readonly label: string; readonly options: readonly Pick
         <SelectValue />
         <span aria-hidden>▾</span>
       </Button>
-      <Popover className="popover">
+      <Popover className="popover show-portal">
         <ListBox className="listbox" items={props.options}>
           {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
         </ListBox>

@@ -76,7 +76,7 @@ function CueFields(props: { readonly entry: AnyGraphic; readonly draft: Draft; r
               <SelectValue>{() => 'Fix a text…'}</SelectValue>
               <span aria-hidden>▾</span>
             </Button>
-            <Popover className="popover">
+            <Popover className="popover show-portal">
               <ListBox className="listbox" items={open.map((name) => ({ id: name, label: `${humanize(name)}${unedited[name] ? ` · ${String(unedited[name])}` : ''}` }))}>
                 {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
               </ListBox>
@@ -168,7 +168,7 @@ export function AddCueDialog(props: { readonly at: number; readonly live: GameLi
   const entry = graphic ? entryOf(registry, graphic) : undefined;
   const check = entry ? checkCue(registry, { graphic: entry.id, params: draft.params, overrides: draft.overrides }) : null;
   return (
-    <ModalOverlay className="overlay" isOpen isDismissable onOpenChange={(open) => !open && props.onClose(null)}>
+    <ModalOverlay className="overlay show-portal" isOpen isDismissable onOpenChange={(open) => !open && props.onClose(null)}>
       <Modal className="modal wide">
         <Dialog className="dialog" aria-label="Add a cue">
           <Heading slot="title">Add a cue</Heading>
@@ -186,7 +186,7 @@ export function AddCueDialog(props: { readonly at: number; readonly live: GameLi
               <SelectValue>{({ selectedText }) => selectedText ?? 'Pick a graphic'}</SelectValue>
               <span aria-hidden>▾</span>
             </Button>
-            <Popover className="popover">
+            <Popover className="popover show-portal">
               <ListBox className="listbox" items={entries.map((each) => ({ id: each.id, label: each.name }))}>
                 {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
               </ListBox>

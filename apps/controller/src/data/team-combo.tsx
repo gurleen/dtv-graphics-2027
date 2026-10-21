@@ -39,7 +39,7 @@ export function TeamCombo({ label, entries, value, onChange }: {
         <Input className="record-input" placeholder="Search schools…" />
         <Button className="button team-combo-button" aria-label={`Show ${label} choices`}>▾</Button>
       </div>
-      <Popover className="popover select-popover">
+      <Popover className="popover select-popover data-portal">
         <ListBox className="list-box" renderEmptyState={() => <span className="faint empty">No team matches</span>}>
           {(item: { id: string; label: string }) => <ListBoxItem id={item.id} textValue={item.label} className="list-item">{item.label}</ListBoxItem>}
         </ListBox>

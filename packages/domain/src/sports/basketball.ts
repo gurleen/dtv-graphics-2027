@@ -68,6 +68,16 @@ export type Clock = z.infer<typeof Clock>;
 export const remainingAt = (clock: Clock, now: EpochMs): number =>
   clock.running ? Math.max(0, clock.remainingMs - (now - clock.since)) : clock.remainingMs;
 
+/** When a running game clock reaches zero; the shot clock stops there too. */
+const expiresAt = (clock: Clock): EpochMs | null => (clock.running ? clock.since + clock.remainingMs : null);
+
+/** The shot clock as of `now`, frozen at the instant the game clock expired. */
+const shotAt = (live: Pick<BasketballLive, 'clock'>, now: EpochMs): EpochMs => Math.min(now, expiresAt(live.clock) ?? now);
+
+/** The shot clock's remaining time as displayed: it stops when the game clock does, and shows nothing outside live play. */
+export const shotClockAt = (live: BasketballLive, now: EpochMs): number | null =>
+  live.shotClock && live.phase !== 'halftime' && live.phase !== 'final' ? remainingAt(live.shotClock, shotAt(live, now)) : null;
+
 const startClock = (clock: Clock, now: EpochMs): Clock =>
   clock.running ? clock : { running: true, remainingMs: clock.remainingMs, since: now };
 
@@ -106,6 +116,14 @@ export const nextDisplayChange = (clock: Clock, now: EpochMs, display: ClockDisp
   // Under a tenth the text already reads 0:00.0; what changes next is the status line at zero.
   if (remaining < unit) return now + remaining;
   return now + (remaining % unit) + 1;
+};
+
+/** When the displayed shot clock next changes; null once it is hidden or frozen by the game clock's expiry. */
+export const nextShotClockChange = (live: BasketballLive, now: EpochMs): EpochMs | null => {
+  if (!live.shotClock || shotClockAt(live, now) === null) return null;
+  const change = nextDisplayChange(live.shotClock, now, 'shot');
+  const expiry = expiresAt(live.clock);
+  return change !== null && (expiry === null || change <= expiry) ? change : null;
 };
 
 export const FIELD_GROUPS = ['clock', 'score', 'stats'] as const;
@@ -197,14 +215,14 @@ function nextLive(live: BasketballLive, command: BasketballCommand, now: EpochMs
     case 'clock': {
       // The shot clock never runs while the game clock is stopped, so the two move together.
       const move = command.action === 'start' ? startClock : stopClock;
-      return { ...live, clock: move(live.clock, now), shotClock: live.shotClock && move(live.shotClock, now) };
+      return { ...live, clock: move(live.clock, now), shotClock: live.shotClock && move(live.shotClock, shotAt(live, now)) };
     }
     case 'clockSet': {
       const clock = setClock(command.remainingMs, command.running ?? live.clock.running, now);
       if (command.running === undefined) return { ...live, clock };
       // With `running` it is also a start or a stop, so the shot clock moves as `clock` moves it.
       const move = command.running ? startClock : stopClock;
-      return { ...live, clock, shotClock: live.shotClock && move(live.shotClock, now) };
+      return { ...live, clock, shotClock: live.shotClock && move(live.shotClock, command.running ? now : shotAt(live, now)) };
     }
     case 'shotClock':
       // A reset during play keeps running with the game clock unless the command says otherwise.

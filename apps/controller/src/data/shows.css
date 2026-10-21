@@ -1,6 +1,7 @@
 /* The Shows list and its dialogs. Colours, sizes and spacings come from app/tokens.css. */
 
-.active-mark {
+:where(.data-page, .data-portal) .active-mark,
+.active-mark:where(.data-portal) {
   display: inline-block;
   padding: 0 var(--space-4);
   border: 1px solid var(--focus);
@@ -13,28 +14,33 @@
   text-transform: uppercase;
 }
 
-.dlg-modal {
+:where(.data-page, .data-portal) .dlg-modal,
+.dlg-modal:where(.data-portal) {
   width: 560px;
 }
 
-.dlg-grid {
+:where(.data-page, .data-portal) .dlg-grid,
+.dlg-grid:where(.data-portal) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-5);
 }
 
-.dlg-row {
+:where(.data-page, .data-portal) .dlg-row,
+.dlg-row:where(.data-portal) {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   min-width: 0;
 }
 
-.dlg-row.wide {
+:where(.data-page, .data-portal) .dlg-row.wide,
+.dlg-row.wide:where(.data-portal) {
   grid-column: 1 / -1;
 }
 
-.dlg-label {
+:where(.data-page, .data-portal) .dlg-label,
+.dlg-label:where(.data-portal) {
   font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -42,54 +48,62 @@
   color: var(--text-muted);
 }
 
-.dlg-grid .pick,
-.dlg-grid .pick-button {
+:where(.data-page, .data-portal) .dlg-grid .pick,
+:where(.data-page, .data-portal) .dlg-grid .pick-button {
   display: flex;
   width: 100%;
 }
 
-.team-combo {
+:where(.data-page, .data-portal) .team-combo,
+.team-combo:where(.data-portal) {
   display: block;
 }
 
-.team-combo-field {
+:where(.data-page, .data-portal) .team-combo-field,
+.team-combo-field:where(.data-portal) {
   display: flex;
   gap: var(--space-2);
 }
 
-.team-combo-button {
+:where(.data-page, .data-portal) .team-combo-button,
+.team-combo-button:where(.data-portal) {
   flex: none;
   padding: 0 var(--space-4);
 }
 
-.team-combo-field .record-input {
+:where(.data-page, .data-portal) .team-combo-field .record-input {
   min-width: 0;
 }
 
-.flagged {
+:where(.data-page, .data-portal) .flagged,
+.flagged:where(.data-portal) {
   margin: 0;
   padding-left: var(--space-6);
   font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
-.dlg-check {
+:where(.data-page, .data-portal) .dlg-check,
+.dlg-check:where(.data-portal) {
   gap: var(--space-4);
   font-size: var(--text-sm);
 }
 
 /* The Shows table must fit its panel at 1440, so long cells clip instead of widening it. */
-.clip {
+:where(.data-page, .data-portal) .clip,
+.clip:where(.data-portal) {
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
 }
 
-.clip.game {
+:where(.data-page, .data-portal) .clip.game,
+.clip.game:where(.data-portal) {
   max-width: 175px;
 }
 
-.clip.crew {
+:where(.data-page, .data-portal) .clip.crew,
+.clip.crew:where(.data-portal) {
   max-width: 130px;
 }

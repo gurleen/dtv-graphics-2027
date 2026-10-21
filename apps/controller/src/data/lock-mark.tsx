@@ -33,11 +33,11 @@ export function LockMark({ kind, id, field, label }: { readonly kind: EditableKi
         <Button className="lock-mark" aria-label={`${label} is locked. ${why}`}>
           <LockIcon />
         </Button>
-        <Tooltip className="tooltip" offset={6}>
+        <Tooltip className="tooltip data-portal" offset={6}>
           {why}
         </Tooltip>
       </TooltipTrigger>
-      <Popover className="popover" placement="bottom start">
+      <Popover className="popover data-portal" placement="bottom start">
         <Dialog className="confirm" aria-label={`Unlock ${label}`}>
           <span>Unlock {label}? The next import may change it.</span>
           <Button

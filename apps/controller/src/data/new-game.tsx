@@ -65,7 +65,7 @@ export function NewGameDialog({ onClose, onCreated }: { readonly onClose: () => 
   };
 
   return (
-    <ModalOverlay className="overlay" isOpen isDismissable onOpenChange={(open) => !open && onClose()}>
+    <ModalOverlay className="overlay data-portal" isOpen isDismissable onOpenChange={(open) => !open && onClose()}>
       <Modal className="modal dlg-modal">
         <Dialog className="dialog" aria-label="New game">
           <Form onSubmit={(event) => { event.preventDefault(); void create(); }}>
