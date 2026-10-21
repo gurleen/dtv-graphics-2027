@@ -252,7 +252,7 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
           const bus = Object.hasOwn(view.otherPreviews, other) ? view.otherPreviews[other]! : {};
           return (
             <div key={other} className="other" data-operator={other}>
-              <Monitor name={`other:${other}`} bus={{ kind: 'preview', operator: other }} className="thumb" />
+              <Monitor name={`other:${other}`} bus={{ kind: 'preview', operator: other }} className="other-monitor" />
               <span className="caption">
                 {other}: {busLabel(view, registry, bus) || 'empty'}
               </span>

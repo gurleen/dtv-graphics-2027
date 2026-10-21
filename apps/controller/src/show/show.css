@@ -269,7 +269,8 @@
 }
 
 .note {
-  width: 160px;
+  flex: 1 1 320px;
+  max-width: 480px;
 }
 
 .override {
@@ -379,7 +380,11 @@
   color: var(--warn);
 }
 
+/* The others' previews take the rail's free height: each as tall as fits, two abreast, still 16:9. */
 .others {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
   display: flex;
   gap: var(--space-3);
   overflow-x: auto;
@@ -389,11 +394,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  width: 140px;
+  width: min(calc(50cqw - var(--space-3) / 2), calc((100cqh - var(--caption) - var(--space-1)) * 16 / 9));
   flex: none;
 }
 
 .other .caption {
+  height: var(--caption);
   overflow: hidden;
   font-size: var(--text-xs);
   color: var(--text-muted);
@@ -401,7 +407,8 @@
   text-overflow: ellipsis;
 }
 
-.monitor.thumb {
+/* Not `.thumb`: the data page styles that class as a 64 px image. */
+.monitor.other-monitor {
   border-width: 1px;
 }
 
