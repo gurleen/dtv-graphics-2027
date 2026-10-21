@@ -47,6 +47,21 @@ that writes the file. A second seed writes nothing, and it never resets a row
 that someone changed. [`data/seed/README.md`](data/seed/README.md) describes the
 seed files and the roster CSV header.
 
+## Server
+
+The server is the one writer of the SQLite file. Every caller talks to it
+through the oRPC contract in `@dtv/api`, over one WebSocket at `/rpc`.
+
+```bash
+bun run start                # serve data/db/dtv.sqlite on http://localhost:8975
+bun run start -- --seed      # seed first, then serve
+bun run dev                  # the same, restarting when a source file changes
+bun run codegen              # regenerate graphics/basketball-v2/scenes.gen.ts from the .rml files
+```
+
+`PORT` and `DTV_DB` override the port and the database file. `/` shows a status
+page with the revision, the active show and the connected operators.
+
 ## Layout
 
 | Path | Contents |
@@ -56,6 +71,10 @@ seed files and the roster CSV header.
 | `site/` | Stakeholder preview website: build script and viewer, published as static assets (`wrangler.jsonc`) |
 | `packages/domain/` | `@dtv/domain`: entities, sport rules, edits and importers |
 | `packages/db/` | `@dtv/db`: the SQLite schema, migrations, commits, seed and backups |
+| `packages/playout/` | `@dtv/playout`: scene facts, the registry kit, the show reducer and the projector |
+| `packages/graphics/` | `@dtv/graphics`: `GRAPHICS`, the one list of graphics |
+| `packages/api/` | `@dtv/api`: the oRPC contract and the `connect`, `watch` and `first` helpers |
+| `apps/server/` | The server: the store, the oRPC router and `Bun.serve` |
 | `data/seed/` | The seed: the vendored team dataset (`teams.json`), `fixtures.json` and roster CSVs |
 | `data/db/` | The SQLite file and its backups, not committed |
 | `scripts/check_deps.ts` | Fails `bun run check` when a package imports what its directory may not |

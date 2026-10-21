@@ -32,12 +32,12 @@ apps/site               the stakeholder site: build script and viewer
 |---|---|
 | `@dtv/domain` | zod |
 | `@dtv/db` | domain, `bun:sqlite` |
-| `@dtv/playout` | domain |
-| `@dtv/basketball-v2` | playout, domain |
-| `@dtv/graphics` | basketball-v2, playout, domain |
+| `@dtv/playout` | domain, zod |
+| `@dtv/basketball-v2` | playout, domain, zod; its golden test may also import db |
+| `@dtv/graphics` | basketball-v2, playout, domain, zod |
 | `@dtv/renderer` | playout, domain, `@rive-app/canvas-single` |
-| `@dtv/api` | playout, domain, `@orpc/*`, partysocket |
-| `apps/server` | api, db, graphics, playout, domain |
+| `@dtv/api` | playout, domain, zod, `@orpc/*`, partysocket |
+| `apps/server` | api, db, graphics, playout, domain, zod, `@orpc/server` |
 | `apps/controller` | api, renderer, graphics, playout, domain, react |
 | `apps/renderer` | api, renderer, graphics |
 | `apps/site` | its build script may import db; its browser code may not |
@@ -195,6 +195,7 @@ on every write and refuses the batch with `INCONSISTENT`.
 - Both teams of a game play in the game's program.
 - `TeamSeason.stats` and `PlayerSeasonStats.stats` have the sport of their team's program.
 - A `game.apply` names the sport of its game.
+- Every rundown cue names a graphic in the registry, and its params and overrides fit that graphic.
 
 ## 3. The API
 
@@ -242,14 +243,17 @@ data, live, show, and clock changes. A clock tick therefore never serializes the
 
 Live commands are absolute and data puts are whole documents, so a repeat of either changes nothing. Show commands
 include `toggle`, which is relative by nature, and a client cannot tell whether a command sent just before a drop
-landed. So `show.command` takes a client-chosen `id`. The server remembers the last 256 ids, reloaded from the
-journal on start, and answers a repeated id with the first result instead of applying the command again.
+landed. So `show.command` takes a client-chosen `id`. The server remembers the last 256 ids and answers a
+repeated id with the first result instead of applying the command again. After a restart it recovers the ids of
+commands that changed state from the journal. A rejected or unchanged command is remembered only in memory,
+because repeating it changes nothing.
 
 ### oRPC version
 
-npm `latest` is 1.15.7, and the v2 line is in beta. The design pins `^1.15.7`. Two files touch oRPC directly,
-`packages/api/src/client.ts` and `apps/server/src/main.ts`. Moving to v2 renames `@orpc/server/bun-ws` and
-`eventIterator`, and the server and every client must move together because the wire format changed.
+The design pins `^1.15.7`, which installs 1.16.0. The v2 line is in beta. Four files import oRPC:
+`packages/api/src/contract.ts` and `client.ts`, and `apps/server/src/router.ts` and `main.ts`. Moving to v2 renames
+`@orpc/server/bun-ws` and `eventIterator`, and the server and every client must move together because the wire
+format changed.
 
 ## 4. Show and playout
 
@@ -284,8 +288,9 @@ Program is one shared bus, because there is one output. Each operator has their 
 taker's preview and nobody else's, so one operator can never put another operator's half-built cue on air. Every
 operator still sees every preview.
 
-A slot is a cue on a bus, frozen when it was cued. Binds still read the live World and live game, so a corrected
-name or a new score shows at once. An edited rundown cue reaches air only through `refresh`. A new slot id on a
+A slot is a cue on a bus, frozen when it was cued. It holds the graphic, the params, the overrides, the ref it
+came from, and its step. It does not hold a `Cue`, because a free-panel graphic has no cue id. Binds still read
+the live World and live game, so a corrected name or a new score shows at once. An edited rundown cue reaches air only through `refresh`. A new slot id on a
 layer is what tells a renderer to play out and then in.
 
 | Command | Effect |
@@ -298,8 +303,8 @@ layer is what tells a renderer to play out and then in.
 | `clear layer slot?` | Off air. With a slot id, only if the layer still holds that slot. |
 | `clearAll` | Everything off air. |
 | `step layer slot to` | Moves a stepped graphic to step `to`. A step past the last takes it off air. |
-| `refresh layer slot` | Re-reads the on-air cue's params from the rundown. |
-| `patch layer slot overrides` | Overrides bound values on air, for a last-second text fix. |
+| `refresh layer slot` | Re-reads the on-air cue's params from the rundown. Refused if the cue now names another graphic. |
+| `patch layer slot overrides` | Replaces the on-air overrides, for a last-second text fix. A resend changes nothing. |
 | `activate show` | Makes a show active, takes a backup, and empties previews. Program stays on air. |
 
 ### Two operators at once
@@ -371,8 +376,9 @@ entry.
 
 ### Two rules in the projector
 
-The projector uppercases every string property once. It also binds an image URL for every image property. Missing
-data binds a transparent PNG or the headshot placeholder, so a scene's embedded test logo never reaches air.
+The projector uppercases every string property once. It also binds an image URL for every image property. A bind
+returns `null` for a missing image, and the projector binds `/assets/images/blank.png` in its place. The player
+lower third binds the headshot placeholder instead. A scene's embedded test logo therefore never reaches air.
 
 ### The four behaviours OGraf carried
 
