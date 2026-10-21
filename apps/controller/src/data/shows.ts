@@ -137,15 +137,27 @@ function ownerOf(world: World, ref: Ref): { readonly team: string } | { readonly
   }
 }
 
-/** What a cue names of the source game: its teams, their players and staff, or the game itself. Empty when nothing. */
-export function namesOfGame(world: World, registry: Registry, cue: Cue, source: Game): readonly string[] {
-  const teams = new Set<string>([source.awayTeamId, source.homeTeamId]);
+type Matchup = Pick<Game, 'id' | 'seasonId' | 'awayTeamId' | 'homeTeamId'>;
+
+const seasonOf = (world: World, ref: Ref): unknown => (ref.kind === 'player' || ref.kind === 'staff' || ref.kind === 'teamSeason' ? rowOf(world, ref.kind, ref.id)?.seasonId : undefined);
+
+/**
+ * What a cue names that belongs to the source game and not to the target: the old opponent,
+ * its players and staff, the source game itself, or a player of a team that plays both but
+ * from another season. A team in both games, or a row unrelated to either, is not flagged.
+ */
+export function namesOfGame(world: World, registry: Registry, cue: Cue, source: Matchup, target: Matchup): readonly string[] {
+  const playsIn = (game: Matchup, team: string) => team === game.awayTeamId || team === game.homeTeamId;
   const names: string[] = [];
   for (const ref of refsOfCue(registry, cue)) {
     const owner = ownerOf(world, ref);
     if (!owner) continue;
-    const ofGame = 'team' in owner ? teams.has(owner.team) : owner.game === source.id;
-    if (!ofGame) continue;
+    const season = seasonOf(world, ref);
+    const stale =
+      'team' in owner
+        ? playsIn(source, owner.team) && (!playsIn(target, owner.team) || (season !== undefined && season !== target.seasonId))
+        : owner.game === source.id && owner.game !== target.id;
+    if (!stale) continue;
     const doc = rowOf(world, ref.kind, ref.id);
     const name = ref.kind === 'game' ? 'the source game' : doc ? rowLabel(world, ref.kind, doc) : ref.id;
     if (!names.includes(name)) names.push(name);
@@ -166,12 +178,12 @@ export interface Duplicate {
 
 const randomSuffix = () => crypto.randomUUID().slice(0, 8);
 
-/** `source` copied onto `gameId`: same crew, same rundown with new cue ids, and each cue that names the source game's teams or players flagged in its note. */
+/** `source` copied onto `onto.game`: same crew, same rundown with new cue ids, and each cue that names what the old game had and the new one lacks flagged in its note. */
 export function duplicateShow(
   world: World,
   registry: Registry,
   source: Show,
-  onto: { readonly gameId: GameId; readonly name: string },
+  onto: { readonly game: Matchup; readonly name: string },
   random: () => string = randomSuffix,
 ): Built<Duplicate> {
   const id = freeShowId(world, onto.name);
@@ -190,11 +202,11 @@ export function duplicateShow(
   const flagged: FlaggedCue[] = [];
   const rundown = source.rundown.map((cue): Cue => {
     const copy = { ...structuredClone(cue), id: fresh(cue) };
-    const names = game ? namesOfGame(world, registry, cue, game) : [];
+    const names = game ? namesOfGame(world, registry, cue, game, onto.game) : [];
     if (!names.length) return copy;
     flagged.push({ cue: copy.id, graphic: cue.graphic, names });
     return { ...copy, note: `${CHECK_PREFIX}names ${names.join(', ')}, from ${source.name}.${cue.note ? ` ${cue.note}` : ''}` };
   });
-  const show = parseEntity('show', { id, name: onto.name.trim(), gameId: onto.gameId, crew: structuredClone(source.crew), rundown });
+  const show = parseEntity('show', { id, name: onto.name.trim(), gameId: onto.game.id, crew: structuredClone(source.crew), rundown });
   return { ok: true, value: { show, flagged } };
 }

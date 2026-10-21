@@ -192,7 +192,11 @@ async function main() {
   check((await world()).get('show', 'hofstra-at-drexel-blank' as never)?.name === 'Hofstra at Drexel (spare)', 'renamed in place; the id did not change');
   await shoot(alex, 'show-renamed');
 
-  console.log('\nduplicate: the seeded rundown onto Hofstra at Drexel');
+  console.log('\nduplicate: the seeded rundown, plus a cue on a Saint Joseph\'s player, onto Hofstra at Drexel');
+  const seededShow = (await world()).get('show', DREXEL_SJU)!;
+  const careyCue = { id: 'carey-feature', graphic: 'basketball-v2/player-lower-third', params: { player: 'saint-josephs-mbb@2026-27/carey' }, overrides: {}, note: '' };
+  await api().data.apply({ origin: 'manual', basis: (await world()).revision, edits: [{ op: 'put', kind: 'show', value: { ...seededShow, rundown: [...seededShow.rundown, careyCue] } as never }] });
+  await waitFor('the Saint Joseph\'s cue', async () => (await world()).get('show', DREXEL_SJU)!.rundown.length === seededShow.rundown.length + 1);
   await seeded.getByRole('gridcell').first().click();
   await alex.getByRole('button', { name: 'Duplicate…' }).click();
   const dialog = alex.getByRole('dialog', { name: 'Duplicate show' });
@@ -215,8 +219,9 @@ async function main() {
   check(copy.rundown.every((cue) => !source.rundown.some((old) => old.id === cue.id)) && new Set(copy.rundown.map((cue) => cue.id)).size === copy.rundown.length, 'every cue has a fresh id, none shared with the source');
   const flagged = copy.rundown.filter((cue) => cue.note.startsWith('CHECK: '));
   console.log(`     flagged cues:\n       ${flagged.map((cue) => `${cue.graphic}: ${cue.note}`).join('\n       ')}`);
-  check(flagged.length > 0 && flagged.every((cue) => /Reed|Spiker|Drexel/.test(cue.note)), `${flagged.length} cues that name the old game's players or teams are flagged in their notes`);
-  check(copy.rundown.filter((cue) => !cue.note.startsWith('CHECK: ')).every((cue) => !/drexel-mbb|saint-josephs/.test(JSON.stringify(cue.params))), 'no unflagged cue names either team');
+  check(flagged.length === 1 && /Carey/.test(flagged[0]!.note), 'only the cue on the old opponent\'s player is flagged');
+  check(copy.rundown.filter((cue) => !cue.note.startsWith('CHECK: ')).every((cue) => !/saint-josephs/.test(JSON.stringify(cue.params))), 'no unflagged cue names the old opponent');
+  check(copy.rundown.some((cue) => !cue.note && /reed-josh|spiker-zach|drexel-mbb/.test(JSON.stringify(cue.params))), 'cues on Drexel, which plays both games, are kept unflagged');
   check(source.rundown.every((cue) => !cue.note), 'the source show was not touched');
   await alex.locator('.data-row', { hasText: 'to check' }).waitFor();
   await shoot(alex, 'duplicate-in-list');

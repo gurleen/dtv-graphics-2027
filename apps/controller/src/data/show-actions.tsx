@@ -59,7 +59,7 @@ export function DuplicateDialog({ sourceId, onClose, onCreated }: { readonly sou
 
   const game = games.find((each) => each.id === gameId);
   const name = typedName ?? (game ? matchupLabel(world, game) : '');
-  const copy = game ? duplicateShow(world, registry, source, { gameId: game.id, name }) : null;
+  const copy = game ? duplicateShow(world, registry, source, { game, name }) : null;
   const flagged = copy?.ok ? copy.value.flagged : [];
 
   const create = async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { type Cue, type EntityOf, emptySnapshot, GameId, indexWorld, type ShowId } from '@dtv/domain';
+import { type Cue, type EntityOf, emptySnapshot, GameId, indexWorld, SeasonId, type ShowId, TeamId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import { buildGame, CHECK_PREFIX, duplicateShow, freeShowId, type GameForm, isFlagged, offsetText, sameConference } from './shows';
 
@@ -92,7 +92,8 @@ describe('duplicateShow', () => {
     let n = 0;
     return () => String(++n);
   };
-  const result = duplicateShow(world, GRAPHICS, sourceShow, { gameId: GameId.parse('2026-27/2026-11-15/hofstra-mbb.at.drexel-mbb'), name: 'Hofstra at Drexel' }, counter());
+  const hofstraAtDrexel = { id: GameId.parse('2026-27/2026-11-15/hofstra-mbb.at.drexel-mbb'), seasonId: SeasonId.parse('2026-27'), awayTeamId: TeamId.parse('hofstra-mbb'), homeTeamId: TeamId.parse('drexel-mbb') };
+  const result = duplicateShow(world, GRAPHICS, sourceShow, { game: hofstraAtDrexel, name: 'Hofstra at Drexel' }, counter());
   if (!result.ok) throw new Error(result.error);
   const { show, flagged } = result.value;
 
@@ -106,12 +107,16 @@ describe('duplicateShow', () => {
     expect(show.rundown[1]!.params).not.toBe(sourceShow.rundown[1]!.params);
   });
 
-  test('flags the cues that name the source game’s players or teams, and only those', () => {
-    expect(flagged.map((each) => [each.cue, each.names])).toEqual([
-      ['player-lower-third-2', ["#3 Han Hawk"]],
-      ['team-lower-third-3', ['Drexel MBB']],
-    ]);
-    expect(show.rundown.filter(isFlagged).map((each) => each.id)).toEqual(['player-lower-third-2', 'team-lower-third-3']);
+  test('flags the cues that name the old opponent, and not a team that plays both games or neither', () => {
+    expect(flagged.map((each) => [each.cue, each.names])).toEqual([['player-lower-third-2', ['#3 Han Hawk']]]);
+    expect(show.rundown.filter(isFlagged).map((each) => each.id)).toEqual(['player-lower-third-2']);
+  });
+
+  test('flags a player of a team in both games when the new game is another season', () => {
+    const nextSeason = { ...hofstraAtDrexel, seasonId: SeasonId.parse('2027-28') };
+    const reed = { ...sourceShow.rundown[1]!, params: { player: 'drexel-mbb@2026-27/reed-josh', line: { kind: 'game', stats: ['pts'] } } };
+    const again = duplicateShow(world, GRAPHICS, { ...sourceShow, rundown: [reed] }, { game: nextSeason, name: 'Next season' }, counter());
+    expect(again.ok && again.value.flagged.map((each) => each.names)).toEqual([['#12 Josh Reed']]);
   });
 
   test('a flag says what the cue names and keeps the operator’s own note', () => {
@@ -120,7 +125,7 @@ describe('duplicateShow', () => {
   });
 
   test('refuses a name that no id can come of', () => {
-    const empty = duplicateShow(world, GRAPHICS, sourceShow, { gameId: GameId.parse(OLD), name: '  ' });
+    const empty = duplicateShow(world, GRAPHICS, sourceShow, { game: hofstraAtDrexel, name: '  ' });
     expect(empty.ok).toBe(false);
   });
 });
