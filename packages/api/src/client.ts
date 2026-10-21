@@ -4,7 +4,7 @@
  * the reconnected socket, and the new stream's first value is complete.
  */
 
-import { createORPCClient } from '@orpc/client';
+import { createORPCClient, ORPCError } from '@orpc/client';
 import { RPCLink } from '@orpc/client/websocket';
 import type { ContractRouterClient } from '@orpc/contract';
 import ReconnectingWebSocket from 'partysocket/ws';
@@ -75,5 +75,33 @@ export async function first<T>(open: (signal: AbortSignal) => Promise<AsyncItera
     throw new Error('The stream ended before its first value');
   } finally {
     controller.abort();
+  }
+}
+
+/** The server did not answer a call in time. A call cut off mid-flight may still have landed. */
+export class NoAnswer extends Error {
+  constructor(readonly withinMs: number) {
+    super(`The server did not answer within ${withinMs / 1000} s`);
+  }
+}
+
+/**
+ * Makes `call` until the server answers it, with a result or with its own error, or until
+ * `withinMs` passes. A call the socket dropped, sent while it was down or cut off mid-flight,
+ * is made again on the reconnected socket. Only for a call whose repeat changes nothing: a
+ * show command keeps its id, which the server dedupes, and a live command's values are absolute.
+ */
+export async function untilAnswered<T>(call: (signal: AbortSignal) => Promise<T>, options: { readonly withinMs: number }): Promise<T> {
+  const deadline = AbortSignal.timeout(options.withinMs);
+  // A call waiting for the socket to open may not settle on its own, so the deadline is raced, not polled.
+  const late = new Promise<never>((_, reject) => deadline.addEventListener('abort', () => reject(new NoAnswer(options.withinMs)), { once: true }));
+  late.catch(() => {});
+  for (;;) {
+    try {
+      return await Promise.race([call(deadline), late]);
+    } catch (error) {
+      if (error instanceof ORPCError || error instanceof NoAnswer) throw error;
+    }
+    await Promise.race([new Promise((resolve) => setTimeout(resolve, RETRY_MS)), late]);
   }
 }

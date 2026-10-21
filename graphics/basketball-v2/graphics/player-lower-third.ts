@@ -2,13 +2,13 @@ import { basketball, PlayerId } from '@dtv/domain';
 import { defineGraphic, FALLBACK_IMAGES } from '@dtv/playout';
 import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
-import { classYearName, fullName, keysOf, playerOf, seasonStatsOf, tonightOf } from './shared';
+import { classYearName, fullName, playerOf, seasonStatsOf, statKey, tonightOf } from './shared';
 
 const { PLAYER_GAME_STATS, PLAYER_SEASON_STATS, positionName } = basketball;
 
 const StatLine = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('game'), stats: z.array(z.enum(keysOf(PLAYER_GAME_STATS))).max(4).default(['pts', 'reb', 'ast']) }),
-  z.object({ kind: z.literal('season'), stats: z.array(z.enum(keysOf(PLAYER_SEASON_STATS))).max(4).default(['ppg', 'rpg', 'apg']) }),
+  z.object({ kind: z.literal('game'), stats: z.array(statKey(PLAYER_GAME_STATS)).max(4).default(['pts', 'reb', 'ast']) }),
+  z.object({ kind: z.literal('season'), stats: z.array(statKey(PLAYER_SEASON_STATS)).max(4).default(['ppg', 'rpg', 'apg']) }),
   z.object({ kind: z.literal('text'), label: z.string(), text: z.string() }),
   z.object({ kind: z.literal('none') }),
 ]);

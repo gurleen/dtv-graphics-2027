@@ -269,7 +269,8 @@
 }
 
 .note {
-  width: 160px;
+  flex: 1 1 320px;
+  max-width: 480px;
 }
 
 .override {
@@ -379,7 +380,11 @@
   color: var(--warn);
 }
 
+/* The others' previews take the rail's free height: each as tall as fits, two abreast, still 16:9. */
 .others {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
   display: flex;
   gap: var(--space-3);
   overflow-x: auto;
@@ -389,11 +394,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  width: 140px;
+  width: min(calc(50cqw - var(--space-3) / 2), calc((100cqh - var(--caption) - var(--space-1)) * 16 / 9));
   flex: none;
 }
 
 .other .caption {
+  height: var(--caption);
   overflow: hidden;
   font-size: var(--text-xs);
   color: var(--text-muted);
@@ -401,7 +407,8 @@
   text-overflow: ellipsis;
 }
 
-.monitor.thumb {
+/* Not `.thumb`: the data page styles that class as a 64 px image. */
+.monitor.other-monitor {
   border-width: 1px;
 }
 
@@ -412,7 +419,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-6);
+  gap: var(--space-5);
   margin: 0 calc(-1 * var(--space-4));
   padding: 0 var(--space-5);
   border-top: 1px solid var(--border);
@@ -472,8 +479,86 @@
   background: var(--text);
 }
 
-.period .select-button {
-  min-width: 90px;
+.period .select-button,
+.phase .select-button {
+  min-width: 0;
+  gap: var(--space-3);
+}
+
+/* A keyed score-bar button: its key sits under its label, like a legend on a key cap, so the bar fits 1440 px. */
+.button.keyed {
+  flex-direction: column;
+  gap: 0;
+  height: 36px;
+  min-width: 30px;
+  padding: 0 var(--space-3);
+  line-height: 1.1;
+}
+
+.button.keyed kbd {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: var(--text-xs);
+  line-height: 1.1;
+  color: var(--text-faint);
+}
+
+/* A command on its way to the server: amber, pulsing, until it is answered or fails. */
+[data-pending] {
+  outline: 1px dashed var(--warn);
+  outline-offset: 1px;
+  animation: pending 1s ease-in-out infinite;
+}
+
+@keyframes pending {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* The key list */
+
+.free .panel-header h2 {
+  margin-right: auto;
+}
+
+.key-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.key-section h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.key-section dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+}
+
+.key-line {
+  display: contents;
+}
+
+.key-line dt {
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.key-line dt kbd:first-child {
+  margin-left: 0;
+}
+
+.key-line dd {
+  margin: 0;
 }
 
 /* No active show */

@@ -1,11 +1,13 @@
 /**
  * Sending show commands, and what an operator must see when one fails. Every show change
- * is one `show.command` with a fresh id, so a resend after a dropped socket applies once.
- * A REJECTED reason or a failed write lands in `problem`, which the show page shows beside
+ * is one `show.command` with a fresh id, sent again under the same id while the socket is
+ * down, so a Take pressed during a blip lands once: the server dedupes by id. While a
+ * command waits it is `pending`, which its control shows. A REJECTED reason, a failed write,
+ * or no answer within `ANSWER_MS` lands in `problem`, which the show page shows beside
  * Take, where the operator is looking.
  */
 
-import type { Api } from '@dtv/api';
+import { type Api, NoAnswer, untilAnswered } from '@dtv/api';
 import { CommandId, type ShowCommand } from '@dtv/playout';
 import { createContext, type ReactNode, useContext, useMemo, useRef, useState } from 'react';
 
@@ -14,9 +16,14 @@ export interface Problem {
   readonly at: number;
 }
 
+/** How long a command is sent again while the server cannot be reached, before it fails. */
+export const ANSWER_MS = 10_000;
+
 export interface Commands {
   /** Resolves to whether the server applied it; a failure becomes the problem. */
   send(command: ShowCommand): Promise<boolean>;
+  /** Commands sent and not yet answered, oldest first. */
+  readonly pending: readonly ShowCommand[];
   /** Shows a failure that did not come from a show command, such as a refused rundown edit. */
   fail(message: string): void;
   readonly problem: Problem | null;
@@ -35,6 +42,7 @@ export function useCommands(): Commands {
 
 /** The reason an oRPC call failed, in the server's words when it gave some. */
 export function reasonOf(error: unknown): string {
+  if (error instanceof NoAnswer) return `the server did not answer within ${error.withinMs / 1000} s`;
   const data = (error as { data?: { reason?: unknown; detail?: unknown } } | null)?.data;
   if (typeof data?.reason === 'string') return data.reason;
   if (typeof data?.detail === 'string') return data.detail;
@@ -89,20 +97,41 @@ function useGuard(fire: () => void): Guard {
   }, [arming]);
 }
 
+/** What each command is called in a failure: "Take failed: …". */
+const COMMAND_NAMES: Record<ShowCommand['type'], string> = {
+  activate: 'Activate',
+  cue: 'Cue',
+  uncue: 'Clear preview',
+  take: 'Take',
+  air: 'Air',
+  toggle: 'Air',
+  clear: 'Clear',
+  clearAll: 'Clear All',
+  step: 'Next',
+  refresh: 'Refresh',
+  patch: 'Text fix',
+};
+
 export function CommandsProvider(props: { readonly api: Api; readonly children: ReactNode }) {
   const { api } = props;
   const [problem, setProblem] = useState<Problem | null>(null);
+  const [pending, setPending] = useState<readonly ShowCommand[]>([]);
   const fail = (message: string) => setProblem({ message, at: Date.now() });
   const send = async (command: ShowCommand) => {
+    const id = CommandId.parse(crypto.randomUUID());
+    setPending((current) => [...current, command]);
     try {
-      await api.show.command({ id: CommandId.parse(crypto.randomUUID()), command });
+      await untilAnswered((signal) => api.show.command({ id, command }, { signal }), { withinMs: ANSWER_MS });
       return true;
     } catch (error) {
-      fail(reasonOf(error));
+      // The server's own refusal already says what; a dropped call needs the command named.
+      fail(error instanceof NoAnswer ? `${COMMAND_NAMES[command.type]} failed: ${reasonOf(error)}.` : reasonOf(error));
       return false;
+    } finally {
+      setPending((current) => current.filter((each) => each !== command));
     }
   };
   const clearAll = useGuard(() => void send({ type: 'clearAll' }));
-  const value: Commands = { send, fail, problem, dismiss: () => setProblem(null), clearAll };
+  const value: Commands = { send, pending, fail, problem, dismiss: () => setProblem(null), clearAll };
   return <CommandsContext.Provider value={value}>{props.children}</CommandsContext.Provider>;
 }

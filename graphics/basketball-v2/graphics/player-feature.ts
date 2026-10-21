@@ -3,13 +3,13 @@
 import { basketball, PlayerId } from '@dtv/domain';
 import { type BindContext, FALLBACK_IMAGES } from '@dtv/playout';
 import { z } from 'zod';
-import { classYearName, keysOf, opponentOf, playerOf, seasonStatsOf, tonightOf } from './shared';
+import { classYearName, opponentOf, playerOf, seasonStatsOf, statKey, tonightOf } from './shared';
 
 const { PLAYER_GAME_STATS, PLAYER_SEASON_STATS, positionName } = basketball;
 
 const Body = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('season'), stats: z.array(z.enum(keysOf(PLAYER_SEASON_STATS))).max(4).default(['ppg', 'rpg', 'apg', 'fgPct']) }),
-  z.object({ kind: z.literal('game'), stats: z.array(z.enum(keysOf(PLAYER_GAME_STATS))).max(4).default(['pts', 'reb', 'ast', 'fg']) }),
+  z.object({ kind: z.literal('season'), stats: z.array(statKey(PLAYER_SEASON_STATS)).max(4).default(['ppg', 'rpg', 'apg', 'fgPct']) }),
+  z.object({ kind: z.literal('game'), stats: z.array(statKey(PLAYER_GAME_STATS)).max(4).default(['pts', 'reb', 'ast', 'fg']) }),
   z.object({ kind: z.literal('text'), text: z.string().min(1) }),
 ]);
 

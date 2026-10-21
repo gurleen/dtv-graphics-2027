@@ -5,16 +5,17 @@
  * bottom.
  */
 
-import { type CueId, resolveGame, type Show } from '@dtv/domain';
-import { type Bus, LAYERS, type OperatorId, type Registry, type ShowView } from '@dtv/playout';
+import { type CueId, resolveGame, sameJson, type Show } from '@dtv/domain';
+import { type Bus, LAYERS, type OperatorId, type Registry, type ShowCommand, type ShowView } from '@dtv/playout';
 import './show.css';
 import { useState } from 'react';
 import { Button } from 'react-aria-components';
 import { useCommands } from '../app/commands';
 import { useController } from '../app/context';
-import { useStream } from '../app/streams';
 import { type ShowActions, slotLabel, stepsOf, useShowActions } from './actions';
+import { useGame } from './game';
 import { AddCueDialog, Inspector } from './inspector';
+import { KeyList } from './key-list';
 import { type KeyAction, useKeys } from './keys';
 import { Monitor } from './monitor';
 import { Rundown } from './rundown';
@@ -52,7 +53,7 @@ function ShowPicker() {
 
 function Console(props: { readonly view: ShowView; readonly show: Show }) {
   const { view, show } = props;
-  const { api, world } = useController();
+  const { world } = useController();
   const { clearAll } = useCommands();
   const ids = view.rundown.map((cue) => cueIdOf(cue)!);
   const [chosen, setChosen] = useState<CueId | null>(null);
@@ -61,11 +62,10 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
   const actions = useShowActions(selected)!;
   const [adding, setAdding] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [listingKeys, setListingKeys] = useState(false);
 
-  const gameId = show.gameId;
-  const live = useStream(gameId ? (signal) => api.game.watch({ game: gameId }, { signal }) : null, [api, gameId]);
-  const game = world && gameId ? resolveGame(world, gameId) : undefined;
-  const basketball = live?.sport === 'basketball' ? live : null;
+  const board = useGame(show.gameId);
+  const game = world && show.gameId ? resolveGame(world, show.gameId) : undefined;
 
   const run = (action: KeyAction) => {
     switch (action.type) {
@@ -91,22 +91,33 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
         const cue = view.free[action.index];
         return cue && actions.free(cue);
       }
+      case 'score':
+        return board.actions?.score(action.side, action.by);
+      case 'clock':
+        return board.actions?.clock();
+      case 'shotClock':
+        return board.actions?.shotClock(action.seconds);
+      case 'possession':
+        return board.actions?.possession(action.side);
+      case 'keys':
+        return setListingKeys(true);
     }
   };
-  useKeys({ run, clearAllUp: clearAll.up, paused: adding || dragging });
+  useKeys({ run, clearAllUp: clearAll.up, paused: adding || dragging || listingKeys });
 
   return (
     <div className="show-page">
-      <FreePanel view={view} actions={actions} />
+      <FreePanel view={view} actions={actions} onKeys={() => setListingKeys(true)} />
       <OnAir view={view} actions={actions} />
       <Rundown view={view} selected={selectedId} onSelect={setChosen} onCue={actions.cue} onAdd={() => setAdding(true)} onDragging={setDragging} />
-      <Inspector cue={selected} live={live} onCue={actions.cue} />
+      <Inspector cue={selected} live={board.live} onCue={actions.cue} />
       <Rail view={view} actions={actions} />
-      <ScoreBar game={game} live={basketball} />
+      <ScoreBar game={game} board={board} />
+      {listingKeys && <KeyList onClose={() => setListingKeys(false)} />}
       {adding && (
         <AddCueDialog
           at={selectedId ? ids.indexOf(selectedId) + 1 : ids.length}
-          live={live}
+          live={board.live}
           onClose={(added) => {
             setAdding(false);
             if (added) setChosen(added.id);
@@ -117,15 +128,28 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
   );
 }
 
-function FreePanel(props: { readonly view: ShowView; readonly actions: ShowActions }) {
+function FreePanel(props: { readonly view: ShowView; readonly actions: ShowActions; readonly onKeys: () => void }) {
+  const { pending } = useCommands();
   return (
     <section className="panel free" aria-label="Free panel">
-      <h2>
-        Free panel <span className="muted">· air directly</span>
-      </h2>
+      <header className="panel-header">
+        <h2>
+          Free panel <span className="muted">· air directly</span>
+        </h2>
+        <Button className="button small" onPress={props.onKeys}>
+          Keys <kbd>?</kbd>
+        </Button>
+      </header>
       <div className="free-grid">
         {props.view.free.map((cue, index) => (
-          <Button key={cue.graphic} className="free-button" data-pgm={!!cue.onProgram || undefined} data-error={!!cue.error || undefined} onPress={() => props.actions.free(cue)}>
+          <Button
+            key={cue.graphic}
+            className="free-button"
+            data-pgm={!!cue.onProgram || undefined}
+            data-error={!!cue.error || undefined}
+            isPending={pending.some((command) => (command.type === 'air' && sameJson(command.ref, cue.ref)) || (command.type === 'clear' && command.slot === cue.onProgram))}
+            onPress={() => props.actions.free(cue)}
+          >
             <span className="free-label">{cue.label}</span>
             {cue.onProgram && <span className="tag pgm">PGM</span>}
             {index < 9 && <kbd>{index + 1}</kbd>}
@@ -141,6 +165,7 @@ const LAYER_NAMES = { bug: 'Bug', lower: 'Lower', card: 'Card' } as const;
 
 function OnAir(props: { readonly view: ShowView; readonly actions: ShowActions }) {
   const { registry } = useController();
+  const { pending } = useCommands();
   const { view, actions } = props;
   return (
     <section className="panel on-air" aria-label="On air by layer">
@@ -161,7 +186,12 @@ function OnAir(props: { readonly view: ShowView; readonly actions: ShowActions }
                   </span>
                 )}
               </span>
-              <Button className="button small" isDisabled={!slot} onPress={() => actions.clearLayer(layer)}>
+              <Button
+                className="button small"
+                isDisabled={!slot}
+                isPending={pending.some((command) => (command.type === 'clear' && command.layer === layer) || command.type === 'clearAll')}
+                onPress={() => actions.clearLayer(layer)}
+              >
                 Clear{layer === 'lower' && <kbd>⇧Esc</kbd>}
               </Button>
             </li>
@@ -177,8 +207,9 @@ const busLabel = (view: ShowView, registry: Registry, bus: Bus) =>
 
 function Rail(props: { readonly view: ShowView; readonly actions: ShowActions }) {
   const { operator, registry } = useController();
-  const { problem, dismiss } = useCommands();
+  const { problem, dismiss, pending } = useCommands();
   const { view, actions } = props;
+  const waiting = (type: ShowCommand['type']) => pending.some((command) => command.type === type);
   const others = [...new Set<OperatorId>([...view.operators, ...(Object.keys(view.otherPreviews) as OperatorId[])])].filter((each) => each !== operator).sort();
   const previewEmpty = Object.keys(view.preview).length === 0;
   return (
@@ -189,13 +220,13 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
       </div>
       <Monitor name="preview" bus={{ kind: 'preview', operator }} className="pvw" />
       <div className="take-row">
-        <Button className="button take" isDisabled={previewEmpty} onPress={actions.take}>
+        <Button className="button take" isDisabled={previewEmpty} isPending={waiting('take')} onPress={actions.take}>
           Take <kbd>Space</kbd>
         </Button>
-        <Button className="button" onPress={actions.next}>
+        <Button className="button" isPending={waiting('step')} onPress={actions.next}>
           Next <kbd>N</kbd>
         </Button>
-        <Button className="button" isDisabled={previewEmpty} onPress={actions.clearPreview}>
+        <Button className="button" isDisabled={previewEmpty} isPending={waiting('uncue')} onPress={actions.clearPreview}>
           Clear PVW <kbd>Esc</kbd>
         </Button>
       </div>
@@ -221,7 +252,7 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
           const bus = Object.hasOwn(view.otherPreviews, other) ? view.otherPreviews[other]! : {};
           return (
             <div key={other} className="other" data-operator={other}>
-              <Monitor name={`other:${other}`} bus={{ kind: 'preview', operator: other }} className="thumb" />
+              <Monitor name={`other:${other}`} bus={{ kind: 'preview', operator: other }} className="other-monitor" />
               <span className="caption">
                 {other}: {busLabel(view, registry, bus) || 'empty'}
               </span>
