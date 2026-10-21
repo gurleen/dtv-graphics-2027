@@ -1,0 +1,13 @@
+{
+  "name": "@dtv/renderer",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@dtv/domain": "workspace:*",
+    "@dtv/playout": "workspace:*",
+    "@rive-app/canvas-single": "^2.42.2"
+  }
+}

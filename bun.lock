@@ -78,6 +78,14 @@
         "zod": "^4.6.7",
       },
     },
+    "packages/renderer": {
+      "name": "@dtv/renderer",
+      "dependencies": {
+        "@dtv/domain": "workspace:*",
+        "@dtv/playout": "workspace:*",
+        "@rive-app/canvas-single": "^2.42.2",
+      },
+    },
   },
   "packages": {
     "@cloudflare/kv-asset-handler": ["@cloudflare/kv-asset-handler@0.5.0", "", {}, "sha512-jxQYkj8dSIzc0cD6cMMNdOc1UVjqSqu8BZdor5s8cGjW2I8BjODt/kWPVdY+u9zj3ms75Q5qaZgnxUad83+eAg=="],
@@ -107,6 +115,8 @@
     "@dtv/graphics": ["@dtv/graphics@workspace:packages/graphics"],
 
     "@dtv/playout": ["@dtv/playout@workspace:packages/playout"],
+
+    "@dtv/renderer": ["@dtv/renderer@workspace:packages/renderer"],
 
     "@dtv/server": ["@dtv/server@workspace:apps/server"],
 
