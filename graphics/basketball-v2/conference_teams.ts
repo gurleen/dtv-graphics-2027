@@ -1,7 +1,7 @@
 /**
  * The members of the Coastal Athletic Association in 2026-27, in alphabetical order: the
  * teams the Conference Standings card can list. generate_conference_standings.ts embeds a
- * logo and a tint for each, and the OGraf package offers the names as its team options.
+ * logo and a tint for each, and the registry entry names each row by `name`.
  *
  * `name` is the text on the card and the value an operator selects; `color` is the team
  * primary (`AARRGGBB`), drawn as the row tint on game nights; `logo` is the full-colour

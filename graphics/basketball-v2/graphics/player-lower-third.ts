@@ -1,12 +1,10 @@
-import { basketball, PlayerId, type PlayerSeasonStats } from '@dtv/domain';
+import { basketball, PlayerId } from '@dtv/domain';
 import { defineGraphic, FALLBACK_IMAGES } from '@dtv/playout';
 import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
-import { classYearName, fullName, playerOf } from './shared';
+import { classYearName, fullName, keysOf, playerOf, seasonStatsOf, tonightOf } from './shared';
 
 const { PLAYER_GAME_STATS, PLAYER_SEASON_STATS, positionName } = basketball;
-
-const keysOf = <K extends string>(stats: Record<K, unknown>) => Object.keys(stats) as [K, ...K[]];
 
 const StatLine = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('game'), stats: z.array(z.enum(keysOf(PLAYER_GAME_STATS))).max(4).default(['pts', 'reb', 'ast']) }),
@@ -16,8 +14,6 @@ const StatLine = z.discriminatedUnion('kind', [
 ]);
 
 const SEPARATOR = '  ·  ';
-
-const seasonStatsOf = (stats: PlayerSeasonStats | undefined) => (stats?.stats.sport === 'basketball' ? stats.stats : undefined);
 
 export const playerLowerThird = defineGraphic({
   id: 'basketball-v2/player-lower-third',
@@ -39,11 +35,11 @@ export const playerLowerThird = defineGraphic({
     let statLabel = '';
     let statLine = '';
     if (line.kind === 'game') {
-      const tonight = context.live?.sport === 'basketball' ? context.live.players[player.id] : undefined;
+      const tonight = tonightOf(context, player.id);
       statLabel = 'Tonight';
       statLine = tonight ? line.stats.map((key) => `${PLAYER_GAME_STATS[key].value(tonight)} ${PLAYER_GAME_STATS[key].label}`).join(SEPARATOR) : '';
     } else if (line.kind === 'season') {
-      const season = seasonStatsOf(context.world.get('playerStats', player.id));
+      const season = seasonStatsOf(context.world, player.id);
       statLabel = 'Season';
       statLine = season ? line.stats.map((key) => `${PLAYER_SEASON_STATS[key].value(season)} ${PLAYER_SEASON_STATS[key].label}`).join(SEPARATOR) : '';
     } else if (line.kind === 'text') {
