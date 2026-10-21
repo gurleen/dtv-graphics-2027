@@ -16,6 +16,12 @@
         "wrangler": "^4.143.1",
       },
     },
+    "packages/db": {
+      "name": "@dtv/db",
+      "dependencies": {
+        "@dtv/domain": "workspace:*",
+      },
+    },
     "packages/domain": {
       "name": "@dtv/domain",
       "dependencies": {
@@ -39,6 +45,8 @@
     "@cloudflare/workerd-windows-64": ["@cloudflare/workerd-windows-64@1.20260926.1", "", { "os": "win32", "cpu": "x64" }, "sha512-ehdL3ataKdEmlnW9oom6OZUR8n3XsTL/zl8+KGREpLi5sMSW0mek0PrF4wK9SX51f3Alnlu8tF8eKBg+mc3xFw=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
+
+    "@dtv/db": ["@dtv/db@workspace:packages/db"],
 
     "@dtv/domain": ["@dtv/domain@workspace:packages/domain"],
 

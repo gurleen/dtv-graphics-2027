@@ -1,0 +1,122 @@
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
+import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { backup, type Db, migrate, openDb, TABLES, tableSql } from './index';
+
+let dir: string;
+let db: Db;
+const backups = () => join(dir, 'backups');
+const backupFiles = () => {
+  try {
+    return readdirSync(backups()).sort();
+  } catch {
+    return [];
+  }
+};
+
+beforeEach(() => {
+  dir = mkdtempSync(join(tmpdir(), 'dtv-db-'));
+  db = openDb(join(dir, 'dtv.sqlite'));
+});
+afterEach(() => {
+  db.sqlite.close();
+  rmSync(dir, { recursive: true, force: true });
+});
+
+const insert = (table: string, doc: object, seq = 1, locked: string[] = []) =>
+  db.sqlite.run(`INSERT INTO "${table}" (id, doc, seq, locked) VALUES (?, ?, ?, ?)`, ['id' in doc ? String(doc.id) : '', JSON.stringify(doc), seq, JSON.stringify(locked)]);
+
+const rows = (table: string) => db.sqlite.query(`SELECT id, doc, seq, locked FROM "${table}" ORDER BY id`).all();
+
+const seedRoster = () => {
+  insert('seasons', { id: '2026-27', name: '2026-27' });
+  insert('schools', { id: 'drexel', name: 'Drexel', shortName: 'Drexel', mascot: 'Dragons', abbreviation: 'DREX', primaryColor: '#07294d', secondaryColor: '#ffc600', logo: null, website: null, espnId: '2182' });
+  insert('teams', { id: 'drexel-mbb', schoolId: 'drexel', program: 'mbb', branding: {} });
+  insert('players', { id: 'drexel-mbb@2026-27/reed-josh', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: 'Josh', lastName: 'Reed', jersey: '5', sourceKey: 'a' }, 4, ['hometown']);
+  insert('players', { id: 'drexel-mbb@2026-27/hipps', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: '', lastName: 'Hipps', jersey: '0', sourceKey: null }, 7);
+};
+
+describe('migrate', () => {
+  test('a new file gets every table, with no backup because there is nothing to lose', () => {
+    expect(migrate(db, { backupDir: backups() })).toEqual({ created: TABLES.map((table) => table.table), rebuilt: [], docMigrations: [], backup: null });
+    const stored = db.sqlite.query<{ name: string; sql: string }, []>(`SELECT name, sql FROM sqlite_schema WHERE type = 'table'`).all();
+    for (const table of TABLES) expect(stored.find((row) => row.name === table.table)?.sql).toBe(table.create);
+  });
+
+  test('a second run rebuilds nothing and takes no backup', () => {
+    migrate(db, { backupDir: backups() });
+    seedRoster();
+    expect(migrate(db, { backupDir: backups() })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
+    expect(backupFiles()).toEqual([]);
+  });
+
+  test('a table made by an older spec is rebuilt with its rows intact, after a backup', () => {
+    migrate(db, { backupDir: backups() });
+    // The file as it was before the players' natural key existed: no source_key column, no index.
+    const current = tableSql('player');
+    const older = current.create.replace(", source_key TEXT GENERATED ALWAYS AS (doc ->> '$.sourceKey') STORED", '');
+    expect(older).not.toBe(current.create);
+    db.sqlite.run('DROP TABLE "players"');
+    db.sqlite.run(older);
+    seedRoster();
+    const before = rows('players');
+
+    const report = migrate(db, { backupDir: backups() });
+    expect(report.rebuilt).toEqual(['players']);
+    expect(report.backup).toStartWith(backups());
+    expect(backupFiles()).toHaveLength(1);
+    expect(rows('players')).toEqual(before);
+    expect(db.sqlite.query(`SELECT sql FROM sqlite_schema WHERE name = 'players'`).get()).toEqual({ sql: current.create });
+    expect(() => insert('players', { id: 'drexel-mbb@2026-27/other', teamId: 'drexel-mbb', seasonId: '2026-27', firstName: 'X', lastName: 'Other', jersey: '9', sourceKey: 'a' })).toThrow(
+      'UNIQUE constraint failed',
+    );
+
+    expect(migrate(db, { backupDir: backups() })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
+  });
+
+  test('a document migration runs once, under user_version', () => {
+    migrate(db, { backupDir: backups() });
+    insert('venues', { id: 'daskalakis-athletic-center', title: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
+    const renameTitle = { version: 1, kind: 'venue', up: (doc: unknown) => (doc !== null && typeof doc === 'object' && 'title' in doc ? { ...doc, name: doc.title } : doc) } as const;
+
+    expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] }).docMigrations).toEqual([1]);
+    expect(JSON.parse(String(rows('venues').map((row) => (row as { doc: string }).doc)[0]))).toEqual({
+      id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA',
+    });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+    expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
+  });
+
+  test('a document migration that produces an invalid document changes nothing', () => {
+    migrate(db, { backupDir: backups() });
+    insert('venues', { id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
+    const before = rows('venues');
+    const broken = { version: 1, kind: 'venue', up: () => ({ id: 'daskalakis-athletic-center' }) } as const;
+    expect(() => migrate(db, { backupDir: backups(), migrations: [broken] })).toThrow();
+    expect(rows('venues')).toEqual(before);
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 0 });
+  });
+
+  test('a new file starts at the latest document migration without running any', () => {
+    const migration = { version: 3, kind: 'venue', up: () => null } as const;
+    expect(migrate(db, { backupDir: backups(), migrations: [migration] }).docMigrations).toEqual([]);
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 3 });
+  });
+});
+
+describe('backup', () => {
+  test('writes a readable copy and keeps the newest 30', () => {
+    migrate(db, { backupDir: backups() });
+    seedRoster();
+    const files = Array.from({ length: 32 }, () => backup(db, backups(), 'manual'));
+    expect(new Set(files).size).toBe(32);
+    const kept = backupFiles();
+    expect(kept).toHaveLength(30);
+    expect(kept).toEqual(files.slice(2).map((file) => file.slice(backups().length + 1)));
+
+    const copy = openDb(files.at(-1)!);
+    expect(copy.sqlite.query('SELECT count(*) AS n FROM players').get()).toEqual({ n: 2 });
+    copy.sqlite.close();
+  });
+});
