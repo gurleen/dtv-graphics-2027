@@ -7,14 +7,18 @@
  *
  * `PORT` and `DTV_DB` override the port and the database file.
  *
- *   /      a plain status page
- *   /rpc   the oRPC WebSocket
+ *   /                   a plain status page
+ *   /rpc                the oRPC WebSocket
+ *   /renderer           the page OBS loads; it draws program
+ *   /riv/<stem>.riv     the signed scenes, from build/riv (`bun run riv:build`)
+ *   /assets/...         images and fonts, from assets/
  */
 
 import { mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { backup, migrate, openDb, seed } from '@dtv/db';
 import { GRAPHICS } from '@dtv/graphics';
+import rendererPage from '@dtv/renderer-page';
 import { RPCHandler } from '@orpc/server/bun-ws';
 import { type CallContext, createRouter } from './router';
 import { createStore, systemClock } from './store';
@@ -55,8 +59,32 @@ const statusPage = () => {
   });
 };
 
+/** The file under `dir` that `path` names, or null for a path that leaves it. */
+function fileUnder(dir: string, path: string): ReturnType<typeof Bun.file> | null {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(path);
+  } catch {
+    return null;
+  }
+  const file = resolve(dir, `.${sep}${decoded}`);
+  return file.startsWith(dir + sep) ? Bun.file(file) : null;
+}
+
+/** Serves `/<prefix>/...` from `dir`; a missing file or a path out of `dir` is a 404. */
+const staticFiles = (prefix: string, dir: string) => async (request: Request) => {
+  const file = fileUnder(dir, new URL(request.url).pathname.slice(prefix.length + 2));
+  if (!file || !(await file.exists())) return new Response('Not found', { status: 404 });
+  return new Response(file, { headers: { 'cache-control': 'no-cache' } });
+};
+
 const server = Bun.serve({
   port: PORT,
+  routes: {
+    '/renderer': rendererPage,
+    '/riv/*': staticFiles('riv', join(ROOT, 'build/riv')),
+    '/assets/*': staticFiles('assets', join(ROOT, 'assets')),
+  },
   fetch(request, server) {
     const url = new URL(request.url);
     if (url.pathname === '/rpc') {
