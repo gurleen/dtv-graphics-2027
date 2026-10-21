@@ -347,7 +347,22 @@ is one reducer step and one transaction that nothing interleaves with.
 Every way of running the show sends the same `show.command` calls. The controller binds keys and clicks to them
 for now. A Stream Deck plugin or another surface later is one more client of `@dtv/api`, with no server change. A
 surface that shows the on-air state sends `air` and `clear`. A surface with no display of its own sends `toggle`,
-which the server decides against the current program. Phase 4 designs the key map with the controller prototypes.
+which the server decides against the current program.
+
+The owner chose the controller's design on 2026-10-21, from four rounds of questions and three wireframes:
+
+- A dark, dense broadcast console for laptops (1440 x 900 first), with red for program and green for preview,
+  set in IBM Plex Sans and Mono. React Aria Components with plain CSS and the tokens in
+  `apps/controller/src/app/tokens.css`.
+- The show page has three columns. The free panel and the on-air layers are on the left and the rundown is in the
+  middle, at equal width, with an inspector for the selected cue under them. The right rail holds my preview,
+  Take, Next and program, then thumbnails of the other operators' previews. Score and clock run along the bottom.
+- The data page has a team list on the left, tables per team (roster, staff, season stats, team and branding) in
+  the middle, and the selected record on the right. Each locked field shows who locked it and when, and unlocks
+  with a click. A roster import shows a diff table before it applies. A refused edit shows theirs beside yours.
+- Keyboard first, with every action also on a click. Space takes, Enter cues the selected rundown row, Up and Down
+  select, N is Next, Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
+  Keys do nothing while typing. Only Clear All is guarded, by a hold or a second press.
 
 ### The clock
 
@@ -470,7 +485,7 @@ Each phase ends in a check that runs on the real artifact.
 | 2.1 Data | workspaces, `@dtv/domain`, `@dtv/db`, the seed | typecheck, tests on a real SQLite file, a second seed writes nothing, a second migrate does nothing, lock and basis tests, the teams.json warnings |
 | 2.2 Live | `@dtv/api`, the show reducer and projector, the scene codegen with two registry entries, `apps/server` | a second client sees the first client's writes over the WebSocket, streams reconnect after a server restart, the clock re-projects on its boundaries |
 | 3 Renderer and site | the other registry entries, `@dtv/renderer`, `/renderer`, the signed `.riv` build, the site on the new renderer, then `ograf/` deleted | the golden test for all 17 scenes, `/renderer` frames compared with the phase 0 captures, the site build |
-| 4 Controller | prototypes first, then the show page and the data page | the owner reviews the prototypes |
+| 4 Controller | wireframes first, then the show page and the data page | two controllers in two browsers stay in sync; every graphic goes through preview, take and program |
 | 5 Show day | a rehearsal in OBS | a full mock show |
 
 ## 7. Open questions for the owner
