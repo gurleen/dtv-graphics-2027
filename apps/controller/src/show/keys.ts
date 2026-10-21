@@ -1,9 +1,12 @@
 /**
- * The show page's key map. Keys run the same actions as the buttons that show them. They
- * are caught before any widget sees them, so Space takes even when a button has focus, and
- * they do nothing while focus is in a text field, a dialog or an open list.
+ * The show page's key map, as one table: `keyAction` reads it, each button's hint reads it,
+ * and the `?` list prints it, so the three cannot disagree. Keys run the same actions as the
+ * buttons that show them. They are caught before any widget sees them, so Space takes even
+ * when a button has focus, and they do nothing while focus is in a text field, a dialog or
+ * an open list.
  */
 
+import { sameJson, type Side } from '@dtv/domain';
 import { useEffect, useRef } from 'react';
 
 export type KeyAction =
@@ -14,21 +17,82 @@ export type KeyAction =
   | { readonly type: 'clearPreview' }
   | { readonly type: 'clearLower' }
   | { readonly type: 'clearAll' }
-  | { readonly type: 'free'; readonly index: number };
+  | { readonly type: 'free'; readonly index: number }
+  | { readonly type: 'score'; readonly side: Side; readonly by: 1 | 2 | 3 | -1 }
+  | { readonly type: 'clock' }
+  | { readonly type: 'shotClock'; readonly seconds: 30 | 20 }
+  | { readonly type: 'possession'; readonly side: Side }
+  | { readonly type: 'keys' };
 
-/** The key map: Space, Enter, Up, Down, N, Esc, Shift+Esc, 1 to 9, and Shift+Backspace held for Clear All. */
-export function keyAction(event: Pick<KeyboardEvent, 'key' | 'code' | 'shiftKey'>): KeyAction | null {
-  if (event.code === 'Space') return { type: 'take' };
-  if (event.key === 'Enter') return { type: 'cue' };
-  if (event.key === 'ArrowUp') return { type: 'move', by: -1 };
-  if (event.key === 'ArrowDown') return { type: 'move', by: 1 };
-  if (event.key === 'n' || event.key === 'N') return { type: 'next' };
-  if (event.key === 'Escape') return event.shiftKey ? { type: 'clearLower' } : { type: 'clearPreview' };
-  if (event.key === 'Backspace' && event.shiftKey) return { type: 'clearAll' };
-  const digit = /^Digit([1-9])$/.exec(event.code);
-  if (digit) return { type: 'free', index: Number(digit[1]) - 1 };
-  return null;
+/** One key. `shift` absent matches with or without Shift. */
+interface Binding {
+  readonly code: string;
+  readonly shift?: boolean;
+  readonly label: string;
+  readonly action: KeyAction;
 }
+
+/** One line of the key list: a key, or a run of keys that do one kind of thing. */
+export interface KeyLine {
+  readonly section: 'Show' | 'Game';
+  readonly what: string;
+  readonly bindings: readonly Binding[];
+}
+
+const letter = (code: string, action: KeyAction, shift = false): Binding => ({ code: `Key${code}`, shift, label: shift ? `⇧${code}` : code, action });
+
+export const KEY_MAP: readonly KeyLine[] = [
+  { section: 'Show', what: 'Take my preview', bindings: [{ code: 'Space', label: 'Space', action: { type: 'take' } }] },
+  { section: 'Show', what: 'Cue the selected row to my preview', bindings: [{ code: 'Enter', label: '⏎', action: { type: 'cue' } }] },
+  {
+    section: 'Show',
+    what: 'Move the rundown selection',
+    bindings: [
+      { code: 'ArrowUp', label: '↑', action: { type: 'move', by: -1 } },
+      { code: 'ArrowDown', label: '↓', action: { type: 'move', by: 1 } },
+    ],
+  },
+  { section: 'Show', what: 'Next on the stepped graphic on program', bindings: [{ code: 'KeyN', label: 'N', action: { type: 'next' } }] },
+  { section: 'Show', what: 'Clear my preview', bindings: [{ code: 'Escape', shift: false, label: 'Esc', action: { type: 'clearPreview' } }] },
+  { section: 'Show', what: 'Clear the program lower third', bindings: [{ code: 'Escape', shift: true, label: '⇧Esc', action: { type: 'clearLower' } }] },
+  { section: 'Show', what: 'Clear All, held for 600 ms or pressed twice', bindings: [{ code: 'Backspace', shift: true, label: '⇧⌫', action: { type: 'clearAll' } }] },
+  {
+    section: 'Show',
+    what: 'Air or clear the free-panel buttons, in order',
+    bindings: Array.from({ length: 9 }, (_, index) => ({ code: `Digit${index + 1}`, label: String(index + 1), action: { type: 'free', index } as const })),
+  },
+  {
+    section: 'Game',
+    what: 'Away +1, +2, +3',
+    bindings: [letter('Q', { type: 'score', side: 'away', by: 1 }), letter('W', { type: 'score', side: 'away', by: 2 }), letter('E', { type: 'score', side: 'away', by: 3 })],
+  },
+  {
+    section: 'Game',
+    what: 'Home +1, +2, +3',
+    bindings: [letter('I', { type: 'score', side: 'home', by: 1 }), letter('O', { type: 'score', side: 'home', by: 2 }), letter('P', { type: 'score', side: 'home', by: 3 })],
+  },
+  { section: 'Game', what: 'Away −1, home −1', bindings: [letter('Q', { type: 'score', side: 'away', by: -1 }, true), letter('I', { type: 'score', side: 'home', by: -1 }, true)] },
+  { section: 'Game', what: 'Start or stop the game clock', bindings: [letter('C', { type: 'clock' })] },
+  { section: 'Game', what: 'Shot clock to 30, to 20', bindings: [letter('R', { type: 'shotClock', seconds: 30 }), letter('T', { type: 'shotClock', seconds: 20 })] },
+  {
+    section: 'Game',
+    what: 'Possession to away, to home',
+    bindings: [
+      { code: 'BracketLeft', label: '[', action: { type: 'possession', side: 'away' } },
+      { code: 'BracketRight', label: ']', action: { type: 'possession', side: 'home' } },
+    ],
+  },
+  { section: 'Show', what: 'This list of keys', bindings: [{ code: 'Slash', shift: true, label: '?', action: { type: 'keys' } }] },
+];
+
+const BINDINGS = KEY_MAP.flatMap((line) => line.bindings);
+
+export function keyAction(event: Pick<KeyboardEvent, 'code' | 'shiftKey'>): KeyAction | null {
+  return BINDINGS.find((binding) => binding.code === event.code && (binding.shift === undefined || binding.shift === event.shiftKey))?.action ?? null;
+}
+
+/** The key that runs `action`, for its button's hint. */
+export const keyLabel = (action: KeyAction): string | undefined => BINDINGS.find((binding) => sameJson(binding.action, action))?.label;
 
 const TEXT_ENTRY = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]), textarea, [contenteditable="true"]';
 const OVERLAY = '[role="dialog"], [role="listbox"], [role="menu"], .drag';

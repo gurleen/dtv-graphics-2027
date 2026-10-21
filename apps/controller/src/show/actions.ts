@@ -51,10 +51,13 @@ export interface ShowActions {
 
 export function useShowActions(selected: CueView | undefined): ShowActions | null {
   const { operator, registry, show: view } = useController();
-  const { send } = useCommands();
+  const { send, pending } = useCommands();
   if (!view?.show) return null;
   return {
-    take: () => void send({ type: 'take', operator }),
+    take() {
+      // A take still on its way already holds my preview; a second would find it empty.
+      if (!pending.some((command) => command.type === 'take')) void send({ type: 'take', operator });
+    },
     cue: (cue) => void send({ type: 'cue', operator, ref: cue.ref }),
     next() {
       const target = nextTarget(registry, view.program, selected);

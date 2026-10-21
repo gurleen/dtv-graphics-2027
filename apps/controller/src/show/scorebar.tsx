@@ -1,19 +1,14 @@
 /**
- * The game, by mouse: score, clocks, period, possession, timeouts, fouls and bonus. Every
- * button sends an absolute value computed from what it shows, so two operators pressing +2
- * for one basket agree. Keys for these come in phase 5.
+ * The game along the bottom: score, clocks, period, phase, possession, timeouts, fouls and
+ * bonus. Score, clocks and possession have keys, shown on their buttons; timeouts, fouls,
+ * period and phase are by mouse. A value still on its way to the server is marked pending.
  */
 
-import { basketball, type GameView, type Side, SIDES, SourceId } from '@dtv/domain';
-import { useEffect, useState } from 'react';
+import { basketball, type GameView, type Side, SIDES } from '@dtv/domain';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Button, Input, Label, ListBox, ListBoxItem, Popover, Select, SelectValue, TextField } from 'react-aria-components';
-import { reasonOf, useCommands } from '../app/commands';
-import { useController } from '../app/context';
-
-type Live = basketball.BasketballLive;
-type Command = basketball.BasketballCommand;
-
-const OPERATOR = SourceId.parse('operator');
+import type { Game, GameCommand } from './game';
+import { type KeyAction, keyLabel } from './keys';
 
 /** The time now, every tenth of a second while `ticking`. */
 function useNow(ticking: boolean): number {
@@ -33,43 +28,63 @@ const parseClock = (text: string): number | null => {
   return (Number(match[1]) * 60 + Number(match[2])) * 1000 + Number(match[3] ?? 0) * 100;
 };
 
-export function ScoreBar(props: { readonly game: GameView | undefined; readonly live: Live | null }) {
-  const { api } = useController();
-  const { fail } = useCommands();
-  const { game, live } = props;
+const Key = (props: { readonly action: KeyAction }) => <kbd>{keyLabel(props.action)}</kbd>;
+
+const PHASES = basketball.Phase.options.map((phase) => ({ id: phase, label: phase === 'pregame' ? 'Pregame' : phase[0]!.toUpperCase() + phase.slice(1) }));
+
+function Choose(props: { readonly label: string; readonly className: string; readonly selected: string; readonly options: readonly { id: string; label: string }[]; readonly onChange: (id: string) => void; readonly pending?: boolean }) {
+  return (
+    <Select className={props.className} aria-label={props.label} selectedKey={props.selected} onSelectionChange={(key) => key !== null && props.onChange(String(key))} data-pending={props.pending || undefined}>
+      <Label className="sr-only">{props.label}</Label>
+      <Button className="select-button">
+        <SelectValue />
+        <span aria-hidden>▾</span>
+      </Button>
+      <Popover className="popover">
+        <ListBox className="listbox" items={props.options}>
+          {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
+        </ListBox>
+      </Popover>
+    </Select>
+  );
+}
+
+export function ScoreBar(props: { readonly game: GameView | undefined; readonly board: Game }) {
+  const { game } = props;
+  const { live, actions, pending } = props.board;
   const now = useNow(!!live && (live.clock.running || !!live.shotClock?.running));
   const [clockText, setClockText] = useState<string | null>(null);
-  if (!game || !live) {
+  if (!game || !live || !actions) {
     return <footer className="scorebar empty">{game ? 'Waiting for the game…' : 'This show has no game.'}</footer>;
   }
-  const apply = (...commands: Command[]) =>
-    void api.game
-      .apply({ sport: 'basketball', gameId: live.gameId, source: OPERATOR, commands: [commands[0]!, ...commands.slice(1)] })
-      .catch((error) => fail(`Game not updated: ${reasonOf(error)}`));
+  const { apply } = actions;
+  const waiting = (match: (command: GameCommand) => boolean) => pending.some(match) || undefined;
   const program = game.program as keyof typeof basketball.BASKETBALL_FORMAT;
   const format = basketball.BASKETBALL_FORMAT[program];
   const remaining = basketball.remainingAt(live.clock, now);
   const shot = live.shotClock && basketball.remainingAt(live.shotClock, now);
   const periods = Array.from({ length: format.periods + 2 }, (_, index) => ({ id: String(index + 1), label: basketball.periodLabel(program, index + 1) }));
 
-  const team = (side: Side) => {
+  const team = (side: Side): ReactNode => {
     const score = live.score[side];
     const fouls = live.team[side].pf;
+    const abbreviation = game.sides[side].brand.abbreviation;
     return (
       <div className={`team ${side}`} data-side={side}>
-        <span className="abbr">{game.sides[side].brand.abbreviation}</span>
-        <span className="score" data-testid={`score-${side}`}>
+        <span className="abbr">{abbreviation}</span>
+        <span className="score" data-testid={`score-${side}`} data-pending={waiting((command) => command.type === 'score' && command.side === side)}>
           {score}
         </span>
-        {[1, 2, 3].map((points) => (
-          <Button key={points} className="button small" onPress={() => apply({ type: 'score', side, value: score + points })}>
+        {([1, 2, 3] as const).map((points) => (
+          <Button key={points} className="button small keyed" onPress={() => actions.score(side, points)}>
             +{points}
+            <Key action={{ type: 'score', side, by: points }} />
           </Button>
         ))}
-        <Button className="button small" aria-label={`${game.sides[side].brand.abbreviation} minus one`} isDisabled={score === 0} onPress={() => apply({ type: 'score', side, value: score - 1 })}>
-          −
+        <Button className="button small keyed" aria-label={`${abbreviation} minus one`} isDisabled={score === 0} onPress={() => actions.score(side, -1)}>
+          −<Key action={{ type: 'score', side, by: -1 }} />
         </Button>
-        <span className="timeouts" aria-label={`${live.timeouts[side]} timeouts left`}>
+        <span className="timeouts" aria-label={`${live.timeouts[side]} timeouts left`} data-pending={waiting((command) => command.type === 'timeouts' && command.side === side)}>
           TO
           {[0, 1, 2, 3].map((index) => (
             <Button
@@ -81,8 +96,8 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
             />
           ))}
         </span>
-        <span className="fouls">
-          fouls <span className="mono">{fouls}</span>
+        <span className="fouls" data-pending={waiting((command) => command.type === 'teamLine' && command.side === side)}>
+          PF <span className="mono">{fouls}</span>
           <Button className="button small" aria-label={`Foul on ${side}`} onPress={() => apply({ type: 'teamLine', side, line: { pf: fouls + 1 } })}>
             +
           </Button>
@@ -90,7 +105,12 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
             −
           </Button>
         </span>
-        <Button className="button small toggle" data-on={live.bonus[side] || undefined} onPress={() => apply({ type: 'bonus', side, value: !live.bonus[side] })}>
+        <Button
+          className="button small toggle"
+          data-on={live.bonus[side] || undefined}
+          data-pending={waiting((command) => command.type === 'bonus' && command.side === side)}
+          onPress={() => apply({ type: 'bonus', side, value: !live.bonus[side] })}
+        >
           Bonus
         </Button>
       </div>
@@ -102,7 +122,13 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
       {team('away')}
       <div className="clocks">
         {clockText === null ? (
-          <Button className="clock mono" aria-label="Set the game clock" onPress={() => setClockText(basketball.formatGameClock(remaining))}>
+          <Button
+            className="clock mono"
+            aria-label="Set the game clock"
+            data-testid="game-clock"
+            data-pending={waiting((command) => command.type === 'clock' || command.type === 'clockSet')}
+            onPress={() => setClockText(basketball.formatGameClock(remaining))}
+          >
             {basketball.formatGameClock(remaining)}
           </Button>
         ) : (
@@ -124,40 +150,46 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
             <Input className="mono" />
           </TextField>
         )}
-        <Button className="button small toggle" data-on={live.clock.running || undefined} onPress={() => apply({ type: 'clock', action: live.clock.running ? 'stop' : 'start' })}>
+        <Button className="button small toggle keyed" data-on={live.clock.running || undefined} onPress={actions.clock}>
           {live.clock.running ? 'Stop' : 'Start'}
+          <Key action={{ type: 'clock' }} />
         </Button>
-        <span className="shot">
-          SC <span className="mono">{shot === null || shot === undefined ? '–' : basketball.formatShotClock(shot)}</span>
+        <span className="shot" data-pending={waiting((command) => command.type === 'shotClock')}>
+          SC <span className="mono" data-testid="shot-clock">{shot === null || shot === undefined ? '–' : basketball.formatShotClock(shot)}</span>
         </span>
-        {[30, 20].map((seconds) => (
-          <Button key={seconds} className="button small" onPress={() => apply({ type: 'shotClock', remainingMs: seconds * 1000, running: live.clock.running })}>
+        {([30, 20] as const).map((seconds) => (
+          <Button key={seconds} className="button small keyed" onPress={() => actions.shotClock(seconds)}>
             {seconds}
+            <Key action={{ type: 'shotClock', seconds }} />
           </Button>
         ))}
-        <Select className="period" aria-label="Period" selectedKey={String(live.period)} onSelectionChange={(key) => key !== null && apply({ type: 'period', period: Number(key) })}>
-          <Label className="sr-only">Period</Label>
-          <Button className="select-button">
-            <SelectValue />
-            <span aria-hidden>▾</span>
-          </Button>
-          <Popover className="popover">
-            <ListBox className="listbox" items={periods}>
-              {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
-            </ListBox>
-          </Popover>
-        </Select>
-        <span className="possession" aria-label="Possession">
-          Poss
+        <Choose
+          label="Period"
+          className="period"
+          selected={String(live.period)}
+          options={periods}
+          onChange={(key) => apply({ type: 'period', period: Number(key) })}
+          pending={waiting((command) => command.type === 'period')}
+        />
+        <Choose
+          label="Phase"
+          className="phase"
+          selected={live.phase}
+          options={PHASES}
+          onChange={(key) => apply({ type: 'phase', phase: basketball.Phase.parse(key) })}
+          pending={waiting((command) => command.type === 'phase')}
+        />
+        <span className="possession" aria-label="Possession" data-pending={waiting((command) => command.type === 'possession')}>
           {SIDES.map((side) => (
             <Button
               key={side}
-              className="button small toggle"
+              className="button small toggle keyed"
               data-on={live.possession === side || undefined}
               aria-label={`Possession ${game.sides[side].brand.abbreviation}`}
-              onPress={() => apply({ type: 'possession', side: live.possession === side ? null : side })}
+              onPress={() => actions.possession(live.possession === side ? null : side)}
             >
               {side === 'away' ? '◀' : '▶'}
+              <Key action={{ type: 'possession', side }} />
             </Button>
           ))}
         </span>

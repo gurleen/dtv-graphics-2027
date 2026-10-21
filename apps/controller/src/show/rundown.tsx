@@ -4,9 +4,10 @@
  * Right from a row to its handle, Enter, Up or Down to the place, Enter.
  */
 
-import type { CueId } from '@dtv/domain';
+import { type CueId, sameJson } from '@dtv/domain';
 import type { CueView, ShowView } from '@dtv/playout';
 import { Button, GridList, GridListItem, useDragAndDrop } from 'react-aria-components';
+import { useCommands } from '../app/commands';
 import { useController } from '../app/context';
 import { stepsOf } from './actions';
 import { cueIdOf, useRundownEdits } from './rundown-edits';
@@ -74,11 +75,20 @@ export function Rundown(props: {
 
 function Row(props: { readonly id: CueId; readonly index: number; readonly cue: CueView; readonly view: ShowView; readonly onRemove: () => void }) {
   const { registry } = useController();
+  const { pending } = useCommands();
   const { cue, view } = props;
   const slot = cue.onProgram && cue.layer ? view.program[cue.layer] : undefined;
   const steps = slot ? stepsOf(registry, slot) : cue.steps ? { step: -1, count: cue.steps } : null;
   return (
-    <GridListItem id={props.id} textValue={cue.label} className="cue-row" data-pgm={!!cue.onProgram || undefined} data-pvw={cue.inMyPreview || undefined} data-error={!!cue.error || undefined}>
+    <GridListItem
+      id={props.id}
+      textValue={cue.label}
+      className="cue-row"
+      data-pgm={!!cue.onProgram || undefined}
+      data-pvw={cue.inMyPreview || undefined}
+      data-error={!!cue.error || undefined}
+      data-pending={pending.some((command) => command.type === 'cue' && sameJson(command.ref, cue.ref)) || undefined}
+    >
       <Button slot="drag" className="drag" aria-label={`Move ${cue.label}`}>
         ⋮⋮
       </Button>

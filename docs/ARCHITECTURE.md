@@ -126,7 +126,9 @@ the score. Only the `operator` source can hand a group to a feed or take it back
 A running clock is `{ running: true, remainingMs, since }`, anchored on the server's time. Nothing ticks it.
 Every display is computed from `now` at projection time, so a restart cannot lose time. A clock command is
 anchored at the server's time when it arrives, so a resent `clockSet` with `running: true` starts again from its
-`remainingMs`, which is safe because `game.apply` never retries on its own and a feed sends its current time.
+`remainingMs`. The controller sends a `game.apply` again only when the socket dropped it, for up to 10 s, and a feed
+sends its current time. A `clockSet` that landed just as the socket dropped, and is sent again, can therefore
+give back up to the length of the drop. `clock start` and `clock stop` are safe to repeat.
 
 ### Prefilled data and manual edits
 
@@ -371,6 +373,13 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
 - Keyboard first, with every action also on a click. Space takes, Enter cues the selected rundown row, Up and Down
   select, N is Next, Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
   Keys do nothing while typing. Only Clear All is guarded, by a hold or a second press.
+- The game keys (phase 5): Q, W, E score 1, 2, 3 for away and I, O, P for home; Shift+Q and Shift+I take one
+  back. C starts or stops the game clock, R and T reset the shot clock to 30 and 20, and [ and ] give possession
+  to away and home. Each sends an absolute value computed from what the page shows, with any command still on its
+  way laid over it. Timeouts, fouls, period and phase stay on the mouse. `?` lists every key, from the same table
+  the key handler reads.
+- A show command or a `game.apply` that the socket drops is sent again, under the same id, until the server
+  answers or 10 s pass. Its control shows it pending meanwhile, and a plain failure after.
 
 ### The clock
 
