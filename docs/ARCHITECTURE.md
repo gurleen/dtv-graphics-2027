@@ -132,7 +132,9 @@ Most data arrives prefilled, and people correct it on the data page. These rules
 
 - Every batch names its origin. `manual` is a person on the data page. `import` is the seed, an importer, or a
   live-data package.
-- Each row keeps a `locked` list beside its document. A manual put locks the fields it changed. A manual insert
+- Each row keeps a list of locks beside its document. A lock names its field, the `?client=` label of the batch
+  that set it, and that batch's commit time, so the data page can say who locked a field and when. A manual put
+  locks the fields it changed, and a later manual edit of a locked field takes the lock over. A manual insert
   locks the fields it sets to something other than null or the field's schema default, so `position: ''` or
   `redshirt: false` that nobody typed stays open to imports. An import put writes only unlocked fields and reports
   the fields it skipped. The data page can unlock a field, and the next import updates it again.
@@ -185,9 +187,13 @@ Three more tables hold what is not an entity.
 `migrate` compares each table's SQL with what `tableSql(kind)` derives and rebuilds the tables that differ, with
 SQLite's documented rebuild. A second run finds nothing to do. An added field needs no migration, because every
 load parses each document and the schema's `.default()` fills it in. A rename is `renameField`, a `DocMigration`
-applied once under `PRAGMA user_version`. It moves the field in each document and in each row's `locked` list. A
+applied once under `PRAGMA user_version`. It moves the field in each document and in each row's locks. A
 table rebuilt in the same run copies its rows through the pending migrations, so its generated columns read the
 renamed field. A document that fails its schema on load stops the server and names its kind and id.
+
+Document migration 1 gave locks their author. Before it, the `locked` column held bare field names. It sends every
+row through the migration once and rewrites each name as a lock with a null actor and time, so the store reads only
+one form and refuses a malformed lock the way it refuses a malformed document. Later migrations take version 2 on.
 
 `VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every show
 activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept, and the newest of
