@@ -71,3 +71,7 @@ export const seasonStatsOf = (world: World, id: PlayerId) => {
 
 /** The player's line in tonight's game, if there is one. */
 export const tonightOf = (context: ShowContext, id: PlayerId) => (context.live?.sport === 'basketball' ? context.live.players[id] : undefined);
+
+/** The other side of the game from `team`, or undefined when `team` is not playing in it. */
+export const opponentOf = ({ game, sides }: GameView, team: TeamId): TeamView | undefined =>
+  game.awayTeamId === team ? sides.home : game.homeTeamId === team ? sides.away : undefined;

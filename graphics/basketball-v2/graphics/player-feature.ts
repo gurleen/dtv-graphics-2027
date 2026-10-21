@@ -3,7 +3,7 @@
 import { basketball, PlayerId } from '@dtv/domain';
 import { type BindContext, FALLBACK_IMAGES } from '@dtv/playout';
 import { z } from 'zod';
-import { classYearName, keysOf, playerOf, seasonStatsOf, tonightOf } from './shared';
+import { classYearName, keysOf, opponentOf, playerOf, seasonStatsOf, tonightOf } from './shared';
 
 const { PLAYER_GAME_STATS, PLAYER_SEASON_STATS, positionName } = basketball;
 
@@ -30,7 +30,7 @@ export function featureValues(params: FeatureParams, context: BindContext) {
   } else if (body.kind === 'game') {
     const tonight = tonightOf(context, player.id);
     if (tonight) stat.push(...body.stats.map((key) => ({ value: PLAYER_GAME_STATS[key].value(tonight), label: PLAYER_GAME_STATS[key].label })));
-    const opponent = context.game && (context.game.game.awayTeamId === player.teamId ? context.game.sides.home : context.game.game.homeTeamId === player.teamId ? context.game.sides.away : undefined);
+    const opponent = context.game && opponentOf(context.game, player.teamId);
     contextLabel = opponent ? `vs ${opponent.school.name}` : '';
   }
   return {
