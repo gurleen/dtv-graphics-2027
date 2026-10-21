@@ -817,10 +817,11 @@ the home team**. The away team can vary as needed for the design and test case.
 Use the existing basketball team data and logo conventions instead of creating
 a parallel team catalog:
 
-- `data/seed/teams.json` is the vendored team dataset.
-- `data/seed/teams.ts` maps its fields to the app's team model, defines the
-  logo URL convention (`https://images.dragonstv.io/logos/<logo_name>`), and
-  exports `DREXEL_ID` (`2182`). Teams without a `logo_name` have no logo URL.
+- `data/seed/teams.json` is the vendored team dataset. `espnEdits` in
+  `packages/domain/src/imports/espn.ts` turns it into schools, teams and
+  conferences, and defines the logo URL convention
+  (`https://images.dragonstv.io/logos/<logo_name>`). Teams without a
+  `logo_name` have no logo URL. Drexel's ESPN id is `2182`.
 - `assets/images/scorebug/` contains local scorebug logo assets, including
   `drexel.png`.
 - The scenes in this package show how local team logos are declared as
@@ -828,5 +829,5 @@ a parallel team catalog:
 
 For local Rive graphics, prefer the existing local logo assets and follow the
 asset declaration pattern in the relevant existing graphic. For data-driven
-team selection in a companion UI, reuse `data/seed/teams.ts` and
-`data/seed/teams.json`.
+team selection in a companion UI, read the teams from the database that
+`bun run db:seed` fills, through `@dtv/domain` and `@dtv/db`.
