@@ -332,11 +332,11 @@ async function beforeTipOff() {
   await press('KeyN');
   await expectProgram({ lower: 'empty' }, 'N past the last step takes Starting Five off');
 
-  await press('Digit2');
-  await expectProgram({ lower: G('talent-lower-third-single'), bug: G('scorebug') }, '2 airs the talent lower third beside the scorebug');
+  await cueAndTake('Talent · Rob Brooks', G('talent-lower-third-single'), 'lower');
+  await expectProgram({ lower: G('talent-lower-third-single'), bug: G('scorebug') }, 'the talent lower third from the rundown sits beside the scorebug');
   await shootRenderer('talent', { lower: G('talent-lower-third-single') });
-  await press('Digit2');
-  await expectProgram({ lower: 'empty' }, '2 again clears it');
+  await press('KeyN');
+  await expectProgram({ lower: 'empty' }, 'N takes the one-step talent lower third off');
 }
 
 async function firstHalf() {
@@ -396,8 +396,8 @@ async function firstHalf() {
   await expectProgram({ lower: 'empty' }, 'Shift+Esc clears it');
 
   await press('KeyC');
-  await press('Digit5');
-  await expectProgram({ bug: G('score-to-break') }, '5 airs Score to Break on the bug layer');
+  await press('Digit2');
+  await expectProgram({ bug: G('score-to-break') }, '2 airs Score to Break on the bug layer');
   await shootRenderer('score-to-break', { bug: G('score-to-break') });
   await press('Digit1');
   await expectProgram({ bug: G('scorebug'), away: 5, home: 6 }, '1 puts the scorebug back');

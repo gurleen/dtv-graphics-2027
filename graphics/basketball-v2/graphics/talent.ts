@@ -1,16 +1,12 @@
 /** What the three talent lower thirds share: a crew member's name and the role for the night. */
 
 import { TalentId } from '@dtv/domain';
-import type { BindContext, ShowContext } from '@dtv/playout';
+import type { BindContext } from '@dtv/playout';
 import { z } from 'zod';
 import { fail, fullName } from './shared';
 
 /** The talent a lower third names, in the order they stand on screen. */
 export const talentParams = (count: number) => z.object({ talents: z.array(TalentId).length(count) });
-
-/** The first `count` crew members, or null (no free-panel button) when the show's crew is shorter. */
-export const firstCrew = (count: number) => (context: ShowContext) =>
-  context.crew.length >= count ? { talents: context.crew.slice(0, count).map((member) => member.talent.id) } : null;
 
 /** The role a crew member has tonight, else the talent's default. */
 export const talentRows = (ids: readonly TalentId[], context: BindContext) =>

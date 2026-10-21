@@ -1,6 +1,6 @@
 import { defineGraphic } from '@dtv/playout';
 import { SCENES } from '../scenes.gen';
-import { firstCrew, talentLabel, talentParams, talentRows } from './talent';
+import { talentLabel, talentParams, talentRows } from './talent';
 
 export const talentLowerThirdDouble = defineGraphic({
   id: 'basketball-v2/talent-lower-third-double',
@@ -13,7 +13,6 @@ export const talentLowerThirdDouble = defineGraphic({
   clears: ['bug'],
   demo: { talents: ['rob-brooks', 'mike-tuberosa'] },
   site: 'full-frame',
-  free: firstCrew(2),
   label: (params, context) => `Talent · ${talentLabel(params.talents, context)}`,
   bind: (params, context) => ({ talent: talentRows(params.talents, context) }),
 });

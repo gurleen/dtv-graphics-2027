@@ -333,7 +333,8 @@ async function provesRunThrough(api: ReturnType<typeof connect>['api']) {
   const expected = [...order.slice(0, -2), order.at(-1)!, order.at(-2)!];
   check(JSON.stringify(reordered) === JSON.stringify(expected), `a keyboard drag moved ${order.at(-1)} up one (${reordered.slice(-3).join(', ')})`);
   await shoot(page, '43-reordered');
-  await rows(page).filter({ hasText: 'Talent · Rob Brooks' }).getByRole('button', { name: /^Remove/ }).click();
+  // The seed's own talent cues share its label, so the added cue is found by its place.
+  await rows(page).nth(reordered.indexOf(added.id)).getByRole('button', { name: /^Remove/ }).click();
   await rows(page).nth(cues.length).waitFor({ state: 'detached' });
   check((await rundown(api)).length === cues.length, 'Remove takes the added cue out of the rundown');
 

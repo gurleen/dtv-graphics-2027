@@ -1,6 +1,6 @@
 import { defineGraphic } from '@dtv/playout';
 import { SCENES } from '../scenes.gen';
-import { firstCrew, talentLabel, talentParams, talentRows } from './talent';
+import { talentLabel, talentParams, talentRows } from './talent';
 
 export const talentLowerThirdSingle = defineGraphic({
   id: 'basketball-v2/talent-lower-third-single',
@@ -12,7 +12,6 @@ export const talentLowerThirdSingle = defineGraphic({
   layer: 'lower',
   demo: { talents: ['rob-brooks'] },
   site: 'with-scorebug',
-  free: firstCrew(1),
   label: (params, context) => `Talent · ${talentLabel(params.talents, context)}`,
   bind: (params, context) => ({ talent: talentRows(params.talents, context) }),
 });

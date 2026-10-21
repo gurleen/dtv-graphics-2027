@@ -38,6 +38,6 @@ Preconditions:
 ## Gotchas
 
 - An edited rundown cue reaches air only through `Save` while it is on program, which sends `refresh`. Editing a cue that is only in preview does not change preview.
-- The free panel is derived, not stored. Its talent buttons come from the show's crew, so a crew edit on the data page changes them.
+- The free panel is derived, not stored. It holds two buttons: the scorebug on 1 and Score to Break on 2. The talent lower thirds are rundown cues.
 - A save on a stale rundown is refused, and `.problem-strip` reads `Someone changed the rundown`. See [two-operators.md](./two-operators.md).
 - The keyboard reorder needs short pauses (about 200 ms) between keys while the drag state settles. Without them the move is dropped.

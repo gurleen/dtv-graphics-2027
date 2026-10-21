@@ -88,10 +88,8 @@ describe('what the entries do beyond their values', async () => {
     expect(ENTRIES.map((entry) => entry.label(entry.params.parse(entry.demo), { ...context, sponsor: undefined }))).toContain('Talent · Rob Brooks + Mike Tuberosa');
   });
 
-  test('a talent lower third takes the first crew members, and has no button when the crew is short', () => {
-    const double = BASKETBALL_V2['basketball-v2/talent-lower-third-double'];
-    expect(double.free?.(context)).toEqual({ talents: ['rob-brooks', 'mike-tuberosa'] });
-    expect(double.free?.({ ...context, crew: context.crew.slice(0, 1) })).toBeNull();
+  test('the free panel holds the scorebug at 1 and Score to Break at 2, nothing else', () => {
+    expect(ENTRIES.filter((entry) => entry.free).map((entry) => entry.id)).toEqual(['basketball-v2/scorebug', 'basketball-v2/score-to-break']);
   });
 
   test('a talent lower third shows the role the crew has tonight', () => {

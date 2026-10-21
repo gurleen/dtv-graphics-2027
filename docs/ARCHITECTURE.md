@@ -309,8 +309,8 @@ both puts only the covering graphic on air, so the two are never on air together
 
 A cue is a graphic id, its params, optional overrides, and a note. The free panel is derived, not stored. It lists
 every registry entry that has a `free(context)` function, with params computed from the show. The scorebug's params
-are `{}`. The talent lower thirds take the first one, two, or three members of the show's crew, and an entry whose
-`free` returns null gets no button. The rundown is `Show.rundown`, an ordered list of cues edited through
+are `{}`. The owner keeps the panel to two buttons for now (2026-10-21): the scorebug on 1 and Score to Break on 2.
+The talent lower thirds are rundown cues. An entry whose `free` returns null gets no button. The rundown is `Show.rundown`, an ordered list of cues edited through
 `data.apply` with a `basis`.
 
 ### Preview and program
