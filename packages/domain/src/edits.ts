@@ -20,6 +20,13 @@ export type ImportEdit = { [K in EntityKind]: (Put<K> & { readonly onExisting?: 
 export type ManualEdit = { [K in EntityKind]: (Put<K> & { readonly unlock?: readonly FieldOf<K>[] }) | Delete<K> }[EntityKind];
 export type DataEdit = ImportEdit | ManualEdit;
 
+/** Every edit union pairs a kind with that kind's value, so checking the kind narrows the value. */
+export const isPutOf = <K extends EntityKind>(edit: { readonly op: 'put' | 'delete'; readonly kind: EntityKind }, kind: K): edit is Put<K> =>
+  edit.op === 'put' && edit.kind === kind;
+
+export const putValues = <K extends EntityKind>(edits: readonly DataEdit[], kind: K): EntityOf<K>[] =>
+  edits.flatMap((edit) => (isPutOf(edit, kind) ? [edit.value] : []));
+
 /**
  * `basis` is the World revision the writer read. A put or delete of a row written after
  * it fails the whole batch, so one editor never overwrites another. A person always has one.
