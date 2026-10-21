@@ -14,10 +14,12 @@ export interface SceneInstance {
   write(values: Readonly<Record<string, WireValue>>): Promise<void>;
   setNumber(name: string, value: number): void;
   setPlaying(playing: boolean): void;
-  /** Resolves once `signal` reads 0, or after `fallbackMs` when there is no signal or it never does. */
-  exited(signal: string | undefined, fallbackMs: number): Promise<void>;
+  /** Resolves once `signal` reads 0, or on a timer: `fallbackMs` with no signal, a second more with one that never reads 0. */
+  exited(signal: string | undefined, fallbackMs: number): Promise<ExitedBy>;
   dispose(): void;
 }
+
+export type ExitedBy = 'signal' | 'timer';
 
 /** One RiveFile per .riv on the page, fetched once and shared by every instance that plays it. */
 const files = new Map<string, Promise<RiveFile>>();
@@ -165,18 +167,18 @@ export async function loadInstance(options: {
         instance.boolean('isPlaying')!.value = playing;
       },
       exited: (signal, fallbackMs) =>
-        new Promise<void>((resolve) => {
+        new Promise<ExitedBy>((resolve) => {
           const property = signal ? instance.number(signal) : null;
-          const done = () => {
+          const done = (by: ExitedBy) => {
             clearTimeout(timer);
             property?.off(check);
-            resolve();
+            resolve(by);
           };
           const check = () => {
-            if (property && property.value <= 0) done();
+            if (property && property.value <= 0) done('signal');
           };
           // With a signal, a ceiling a second past the Outro, so a scene that never reports cannot hold the layer.
-          const timer = setTimeout(done, property ? fallbackMs + 1000 : fallbackMs);
+          const timer = setTimeout(() => done('timer'), property ? fallbackMs + 1000 : fallbackMs);
           property?.on(check);
           check();
         }),

@@ -130,7 +130,14 @@ export function createRenderer(options: RendererOptions): Renderer {
         const slot = frame!.slot;
         const outro = entry?.scene.animations.Outro ?? 0;
         if (!run.instance) return after(outro, () => dispatch(layer, { type: 'exited', slot }));
-        void run.instance.exited(entry?.exitSignal, outro).then(() => dispatch(layer, { type: 'exited', slot }));
+        const signal = entry?.exitSignal;
+        const started = performance.now();
+        void run.instance.exited(signal, outro).then((by) => {
+          const said = `${frame!.graphic} let go ${Math.round(performance.now() - started)} ms after the outro began (Outro ${outro} ms)`;
+          if (signal && by === 'timer') problem(layer, `${said}: ${signal} never read 0`);
+          else console.debug(`renderer: ${layer}: ${said}, on ${by === 'signal' ? `${signal} reading 0` : 'its length'}`);
+          dispatch(layer, { type: 'exited', slot });
+        });
         return;
       }
       case 'dispose':

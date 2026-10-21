@@ -1,9 +1,9 @@
-// Browser code, the renderer and the /renderer page, checked with the DOM's types; the page's
-// scripts/ run in Bun and stay in the root config. The root
-// config leaves it out because the DOM's ReadableStream hides Bun's async iterator.
+// Browser code, the renderer, the /renderer page and the two-renderer proof page, checked with
+// the DOM's types; the page's other scripts/ run in Bun and stay in the root config. The root
+// config leaves them out because the DOM's ReadableStream hides Bun's async iterator.
 {
   "extends": "./tsconfig.json",
   "compilerOptions": { "lib": ["ES2023", "DOM", "DOM.Iterable"] },
-  "include": ["packages/renderer", "apps/renderer/*.ts"],
+  "include": ["packages/renderer", "apps/renderer/*.ts", "apps/renderer/scripts/monitors/main.ts"],
   "exclude": []
 }
