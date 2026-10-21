@@ -29,7 +29,8 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'apps/controller': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', 'react-aria-components', '@fontsource/*'],
   'apps/renderer': ['@dtv/api', '@dtv/renderer', '@dtv/graphics'],
   // The controller's proofs: operators in a real Chromium against the real server, and the data page's dev stand-in.
-  'apps/controller/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', '@fontsource/*', 'playwright', 'pngjs', 'node:*'],
+  // The scripted game reads the scratch database's journal to show a command pressed during an outage landed once.
+  'apps/controller/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', '@fontsource/*', 'playwright', 'pngjs', 'bun:sqlite', 'node:*'],
   // The page's proofs: they drive a real server and a real Chromium, and decode its screenshots.
   'apps/renderer/scripts': ['@dtv/api', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'playwright', 'pngjs', 'node:*'],
   // The two-renderer proof page draws with the renderer, as the controller's monitors will.
