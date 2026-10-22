@@ -66,9 +66,9 @@ export function regularSeasonEnd<T extends string>(games: readonly Result<T>[], 
  *
  * Overall and the streak count every game. The conference record counts games between two
  * teams of the same conference up to that conference's `regularSeasonEnd`. Rank orders a
- * conference by conference win percentage, then conference wins, then overall win
- * percentage, then, among the teams tied on that record, win percentage in conference games
- * between them, then overall win percentage, then name.
+ * conference by conference win percentage, then conference wins, then, among the teams tied
+ * on that record, win percentage in the conference games between them, then overall win
+ * percentage, then name.
  */
 export function standings<T extends string, C extends string>(input: {
   readonly results: readonly Result<T>[];
