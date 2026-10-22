@@ -1,5 +1,5 @@
 /**
- * The whole API: eight procedures. Every caller depends on this package and never on the
+ * The whole API: nine procedures. Every caller depends on this package and never on the
  * server, so no client's typecheck pulls in SQLite. Inputs are validated with the domain's
  * zod schemas; outputs are the server's own values, typed and not re-validated.
  *
@@ -8,14 +8,22 @@
  */
 
 import {
-  EditBatch, type EntityKind, GameApplyInput, GameId, type GameLive, type Revision, type RosterError, type RosterPlan, SeasonId, TeamId,
-  type WorldSnapshot,
+  EditBatch, type EntityKind, GameApplyInput, GameId, type GameLive, ProgramCode, type Revision, type RosterError, type RosterPlan, type SdvLoadReport,
+  SeasonId, TeamId, type WorldSnapshot,
 } from '@dtv/domain';
 import { BusRef, CommandId, type OutputFrame, OperatorId, ShowCommand, type ShowView } from '@dtv/playout';
 import { eventIterator, oc, type } from '@orpc/contract';
 import { z } from 'zod';
 
 const detail = z.object({ detail: z.string() });
+
+/** Why a data commit is refused. */
+const refusals = {
+  CONFLICT: { message: 'A row changed after your basis revision', data: detail },
+  INVALID_REFERENCE: { message: 'An edit points at a row that does not exist', data: detail },
+  DUPLICATE: { message: 'An edit repeats a natural key', data: detail },
+  INCONSISTENT: { message: 'The edits break a rule that spans rows', data: detail },
+};
 
 export const contract = {
   data: {
@@ -24,16 +32,16 @@ export const contract = {
     apply: oc
       .input(EditBatch)
       .output(type<{ revision: Revision; skipped: readonly { kind: EntityKind; id: string; fields: readonly string[] }[] }>())
-      .errors({
-        CONFLICT: { message: 'A row changed after your basis revision', data: detail },
-        INVALID_REFERENCE: { message: 'An edit points at a row that does not exist', data: detail },
-        DUPLICATE: { message: 'An edit repeats a natural key', data: detail },
-        INCONSISTENT: { message: 'The edits break a rule that spans rows', data: detail },
-      }),
+      .errors(refusals),
     /** Parses a roster CSV and plans it against the team-season. Writes nothing; commit `plan.edits` with `apply`. */
     planRoster: oc
       .input(z.object({ team: TeamId, season: SeasonId, csv: z.string().min(1), prune: z.boolean().default(false) }))
       .output(type<{ ok: true; plan: RosterPlan } | { ok: false; errors: readonly RosterError[] }>()),
+    /** Downloads the program-season's sportsdataverse files and commits what they change as one import batch. A second load writes nothing. */
+    load: oc
+      .input(z.object({ program: ProgramCode, season: SeasonId }))
+      .output(type<SdvLoadReport>())
+      .errors({ ...refusals, UNAVAILABLE: { message: 'A sportsdataverse file could not be downloaded or read', data: detail } }),
   },
   game: {
     watch: oc.input(z.object({ game: GameId })).output(eventIterator(type<GameLive>())),

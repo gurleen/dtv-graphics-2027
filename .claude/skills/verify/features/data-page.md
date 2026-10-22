@@ -9,27 +9,33 @@ The data page (`#/data`) is where an operator corrects reference data before or 
 - `data-import` imports a roster CSV with `Import CSV`. A diff shows added, updated, unchanged, locked-skipped, missing and bad rows. `Apply` writes it, removing missing players only when that box is ticked. A second import of the same file says `Nothing to do`.
 - `data-conflict` shows a conflict panel for a refused save, with `Keep theirs`, `Use yours`, and `Pick per field` then `Save picks`.
 - `data-branding` edits a school colour, or overrides a team's branding.
-- `data-show-record` edits a show's name and crew from the `Shows` list.
+- `data-game-record` edits a game's event title and crew from the `Games` list.
 - `data-search` filters the team list with the `Search teams` searchbox.
+- `data-load` loads a program-season from sportsdataverse with `Load…` in the team list header. The dialog picks `Program` and `Season`, and `Load` downloads the files from GitHub and commits them. `[data-testid="load-report"]` shows rows inserted and updated, locked fields skipped, the time, each dataset's row count or `not published`, and the warnings, each a `<details>` that lists its teams or files. A second load of the same season reads `Nothing changed`.
 
 ## How to get to it (user POV)
 
 - Press `Data` in the top bar, or open `http://localhost:<port>/#/data`.
-- Choose a team in the list, such as `Drexel · MBB` or `Saint Joseph's · MBB`, or choose `Shows`.
+- Choose a team in the list, such as `Drexel · MBB` or `Saint Joseph's · MBB`, or choose `Games`.
 - Each cell is a button named `<field> of <row>: <value>. Edit`. Tabs include `Team and branding`.
 
 ## Driving it with controller data-proofs.ts
 
 Preconditions:
 
-- Port 8999 is free. The suite seeds its own server and activates `drexel-sju`.
+- Port 8999 is free. The suite seeds its own server and activates the seeded game.
 
 - **Run.** `bun apps/controller/scripts/data-proofs.ts --port=8999 --out=build/verify/<run>/data [--only=lock,conflicts,import,edits]`. It exits 0 and prints `all data-page checks passed`. Every check reads the World back over `@dtv/api`.
 - **Lock.** In `Drexel · MBB`, cell `Last of ...: Reed. Edit`: Esc after typing writes nothing. Typing `Reid` and pressing Enter saves `lastName` and locks only that field, and `.lock-count` reads `1 lock`. Hovering the mark shows a tooltip. `Unlock` in the `Unlock Last` dialog removes the lock and keeps the value.
 - **Conflicts.** Two pages (`alex`, `sam`) start editing the same cell. Alex saves first. Sam's save shows `.conflict`, with a `tr[data-field="lastName"]` that holds alex's value. `Keep theirs` keeps alex's value. `Use yours` saves sam's value on the new basis. `Pick per field` lists `lastName,position,classYear` and saves the mix that was picked.
 - **Import.** In `Saint Joseph's · MBB`, a position is locked first (`G/F`). Then a CSV with six rows goes through the file chooser of `Import CSV`. `.import-summary` reads `1 added`, `2 updated`, `1 unchanged`, `1 field skipped (locked)`, `1 missing` and `1 bad row`, and the bad row names `line 7`. Planning writes nothing. With the `.prune` box ticked, `Apply` adds Ty House, removes Marrs and keeps `G/F`. The same file again reads `Nothing to do`, and `Apply` is disabled.
-- **Edits.** `Primary colour` `0b2a4a` saves as `#0b2a4a` and locks `primaryColor`. The override `#123456` lands on the team's branding. `Abbreviation` `TOOLONG` is refused in place. In `Shows`, renaming the show and removing crew member 3 saves, and locks `crew,name`.
+- **Edits.** `Primary colour` `0b2a4a` saves as `#0b2a4a` and locks `primaryColor`. The override `#123456` lands on the team's branding. `Abbreviation` `TOOLONG` is refused in place. In `Games`, setting the event title to `Big 5 Classic` and removing crew member 3 saves both; the show locks `crew` and the game locks `title`.
 - **Journey form.** `s.operator('alex', 'data')`, then `getByRole('option', { name: 'Drexel · MBB', exact: true })`, and wait for `.data-table`. Read `world()` after every save.
+
+## Driving the load with journeys/load.ts
+
+- **Run.** `.claude/skills/verify/journeys/load.ts --port=8998` against a `dtv.sh up` instance. It needs the network: it loads MBB 2025-26 twice, WBB 2025-26 and MBB 2026-27 from GitHub, screenshots each report, and reads Drexel's records, Josh Reed and the home games back over `world()`.
+- Only groups (conferences) are published for 2026-27 so far, so that load reports five datasets as not published and changes only conferences.
 
 ## Gotchas
 

@@ -781,3 +781,43 @@
 .prune:where(.data-portal) {
   margin-top: var(--space-4);
 }
+
+/* The sportsdataverse load */
+
+:where(.data-page, .data-portal) .panel-head,
+.panel-head:where(.data-portal) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+:where(.data-page, .data-portal) .load-report,
+.load-report:where(.data-portal) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+:where(.data-page, .data-portal) .load-report p {
+  margin: 0;
+}
+:where(.data-page, .data-portal) .load-datasets,
+.load-datasets:where(.data-portal) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+}
+:where(.data-page, .data-portal) .load-warnings,
+.load-warnings:where(.data-portal) {
+  margin: 0;
+  padding-inline-start: var(--space-6);
+  max-height: 240px;
+  overflow: auto;
+}
+:where(.data-page, .data-portal) .load-warnings summary {
+  cursor: pointer;
+}
+:where(.data-page, .data-portal) .load-warnings details p {
+  margin: var(--space-2) 0 var(--space-3);
+  overflow-wrap: anywhere;
+}

@@ -8,7 +8,7 @@
 import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
 import { loadLive, loadSnapshot, migrate, openDb, seed } from '@dtv/db';
-import { GraphicId, indexWorld, PlayerId, ShowId, Url } from '@dtv/domain';
+import { GameId, GraphicId, indexWorld, PlayerId, Url } from '@dtv/domain';
 import { type AnyGraphic, bindValues, EMPTY_SHOW, OperatorId, showContext, viewShow } from '@dtv/playout';
 import { BASKETBALL_V2, SCENES } from './index';
 
@@ -51,7 +51,7 @@ async function seededContext() {
   const world = indexWorld(loadSnapshot(db));
   const lives = loadLive(db);
   db.sqlite.close();
-  return showContext({ world, showId: ShowId.parse('drexel-sju'), live: (game) => lives.get(game), now: Date.parse('2026-11-08T21:00:00Z') });
+  return showContext({ world, gameId: GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb'), live: (game) => lives.get(game), now: Date.parse('2026-11-08T21:00:00Z') });
 }
 
 describe('every entry binds its demo to the scene’s Default instance', async () => {

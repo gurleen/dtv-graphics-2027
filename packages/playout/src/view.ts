@@ -3,7 +3,7 @@
  * each cue's on-air state, program, the viewer's own preview and everyone else's.
  */
 
-import { GraphicId, type Revision, sameJson, type Show } from '@dtv/domain';
+import { type GameId, GraphicId, matchupLabel, type Revision, sameJson } from '@dtv/domain';
 import { entryOf, type LayerId, type Registry, type ShowContext } from './graphic';
 import { bindValues } from './project';
 import { type Bus, type CueRef, type OperatorId, previewOf, resolveCue, type ShowState, type SlotId } from './show';
@@ -26,7 +26,8 @@ export interface CueView {
 
 export interface ShowView {
   readonly revision: Revision;
-  readonly show: Show | null;
+  /** The active game and its matchup, which names the show. */
+  readonly game: { readonly id: GameId; readonly label: string } | null;
   readonly free: readonly CueView[];
   readonly rundown: readonly CueView[];
   readonly program: Bus;
@@ -73,11 +74,12 @@ export function viewShow(input: {
     const graphic = GraphicId.parse(entry.id);
     return [view({ kind: 'free', graphic }, { graphic, label: entry.name })];
   });
+  const activeGame = state.gameId ? context.world.get('game', state.gameId) : undefined;
   const rundown = (context.show?.rundown ?? []).map((cue) => view({ kind: 'rundown', cue: cue.id }, { graphic: cue.graphic, label: cue.note || cue.graphic }));
 
   return {
     revision: input.revision,
-    show: context.show ?? null,
+    game: activeGame ? { id: activeGame.id, label: matchupLabel(context.world, activeGame) } : null,
     free,
     rundown,
     program: state.program,

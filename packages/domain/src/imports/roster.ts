@@ -115,7 +115,7 @@ const CLASS_WORDS: Readonly<Record<string, ClassYear>> = {
 };
 
 /** `R-Jr.` is a redshirt junior; `Gr.` and `5th` are graduates. */
-function parseClass(text: string): { classYear: ClassYear | null; redshirt: boolean } | string {
+export function parseClass(text: string): { classYear: ClassYear | null; redshirt: boolean } | string {
   const value = text.trim().toLowerCase().replace(/\./g, '');
   if (!value) return { classYear: null, redshirt: false };
   const redshirt = /^(r|rs|redshirt)[-\s]/.test(value);
@@ -130,7 +130,7 @@ const POSITION_WORDS: Readonly<Record<string, string>> = {
   c: 'C', center: 'C', centre: 'C',
 };
 
-function parsePosition(text: string): string | { error: string } {
+export function parsePosition(text: string): string | { error: string } {
   const parts = text.split(/[/,-]/).map((part) => part.trim().toLowerCase().replace(/\./g, '')).filter(Boolean);
   const codes: string[] = [];
   for (const part of parts) {

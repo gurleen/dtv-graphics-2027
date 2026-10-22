@@ -1,13 +1,12 @@
-/** The new-game dialog: season, program, the two teams, venue, start, conference game and title, and optionally the game's show in the same commit. */
+/** The new-game dialog: season, program, the two teams, venue, start, conference game and title. The game is its show; its crew and rundown start empty. */
 
-import { type ManualEdit, parseEntity, PROGRAM_CODES, PROGRAMS, type ProgramCode, TeamId } from '@dtv/domain';
+import { PROGRAM_CODES, PROGRAMS, type ProgramCode } from '@dtv/domain';
 import { useMemo, useState } from 'react';
 import { Button, Checkbox, Dialog, Form, Heading, Input, Label, Modal, ModalOverlay, TextField } from 'react-aria-components';
 import { useController } from '../app/context';
 import { describeError } from './editing';
 import { Pick } from './pick';
-import { matchupLabel } from './rows';
-import { buildGame, freeShowId, sameConference } from './shows';
+import { buildGame, sameConference } from './games';
 import { teamEntries } from './teams';
 import { TeamCombo } from './team-combo';
 import type { Target } from './types';
@@ -18,7 +17,7 @@ const today = () => {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 };
 
-export function NewGameDialog({ onClose, onCreated }: { readonly onClose: () => void; readonly onCreated: (show: Target | null) => void }) {
+export function NewGameDialog({ onClose, onCreated }: { readonly onClose: () => void; readonly onCreated: (game: Target) => void }) {
   const { world, api, revision } = useController();
   const seasons = useMemo(() => (world?.all('season') ?? []).map((each) => each.id).sort().reverse(), [world]);
   const [seasonId, setSeasonId] = useState(seasons[0] ?? '');
@@ -30,33 +29,22 @@ export function NewGameDialog({ onClose, onCreated }: { readonly onClose: () => 
   const [time, setTime] = useState('19:00');
   const [conferenceChoice, setConferenceChoice] = useState<boolean | null>(null);
   const [title, setTitle] = useState('');
-  const [withShow, setWithShow] = useState(true);
-  const [showName, setShowName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const entries = useMemo(() => (world ? teamEntries(world).filter((entry) => entry.team.program === program) : []), [world, program]);
   if (!world || revision === null) return null;
 
   const conferenceGame = conferenceChoice ?? sameConference(world, seasonId, away, home);
-  const matchup = away && home ? matchupLabel(world, { awayTeamId: TeamId.parse(away), homeTeamId: TeamId.parse(home) }) : '';
-  const nameOfShow = showName ?? matchup;
 
   const create = async () => {
     const minutesWest = new Date(`${date}T${time || '00:00'}`).getTimezoneOffset();
     const built = buildGame(world, { seasonId, program, awayTeamId: away, homeTeamId: home, venueId, date, time, conferenceGame, title }, minutesWest);
     if (!built.ok) return setError(built.error);
-    const edits: ManualEdit[] = [{ op: 'put', kind: 'game', value: built.value }];
-    let created: Target | null = null;
-    if (withShow) {
-      const id = freeShowId(world, nameOfShow);
-      if (!id) return setError('Give the show a name');
-      edits.push({ op: 'put', kind: 'show', value: parseEntity('show', { id, name: nameOfShow.trim(), gameId: built.value.id, crew: [], rundown: [] }) });
-      created = { kind: 'show', id };
-    }
     setSaving(true);
     try {
-      await api.data.apply({ origin: 'manual', basis: revision, edits });
-      onCreated(created);
+      await api.data.apply({ origin: 'manual', basis: revision, edits: [{ op: 'put', kind: 'game', value: built.value }] });
+      // The World may not hold the game yet; the fallback keeps it selected until it does.
+      onCreated({ kind: 'game', id: built.value.id, fallback: built.value });
       onClose();
     } catch (failure) {
       setError(describeError(failure).message);
@@ -112,16 +100,6 @@ export function NewGameDialog({ onClose, onCreated }: { readonly onClose: () => 
                 <span className="check-box" aria-hidden="true">{conferenceGame ? '✓' : ''}</span>
                 Conference game
               </Checkbox>
-              <Checkbox className="cell-check dlg-check" isSelected={withShow} onChange={setWithShow}>
-                <span className="check-box" aria-hidden="true">{withShow ? '✓' : ''}</span>
-                Create its show too
-              </Checkbox>
-              {withShow && (
-                <TextField className="dlg-row wide" value={nameOfShow} onChange={setShowName}>
-                  <Label className="dlg-label">Show name</Label>
-                  <Input className="record-input" />
-                </TextField>
-              )}
             </div>
             {error && <p className="problem" role="alert">{error}</p>}
             <div className="dialog-actions">

@@ -29,10 +29,10 @@ Preconditions:
 
 - **Free panel.** Press the `.free-button` whose `.free-label` starts with `Scorebug`. `waitMonitor(page, 'program', { bug: 'basketball-v2/scorebug' })` holds, and the button gets `data-pgm`. Press it again, and the bug layer goes `empty`.
 - **Keys.** Blur focus, then press `Digit1`. The scorebug is on program.
-- **Add cue.** Select the last row and press `Add cue`. In the dialog, open the first `.select-button`, choose `Talent Lower Third (Single)`, open the first combobox, choose `Rob Brooks`, and press `Add to rundown`. `world()` shows a new last cue on `drexel-sju` with `graphic: 'basketball-v2/talent-lower-third-single'` and `params: { talents: ['rob-brooks'] }`.
+- **Add cue.** Select the last row and press `Add cue`. In the dialog, open the first `.select-button`, choose `Talent Lower Third (Single)`, open the first combobox, choose `Rob Brooks`, and press `Add to rundown`. `world()` shows a new last cue on the seeded game's show with `graphic: 'basketball-v2/talent-lower-third-single'` and `params: { talents: ['rob-brooks'] }`.
 - **Edit on air.** Take the `Josh Reed #5 · game` row. In the inspector, toggle the `threes` and `stl` stat chips and press `Save`. `dtvMonitors.program.frame.layers` for `lower` has a `statLine` that ends in `STL` and no longer holds `3PT`. The cue in `world()` has `line.stats` set to `pts, reb, ast, stl`.
 - **Reorder.** Click the last row, then press Right (to its handle), Enter, Up and Enter. In `world()`, the last two cue ids have swapped.
-- **Remove.** Press `Remove Talent · Rob Brooks`. The rundown length in `world()` is back to 12.
+- **Remove.** Press `Remove Talent · Rob Brooks`. The rundown length in `world()` is back to 15.
 - **Suite.** `bun apps/controller/scripts/proofs.ts --port=8999 --quick` checks all of the above under `rundown edits`. Its screenshots are `40-add-cue.png`, `42-edited-on-air.png` and `43-reordered.png` in `build/controller/proofs/`.
 
 ## Gotchas

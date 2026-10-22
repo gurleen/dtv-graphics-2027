@@ -79,13 +79,13 @@ describe('migrate', () => {
   test('a document migration runs once, under user_version', () => {
     migrate(db, { backupDir: backups() });
     insert('venues', { id: 'daskalakis-athletic-center', title: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
-    const renameTitle = { version: 2, kind: 'venue', up: (doc: unknown) => (doc !== null && typeof doc === 'object' && 'title' in doc ? { ...doc, name: doc.title } : doc) } as const;
+    const renameTitle = { version: 3, kind: 'venue', up: (doc: unknown) => (doc !== null && typeof doc === 'object' && 'title' in doc ? { ...doc, name: doc.title } : doc) } as const;
 
-    expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] }).docMigrations).toEqual([2]);
+    expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] }).docMigrations).toEqual([3]);
     expect(JSON.parse(String(rows('venues').map((row) => (row as { doc: string }).doc)[0]))).toEqual({
       id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA',
     });
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 2 });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 3 });
     expect(migrate(db, { backupDir: backups(), migrations: [renameTitle] })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
   });
 
@@ -93,7 +93,7 @@ describe('migrate', () => {
     migrate(db, { backupDir: backups() });
     const lock = (field: string) => ({ field, actor: 'alex', at: 1 });
     insert('venues', { id: 'daskalakis-athletic-center', title: 'The DAC', city: 'Philadelphia', state: 'PA' }, 1, [lock('title'), lock('city')]);
-    expect(migrate(db, { backupDir: backups(), migrations: [renameField(2, 'venue', 'title', 'name')] }).docMigrations).toEqual([2]);
+    expect(migrate(db, { backupDir: backups(), migrations: [renameField(3, 'venue', 'title', 'name')] }).docMigrations).toEqual([3]);
     expect(rows('venues')).toEqual([
       {
         id: 'daskalakis-athletic-center',
@@ -116,23 +116,23 @@ describe('migrate', () => {
       { field: 'team', actor: 'alex', at: 1 },
     ]);
 
-    const report = migrate(db, { backupDir: backups(), migrations: [renameField(2, 'player', 'team', 'teamId')] });
-    expect(report).toMatchObject({ rebuilt: ['players'], docMigrations: [2] });
+    const report = migrate(db, { backupDir: backups(), migrations: [renameField(3, 'player', 'team', 'teamId')] });
+    expect(report).toMatchObject({ rebuilt: ['players'], docMigrations: [3] });
     expect(db.sqlite.query('SELECT team_id, seq, locked FROM players').all()).toEqual([
       { team_id: 'drexel-mbb', seq: 4, locked: JSON.stringify([{ field: 'teamId', actor: 'alex', at: 1 }]) },
     ]);
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 2 });
-    expect(migrate(db, { backupDir: backups(), migrations: [renameField(2, 'player', 'team', 'teamId')] })).toMatchObject({ rebuilt: [], docMigrations: [] });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 3 });
+    expect(migrate(db, { backupDir: backups(), migrations: [renameField(3, 'player', 'team', 'teamId')] })).toMatchObject({ rebuilt: [], docMigrations: [] });
   });
 
   test('a document migration that produces an invalid document changes nothing', () => {
     migrate(db, { backupDir: backups() });
     insert('venues', { id: 'daskalakis-athletic-center', name: 'Daskalakis Athletic Center', city: 'Philadelphia', state: 'PA' });
     const before = rows('venues');
-    const broken = { version: 2, kind: 'venue', up: () => ({ id: 'daskalakis-athletic-center' }) } as const;
+    const broken = { version: 3, kind: 'venue', up: () => ({ id: 'daskalakis-athletic-center' }) } as const;
     expect(() => migrate(db, { backupDir: backups(), migrations: [broken] })).toThrow();
     expect(rows('venues')).toEqual(before);
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 2 });
   });
 
   test('a file from before locks had authors gets each lock rewritten with no author, once', () => {
@@ -141,14 +141,14 @@ describe('migrate', () => {
     db.sqlite.run(`UPDATE players SET locked = '["hometown","jersey"]' WHERE id = 'drexel-mbb@2026-27/reed-josh'`);
     db.sqlite.run('PRAGMA user_version = 0');
 
-    expect(migrate(db, { backupDir: backups() })).toMatchObject({ rebuilt: [], docMigrations: [1] });
+    expect(migrate(db, { backupDir: backups() })).toMatchObject({ rebuilt: [], docMigrations: [1, 2] });
     expect(loadSnapshot(db).locks.player).toEqual({
       'drexel-mbb@2026-27/reed-josh': [
         { field: 'hometown', actor: null, at: null },
         { field: 'jersey', actor: null, at: null },
       ],
     });
-    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 2 });
     expect(migrate(db, { backupDir: backups() })).toEqual({ created: [], rebuilt: [], docMigrations: [], backup: null });
   });
 
@@ -156,6 +156,75 @@ describe('migrate', () => {
     const migration = { version: 3, kind: 'venue', up: () => null } as const;
     expect(migrate(db, { backupDir: backups(), migrations: [migration] }).docMigrations).toEqual([]);
     expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 3 });
+  });
+});
+
+describe('the show becomes its game’s broadcast', () => {
+  const GAME = '2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb';
+  const OTHER = '2026-27/2026-11-12/hofstra-mbb.at.drexel-mbb';
+  const lock = (field: string) => ({ field, actor: 'gurleen', at: 1 });
+  const cue = { id: 'starting-five', graphic: 'basketball-v2/starting-five', params: {}, overrides: {}, note: '' };
+
+  /** A file as version 1 left it: the old shows table, show docs with a name and a game. */
+  const versionOne = (shows: readonly { id: string; gameId: string | null }[]) => {
+    migrate(db, { backupDir: backups() });
+    seedRoster();
+    insert('schools', { id: 'saint-josephs', name: "Saint Joseph's", shortName: "Saint Joseph's", mascot: 'Hawks', abbreviation: 'SJU', primaryColor: '#9e1b32', secondaryColor: '#000000', logo: null, website: null, espnId: '2603' });
+    insert('teams', { id: 'saint-josephs-mbb', schoolId: 'saint-josephs', program: 'mbb', branding: {} });
+    for (const id of [GAME, OTHER]) {
+      insert('games', { id, seasonId: '2026-27', program: 'mbb', awayTeamId: 'saint-josephs-mbb', homeTeamId: 'drexel-mbb', startsAt: '2026-11-08T19:00:00-05:00' });
+    }
+    db.sqlite.run('DROP TABLE "shows"');
+    db.sqlite.run(
+      'CREATE TABLE "shows" (id TEXT PRIMARY KEY, doc TEXT NOT NULL CHECK (json_valid(doc)), seq INTEGER NOT NULL, ' +
+        "locked TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(locked)), game_id TEXT GENERATED ALWAYS AS (doc ->> '$.gameId') STORED " +
+        'REFERENCES "games" (id) DEFERRABLE INITIALLY DEFERRED) STRICT',
+    );
+    for (const show of shows) {
+      insert('shows', { ...show, name: show.id, crew: [{ talentId: 'rob-brooks', role: null }], rundown: [cue] }, 9, [lock('name'), lock('gameId'), lock('rundown')]);
+    }
+    db.sqlite.run('PRAGMA user_version = 1');
+  };
+  const showState = () => JSON.parse(db.sqlite.query<{ doc: string }, []>('SELECT doc FROM show_state').get()!.doc);
+  const writeShowState = (doc: object) => db.sqlite.run('INSERT INTO show_state (id, doc, seq) VALUES (1, ?, 3)', [JSON.stringify(doc)]);
+
+  test('a show is keyed by its game, keeps its crew, rundown and rundown lock, and the active show becomes the active game', () => {
+    versionOne([{ id: 'drexel-sju', gameId: GAME }]);
+    writeShowState({ showId: 'drexel-sju', program: {}, previews: {} });
+
+    expect(migrate(db, { backupDir: backups() })).toMatchObject({ rebuilt: ['shows'], docMigrations: [2] });
+    expect(rows('shows')).toEqual([
+      { id: GAME, doc: JSON.stringify({ id: GAME, crew: [{ talentId: 'rob-brooks', role: null }], rundown: [cue] }), seq: 9, locked: JSON.stringify([lock('rundown')]) },
+    ]);
+    expect(db.sqlite.query('SELECT sql FROM sqlite_schema WHERE name = ?').get('shows')).toEqual({ sql: tableSql('show').create });
+    expect(showState()).toEqual({ gameId: GAME, program: {}, previews: {} });
+
+    db.sqlite.run('DELETE FROM games WHERE id = ?', [GAME]);
+    expect(rows('shows')).toEqual([]);
+  });
+
+  test('a show state with no active show names no game', () => {
+    versionOne([{ id: 'drexel-sju', gameId: GAME }]);
+    writeShowState({ showId: null, program: {}, previews: {} });
+    migrate(db, { backupDir: backups() });
+    expect(showState()).toEqual({ gameId: null, program: {}, previews: {} });
+  });
+
+  test('a show with no game refuses the migration, names the show, and changes nothing', () => {
+    versionOne([{ id: 'drexel-sju', gameId: GAME }, { id: 'scrimmage', gameId: null }]);
+    writeShowState({ showId: 'drexel-sju', program: {}, previews: {} });
+    const before = rows('shows');
+    expect(() => migrate(db, { backupDir: backups() })).toThrow("shows with no game cannot become a game's show: scrimmage");
+    expect(rows('shows')).toEqual(before);
+    expect(showState()).toEqual({ showId: 'drexel-sju', program: {}, previews: {} });
+    expect(db.sqlite.query('PRAGMA user_version').get()).toEqual({ user_version: 1 });
+  });
+
+  test('two shows on one game refuse the migration and name both', () => {
+    versionOne([{ id: 'drexel-sju', gameId: GAME }, { id: 'drexel-sju-2', gameId: GAME }, { id: 'hofstra', gameId: OTHER }]);
+    const before = rows('shows');
+    expect(() => migrate(db, { backupDir: backups() })).toThrow(`games with more than one show: ${GAME} (drexel-sju, drexel-sju-2)`);
+    expect(rows('shows')).toEqual(before);
   });
 });
 

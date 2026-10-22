@@ -1,11 +1,12 @@
 /**
- * Saved shows and rundowns, driven the way operators drive them: the real server on a scratch
+ * Games, each its own show, driven the way operators drive them: the real server on a scratch
  * database, two controllers in Chromium at 1440 x 900, and every claim also read back over the
- * API. Hofstra at Drexel is created as a game, given a show, and given the seeded Saint Joseph's
- * rundown; one controller makes it active while the other holds a cue in preview, and the server
- * restarts to show the choice and the rundown survive. Exits 1 if any check fails.
+ * API. Hofstra at Drexel is created as a game and given a crew; one controller makes it active
+ * while the other holds a cue in preview, and its first cue stores its show. The active game
+ * cannot be deleted, another game goes with its show, and the server restarts to show the choice
+ * and the rundown survive. Exits 1 if any check fails.
  *
- *   bun apps/controller/scripts/shows-proofs.ts [--port=8996] [--out=build/controller/shows-proofs]
+ *   bun apps/controller/scripts/games-proofs.ts [--port=8996] [--out=build/controller/games-proofs]
  *
  * It serves the controller itself. The scenes are not built here, so the monitors stay dark;
  * the tally is read from the rundown rows and from the show stream.
@@ -15,14 +16,14 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { type Api, connect, first } from '@dtv/api';
-import { GraphicId, indexWorld, ShowId, type World } from '@dtv/domain';
+import { GameId, GraphicId, indexWorld, type World } from '@dtv/domain';
 import { CommandId, OperatorId, type ShowView } from '@dtv/playout';
 import { type Browser, chromium, type Page } from 'playwright';
 
 const ROOT = resolve(import.meta.dir, '../../..');
 const flag = (name: string) => process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
 const PORT = Number(flag('port') ?? 8996);
-const out = join(ROOT, flag('out') ?? 'build/controller/shows-proofs');
+const out = join(ROOT, flag('out') ?? 'build/controller/games-proofs');
 const origin = `http://localhost:${PORT}`;
 const MAIN = join(ROOT, 'apps/server/src/main.ts');
 
@@ -41,7 +42,7 @@ const shoot = async (page: Page, name: string) => {
   console.log(`     ${file.replace(`${ROOT}/`, '')}`);
 };
 
-const dir = mkdtempSync(join(tmpdir(), 'dtv-shows-proofs-'));
+const dir = mkdtempSync(join(tmpdir(), 'dtv-games-proofs-'));
 let server: ReturnType<typeof Bun.spawn> | null = null;
 
 async function startServer(seed: boolean) {
@@ -68,7 +69,7 @@ async function stopServer() {
 let connection = { api: null as unknown as Api, close: () => {} };
 const reconnect = () => {
   connection.close();
-  connection = connect({ url: `ws://localhost:${PORT}/rpc`, client: 'shows-proofs' });
+  connection = connect({ url: `ws://localhost:${PORT}/rpc`, client: 'games-proofs' });
 };
 const api = () => connection.api;
 const world = async (): Promise<World> => indexWorld(await first((signal) => api().data.watch(undefined, { signal })));
@@ -99,8 +100,9 @@ async function openPage(operator: string, route: 'show' | 'data'): Promise<Page>
 }
 
 const topBarShow = (page: Page) => page.locator('.topbar .show-name');
-const DREXEL_SJU = ShowId.parse('drexel-sju');
-const HOFSTRA_GAME = '2026-27/2026-11-15/hofstra-mbb.at.drexel-mbb';
+const SJU_GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
+const HOFSTRA_GAME = GameId.parse('2026-27/2026-11-15/hofstra-mbb.at.drexel-mbb');
+const SPARE_GAME = GameId.parse('2026-27/2026-11-22/saint-josephs-mbb.at.drexel-mbb');
 
 /** A Pick (a Select) inside a dialog, by its label. */
 const choose = async (scope: ReturnType<Page['locator']>, page: Page, label: string, option: RegExp | string) => {
@@ -114,27 +116,29 @@ async function main() {
   browser = await chromium.launch();
 
   console.log('\nsetup: Saint Joseph\'s at Drexel is active, sam has a cue in preview, the scorebug is on program');
-  await send({ type: 'activate', show: DREXEL_SJU });
+  await send({ type: 'activate', game: SJU_GAME });
   await send({ type: 'air', operator: OperatorId.parse('alex'), ref: { kind: 'free', graphic: GraphicId.parse('basketball-v2/scorebug') } });
   const sam = await openPage('sam', 'show');
   const alex = await openPage('alex', 'data');
   const cueId = (await viewFor('sam')).rundown[0]!;
   await send({ type: 'cue', operator: OperatorId.parse('sam'), ref: cueId.ref });
   await sam.locator('.cue-row[data-pvw]').first().waitFor();
-  check((await topBarShow(sam).innerText()) === 'Saint Joseph\'s at Drexel', 'sam\'s console shows the seeded show');
+  check((await topBarShow(sam).innerText()) === 'Saint Joseph\'s at Drexel', 'sam\'s console names the seeded game');
   await shoot(sam, 'sam-before-switch');
 
-  console.log('\ngames: create Hofstra at Drexel');
-  await alex.getByRole('option', { name: 'Shows', exact: true }).click();
+  console.log('\ngames: the list, then create Hofstra at Drexel');
+  await alex.getByRole('option', { name: 'Games', exact: true }).click();
   await alex.locator('.data-table').waitFor();
   const seeded = alex.locator('.data-row', { hasText: 'Saint Joseph' });
-  check((await seeded.locator('.active-mark').count()) === 1, 'the active show is marked in the list');
-  check((await alex.locator('.active-mark').count()) === 1, 'only one show carries the mark');
-  await shoot(alex, 'shows-list');
+  check((await seeded.locator('.active-mark').count()) === 1, 'the active game is marked in the list');
+  check((await alex.locator('.active-mark').count()) === 1, 'only one game carries the mark');
+  check((await alex.getByRole('option', { name: 'Shows', exact: true }).count()) === 0 && (await alex.getByRole('button', { name: '+ Show' }).count()) === 0, 'the data page has no Shows list and no + Show');
+  await shoot(alex, 'games-list');
 
   await alex.getByRole('button', { name: '+ Game' }).click();
   const game = alex.getByRole('dialog', { name: 'New game' });
   await game.waitFor();
+  check((await game.getByText(/show/i).count()) === 0, 'the new-game dialog asks nothing about a show');
   await game.getByRole('combobox', { name: 'Away team' }).fill('hofs');
   await shoot(alex, 'new-game-searching');
   await alex.locator('.select-popover').getByRole('option', { name: 'Hofstra · MBB' }).click();
@@ -144,18 +148,18 @@ async function main() {
   await game.getByLabel('Game day').fill('2026-11-15');
   await game.getByLabel('Start time').fill('14:30');
   await game.getByLabel('Event title').fill('CAA opener');
-  await game.getByText('Create its show too').click();
   const conferenceTicked = await game.getByRole('checkbox', { name: 'Conference game' }).isChecked();
   await shoot(alex, 'new-game-filled');
   await game.getByRole('button', { name: 'Create game' }).click();
   await game.waitFor({ state: 'detached' });
   let w = await world();
-  const created = w.get('game', HOFSTRA_GAME as never);
+  const created = w.get('game', HOFSTRA_GAME);
   check(!!created, `the game exists under its deterministic id ${HOFSTRA_GAME}`);
   check(created?.awayTeamId === 'hofstra-mbb' && created.homeTeamId === 'drexel-mbb' && created.title === 'CAA opener' && created.venueId === 'daskalakis-athletic-center', 'its teams, venue and title are as typed');
   check(created?.startsAt === `2026-11-15T14:30:00${offsetOf('2026-11-15T14:30')}`, `its start carries the browser's offset (${created?.startsAt})`);
   check(created?.conferenceGame === conferenceTicked, `conference game was ticked for it by the teams' conference (${conferenceTicked})`);
-  const live = await first((signal) => api().game.watch({ game: HOFSTRA_GAME as never }, { signal }));
+  check(!w.get('show', HOFSTRA_GAME), 'creating a game stores no show row');
+  const live = await first((signal) => api().game.watch({ game: HOFSTRA_GAME }, { signal }));
   check(live.sport === 'basketball' && live.score.away === 0 && live.score.home === 0, 'the game came with its live state, 0 to 0');
 
   await alex.getByRole('button', { name: '+ Game' }).click();
@@ -171,119 +175,94 @@ async function main() {
   await shoot(alex, 'new-game-duplicate-refused');
   await game.getByRole('button', { name: 'Cancel' }).click();
 
-  console.log('\nshows: create its show, rename it');
-  await alex.getByRole('button', { name: '+ Show' }).click();
-  await alex.getByRole('textbox', { name: 'Name', exact: true }).fill('Hofstra at Drexel (blank)');
-  await alex.locator('.record .field', { hasText: 'Game' }).locator('.pick-button').click();
-  await alex.locator('.select-popover').getByRole('option', { name: /Hofstra at Drexel/ }).click();
-  await alex.getByRole('button', { name: '+ Add crew' }).click();
-  await shoot(alex, 'new-show-record');
-  await alex.getByRole('button', { name: 'Create', exact: true }).click();
-  await waitFor('the new show', async () => !!(await world()).get('show', 'hofstra-at-drexel-blank' as never));
-  w = await world();
-  const blank = w.get('show', 'hofstra-at-drexel-blank' as never);
-  check(blank?.gameId === HOFSTRA_GAME && blank.crew.length === 1 && blank.rundown.length === 0, 'the show is for the game, with one crew member and no cues');
-  await alex.locator('.data-row', { hasText: 'Hofstra at Drexel (blank)' }).waitFor();
-
-  await alex.getByRole('button', { name: /^Name of .*Hofstra at Drexel \(blank\).*\. Edit$/ }).click();
-  await alex.locator('.cell-input').fill('Hofstra at Drexel (spare)');
-  await alex.keyboard.press('Enter');
-  await waitFor('the rename', async () => (await world()).get('show', 'hofstra-at-drexel-blank' as never)?.name === 'Hofstra at Drexel (spare)');
-  check((await world()).get('show', 'hofstra-at-drexel-blank' as never)?.name === 'Hofstra at Drexel (spare)', 'renamed in place; the id did not change');
-  await shoot(alex, 'show-renamed');
-
-  console.log('\nduplicate: the seeded rundown, plus a cue on a Saint Joseph\'s player, onto Hofstra at Drexel');
-  const seededShow = (await world()).get('show', DREXEL_SJU)!;
-  const careyCue = { id: 'carey-feature', graphic: 'basketball-v2/player-lower-third', params: { player: 'saint-josephs-mbb@2026-27/carey' }, overrides: {}, note: '' };
-  await api().data.apply({ origin: 'manual', basis: (await world()).revision, edits: [{ op: 'put', kind: 'show', value: { ...seededShow, rundown: [...seededShow.rundown, careyCue] } as never }] });
-  await waitFor('the Saint Joseph\'s cue', async () => (await world()).get('show', DREXEL_SJU)!.rundown.length === seededShow.rundown.length + 1);
-  await seeded.getByRole('gridcell').first().click();
-  await alex.getByRole('button', { name: 'Duplicate…' }).click();
-  const dialog = alex.getByRole('dialog', { name: 'Duplicate show' });
-  await dialog.waitFor();
-  await choose(dialog, alex, 'Onto game', /Hofstra at Drexel/);
-  await dialog.getByRole('textbox', { name: 'Show name' }).fill('Hofstra at Drexel');
-  await dialog.locator('.flagged li').first().waitFor();
-  const preview = await dialog.locator('.flagged li').allInnerTexts();
-  console.log(`     the dialog flags ${preview.length} cues:\n       ${preview.join('\n       ')}`);
-  await shoot(alex, 'duplicate-dialog');
-  await dialog.getByRole('button', { name: 'Duplicate', exact: true }).click();
-  await dialog.waitFor({ state: 'detached' });
-  await waitFor('the duplicate', async () => !!(await world()).get('show', 'hofstra-at-drexel' as never));
-  w = await world();
-  const source = w.get('show', DREXEL_SJU)!;
-  const copy = w.get('show', 'hofstra-at-drexel' as never)!;
-  check(copy.gameId === HOFSTRA_GAME, 'the copy is on the new game');
-  check(copy.crew.length === source.crew.length && JSON.stringify(copy.crew) === JSON.stringify(source.crew), `the crew was copied (${copy.crew.length} members)`);
-  check(copy.rundown.length === source.rundown.length && copy.rundown.every((cue, at) => cue.graphic === source.rundown[at]!.graphic && JSON.stringify(cue.params) === JSON.stringify(source.rundown[at]!.params)), `all ${copy.rundown.length} cues were copied in order with their params`);
-  check(copy.rundown.every((cue) => !source.rundown.some((old) => old.id === cue.id)) && new Set(copy.rundown.map((cue) => cue.id)).size === copy.rundown.length, 'every cue has a fresh id, none shared with the source');
-  const flagged = copy.rundown.filter((cue) => cue.note.startsWith('CHECK: '));
-  console.log(`     flagged cues:\n       ${flagged.map((cue) => `${cue.graphic}: ${cue.note}`).join('\n       ')}`);
-  check(flagged.length === 1 && /Carey/.test(flagged[0]!.note), 'only the cue on the old opponent\'s player is flagged');
-  check(copy.rundown.filter((cue) => !cue.note.startsWith('CHECK: ')).every((cue) => !/saint-josephs/.test(JSON.stringify(cue.params))), 'no unflagged cue names the old opponent');
-  check(copy.rundown.some((cue) => !cue.note && /reed-josh|spiker-zach|drexel-mbb/.test(JSON.stringify(cue.params))), 'cues on Drexel, which plays both games, are kept unflagged');
-  check(source.rundown.every((cue) => !cue.note), 'the source show was not touched');
-  await alex.locator('.data-row', { hasText: 'to check' }).waitFor();
-  await shoot(alex, 'duplicate-in-list');
+  console.log('\ncrew: the new game is selected; give it a crew member');
+  const record = alex.locator('.record');
+  await record.getByText('0 cues').waitFor();
+  check((await record.locator('.crew-row').count()) === 0 && (await record.getByRole('button', { name: /^Make .* active$/ }).count()) === 1, 'the record shows the game, an empty crew and Make active');
+  await record.getByRole('button', { name: '+ Add crew' }).click();
+  await record.getByRole('textbox', { name: 'Role for crew member 1' }).fill('Sideline');
+  await shoot(alex, 'game-crew-edited');
+  await record.getByRole('button', { name: 'Save', exact: true }).click();
+  await waitFor('the crew', async () => (await world()).get('show', HOFSTRA_GAME)?.crew.length === 1);
+  const stored = (await world()).get('show', HOFSTRA_GAME);
+  check(stored?.crew[0]?.role === 'Sideline' && stored.rundown.length === 0, 'the first crew edit stored the game\'s show, keyed by the game, with no cues');
+  await alex.locator('.data-row', { hasText: 'Hofstra' }).getByText(/Brooks|Tuberosa|Peloso/).waitFor();
+  await shoot(alex, 'game-crew-saved');
 
   console.log('\nactivate: alex makes it active; sam has a cue in preview and the scorebug is on program');
   const before = await viewFor('sam');
   check(Object.keys(before.preview).length === 1 && !!before.program.bug, 'before, sam has one cue in preview and the scorebug is on program');
-  const row = alex.locator('.data-row', { hasText: 'Hofstra at Drexel' }).filter({ hasNotText: 'spare' });
+  const row = alex.locator('.data-row', { hasText: 'Hofstra' });
   await row.getByRole('button', { name: /^Make .* active$/ }).click();
   const confirm = alex.getByRole('dialog', { name: /Make .* active/ });
   const sentence = await confirm.innerText();
   check(/previews? empt/i.test(sentence) && /program stays on air/i.test(sentence), `the confirm says what happens (${sentence.split('\n')[0]})`);
   await shoot(alex, 'make-active-confirm');
   await confirm.getByRole('button', { name: 'Make active', exact: true }).click();
-  await waitFor('the switch', async () => (await viewFor('sam')).show?.id === 'hofstra-at-drexel');
+  await waitFor('the switch', async () => (await viewFor('sam')).game?.id === HOFSTRA_GAME);
   await waitFor('sam\'s console', async () => (await topBarShow(sam).innerText()) === 'Hofstra at Drexel');
   await waitFor('alex\'s console', async () => (await topBarShow(alex).innerText()) === 'Hofstra at Drexel');
   const after = await viewFor('sam');
   check(Object.keys(after.preview).length === 0, 'sam\'s preview is empty');
   check(after.program.bug?.id === before.program.bug?.id, 'the scorebug is still on program, the same slot');
-  check((await sam.locator('.cue-row[data-pvw]').count()) === 0, 'sam\'s rundown shows no PVW tag');
-  check((await sam.locator('.cue-row').count()) === copy.rundown.length, `sam's console now lists the ${copy.rundown.length} cues of the new rundown`);
-  check((await alex.locator('.data-row', { hasText: 'Hofstra at Drexel' }).filter({ hasNotText: 'spare' }).locator('.active-mark').count()) === 1 && (await alex.locator('.active-mark').count()) === 1, 'the mark moved to the new show');
+  check(after.rundown.length === 0 && (await sam.locator('.cue-row').count()) === 0, 'sam\'s console lists the new game\'s empty rundown');
+  check((await row.locator('.active-mark').count()) === 1 && (await alex.locator('.data-row .active-mark').count()) === 1, 'the mark moved to the new game');
   await shoot(alex, 'alex-after-switch');
-  await shoot(sam, 'sam-after-switch');
 
-  console.log('\ndelete: the active show cannot go, an inactive one can');
-  await alex.locator('.data-row', { hasText: 'Hofstra at Drexel' }).filter({ hasNotText: 'spare' }).getByRole('gridcell').first().click();
-  check(await alex.getByRole('button', { name: /^Delete/ }).isDisabled(), 'Delete is disabled on the active show');
-  const refused = await api().data.apply({ origin: 'manual', basis: (await world()).revision, edits: [{ op: 'delete', kind: 'show', id: ShowId.parse('hofstra-at-drexel') }] }).then(() => null, (error: { data?: { detail?: string } }) => error.data?.detail ?? 'refused');
+  console.log('\nrundown: sam adds the first cue on the show page');
+  await sam.getByRole('button', { name: 'Add cue' }).click();
+  await sam.getByRole('dialog').locator('.select-button').first().click();
+  await sam.getByRole('option', { name: 'Talent Lower Third (Single)' }).click();
+  await sam.getByRole('dialog').getByRole('combobox').first().click();
+  await sam.getByRole('option', { name: /Rob Brooks/ }).click();
+  await sam.getByRole('button', { name: 'Add to rundown' }).click();
+  await sam.getByRole('dialog').waitFor({ state: 'detached' });
+  await waitFor('the cue', async () => (await world()).get('show', HOFSTRA_GAME)?.rundown.length === 1);
+  check((await world()).get('show', HOFSTRA_GAME)?.crew[0]?.role === 'Sideline', 'the rundown edit kept the crew');
+  await sam.locator('.cue-row').first().waitFor();
+  await shoot(sam, 'sam-first-cue');
+
+  console.log('\ndelete: the active game cannot go; another game goes with its show');
+  await api().data.apply({
+    origin: 'manual',
+    basis: (await world()).revision,
+    edits: [
+      { op: 'put', kind: 'game', value: { ...(await world()).get('game', SJU_GAME)!, id: SPARE_GAME, startsAt: '2026-11-22T19:00:00-05:00' } },
+      { op: 'put', kind: 'show', value: { id: SPARE_GAME, crew: [{ talentId: 'rob-brooks' as never, role: null }], rundown: [] } },
+    ],
+  });
+  await alex.locator('.data-row', { hasText: 'Hofstra' }).getByRole('gridcell').first().click();
+  check(await alex.getByRole('button', { name: /^Delete/ }).isDisabled(), 'Delete is disabled on the active game');
+  const refused = await api().data.apply({ origin: 'manual', basis: (await world()).revision, edits: [{ op: 'delete', kind: 'game', id: HOFSTRA_GAME }] }).then(() => null, (error: { data?: { detail?: string } }) => error.data?.detail ?? 'refused');
   check(!!refused && /is active/.test(refused), `the server refuses it too (${refused})`);
-  await alex.locator('.data-row', { hasText: 'spare' }).getByRole('gridcell').first().click();
+  const showAlone = await api().data.apply({ origin: 'manual', basis: (await world()).revision, edits: [{ op: 'delete', kind: 'show', id: SPARE_GAME }] }).then(() => null, (error: { data?: { detail?: string } }) => error.data?.detail ?? 'refused');
+  check(!!showAlone && /only with its game/.test(showAlone), `a show is not deleted apart from its game (${showAlone})`);
+  await alex.locator('.data-row', { hasText: 'Nov 22' }).getByRole('gridcell').first().click();
   await alex.getByRole('button', { name: 'Delete', exact: true }).click();
-  await alex.getByRole('dialog', { name: 'Confirm delete' }).getByRole('button', { name: 'Delete' }).click();
-  await waitFor('the delete', async () => !(await world()).get('show', 'hofstra-at-drexel-blank' as never));
-  check(!!(await world()).get('game', HOFSTRA_GAME as never), 'the show is gone and its game stays');
-  await shoot(alex, 'inactive-show-deleted');
+  const confirmDelete = alex.getByRole('dialog', { name: 'Confirm delete' });
+  check(/crew, rundown and live score go with it/.test(await confirmDelete.innerText()), 'the confirm says the show goes with the game');
+  await confirmDelete.getByRole('button', { name: 'Delete' }).click();
+  await waitFor('the delete', async () => !(await world()).get('game', SPARE_GAME));
+  check(!(await world()).get('show', SPARE_GAME), 'its show row went with it');
+  await shoot(alex, 'spare-game-deleted');
 
-  console.log('\nshow page: the rundown of the active show, with the flagged notes');
-  await alex.goto(`${origin}/#/show`);
-  await alex.locator('.rundown').waitFor();
-  await alex.locator('.cue-row').first().click();
-  await alex.locator('.cue-row').nth(3).click();
-  await shoot(alex, 'show-page-new-rundown');
-
-  console.log('\nrestart: the server comes back with the new show active');
+  console.log('\nrestart: the server comes back with the new game active');
   await alex.close();
   await sam.close();
   await stopServer();
   await startServer(false);
   reconnect();
   const restarted = await viewFor('alex');
-  check(restarted.show?.id === 'hofstra-at-drexel' && restarted.rundown.length === copy.rundown.length, `after the restart the active show is ${restarted.show?.name} with ${restarted.rundown.length} cues`);
+  check(restarted.game?.id === HOFSTRA_GAME && restarted.rundown.length === 1, `after the restart the active game is ${restarted.game?.label} with ${restarted.rundown.length} cue`);
   check(restarted.program.bug?.id === before.program.bug?.id, 'program came back as it was');
   const again = await openPage('alex', 'show');
-  check((await topBarShow(again).innerText()) === 'Hofstra at Drexel' && (await again.locator('.cue-row').count()) === copy.rundown.length, 'a fresh controller shows the new show and its rundown');
+  check((await topBarShow(again).innerText()) === 'Hofstra at Drexel' && (await again.locator('.cue-row').count()) === 1, 'a fresh controller shows the new game and its rundown');
   await shoot(again, 'after-restart');
   await again.goto(`${origin}/#/data`);
-  await again.getByRole('option', { name: 'Shows', exact: true }).click();
+  await again.getByRole('option', { name: 'Games', exact: true }).click();
   await again.locator('.data-table').waitFor();
-  check((await again.locator('.data-row', { hasText: 'Hofstra at Drexel' }).locator('.active-mark').count()) === 1, 'the list still marks it');
-  await shoot(again, 'shows-list-after-restart');
+  check((await again.locator('.data-row', { hasText: 'Hofstra' }).locator('.active-mark').count()) === 1, 'the list still marks it');
+  await shoot(again, 'games-list-after-restart');
 }
 
 /** `-05:00` style offset for a local wall-clock time in the zone this script runs in, which Chromium shares. */
@@ -301,5 +280,5 @@ try {
   await stopServer();
   rmSync(dir, { recursive: true, force: true });
 }
-console.log(failures.length ? `\n${failures.length} check(s) failed` : '\nall shows checks passed');
+console.log(failures.length ? `\n${failures.length} check(s) failed` : '\nall games checks passed');
 process.exit(failures.length ? 1 : 0);

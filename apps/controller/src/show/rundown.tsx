@@ -40,7 +40,7 @@ export function Rundown(props: {
     <section className="panel rundown" aria-label="Rundown">
       <header className="panel-header">
         <h2>
-          Rundown <span className="muted">· ↑↓ select, ⏎ cue</span>
+          Rundown <span className="muted">· ↑↓ select to preview</span>
         </h2>
         <Button className="button small" onPress={props.onAdd} isDisabled={!edits}>
           Add cue

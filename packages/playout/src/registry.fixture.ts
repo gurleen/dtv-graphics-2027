@@ -1,4 +1,4 @@
-import { Color, emptySnapshot, type EntityKind, type EntityOf, indexWorld, Show, ShowId, Talent, TalentId, type World } from '@dtv/domain';
+import { Color, emptySnapshot, type EntityKind, type EntityOf, Game, GameId, indexWorld, Show, Talent, TalentId, type World } from '@dtv/domain';
 import { z } from 'zod';
 import { showContext } from './context';
 import { defineGraphic, type Registry, type ShowContext } from './graphic';
@@ -56,7 +56,7 @@ const bug = defineGraphic({ id: 'test/bug', scene: BUG_SCENE, params: z.object({
   site: 'scorebug',
   free: () => ({}),
   label: () => 'Bug',
-  bind: (_params, context) => ({ title: context.show?.name ?? 'No show', score: context.now, logo: context.sponsor?.logoOnDark ?? null }),
+  bind: (_params, context) => ({ title: context.show?.id ?? 'No show', score: context.now, logo: context.sponsor?.logoOnDark ?? null }),
 });
 
 const name = defineGraphic({ id: 'test/name', scene: NAME_SCENE, params: z.object({ talent: TalentId, live: z.boolean().default(false) }) })({
@@ -119,10 +119,14 @@ const talent = [
   Talent.parse({ id: 'mike-tuberosa', firstName: 'Mike', lastName: 'Tuberosa', role: 'Color Analyst' }),
 ];
 
+/** Games enough to key shows by; their teams and season are not in the World, so none resolves. */
+const games = ['demo', 'other', 'bare'].map((id) =>
+  Game.parse({ id, seasonId: '2026-27', program: 'mbb', awayTeamId: 'away', homeTeamId: 'home', startsAt: '2026-11-08T19:00:00-05:00' }),
+);
+
 const shows = [
   Show.parse({
     id: 'demo',
-    name: 'Demo Show',
     crew: [{ talentId: 'rob-brooks' }, { talentId: 'mike-tuberosa', role: 'Analyst' }],
     rundown: [
       { id: 'brooks', graphic: 'test/name', params: { talent: 'rob-brooks' } },
@@ -132,14 +136,14 @@ const shows = [
       { id: 'missing-talent', graphic: 'test/name', params: { talent: 'nobody' } },
     ],
   }),
-  Show.parse({ id: 'other', name: 'Other Show', crew: [{ talentId: 'rob-brooks' }] }),
+  Show.parse({ id: 'other', crew: [{ talentId: 'rob-brooks' }] }),
 ];
 
-/** A World with two talent and two shows, `demo` and `other`. Pass rows to replace a kind. */
+/** A World with two talent and three games: `demo` and `other` have shows, `bare` has none stored. Pass rows to replace a kind. */
 export const fixtureWorld = (patch: Partial<{ [K in EntityKind]: EntityOf<K>[] }> = {}): World => {
   const snapshot = emptySnapshot();
-  return indexWorld({ ...snapshot, entities: { ...snapshot.entities, talent, show: shows, ...patch } });
+  return indexWorld({ ...snapshot, entities: { ...snapshot.entities, talent, game: games, show: shows, ...patch } });
 };
 
-export const fixtureContext = (world: World = fixtureWorld(), showId: ShowId | null = ShowId.parse('demo'), now = 1_000): ShowContext =>
-  showContext({ world, showId, live: () => undefined, now });
+export const fixtureContext = (world: World = fixtureWorld(), gameId: GameId | null = GameId.parse('demo'), now = 1_000): ShowContext =>
+  showContext({ world, gameId, live: () => undefined, now });

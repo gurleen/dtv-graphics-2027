@@ -9,7 +9,7 @@
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { first } from '@dtv/api';
-import { GameId, PlayerId, ShowId, SourceId } from '@dtv/domain';
+import { GameId, PlayerId, SourceId } from '@dtv/domain';
 import { cueOf } from '@dtv/graphics';
 import { CueRef, OperatorId } from '@dtv/playout';
 import { PNG } from 'pngjs';
@@ -20,7 +20,6 @@ const port = Number(flag('port', '8981'));
 const out = join(ROOT, flag('out', 'build/renderer/drive'));
 mkdirSync(out, { recursive: true });
 
-const SHOW = ShowId.parse('drexel-sju');
 const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const operator = OperatorId.parse('gate');
 const failures: string[] = [];
@@ -53,7 +52,7 @@ try {
     return { png, bug, lower, all };
   };
 
-  await rig.command({ type: 'activate', show: SHOW });
+  await rig.command({ type: 'activate', game: GAME });
   const empty = await shot('0-empty');
   check(empty.all === 0, 'an empty program draws nothing');
 
@@ -63,7 +62,7 @@ try {
   check(bug.bug > 0.3 && bug.lower === 0, 'the scorebug draws, and nothing where the lower third goes');
 
   const world = await first((signal) => rig.api.data.watch(undefined, { signal }));
-  const show = world.entities.show.find((each) => each.id === SHOW)!;
+  const show = world.entities.show.find((each) => each.id === GAME)!;
   const reed = cueOf('basketball-v2/player-lower-third', { player: PlayerId.parse('drexel-mbb@2026-27/reed-josh') }, { id: 'reed' });
   await rig.api.data.apply({ origin: 'manual', basis: world.revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [reed] } }] });
   await rig.command({ type: 'cue', operator, ref: CueRef.parse({ kind: 'rundown', cue: 'reed' }) });

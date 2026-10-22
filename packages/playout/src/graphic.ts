@@ -19,9 +19,10 @@ export type LayerId = (typeof LAYERS)[number];
 /** Everything a bind may read, resolved once per projection. */
 export interface BindContext {
   readonly world: World;
-  /** The active show's game. Undefined for a show without one. */
+  /** The active game. Undefined when no game is active. */
   readonly game: GameView | undefined;
   readonly live: GameLive | undefined;
+  /** The active game's show, empty if it has none stored. Undefined when no game is active. */
   readonly show: Show | undefined;
   /** The show's crew in order, resolved to talent, with the role for the night or the talent's default. */
   readonly crew: readonly { readonly talent: Talent; readonly role: string }[];

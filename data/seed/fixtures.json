@@ -87,9 +87,7 @@
     ],
     "show": [
       {
-        "id": "drexel-sju",
-        "name": "Saint Joseph's at Drexel",
-        "gameId": "2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb",
+        "id": "2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb",
         "crew": [{ "talentId": "rob-brooks" }, { "talentId": "mike-tuberosa" }, { "talentId": "tessa-peloso" }],
         "rundown": [
           { "id": "matchup-locator", "graphic": "basketball-v2/matchup-locator", "params": {} },

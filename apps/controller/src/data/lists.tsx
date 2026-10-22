@@ -17,7 +17,7 @@ const NEW = {
   venues: { kind: 'venue', label: '+ Venue', blank: { name: '', city: '', state: '' } },
 } as const;
 
-export function ListView({ list, selected, onSelect }: { list: Exclude<ListId, 'shows'>; selected: Target | null; onSelect(target: Target): void }) {
+export function ListView({ list, selected, onSelect }: { list: Exclude<ListId, 'games'>; selected: Target | null; onSelect(target: Target): void }) {
   const { world } = useController();
   const edits = useEditing();
   if (!world) return null;

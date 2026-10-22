@@ -10,7 +10,6 @@ import { useController } from '../app/context';
 import { type EditableKind, type Field } from './fields';
 import { type Doc } from './paths';
 import { rowOf } from './rows';
-import { freeShowId } from './shows';
 import {
   type Chosen, disagreements, type Disagreement, type IdFor, keyOf, isDirty, keyOfSession, manualBatch, manualDelete, manualPut,
   mergeChoices, NEW_ID, openNewSession, openSession, readyToSave, type Session, setDraft, typeInto,
@@ -82,12 +81,6 @@ const idForDraft =
         case 'venue':
           id = idFor.venue(text('name'));
           break;
-        case 'show': {
-          const free = freeShowId(world, text('name'));
-          if (!free) return null;
-          id = free;
-          break;
-        }
         default:
           return null;
       }

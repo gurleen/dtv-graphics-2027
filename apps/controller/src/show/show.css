@@ -1,13 +1,13 @@
-/* The show page, laid out as Show A: two equal columns and an inspector, a rail of monitors, the game along the bottom. */
+/* The show page, laid out as Show A: the free panel, on air and the inspector beside the rundown, a rail of monitors, the game along the bottom. */
 
 .show-page {
   display: grid;
   grid-template-columns: 1fr 1fr var(--rail);
-  grid-template-rows: auto 1fr minmax(150px, auto) var(--scorebar);
+  grid-template-rows: auto auto minmax(0, 1fr) var(--scorebar);
   grid-template-areas:
     'free rundown rail'
     'onair rundown rail'
-    'inspector inspector rail'
+    'inspector rundown rail'
     'score score score';
   gap: var(--space-4);
   height: 100%;
@@ -61,6 +61,10 @@
 :where(.show-page, .show-portal) .tag.pvw,
 .tag.pvw:where(.show-portal) {
   background: var(--pvw);
+}
+
+:where(.show-page, .show-portal) .tag.bonus {
+  background: var(--warn);
 }
 
 :where(.show-page, .show-portal) .cue-error,
@@ -284,38 +288,28 @@
   overflow: auto;
 }
 
+/* One input to a row, each as wide as the panel: the form grows down, not across. */
 :where(.show-page, .show-portal) .cue-fields,
 .cue-fields:where(.show-portal),
-:where(.show-page, .show-portal) .form-row,
-.form-row:where(.show-portal) {
+:where(.show-page, .show-portal) .cue-fields :is(.form-row, .group),
+.cue-fields:where(.show-portal) :is(.form-row, .group) {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
   gap: var(--space-4);
 }
 
-:where(.show-page, .show-portal) .cue-fields,
-.cue-fields:where(.show-portal) {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-:where(.show-page, .show-portal) .picker,
-.picker:where(.show-portal) {
-  width: 220px;
-}
-
-:where(.show-page, .show-portal) .note,
-.note:where(.show-portal) {
-  flex: 1 1 320px;
-  max-width: 480px;
-}
-
-:where(.show-page, .show-portal) .override,
-.override:where(.show-portal) {
+:where(.show-page, .show-portal) .cue-fields :is(.list-item, .override),
+.cue-fields:where(.show-portal) :is(.list-item, .override) {
   display: flex;
   align-items: flex-end;
   gap: var(--space-2);
+}
+
+:where(.show-page, .show-portal) .cue-fields :is(.list-item, .override) > .field,
+.cue-fields:where(.show-portal) :is(.list-item, .override) > .field {
+  flex: 1;
 }
 
 /* Rail */
@@ -508,59 +502,26 @@
 
 :where(.show-page, .show-portal) .scorebar .clock {
   min-width: 5ch;
-  border: 0;
-  background: transparent;
-  color: var(--text);
   font: 500 var(--text-score) var(--mono);
-  cursor: text;
 }
 
-:where(.show-page, .show-portal) .clock-edit input {
-  width: 7ch;
-  height: 30px;
-  font: 500 var(--text-lg) var(--mono);
-}
-
-:where(.show-page, .show-portal) .timeout,
-.timeout:where(.show-portal) {
+:where(.show-page, .show-portal) .scorebar .timeout {
   width: 10px;
   height: 10px;
-  padding: 0;
   border: 1px solid var(--text-muted);
   border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
 }
 
-:where(.show-page, .show-portal) .timeout[data-on],
-.timeout[data-on]:where(.show-portal) {
+:where(.show-page, .show-portal) .scorebar .timeout[data-on] {
   background: var(--text);
 }
 
-:where(.show-page, .show-portal) .period .select-button,
-:where(.show-page, .show-portal) .phase .select-button {
-  min-width: 0;
-  gap: var(--space-3);
-}
-
-/* A keyed score-bar button: its key sits under its label, like a legend on a key cap, so the bar fits 1440 px. */
-:where(.show-page, .show-portal) .button.keyed,
-.button.keyed:where(.show-portal) {
-  flex-direction: column;
-  gap: 0;
-  height: 36px;
-  min-width: 30px;
-  padding: 0 var(--space-3);
-  line-height: 1.1;
-}
-
-:where(.show-page, .show-portal) .button.keyed kbd {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: var(--text-xs);
-  line-height: 1.1;
+:where(.show-page, .show-portal) .scorebar .possession span {
   color: var(--text-faint);
+}
+
+:where(.show-page, .show-portal) .scorebar .possession [data-on] {
+  color: var(--warn);
 }
 
 /* A command on its way to the server: amber, pulsing, until it is answered or fails. */
@@ -583,22 +544,8 @@
   margin-right: auto;
 }
 
-:where(.show-page, .show-portal) .key-sections,
-.key-sections:where(.show-portal) {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-6);
-}
-
-:where(.show-page, .show-portal) .key-section h3 {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-:where(.show-page, .show-portal) .key-section dl {
+:where(.show-page, .show-portal) .key-lines,
+.key-lines:where(.show-portal) {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--space-3) var(--space-5);
@@ -623,7 +570,7 @@
   margin: 0;
 }
 
-/* No active show */
+/* No active game */
 
 :where(.show-page, .show-portal) .picker-page,
 .picker-page:where(.show-portal) {

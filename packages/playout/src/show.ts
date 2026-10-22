@@ -8,7 +8,7 @@
  * changed, so a late Clear cannot take down a graphic its sender never saw.
  */
 
-import { Cue, CueId, GraphicId, sameJson, ShowId } from '@dtv/domain';
+import { Cue, CueId, GameId, GraphicId, sameJson } from '@dtv/domain';
 import { z } from 'zod';
 import { type AnyGraphic, entryOf, LAYERS, type LayerId, type Registry, type ShowContext } from './graphic';
 import { boundProps, type SceneFacts } from './scene';
@@ -60,16 +60,16 @@ export type Bus = z.infer<typeof Bus>;
 
 /** What `show_state` holds, so a restart brings program back as it was. */
 export const ShowState = z.object({
-  showId: ShowId.nullable(),
+  gameId: GameId.nullable(),
   program: Bus,
   previews: z.record(OperatorId, Bus),
 });
 export type ShowState = z.infer<typeof ShowState>;
 
-export const EMPTY_SHOW: ShowState = { showId: null, program: {}, previews: {} };
+export const EMPTY_SHOW: ShowState = { gameId: null, program: {}, previews: {} };
 
 export const ShowCommand = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('activate'), show: ShowId }),
+  z.object({ type: z.literal('activate'), game: GameId }),
   z.object({ type: z.literal('cue'), operator: OperatorId, ref: CueRef }),
   z.object({ type: z.literal('uncue'), operator: OperatorId, layer: Layer }),
   z.object({ type: z.literal('take'), operator: OperatorId }),
@@ -116,9 +116,9 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
 
   switch (command.type) {
     case 'activate': {
-      if (!env.context.world.get('show', command.show)) return rejected(`No show ${command.show}`);
-      if (state.showId === command.show && !Object.keys(state.previews).length) return unchanged;
-      return next({ showId: command.show, previews: {} });
+      if (!env.context.world.get('game', command.game)) return rejected(`No game ${command.game}`);
+      if (state.gameId === command.game && !Object.keys(state.previews).length) return unchanged;
+      return next({ gameId: command.game, previews: {} });
     }
     case 'cue': {
       const cue = resolved(command.ref, command.operator);

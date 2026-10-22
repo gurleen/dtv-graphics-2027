@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { CueId, GraphicId, ShowId } from '@dtv/domain';
+import { CueId, GameId, GraphicId } from '@dtv/domain';
 import { fixtureContext, fixtureWorld, REGISTRY } from './registry.fixture';
 import { type CueRef, EMPTY_SHOW, OperatorId, reduceShow, type ShowCommand, type ShowEnv, ShowState, SlotId } from './show';
 
@@ -19,7 +19,7 @@ const deepFreeze = <T>(value: T): T => {
 /** Runs commands in order the way the store does, and keeps the state of the last one that applied. */
 const harness = (env: Partial<ShowEnv> = {}) => {
   let slots = 0;
-  let state = ShowState.parse({ ...EMPTY_SHOW, showId: 'demo' });
+  let state = ShowState.parse({ ...EMPTY_SHOW, gameId: 'demo' });
   const full: ShowEnv = { registry: REGISTRY, context: fixtureContext(), newSlotId: () => SlotId.parse(`slot-${++slots}`), ...env };
   const send = (command: ShowCommand, patch: Partial<ShowEnv> = {}) => {
     const result = reduceShow(deepFreeze(state), command, { ...full, ...patch });
@@ -77,11 +77,11 @@ describe('cue and uncue', () => {
     expect(send({ type: 'cue', operator: alex, ref: free('test/name') })).toEqual({ ok: false, error: 'Name is not on the free panel' });
     expect(send({ type: 'cue', operator: alex, ref: free('test/unknown') })).toEqual({ ok: false, error: 'No graphic test/unknown' });
     expect(send({ type: 'cue', operator: alex, ref: free('constructor') })).toEqual({ ok: false, error: 'No graphic constructor' });
-    expect(state()).toEqual(ShowState.parse({ ...EMPTY_SHOW, showId: 'demo' }));
+    expect(state()).toEqual(ShowState.parse({ ...EMPTY_SHOW, gameId: 'demo' }));
   });
 
   test('a free graphic whose params need what the show lacks is rejected', () => {
-    const { send } = harness({ context: fixtureContext(fixtureWorld(), ShowId.parse('other')) });
+    const { send } = harness({ context: fixtureContext(fixtureWorld(), GameId.parse('other')) });
     expect(send({ type: 'cue', operator: alex, ref: free('test/wide') })).toEqual({ ok: false, error: 'Wide is not available for this show' });
   });
 });
@@ -252,7 +252,7 @@ describe('refresh and patch', () => {
     const slot = SlotId.parse('slot-1');
     send({ type: 'step', layer: 'lower', slot, to: 1 });
     expect(changed(send({ type: 'refresh', layer: 'lower', slot }))).toBe(false);
-    const demo = fixtureWorld().get('show', ShowId.parse('demo'))!;
+    const demo = fixtureWorld().get('show', GameId.parse('demo'))!;
     const edited = fixtureWorld({
       show: [{ ...demo, rundown: demo.rundown.map((cue) => (cue.id === 'starters' ? { ...cue, params: { title: 'Tonight' } } : cue)) }],
     });
@@ -280,18 +280,24 @@ describe('refresh and patch', () => {
 });
 
 describe('activate', () => {
-  test('a new show empties previews and keeps program on air', () => {
+  test('a new game empties previews and keeps program on air', () => {
     const { send, state } = harness();
     send({ type: 'air', operator: alex, ref: free('test/bug') });
     send({ type: 'cue', operator: sam, ref: rundown('brooks') });
-    expect(changed(send({ type: 'activate', show: ShowId.parse('other') }))).toBe(true);
-    expect(state()).toEqual({ showId: ShowId.parse('other'), program: { bug: expect.objectContaining({ id: 'slot-1' }) }, previews: {} });
+    expect(changed(send({ type: 'activate', game: GameId.parse('other') }))).toBe(true);
+    expect(state()).toEqual({ gameId: GameId.parse('other'), program: { bug: expect.objectContaining({ id: 'slot-1' }) }, previews: {} });
   });
 
-  test('activating the active show with empty previews changes nothing; an unknown show is rejected', () => {
+  test('activating the active game with empty previews changes nothing; an unknown game is rejected', () => {
     const { send } = harness();
-    expect(changed(send({ type: 'activate', show: ShowId.parse('demo') }))).toBe(false);
-    expect(send({ type: 'activate', show: ShowId.parse('nope') })).toEqual({ ok: false, error: 'No show nope' });
+    expect(changed(send({ type: 'activate', game: GameId.parse('demo') }))).toBe(false);
+    expect(send({ type: 'activate', game: GameId.parse('nope') })).toEqual({ ok: false, error: 'No game nope' });
+  });
+
+  test('a game with no stored show can be activated', () => {
+    const { send, state } = harness();
+    expect(changed(send({ type: 'activate', game: GameId.parse('bare') }))).toBe(true);
+    expect(state().gameId).toBe(GameId.parse('bare'));
   });
 });
 

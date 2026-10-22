@@ -7,5 +7,7 @@ export * from './world';
 export * from './checks';
 export * from './imports/espn';
 export * from './imports/roster';
+export * from './imports/sportsdataverse';
+export * from './imports/standings';
 export * from './imports/fixtures';
 export { basketball, GameApplyInput, GameLive, SPORT_MODULES } from './sports';

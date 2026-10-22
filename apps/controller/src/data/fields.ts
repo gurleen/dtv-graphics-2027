@@ -106,7 +106,15 @@ export const FIELDS = {
   talent: [text('firstName', 'First'), text('lastName', 'Last'), text('role', 'Role')],
   sponsor: [text('name', 'Name'), image('logoOnDark', 'Logo on dark', { empty: 'null' }), image('logoOnLight', 'Logo on light', { empty: 'null' })],
   venue: [text('name', 'Name'), text('city', 'City'), text('state', 'State', { mono: true })],
-  show: [text('name', 'Name'), field('gameId', 'Game', 'ref', { empty: 'null', refTo: 'game' })],
+  /** The teams, season and day are the game's id; a game on another day is a new game. */
+  game: [
+    field('venueId', 'Venue', 'ref', { empty: 'null', refTo: 'venue' }),
+    text('startsAt', 'Starts', { mono: true, hint: 'a time like 2026-11-08T19:00:00-05:00' }),
+    field('conferenceGame', 'Conference game', 'bool'),
+    text('title', 'Event title', { empty: 'null' }),
+  ],
+  /** The crew has its own editor, and the rundown is edited on the show page. */
+  show: [],
 } as const satisfies Partial<Record<EntityKind, readonly Field[]>>;
 
 export type EditableKind = keyof typeof FIELDS;

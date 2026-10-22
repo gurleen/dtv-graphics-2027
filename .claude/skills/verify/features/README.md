@@ -6,7 +6,7 @@ This directory is the maintained list of what operators, OBS and stakeholders ca
 
 - The prerequisites in [../SKILL.md](../SKILL.md) are met: `bun install` is done, `rive whoami` names an account, and `bun run riv:build` has run since the last `.rml` change.
 - An instance runs from `.claude/skills/verify/scripts/dtv.sh up --port=8998` (or `8999`), and `dtv.sh doctor` passes.
-- The seed has one show, `Saint Joseph's at Drexel` (`drexel-sju`), on the game `2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb`, with 12 rundown cues and three crew members (Rob Brooks, Mike Tuberosa, Tessa Peloso). No show is active until someone presses `Activate`.
+- The seed has one game, `Saint Joseph's at Drexel` (`2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb`). Its show, keyed by the same id, has 15 rundown cues and three crew members (Rob Brooks, Mike Tuberosa, Tessa Peloso). No game is active until someone presses `Activate`.
 - Drexel is the home team for every default test.
 
 ## Driving conventions
@@ -33,9 +33,9 @@ Each feature file starts with an H1 and a paragraph on what the user sees. Then 
 - [Free panel and rundown editing](./free-panel-and-rundown.md) covers airing from the free panel, Add cue, editing in the inspector, refresh on air, reorder and remove.
 - [Two operators](./two-operators.md) covers separate previews, a shared program, the name dialog and a refused stale save.
 - [Data page](./data-page.md) covers in-place edits, locks, roster CSV import and edit conflicts.
-- [Saved shows](./saved-shows.md) covers creating a game and a show, duplicating with flagged cues, making a show active, and the delete guard.
+- [Games](./games.md) covers creating a game, its crew, making it active, its first cue, and the delete guards.
 - [Renderer output](./renderer-output.md) covers `/renderer` program and preview buses, reload mid-show, steps and Score to Break.
 - [Server restart recovery](./restart-recovery.md) covers the Reconnecting badge, program and show surviving a restart, and pages that do not reload.
 - [Frame comparison](./frame-comparison.md) covers every graphic on `/renderer` against the phase 0 captures.
-- [Score and clock](./score-and-clock.md) covers the score bar's clicks and keys, the shot clock at the buzzer, and the scripted tip-off-to-final game.
+- [Score and clock](./score-and-clock.md) covers the read-only score bar, driving the game over `game.apply`, the shot clock at the buzzer, and the scripted tip-off-to-final game.
 - [Stakeholder site](./site.md) covers the static preview site built from the same renderer.

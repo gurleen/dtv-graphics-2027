@@ -17,7 +17,7 @@ export interface Problem {
 }
 
 /** How long a command is sent again while the server cannot be reached, before it fails. */
-export const ANSWER_MS = 10_000;
+const ANSWER_MS = 10_000;
 
 export interface Commands {
   /** Resolves to whether the server applied it; a failure becomes the problem. */

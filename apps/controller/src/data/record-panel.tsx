@@ -1,3 +1,4 @@
+import { type GameId, showOf } from '@dtv/domain';
 import { type ReactNode, useState } from 'react';
 import { Button, Checkbox, Dialog, DialogTrigger, Input, Label, Popover, TextField } from 'react-aria-components';
 import { useController } from '../app/context';
@@ -6,20 +7,19 @@ import { type EditableKind, type Field, fieldsOf, lockFieldOf, readText } from '
 import { LockMark } from './lock-mark';
 import type { Doc } from './paths';
 import { Pick, type Option } from './pick';
-import { gameLabel, personName, rowLabel, rowOf } from './rows';
+import { personName, rowLabel, rowOf } from './rows';
 import { isDirty, NEW_ID, problemsOf, type Session, shownProblems } from './session';
 import { SHOW_PAGE_HREF } from './links';
-import { DuplicateDialog, MakeActive } from './show-actions';
-import { isFlagged } from './shows';
+import { MakeActive } from './make-active';
 import type { Target } from './types';
 
-const DELETABLE: ReadonlySet<EditableKind> = new Set(['player', 'staff', 'talent', 'sponsor', 'venue', 'show']);
+const DELETABLE: ReadonlySet<EditableKind> = new Set(['player', 'staff', 'talent', 'sponsor', 'venue', 'game']);
 
 function useOptions(field: Field): readonly Option[] {
   const { world } = useController();
   if (!world) return [];
   if (field.refTo === 'conference') return world.all('conference').map((each) => ({ id: each.id, label: `${each.shortName} · ${each.name}` }));
-  if (field.refTo === 'game') return world.all('game').map((each) => ({ id: each.id, label: gameLabel(world, each) }));
+  if (field.refTo === 'venue') return world.all('venue').map((each) => ({ id: each.id, label: each.name }));
   return [];
 }
 
@@ -75,7 +75,6 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
   const { world, show: view } = useController();
   const editing = useEditing();
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [duplicating, setDuplicating] = useState(false);
   if (!target || !world) {
     return <section className="panel record"><h2 className="panel-title">Record</h2><p className="faint empty">Select a row to see it in full.</p></section>;
   }
@@ -102,16 +101,22 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
       </span>
     </div>
   );
-  const isActiveShow = kind === 'show' && view?.show?.id === id;
-  const cues = Array.isArray(doc.rundown) ? (doc.rundown as { note?: string }[]) : [];
-  const toCheck = cues.filter((cue) => isFlagged({ note: cue.note ?? '' })).length;
-  const dirty = !!session && isDirty(session);
-  const saving = session?.phase === 'saving';
+  const isGame = kind === 'game';
+  const isActiveGame = isGame && view?.game?.id === id;
+  // A game's crew lives on its show row, edited in a session of its own and saved with the game.
+  const show = isGame ? showOf(world, id as GameId) : null;
+  const crewSession = show ? editing.session('show', id) : undefined;
+  const sessions = [session, crewSession].filter((each) => each !== undefined);
+  const dirty = sessions.some(isDirty);
+  const saving = sessions.some((each) => each.phase === 'saving');
   const save = async () => {
     if (isNew) {
       const saved = await editing.saveNew(kind);
       if ('id' in saved) onSelect({ kind, id: saved.id });
-    } else await editing.save(kind, id);
+      return;
+    }
+    if (session) await editing.save(kind, id);
+    if (crewSession) await editing.save('show', id);
   };
 
   return (
@@ -119,20 +124,20 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
       <h2 className="panel-title">{rowLabel(world, kind, doc)} · record</h2>
       <div className="record-fields">
         {plain.map((field) => row(field))}
-        {kind === 'show' && (
+        {show && (
           <>
             <div className="field wide">
               <span className="field-label">Crew</span>
               <span className="field-body">
-                <CrewEditor doc={doc} onChange={(next) => editing.setValue(kind, base, ['crew'], next)} />
-                <LockMark kind={kind} id={id} field="crew" label="Crew" />
+                <CrewEditor doc={crewSession?.draft ?? show} onChange={(next) => editing.setValue('show', show, ['crew'], next)} />
+                <LockMark kind="show" id={id} field="crew" label="Crew" />
               </span>
             </div>
             <div className="field">
               <span className="field-label">Rundown</span>
               <span className="field-body faint">
-                {cues.length} cues{toCheck > 0 && <span className="warn"> · {toCheck} to check</span>} ·{' '}
-                {isActiveShow ? <a href={SHOW_PAGE_HREF}>edit it on the show page</a> : 'make it active to edit it on the show page'}
+                {show.rundown.length} cues ·{' '}
+                {isActiveGame ? <a href={SHOW_PAGE_HREF}>edit it on the show page</a> : 'make it active to edit it on the show page'}
               </span>
             </div>
           </>
@@ -141,21 +146,20 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
       </div>
       <p className="record-id faint mono">{isNew ? 'new row' : id}</p>
       {isNew && Object.keys(problems).length > 0 && <p className="faint">Still needed: {Object.keys(problems).map((fieldId) => fields.find((each) => each.id === fieldId)?.label ?? fieldId).join(', ')}</p>}
-      {session?.error && session.phase !== 'conflict' && <p role="alert" className="remove">{session.error}</p>}
+      {sessions.map((each) => each.error && each.phase !== 'conflict' && <p key={each.kind} role="alert" className="remove">{each.error}</p>)}
       {deleteError && <p role="alert" className="remove">{deleteError}</p>}
       <div className="actions">
         <Button className="button primary" isDisabled={!dirty || saving || session?.phase === 'conflict' || Object.keys(problems).length > 0} onPress={() => void save()}>{isNew ? 'Create' : 'Save'}</Button>
-        <Button className="button" isDisabled={!session || saving} onPress={() => { editing.discard(kind, id); if (isNew) onSelect(null); }}>Discard</Button>
-        {kind === 'show' && !isNew && <MakeActive id={id} name={rowLabel(world, kind, doc)} />}
-        {kind === 'show' && !isNew && <Button className="button" onPress={() => setDuplicating(true)}>Duplicate…</Button>}
+        <Button className="button" isDisabled={!sessions.length || saving} onPress={() => { editing.discard(kind, id); editing.discard('show', id); if (isNew) onSelect(null); }}>Discard</Button>
+        {isGame && <MakeActive id={id} name={rowLabel(world, kind, doc)} />}
         {!isNew && DELETABLE.has(kind) && (
           <DialogTrigger>
-            <Button className="button danger" isDisabled={isActiveShow} aria-label={isActiveShow ? 'Delete (the active show cannot be deleted)' : 'Delete'}>Delete</Button>
+            <Button className="button danger" isDisabled={isActiveGame} aria-label={isActiveGame ? 'Delete (the active game cannot be deleted)' : 'Delete'}>Delete</Button>
             <Popover className="popover data-portal" placement="bottom start">
               <Dialog className="confirm" aria-label="Confirm delete">
                 {({ close }) => (
                   <>
-                    <span>Delete {rowLabel(world, kind, doc)}? This cannot be undone.</span>
+                    <span>Delete {rowLabel(world, kind, doc)}?{isGame && ' Its crew, rundown and live score go with it.'} This cannot be undone.</span>
                     <Button className="button danger" onPress={async () => { const failed = await editing.remove(kind, id); setDeleteError(failed); close(); if (!failed) onSelect(null); }}>Delete</Button>
                     <Button className="button" onPress={close}>Cancel</Button>
                   </>
@@ -164,10 +168,9 @@ export function RecordPanel({ target, onSelect }: { readonly target: Target | nu
             </Popover>
           </DialogTrigger>
         )}
-        {isActiveShow && <span className="faint basis">Active shows cannot be deleted; make another active first.</span>}
-        {session && <span className="faint basis">{saving ? 'Saving…' : `Editing from revision ${session.basis}`}</span>}
+        {isActiveGame && <span className="faint basis">The active game cannot be deleted; make another active first.</span>}
+        {sessions[0] && <span className="faint basis">{saving ? 'Saving…' : `Editing from revision ${sessions[0].basis}`}</span>}
       </div>
-      {duplicating && <DuplicateDialog sourceId={id} onClose={() => setDuplicating(false)} onCreated={onSelect} />}
     </section>
   );
 }

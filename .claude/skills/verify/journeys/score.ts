@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
- * The score bar under the show page: alex airs the scorebug with free-panel key 1, presses
- * Drexel's +3, and the scorebug on program and on /renderer carries the new score. The live
- * game is read back over @dtv/api.
+ * The score bar under the show page, which only shows the game: alex airs the scorebug with
+ * free-panel key 1, Drexel's score goes up 3 over `game.apply` (as a live feed will send it),
+ * and the score bar and the scorebug on /renderer carry the new score.
  *
  *   .claude/skills/verify/scripts/dtv.sh up --port=8998
  *   .claude/skills/verify/journeys/score.ts --port=8998
@@ -29,7 +29,8 @@ await s.run(async () => {
   const home = alex.getByTestId('score-home');
   const before = Number(await home.innerText());
   await s.shoot(alex, 'before');
-  await bar.locator('[data-side="home"]').getByRole('button', { name: /^\+3\b/ }).click();
+  s.check((await bar.getByRole('button').count()) === 0, 'the score bar has no controls');
+  await s.api.game.apply({ sport: 'basketball', gameId: GAME as never, source: 'operator' as never, commands: [{ type: 'score', side: 'home', value: before + 3 }] });
   await s.until(`the score bar reads ${before + 3}`, async () => Number(await home.innerText()), (value) => value === before + 3);
   const live = await s.live(GAME);
   s.check(live.sport === 'basketball' && live.score.home === before + 3, `the live game's home score is ${before + 3} over the API`);

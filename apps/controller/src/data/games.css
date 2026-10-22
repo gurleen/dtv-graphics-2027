@@ -1,4 +1,4 @@
-/* The Shows list and its dialogs. Colours, sizes and spacings come from app/tokens.css. */
+/* The Games list and its dialogs. Colours, sizes and spacings come from app/tokens.css. */
 
 :where(.data-page, .data-portal) .active-mark,
 .active-mark:where(.data-portal) {

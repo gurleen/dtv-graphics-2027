@@ -12,7 +12,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { type Api, connect, first } from '@dtv/api';
-import { type EntityOf, indexWorld, type PlayerId, ShowId, type World } from '@dtv/domain';
+import { type EntityOf, GameId, indexWorld, type PlayerId, type World } from '@dtv/domain';
 import { CommandId } from '@dtv/playout';
 import { type Browser, chromium, type Page } from 'playwright';
 
@@ -37,6 +37,7 @@ const shoot = async (page: Page, name: string) => {
   console.log(`     ${file.replace(`${ROOT}/`, '')}`);
 };
 
+const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const dir = mkdtempSync(join(tmpdir(), 'dtv-data-proofs-'));
 const server = Bun.spawn(['bun', join(ROOT, 'apps/server/src/main.ts'), '--seed'], {
   env: { ...process.env, PORT: String(SERVER_PORT), DTV_DB: join(dir, 'db.sqlite') },
@@ -293,7 +294,7 @@ async function importProof() {
 }
 
 async function editsProof() {
-  console.log('\nedits: a school colour, a branding override, a show\'s crew');
+  console.log('\nedits: a school colour, a branding override, a game\'s title and crew');
   const page = await openPage('alex');
   await openTeam(page, 'Drexel · MBB');
   await page.getByRole('tab', { name: 'Team and branding' }).click();
@@ -320,28 +321,28 @@ async function editsProof() {
   await shoot(page, 'refused-in-place');
   await page.keyboard.press('Escape');
 
-  await page.getByRole('option', { name: 'Shows', exact: true }).click();
+  await page.getByRole('option', { name: 'Games', exact: true }).click();
   await page.locator('.data-table').waitFor();
   await page.locator('.data-row').first().getByRole('gridcell').first().click();
   await page.locator('.crew-row').first().waitFor();
-  await shoot(page, 'show-record');
-  const before = (await world()).get('show', 'drexel-sju' as never);
+  await shoot(page, 'game-record');
+  const before = (await world()).get('show', GAME);
   await page.getByRole('textbox', { name: 'Role for crew member 1' }).fill('Lead analyst');
   await page.getByRole('button', { name: 'Remove crew member 3' }).click();
-  await page.getByRole('textbox', { name: 'Name' }).fill('Drexel vs Saint Joseph\'s, Oct 21');
-  await shoot(page, 'show-edited');
+  await page.locator('.record').getByRole('textbox', { name: 'Event title' }).fill('Big 5 Classic');
+  await shoot(page, 'game-edited');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await waitFor('the show to save', async () => (await world()).get('show', 'drexel-sju' as never)?.crew.length === 2);
-  const after = (await world()).get('show', 'drexel-sju' as never);
-  check(before?.crew.length === 3 && after?.crew[0]?.role === 'Lead analyst' && after.name.endsWith('Oct 21'), 'the show\'s name and crew were saved');
-  check([...(await world()).locked('show', 'drexel-sju')].sort().join() === 'crew,name', 'the show edit locked name and crew');
-  await shoot(page, 'show-saved');
+  await waitFor('the crew to save', async () => (await world()).get('show', GAME)?.crew.length === 2);
+  await waitFor('the title to save', async () => (await world()).get('game', GAME)?.title === 'Big 5 Classic');
+  check(before?.crew.length === 3 && (await world()).get('show', GAME)?.crew[0]?.role === 'Lead analyst', 'the game\'s crew was saved to its show');
+  check([...(await world()).locked('show', GAME)].join() === 'crew' && (await world()).locked('game', GAME).includes('title'), 'the edit locked the crew and the title');
+  await shoot(page, 'game-saved');
   await page.close();
 }
 
 const proofs = { lock: lockProof, conflicts: conflictProof, import: importProof, edits: editsProof };
 try {
-  await api.show.command({ id: CommandId.parse('proof-activate'), command: { type: 'activate', show: ShowId.parse('drexel-sju') } });
+  await api.show.command({ id: CommandId.parse('proof-activate'), command: { type: 'activate', game: GAME } });
   for (const [name, run] of Object.entries(proofs)) if (!only || only.includes(name)) await run();
 } finally {
   connection.close();

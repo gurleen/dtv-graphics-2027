@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { CueId, ShowId } from '@dtv/domain';
+import { CueId, GameId } from '@dtv/domain';
 import { createLocalShow } from './local';
 import { paramFields } from './fields';
 import { fixtureWorld, REGISTRY } from './registry.fixture';
@@ -7,7 +7,7 @@ import type { CueRef } from './show';
 
 const rundown = (cue: string): CueRef => ({ kind: 'rundown', cue: CueId.parse(cue) });
 
-const local = () => createLocalShow({ registry: REGISTRY, snapshot: fixtureWorld().snapshot, showId: ShowId.parse('demo'), now: 1_000 });
+const local = () => createLocalShow({ registry: REGISTRY, snapshot: fixtureWorld().snapshot, gameId: GameId.parse('demo'), now: 1_000 });
 
 const air = (show: ReturnType<typeof local>, cue: string) => show.command({ type: 'air', operator: show.operator, ref: rundown(cue) });
 
@@ -72,7 +72,7 @@ describe('a local show', () => {
 
 describe('a property the scene holds still while on air', () => {
   const held = { ...REGISTRY, 'test/name': { ...REGISTRY['test/name']!, frozenOnAir: ['role'] } as const } as typeof REGISTRY;
-  const withHeldRole = () => createLocalShow({ registry: held, snapshot: fixtureWorld().snapshot, showId: ShowId.parse('demo'), now: 1_000 });
+  const withHeldRole = () => createLocalShow({ registry: held, snapshot: fixtureWorld().snapshot, gameId: GameId.parse('demo'), now: 1_000 });
 
   test('an edit to it takes the graphic again, so the scene plays it out and in', () => {
     const show = withHeldRole();

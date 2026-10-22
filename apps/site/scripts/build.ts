@@ -16,7 +16,7 @@
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { loadLive, loadSnapshot, migrate, openDb, seed } from '@dtv/db';
-import { Cue, type CueId, type EntityOf, type GameLive, GraphicId, ShowId } from '@dtv/domain';
+import { Cue, type CueId, type EntityOf, GameId, type GameLive, GraphicId } from '@dtv/domain';
 import { GRAPHICS, parseCue } from '@dtv/graphics';
 import { boundProps, createLocalShow, FALLBACK_IMAGES } from '@dtv/playout';
 import type { SiteWorld } from '../world';
@@ -25,7 +25,7 @@ const ROOT = resolve(import.meta.dir, '../../..');
 const OUT = join(ROOT, 'build/site');
 const APP = join(ROOT, 'apps/site');
 
-const SHOW = ShowId.parse('drexel-sju');
+const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const NOW = Date.parse('2026-11-08T21:00:00Z');
 
 // --- the demo World ----------------------------------------------------------------
@@ -37,10 +37,10 @@ const seeded = loadSnapshot(db);
 const lives = loadLive(db);
 db.sqlite.close();
 
-const show = seeded.entities.show.find((row) => row.id === SHOW);
-if (!show) throw new Error(`The seed has no show ${SHOW}`);
-const live: GameLive | undefined = show.gameId ? lives.get(show.gameId) : undefined;
-if (!live) throw new Error(`The seed has no live state for ${SHOW}'s game`);
+const show = seeded.entities.show.find((row) => row.id === GAME);
+if (!show) throw new Error(`The seed has no show for ${GAME}`);
+const live: GameLive | undefined = lives.get(GAME);
+if (!live) throw new Error(`The seed has no live state for ${GAME}`);
 
 const cueFor = (id: string): CueId => Cue.shape.id.parse(id.slice(id.indexOf('/') + 1));
 const rundown = Object.values(GRAPHICS).map((entry) => {
@@ -49,8 +49,8 @@ const rundown = Object.values(GRAPHICS).map((entry) => {
   return parsed.cue;
 });
 const demoShow: EntityOf<'show'> = { ...show, rundown };
-const snapshot = { ...seeded, entities: { ...seeded.entities, show: seeded.entities.show.map((row) => (row.id === SHOW ? demoShow : row)) } };
-const world: SiteWorld = { snapshot, live, showId: SHOW, now: NOW };
+const snapshot = { ...seeded, entities: { ...seeded.entities, show: seeded.entities.show.map((row) => (row.id === GAME ? demoShow : row)) } };
+const world: SiteWorld = { snapshot, live, gameId: GAME, now: NOW };
 
 // --- every cue binds, and the files it names exist ---------------------------------
 
