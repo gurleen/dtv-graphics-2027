@@ -35,7 +35,7 @@ Preconditions:
 ## Driving the load with journeys/load.ts
 
 - **Run.** `.claude/skills/verify/journeys/load.ts --port=8998` against a `dtv.sh up` instance. It needs the network: it loads MBB 2025-26 twice, WBB 2025-26, MBB 2026-27 and WBB 2026-27 from GitHub, screenshots each report, and reads the CAA table, Drexel's stats, Josh Reed, the home games and the new schools back over `world()`.
-- The loader reads ESPN's files: groups, schedule, team and player box scores, rosters and last season's rosters. For 2026-27 the box scores are not published yet and ESPN's rosters are last season's copied forward, so those loads write conferences and Drexel's home games and report every roster as `stale-roster`.
+- The loader reads ESPN's files: groups, schedule, team and player box scores, rosters and last season's rosters. For 2026-27 the box scores are not published yet and ESPN's rosters are mostly last season's copied forward, so those loads write conferences and Drexel's home games and report most rosters, Drexel's included, as `stale-roster`. A 2025-26 load over players the retired NCAA loader wrote rekeys them to ESPN, deletes the few ESPN has no record of, and reports both counts.
 
 ## Gotchas
 

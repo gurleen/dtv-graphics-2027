@@ -211,12 +211,13 @@ export function createStore(options: {
         return { ok: false, reason: 'unavailable', detail: error instanceof Error ? error.message : String(error) };
       }
       // Planned on the World as it is after the download, and committed before anything else can write.
-      const plan = sportsdataverseEdits(world, sources, { program, season, gamesFor: HOME_GAMES });
+      const inUse = heldStrings([...world.all('show'), ...lives.values(), show]);
+      const plan = sportsdataverseEdits(world, sources, { program, season, gamesFor: HOME_GAMES, inUse });
       const result = commit(actor, { origin: 'import', edits: plan.edits });
       if (!result.ok) return result;
-      const { revision, inserted, updated, skipped } = result;
+      const { revision, inserted, updated, deleted, skipped } = result;
       const ms = Math.round(performance.now() - started);
-      return { ok: true, report: { program, season, revision, inserted, updated, skipped, warnings: plan.warnings, summary: plan.summary, ms } };
+      return { ok: true, report: { program, season, revision, inserted, updated, deleted, skipped, warnings: plan.warnings, summary: plan.summary, ms } };
     },
 
     planRoster(input) {
@@ -334,6 +335,22 @@ function showDeletions(state: ShowState, batch: EditBatch): string[] {
     if (edit.kind === 'game' && edit.id === state.gameId) return [`Game ${edit.id} is active; make another game active before deleting it`];
     return [];
   });
+}
+
+/** Every string anywhere in `values`: a show's cue names a player in its params, a live game in its starters and lines. */
+function heldStrings(values: readonly unknown[]): Set<string> {
+  const held = new Set<string>();
+  const walk = (value: unknown) => {
+    if (typeof value === 'string') held.add(value);
+    else if (value && typeof value === 'object') {
+      for (const [key, inner] of Object.entries(value)) {
+        held.add(key);
+        walk(inner);
+      }
+    }
+  };
+  values.forEach(walk);
+  return held;
 }
 
 /** Rundown cues must name a graphic and fit its params, which SQLite cannot check. */

@@ -206,7 +206,7 @@ describe('sportsdataverse', () => {
     priorRosters: null,
     playerBox: [
       {
-        athlete_id: '5239623', team_id: '2182', game_id: '401', did_not_play: false, minutes: 31.5, points: 22, field_goals_made: 9, field_goals_attempted: 14,
+        athlete_id: '5239623', athlete_display_name: 'Josh Reed', athlete_jersey: '5', team_id: '2182', game_id: '401', did_not_play: false, minutes: 31.5, points: 22, field_goals_made: 9, field_goals_attempted: 14,
         three_point_field_goals_made: 1, three_point_field_goals_attempted: 3, free_throws_made: 3, free_throws_attempted: 4, offensive_rebounds: 2,
         defensive_rebounds: 6, assists: 4, steals: 1, blocks: 0, turnovers: 2, fouls: 3,
       },
@@ -230,8 +230,7 @@ describe('sportsdataverse', () => {
     expect(first).toMatchObject({
       ok: true,
       report: {
-        program: 'mbb', season: '2025-26', inserted: 3, updated: 2, skipped: [],
-        warnings: [{ code: 'not-published', subjects: ['espn_mens_college_basketball_rosters/rosters_2025'] }],
+        program: 'mbb', season: '2025-26', inserted: 3, updated: 2, deleted: 0, skipped: [], warnings: [],
       },
     });
     if (!first.ok) throw new Error(first.reason);
@@ -252,6 +251,61 @@ describe('sportsdataverse', () => {
 
     const second = await store.loadSportsdataverse('alex', { program: 'mbb', season });
     expect(second).toMatchObject({ ok: true, report: { revision: first.report.revision, inserted: 0, updated: 0 } });
+  });
+
+  test("an NCAA-keyed player ESPN's roster lacks is deleted with his stats, unless a show's cue names him", async () => {
+    const store = loader(async () => SOURCES);
+    const ncaa = (slug: string, firstName: string, jersey: string) => ({
+      op: 'put' as const,
+      kind: 'player' as const,
+      value: { id: PlayerId.parse(`drexel-mbb@2025-26/${slug}`), teamId: TeamId.parse('drexel-mbb'), seasonId: season, firstName, lastName: slug, jersey, sourceKey: `ncaa:${jersey}` },
+    });
+    const seeded = store.applyEdits('alex', {
+      origin: 'import',
+      edits: [
+        { op: 'put', kind: 'season', value: { id: season, name: season } },
+        ncaa('held', 'Amaris', '4'),
+        ncaa('gone', 'Old', '20'),
+        { op: 'put', kind: 'playerStats', value: { id: PlayerId.parse('drexel-mbb@2025-26/gone'), stats: { sport: 'basketball', gp: 3, totals: { pts: 30 } } } },
+      ] as EditBatch['edits'],
+    });
+    expect(seeded).toMatchObject({ ok: true });
+    const cue = { id: CueId.parse('watch'), graphic: GraphicId.parse('basketball-v2/player-to-watch'), params: { player: 'drexel-mbb@2025-26/held', body: { kind: 'season' } }, overrides: {}, note: '' };
+    const show = store.world().get('show', GAME)!;
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [cue] } }] })).toMatchObject({ ok: true });
+
+    const load = await store.loadSportsdataverse('alex', { program: 'mbb', season });
+    expect(load).toMatchObject({ ok: true, report: { deleted: 1, summary: { removed: 1 }, warnings: [{ code: 'ncaa-player-kept', subjects: ['Amaris held (Drexel)'] }] } });
+    const world = store.world();
+    expect(world.roster(TeamId.parse('drexel-mbb'), season).map((player) => [player.id, player.sourceKey])).toEqual([
+      ['drexel-mbb@2025-26/held', 'ncaa:4'],
+      ['drexel-mbb@2025-26/reed-josh', 'espn:5239623'],
+    ]);
+    expect(world.get('playerStats', PlayerId.parse('drexel-mbb@2025-26/gone'))).toBeUndefined();
+  });
+
+  test('an NCAA-keyed player a cue holds on a bus is kept after the cue leaves the rundown', async () => {
+    const store = loader(async () => SOURCES);
+    const held = PlayerId.parse('drexel-mbb@2025-26/held');
+    expect(
+      store.applyEdits('alex', {
+        origin: 'import',
+        edits: [
+          { op: 'put', kind: 'season', value: { id: season, name: season } },
+          { op: 'put', kind: 'player', value: { id: held, teamId: TeamId.parse('drexel-mbb'), seasonId: season, firstName: 'Amaris', lastName: 'held', jersey: '4', sourceKey: 'ncaa:4' } },
+        ] as EditBatch['edits'],
+      }),
+    ).toMatchObject({ ok: true });
+    const cue = { id: CueId.parse('watch'), graphic: GraphicId.parse('basketball-v2/player-to-watch'), params: { player: held, body: { kind: 'season' } }, overrides: {}, note: '' };
+    const show = store.world().get('show', GAME)!;
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [cue] } }] })).toMatchObject({ ok: true });
+    send(store, { type: 'activate', game: GAME });
+    expect(send(store, { type: 'cue', operator: sam, ref: { kind: 'rundown', cue: cue.id } })).toMatchObject({ ok: true });
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [] } }] })).toMatchObject({ ok: true });
+
+    const load = await store.loadSportsdataverse('alex', { program: 'mbb', season });
+    expect(load).toMatchObject({ ok: true, report: { deleted: 0, warnings: [{ code: 'ncaa-player-kept', subjects: ['Amaris held (Drexel)'] }] } });
+    expect(store.world().get('player', held)?.sourceKey).toBe('ncaa:4');
   });
 
   test('a download that fails is UNAVAILABLE and writes nothing', async () => {
