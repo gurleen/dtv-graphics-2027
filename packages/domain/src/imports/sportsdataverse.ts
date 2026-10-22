@@ -116,6 +116,8 @@ export const SDV_DATASETS = {
     path: (g: ProgramCode, y: number) => `${espn(g, 'player_boxscores')}/player_box_${y}`,
     row: z.object({
       athlete_id: id.nullable(),
+      athlete_display_name: text,
+      athlete_jersey: text,
       team_id: id,
       game_id: id,
       did_not_play: z.boolean(),
@@ -136,7 +138,9 @@ export type SdvSources = { readonly [D in SdvDataset]: readonly SdvRow<D>[] | nu
 export const sdvYear = (season: SeasonId) => Number(season.slice(0, 4)) + 1;
 
 export interface SdvWarning {
-  readonly code: 'not-published' | 'unmatched-team' | 'school-id-taken' | 'unknown-conference' | 'stale-roster' | 'no-jersey' | 'unmatched-opponent';
+  readonly code:
+    | 'not-published' | 'unmatched-team' | 'school-id-taken' | 'unknown-conference' | 'stale-roster' | 'no-jersey' | 'ncaa-player-kept'
+    | 'unmatched-opponent';
   readonly message: string;
   /** What it concerns: datasets, teams, conference labels or players, by name. */
   readonly subjects: readonly string[];
@@ -150,6 +154,9 @@ export interface SdvSummary {
   readonly newSchools: number;
   readonly players: number;
   readonly playerStats: number;
+  /** Players keyed by the retired NCAA files: matched to an ESPN row and rekeyed, or deleted with their stats. */
+  readonly rematched: number;
+  readonly removed: number;
   readonly games: number;
 }
 
@@ -224,7 +231,13 @@ const groupBy = <T>(rows: readonly T[], key: (row: T) => string) => {
 export function sportsdataverseEdits(
   world: World,
   sources: SdvSources,
-  options: { readonly program: ProgramCode; readonly season: SeasonId; readonly gamesFor: HomeGames | null },
+  options: {
+    readonly program: ProgramCode;
+    readonly season: SeasonId;
+    readonly gamesFor: HomeGames | null;
+    /** Ids a show or a live game holds; a player among them is never deleted. */
+    readonly inUse: ReadonlySet<string>;
+  },
 ): { readonly edits: ImportEdit[]; readonly warnings: SdvWarning[]; readonly summary: SdvSummary } {
   const { program, season } = options;
   const subjects = new Map<SdvWarning['code'], Set<string>>();
@@ -305,7 +318,7 @@ export function sportsdataverseEdits(
     );
   }
 
-  const players = rosterEdits(world, sources, { program, season, schools, schoolByEspn, warn });
+  const players = rosterEdits(world, sources, { program, season, schools, schoolByEspn, inUse: options.inUse, warn });
   edits.push(...players.edits);
 
   const games = options.gamesFor ? homeGames(world, sources, { ...options, gamesFor: options.gamesFor, schoolByEspn, conferenceOf, warn }) : [];
@@ -319,7 +332,16 @@ export function sportsdataverseEdits(
   return {
     edits,
     warnings,
-    summary: { rows, teamSeasons: schools.size, newSchools, players: players.players, playerStats: players.playerStats, games: games.length },
+    summary: {
+      rows,
+      teamSeasons: schools.size,
+      newSchools,
+      players: players.players,
+      playerStats: players.playerStats,
+      rematched: players.rematched,
+      removed: players.removed,
+      games: games.length,
+    },
   };
 }
 
@@ -332,6 +354,8 @@ const WARNING_TEXT: { readonly [C in SdvWarning['code']]: (n: number) => string 
   'unknown-conference': (n) => `${plural(n, 'conference label names', 'conference labels name')} no conference we have; those teams keep theirs`,
   'stale-roster': (n) => `${plural(n, "team's roster is", "teams' rosters are")} last season's, copied forward; not loaded`,
   'no-jersey': (n) => `${plural(n, 'player has', 'players have')} no jersey number; skipped`,
+  'ncaa-player-kept': (n) =>
+    `${plural(n, 'player', 'players')} from the retired NCAA files ${n === 1 ? 'is' : 'are'} on no ESPN roster, but a show, a live game or a person's edit holds ${n === 1 ? 'it' : 'them'}; kept`,
   'unmatched-opponent': (n) => `${plural(n, 'home game is', 'home games are')} against a team we have no school for; skipped`,
 };
 
@@ -372,6 +396,35 @@ const isStale = (rows: readonly SdvRow<'rosters'>[], prior: readonly SdvRow<'pri
   return returning.length > 0 && returning.every((row) => before.get(row.athlete_id) === row.experience_display_value);
 };
 
+/** The retired stats.ncaa.org loader's player keys. A team-season ESPN describes keeps none. */
+const NCAA = 'ncaa:';
+
+const SUFFIXES = new Set(['jr', 'sr', 'ii', 'iii', 'iv', 'v']);
+/** `Philon Jr.` is `philon`, `Guimarães` is `guimaraes`, `Blue-Smith` is `blue`, `smith`. */
+const nameTokens = (name: string) =>
+  name
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[.']/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token && !SUFFIXES.has(token));
+
+/**
+ * The NCAA files spelled some names their own way (`Philon` for ESPN's `Philon Jr.`, `Palomo`
+ * for `Palomo Vicente`, `Guimares` for `Guimarães`) and gave some players another jersey, so
+ * an NCAA-keyed player of the team-season is the row's player when the two names fold to the
+ * same one, or when the jersey is the same and they share the first name or a family name token.
+ */
+const sameNcaaPlayer = (row: { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }, player: Player) => {
+  if (!player.sourceKey?.startsWith(NCAA)) return false;
+  const first = nameTokens(row.firstName).join(' ');
+  const sameFirst = first !== '' && first === nameTokens(player.firstName).join(' ');
+  if (sameFirst && nameTokens(row.lastName).join(' ') === nameTokens(player.lastName).join(' ')) return true;
+  const last = new Set(nameTokens(player.lastName));
+  return row.jersey === player.jersey && (sameFirst || nameTokens(row.lastName).some((token) => last.has(token)));
+};
+
 /** `Lynn, MA`; `Belgrade, Serbia` for a player born outside the US. */
 const hometown = (row: SdvRow<'rosters'>) => {
   const where = row.birth_place_state ?? (row.birth_place_country === 'USA' ? null : row.birth_place_country);
@@ -387,16 +440,18 @@ function rosterEdits(
     readonly season: SeasonId;
     readonly schools: ReadonlyMap<SchoolId, School>;
     readonly schoolByEspn: ReadonlyMap<string, School>;
+    readonly inUse: ReadonlySet<string>;
     readonly warn: Warn;
   },
-): { readonly edits: ImportEdit[]; readonly players: number; readonly playerStats: number } {
+): { readonly edits: ImportEdit[]; readonly players: number; readonly playerStats: number; readonly rematched: number; readonly removed: number } {
   // Once the season's box scores exist its roster file is the season's, and last season's file
   // may by then hold this season's roster too, so only a roster before tip-off is compared.
   const prior = !sources.playerBox && sources.priorRosters && groupBy(sources.priorRosters, (row) => row.team_id);
+  const boxByTeam = groupBy(sources.playerBox ?? [], (row) => row.team_id);
   const edits: ImportEdit[] = [];
   /** `<ESPN team id>/<athlete id>` to the player, which is how the player box names one. */
   const playerOf = new Map<string, Player['id']>();
-  let players = 0;
+  let [players, rematched, removed] = [0, 0, 0];
   for (const [espnTeam, rows] of groupBy(sources.rosters ?? [], (row) => row.team_id)) {
     const school = context.schoolByEspn.get(espnTeam);
     if (!school || !context.schools.has(school.id)) continue;
@@ -427,9 +482,36 @@ function rosterEdits(
         sourceKey: `espn:${row.athlete_id}`,
       });
     }
-    const plan = planRoster(world, { team, season: context.season, rows: roster, prune: false });
+    const plan = planRoster(world, { team, season: context.season, rows: roster, prune: false, lastPass: sameNcaaPlayer });
     edits.push(...plan.edits);
     players += roster.length;
+    rematched += plan.update.filter(({ before }) => before.sourceKey?.startsWith(NCAA)).length;
+    // ESPN rebuilds a finished season's roster file from the rosters it serves then, so it can
+    // leave out a player its box scores show played that season: the box names him instead.
+    const planned = new Set(roster.map((row) => row.sourceKey));
+    const boxed = new Map<string, { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }>();
+    for (const line of boxByTeam.get(espnTeam) ?? []) {
+      if (!line.athlete_id || planned.has(`espn:${line.athlete_id}`) || boxed.get(line.athlete_id)?.jersey) continue;
+      const [firstName = '', ...last] = (line.athlete_display_name ?? '').trim().split(/\s+/);
+      boxed.set(line.athlete_id, { jersey: line.athlete_jersey, firstName, lastName: last.join(' ') });
+    }
+    for (const player of plan.missing) {
+      if (!player.sourceKey?.startsWith(NCAA)) continue;
+      const athlete = [...boxed].find(([, named]) => sameNcaaPlayer(named, player))?.[0];
+      if (athlete) {
+        boxed.delete(athlete);
+        edits.push(importPut('player', { ...player, sourceKey: `espn:${athlete}` }));
+        playerOf.set(`${espnTeam}/${athlete}`, player.id);
+        rematched++;
+        continue;
+      }
+      if (context.inUse.has(player.id) || world.locks('player', player.id).length) {
+        context.warn('ncaa-player-kept', `${player.firstName} ${player.lastName} (${school.name})`);
+        continue;
+      }
+      edits.push({ op: 'delete', kind: 'player', id: player.id });
+      removed++;
+    }
     for (const player of [...world.roster(team, context.season), ...plan.add, ...plan.update.map((change) => change.after)]) {
       if (player.sourceKey?.startsWith('espn:')) playerOf.set(`${espnTeam}/${player.sourceKey.slice('espn:'.length)}`, player.id);
     }
@@ -473,7 +555,7 @@ function rosterEdits(
       }),
     );
   }
-  return { edits, players, playerStats: games.size };
+  return { edits, players, playerStats: games.size, rematched, removed };
 }
 
 /** Each game on `gamesFor.school`'s home floor, played or not. A neutral-site game is not a home game. */
@@ -527,6 +609,7 @@ export interface SdvLoadReport {
   readonly revision: Revision;
   readonly inserted: number;
   readonly updated: number;
+  readonly deleted: number;
   /** Locked fields the load left alone, per row. */
   readonly skipped: readonly { readonly kind: EntityKind; readonly id: string; readonly fields: readonly string[] }[];
   readonly warnings: readonly SdvWarning[];

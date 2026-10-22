@@ -206,7 +206,7 @@ describe('sportsdataverse', () => {
     priorRosters: null,
     playerBox: [
       {
-        athlete_id: '5239623', team_id: '2182', game_id: '401', did_not_play: false, minutes: 31.5, points: 22, field_goals_made: 9, field_goals_attempted: 14,
+        athlete_id: '5239623', athlete_display_name: 'Josh Reed', athlete_jersey: '5', team_id: '2182', game_id: '401', did_not_play: false, minutes: 31.5, points: 22, field_goals_made: 9, field_goals_attempted: 14,
         three_point_field_goals_made: 1, three_point_field_goals_attempted: 3, free_throws_made: 3, free_throws_attempted: 4, offensive_rebounds: 2,
         defensive_rebounds: 6, assists: 4, steals: 1, blocks: 0, turnovers: 2, fouls: 3,
       },

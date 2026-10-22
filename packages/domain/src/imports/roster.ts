@@ -268,11 +268,18 @@ const applyRow = (player: Player, row: RosterRow): Player => ({
  * rows still unmatched. Ids never change, so the id pass finds a player whose name a person
  * corrected since. A match keeps its id; a new row gets `idFor.player`, with its jersey
  * appended when another player has that id. Locked fields are compared as the store will
- * write them, so a difference only in a field a person locked is no change.
+ * write them, so a difference only in a field a person locked is no change. `lastPass` runs
+ * after the others, for players another source named differently.
  */
 export function planRoster(
   world: World,
-  input: { readonly team: TeamId; readonly season: SeasonId; readonly rows: readonly RosterRow[]; readonly prune: boolean },
+  input: {
+    readonly team: TeamId;
+    readonly season: SeasonId;
+    readonly rows: readonly RosterRow[];
+    readonly prune: boolean;
+    readonly lastPass?: (row: RosterRow, player: Player) => boolean;
+  },
 ): RosterPlan {
   const unmatched = new Set(world.roster(input.team, input.season));
   const matches = new Map<RosterRow, Player>();
@@ -283,6 +290,7 @@ export function planRoster(
     (row, player) => player.id === idOf(row),
     (row, player) => row.jersey === player.jersey && sameName(row.lastName, player.lastName),
     (row, player) => sameName(row.firstName, player.firstName) && sameName(row.lastName, player.lastName),
+    ...(input.lastPass ? [input.lastPass] : []),
   ];
   for (const pass of passes) {
     for (const row of input.rows) {

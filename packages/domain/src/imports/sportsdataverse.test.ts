@@ -6,6 +6,7 @@ import {
 
 const season = SeasonId.parse('2025-26');
 const HOME = { school: SchoolId.parse('drexel'), venue: VenueId.parse('daskalakis-athletic-center') };
+const OPTIONS = { program: 'mbb', season, gamesFor: HOME, inUse: new Set<string>() } as const;
 
 /** Our schools, with their ESPN ids. */
 const SCHOOLS = [
@@ -50,12 +51,15 @@ const seeded = (): WorldSnapshot => {
   };
 };
 
-/** The store's commit, in memory: every put merges as an import over a row with no locks. */
+/** The store's commit, in memory: every put merges as an import over a row with no locks; a player's delete takes his stats. */
 function commit(world: World, edits: readonly ImportEdit[]): World {
   const snapshot = world.snapshot;
   const entities = { ...snapshot.entities } as Record<EntityKind, readonly { id: string }[]>;
   for (const edit of edits) {
-    if (edit.op !== 'put') continue;
+    if (edit.op === 'delete') {
+      for (const kind of edit.kind === 'player' ? (['player', 'playerStats'] as const) : [edit.kind]) entities[kind] = entities[kind].filter((row) => row.id !== edit.id);
+      continue;
+    }
     const rows = new Map(entities[edit.kind].map((row) => [row.id, row]));
     const existing = rows.get(edit.value.id);
     const merge = mergePut({ origin: 'import' }, existing && { doc: existing, locks: [] }, edit);
@@ -67,7 +71,7 @@ function commit(world: World, edits: readonly ImportEdit[]): World {
 
 const changing = (world: World, edits: readonly ImportEdit[]) =>
   edits.filter((edit) => {
-    if (edit.op !== 'put') return false;
+    if (edit.op !== 'put') return true;
     const existing = world.get(edit.kind, edit.value.id as never);
     return mergePut({ origin: 'import' }, existing && { doc: existing, locks: [] }, edit).change !== 'none';
   });
@@ -133,7 +137,7 @@ const athlete = (athlete_id: string, team_id: string, first_name: string, last_n
 const line = (game_id: string, values: readonly number[], did_not_play = false): SdvRow<'playerBox'> => {
   const [minutes, points, fgm, fga, tpm, tpa, ftm, fta, orb, drb, ast, stl, blk, tov, pf] = values as number[];
   return {
-    athlete_id: '5239623', team_id: '2182', game_id, did_not_play, minutes: minutes!, points: points!, field_goals_made: fgm!, field_goals_attempted: fga!,
+    athlete_id: '5239623', athlete_display_name: 'Josh Reed', athlete_jersey: '5', team_id: '2182', game_id, did_not_play, minutes: minutes!, points: points!, field_goals_made: fgm!, field_goals_attempted: fga!,
     three_point_field_goals_made: tpm!, three_point_field_goals_attempted: tpa!, free_throws_made: ftm!, free_throws_attempted: fta!,
     offensive_rebounds: orb!, defensive_rebounds: drb!, assists: ast!, steals: stl!, blocks: blk!, turnovers: tov!, fouls: pf!,
   };
@@ -167,7 +171,7 @@ const SOURCES: SdvSources = {
 };
 
 const world = indexWorld(seeded());
-const plan = sportsdataverseEdits(world, SOURCES, { program: 'mbb', season, gamesFor: HOME });
+const plan = sportsdataverseEdits(world, SOURCES, OPTIONS);
 const teamSeason = (school: string) => putValues(plan.edits, 'teamSeason').find((row) => row.teamId === `${school}-mbb`);
 
 describe('sportsdataverseEdits', () => {
@@ -234,7 +238,7 @@ describe('sportsdataverseEdits', () => {
       },
     ] as never);
     const curated = commit(world, [{ op: 'put', kind: 'school', value: parseEntity('school', { ...schools[0]!.value, name: 'Le Moyne College', primaryColor: '#00573f' }) }]);
-    const after = commit(curated, sportsdataverseEdits(curated, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits);
+    const after = commit(curated, sportsdataverseEdits(curated, SOURCES, OPTIONS).edits);
     expect([after.get('school', 'le-moyne' as never)?.name, after.get('school', 'le-moyne' as never)?.primaryColor]).toEqual(['Le Moyne College', '#00573f']);
     expect(after.get('school', 'drexel' as never)).toEqual(world.get('school', 'drexel' as never));
   });
@@ -252,6 +256,8 @@ describe('sportsdataverseEdits', () => {
       newSchools: 1,
       players: 1,
       playerStats: 1,
+      rematched: 0,
+      removed: 0,
       games: 4,
     });
   });
@@ -259,7 +265,7 @@ describe('sportsdataverseEdits', () => {
   test('a new school whose id another school has is warned about, not written', () => {
     const imposter = { ...SOURCES, groups: [{ team_id: '7777', team_name: 'Drexel Imposters', conference_id: 'mbb:caa' }] };
     const imposterGame = { ...schedule[1]!, game_id: 'x1', away_id: '7777', away_location: 'Drexel' };
-    const next = sportsdataverseEdits(world, { ...imposter, schedule: [imposterGame] }, { program: 'mbb', season, gamesFor: null });
+    const next = sportsdataverseEdits(world, { ...imposter, schedule: [imposterGame] }, { ...OPTIONS, gamesFor: null });
     expect(putValues(next.edits, 'school')).toEqual([]);
     expect(next.warnings.find((warning) => warning.code === 'school-id-taken')?.subjects).toEqual(['Drexel Imposters (drexel)']);
   });
@@ -267,20 +273,69 @@ describe('sportsdataverseEdits', () => {
   test('a second plan on the committed World changes nothing', () => {
     const after = commit(world, plan.edits);
     expect(after.get('player', 'drexel-mbb@2025-26/reed-josh' as never)?.jersey).toBe('5');
-    expect(changing(after, sportsdataverseEdits(after, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits)).toEqual([]);
+    expect(changing(after, sportsdataverseEdits(after, SOURCES, OPTIONS).edits)).toEqual([]);
   });
 
-  test('a player an earlier load keyed by his NCAA id is matched by name and takes the ESPN key', () => {
+  test("NCAA-keyed players take their ESPN row's key under the names ESPN spells differently; the rest go with their stats unless something holds them", () => {
+    const player = (slug: string, firstName: string, lastName: string, jersey: string, sourceKey: string | null) =>
+      ({ op: 'put', kind: 'player', value: parseEntity('player', { id: `drexel-mbb@2025-26/${slug}`, teamId: 'drexel-mbb', seasonId: '2025-26', firstName, lastName, jersey, sourceKey }) }) as const;
+    const stats = (slug: string) =>
+      ({ op: 'put', kind: 'playerStats', value: parseEntity('playerStats', { id: `drexel-mbb@2025-26/${slug}`, stats: { sport: 'basketball', gp: 3, totals: { pts: 30 } } }) }) as const;
     const ncaa = commit(world, [
-      {
-        op: 'put',
-        kind: 'player',
-        value: parseEntity('player', { id: 'drexel-mbb@2025-26/reed-josh', teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Josh', lastName: 'Reed', jersey: '5', sourceKey: 'ncaa:9335965' }),
-      },
+      player('reed-josh', 'Josh', 'Reed', '5', 'ncaa:9335965'),
+      player('philon-labaron', 'Labaron', 'Philon', '0', 'ncaa:9333106'),
+      stats('philon-labaron'),
+      player('guimares-gustavo', 'Gustavo', 'Guimares', '11', 'ncaa:2'),
+      player('gone-old', 'Old', 'Gone', '0', 'ncaa:3'),
+      stats('gone-old'),
+      player('baker-amaris', 'Amaris', 'Baker', '4', 'ncaa:4'),
+      player('walk-on', 'Walk', 'On', '40', null),
     ]);
-    const after = commit(ncaa, sportsdataverseEdits(ncaa, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits);
-    expect(after.all('player').map((player) => [player.id, player.sourceKey])).toEqual([['drexel-mbb@2025-26/reed-josh', 'espn:5239623']]);
-    expect(after.get('playerStats', 'drexel-mbb@2025-26/reed-josh' as never)?.stats.gp).toBe(2);
+    const sources = {
+      ...SOURCES,
+      rosters: [
+        ...SOURCES.rosters!,
+        athlete('4873090', '2182', 'Labaron', 'Philon Jr.', '0', 'Sophomore'),
+        athlete('77', '2182', 'Gustavo', 'Guimarães', '11', 'Junior'),
+      ],
+    };
+    const next = sportsdataverseEdits(ncaa, sources, { ...OPTIONS, inUse: new Set(['drexel-mbb@2025-26/baker-amaris']) });
+    const after = commit(ncaa, next.edits);
+    expect(after.all('player').map((row) => [row.id, row.lastName, row.sourceKey])).toEqual([
+      ['drexel-mbb@2025-26/reed-josh', 'Reed', 'espn:5239623'],
+      ['drexel-mbb@2025-26/philon-labaron', 'Philon Jr.', 'espn:4873090'],
+      ['drexel-mbb@2025-26/guimares-gustavo', 'Guimarães', 'espn:77'],
+      ['drexel-mbb@2025-26/baker-amaris', 'Baker', 'ncaa:4'],
+      ['drexel-mbb@2025-26/walk-on', 'On', null],
+    ]);
+    expect(after.all('playerStats').map((row) => [row.id, row.stats.gp])).toEqual([
+      ['drexel-mbb@2025-26/philon-labaron', 3],
+      ['drexel-mbb@2025-26/reed-josh', 2],
+    ]);
+    expect([next.summary.rematched, next.summary.removed]).toEqual([3, 1]);
+    expect(next.warnings.find((warning) => warning.code === 'ncaa-player-kept')).toEqual({
+      code: 'ncaa-player-kept',
+      message: "1 player from the retired NCAA files is on no ESPN roster, but a show, a live game or a person's edit holds it; kept",
+      subjects: ['Amaris Baker (Drexel)'],
+    });
+    const again = sportsdataverseEdits(after, sources, { ...OPTIONS, inUse: new Set(['drexel-mbb@2025-26/baker-amaris']) });
+    expect([changing(after, again.edits), again.summary.rematched, again.summary.removed]).toEqual([[], 0, 0]);
+  });
+
+  test("an NCAA-keyed player missing from ESPN's roster file but in its player box takes the box's key and stats", () => {
+    const ncaa = commit(world, [
+      { op: 'put', kind: 'player', value: parseEntity('player', { id: 'drexel-mbb@2025-26/spearman-zee', teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Zee', lastName: 'Spearman', jersey: '11', sourceKey: 'ncaa:7' }) },
+    ]);
+    const boxOnly = { ...line('c1', [20, 8, 3, 6, 0, 1, 2, 2, 1, 2, 1, 0, 0, 1, 2]), athlete_id: '88', athlete_display_name: 'Lazaria Spearman', athlete_jersey: '11' };
+    const next = sportsdataverseEdits(ncaa, { ...SOURCES, playerBox: [...SOURCES.playerBox!, boxOnly] }, OPTIONS);
+    const after = commit(ncaa, next.edits);
+    expect(after.get('player', 'drexel-mbb@2025-26/spearman-zee' as never)?.sourceKey).toBe('espn:88');
+    expect(after.get('playerStats', 'drexel-mbb@2025-26/spearman-zee' as never)?.stats).toEqual({
+      sport: 'basketball',
+      gp: 1,
+      totals: { min: 20, pts: 8, fgm: 3, fga: 6, tpm: 0, tpa: 1, ftm: 2, fta: 2, reb: 3, ast: 1, stl: 0, blk: 0, to: 1, pf: 2 },
+    });
+    expect([next.summary.rematched, next.summary.removed]).toEqual([1, 0]);
   });
 
   test("before tip-off, a roster whose returning players are all still in last season's class is skipped; one that moved up is planned", () => {
@@ -301,7 +356,7 @@ describe('sportsdataverseEdits', () => {
           { athlete_id: '6000002', team_id: '2275', experience_display_value: 'Freshman' },
         ],
       },
-      { program: 'mbb', season: next, gamesFor: HOME },
+      { ...OPTIONS, season: next },
     );
     expect(putValues(upcoming.edits, 'player').map((player) => [player.id, player.classYear])).toEqual([
       ['hofstra-mbb@2026-27/pride-pat', 'SO'],
@@ -317,7 +372,7 @@ describe('sportsdataverseEdits', () => {
   test('with only groups published, conferences change and records stay', () => {
     const before = commit(world, plan.edits);
     const moved = { ...unpublished, groups: [{ team_id: '2182', team_name: 'Drexel Dragons', conference_id: 'mbb:atlantic-10' }] };
-    const next = sportsdataverseEdits(before, moved, { program: 'mbb', season, gamesFor: HOME });
+    const next = sportsdataverseEdits(before, moved, OPTIONS);
     expect(putValues(next.edits, 'teamSeason').map((row) => [row.id, row.conferenceId, row.overall, row.rank])).toEqual([
       ['drexel-mbb@2025-26', 'a-10', { wins: 4, losses: 3 }, 2],
     ]);
