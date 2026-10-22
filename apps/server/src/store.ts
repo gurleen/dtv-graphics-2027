@@ -211,7 +211,7 @@ export function createStore(options: {
         return { ok: false, reason: 'unavailable', detail: error instanceof Error ? error.message : String(error) };
       }
       // Planned on the World as it is after the download, and committed before anything else can write.
-      const inUse = heldStrings([...world.all('show'), ...lives.values()]);
+      const inUse = heldStrings([...world.all('show'), ...lives.values(), show]);
       const plan = sportsdataverseEdits(world, sources, { program, season, gamesFor: HOME_GAMES, inUse });
       const result = commit(actor, { origin: 'import', edits: plan.edits });
       if (!result.ok) return result;

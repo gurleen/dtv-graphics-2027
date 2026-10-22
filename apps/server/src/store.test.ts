@@ -284,6 +284,30 @@ describe('sportsdataverse', () => {
     expect(world.get('playerStats', PlayerId.parse('drexel-mbb@2025-26/gone'))).toBeUndefined();
   });
 
+  test('an NCAA-keyed player a cue holds on a bus is kept after the cue leaves the rundown', async () => {
+    const store = loader(async () => SOURCES);
+    const held = PlayerId.parse('drexel-mbb@2025-26/held');
+    expect(
+      store.applyEdits('alex', {
+        origin: 'import',
+        edits: [
+          { op: 'put', kind: 'season', value: { id: season, name: season } },
+          { op: 'put', kind: 'player', value: { id: held, teamId: TeamId.parse('drexel-mbb'), seasonId: season, firstName: 'Amaris', lastName: 'held', jersey: '4', sourceKey: 'ncaa:4' } },
+        ] as EditBatch['edits'],
+      }),
+    ).toMatchObject({ ok: true });
+    const cue = { id: CueId.parse('watch'), graphic: GraphicId.parse('basketball-v2/player-to-watch'), params: { player: held, body: { kind: 'season' } }, overrides: {}, note: '' };
+    const show = store.world().get('show', GAME)!;
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [cue] } }] })).toMatchObject({ ok: true });
+    send(store, { type: 'activate', game: GAME });
+    expect(send(store, { type: 'cue', operator: sam, ref: { kind: 'rundown', cue: cue.id } })).toMatchObject({ ok: true });
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [] } }] })).toMatchObject({ ok: true });
+
+    const load = await store.loadSportsdataverse('alex', { program: 'mbb', season });
+    expect(load).toMatchObject({ ok: true, report: { deleted: 0, warnings: [{ code: 'ncaa-player-kept', subjects: ['Amaris held (Drexel)'] }] } });
+    expect(store.world().get('player', held)?.sourceKey).toBe('ncaa:4');
+  });
+
   test('a download that fails is UNAVAILABLE and writes nothing', async () => {
     const store = loader(async () => {
       throw new Error('https://github.com/...: HTTP 503');
