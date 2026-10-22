@@ -7,15 +7,26 @@ import {
 const season = SeasonId.parse('2025-26');
 const HOME = { school: SchoolId.parse('drexel'), venue: VenueId.parse('daskalakis-athletic-center') };
 
+/** Our schools, with their ESPN ids. */
 const SCHOOLS = [
-  ['drexel', 'Drexel', '2182', '100'],
-  ['hofstra', 'Hofstra', '2275', '200'],
-  ['towson', 'Towson', '119', '300'],
-  ['saint-josephs', "Saint Joseph's", '2603', '400'],
-  ['pennsylvania', 'Penn', '219', '500'],
+  ['drexel', 'Drexel', '2182'],
+  ['hofstra', 'Hofstra', '2275'],
+  ['towson', 'Towson', '119'],
+  ['saint-josephs', "Saint Joseph's", '2603'],
+  ['pennsylvania', 'Penn', '219'],
 ] as const;
-const ncaaOf = Object.fromEntries(SCHOOLS.map(([, name, , ncaa]) => [name, ncaa]));
-const espnOf = Object.fromEntries(SCHOOLS.map(([, name, espn]) => [name, espn]));
+
+/** How the schedule names each team: ESPN id, location, mascot, abbreviation, short name, colours, logo. */
+const ESPN_TEAMS = {
+  Drexel: ['2182', 'Drexel', 'Dragons', 'DREX', 'Drexel', '07294d', 'ffc600'],
+  Hofstra: ['2275', 'Hofstra', 'Pride', 'HOF', 'Hofstra', '00337f', 'ffd100'],
+  Towson: ['119', 'Towson', 'Tigers', 'TOW', 'Towson', 'ffc72c', '000000'],
+  "Saint Joseph's": ['2603', "Saint Joseph's", 'Hawks', 'JOES', "Saint Joe's", '9e1b32', '6c6f70'],
+  Penn: ['219', 'Pennsylvania', 'Quakers', 'PENN', 'Penn', '082a74', 'a6163d'],
+  'Le Moyne': ['2330', 'Le Moyne', 'Dolphins', 'LEM', 'Le Moyne', null, null],
+  Widener: ['9001', 'Widener', 'Pride', 'WID', 'Widener', '003366', 'ffcc00'],
+} as const;
+type Name = keyof typeof ESPN_TEAMS;
 
 const seeded = (): WorldSnapshot => {
   const empty = emptySnapshot();
@@ -24,7 +35,11 @@ const seeded = (): WorldSnapshot => {
     ...empty,
     entities: {
       ...empty.entities,
-      conference: parse('conference', [{ id: 'caa', name: 'Coastal Athletic Association', shortName: 'CAA' }, { id: 'a-10', name: 'Atlantic 10', shortName: 'A 10' }]),
+      conference: parse('conference', [
+        { id: 'caa', name: 'Coastal Athletic Association', shortName: 'CAA' },
+        { id: 'a-10', name: 'Atlantic 10', shortName: 'A 10' },
+        { id: 'nec', name: 'Northeast Conference', shortName: 'NEC' },
+      ]),
       school: parse(
         'school',
         SCHOOLS.map(([id, name, espnId]) => ({ id, name, shortName: name, mascot: 'Mascot', abbreviation: 'ABC', primaryColor: '#000000', secondaryColor: '#ffffff', espnId })),
@@ -50,58 +65,78 @@ function commit(world: World, edits: readonly ImportEdit[]): World {
   return indexWorld({ ...snapshot, entities: entities as WorldSnapshot['entities'] });
 }
 
-const unchanged = (world: World, edits: readonly ImportEdit[]) =>
+const changing = (world: World, edits: readonly ImportEdit[]) =>
   edits.filter((edit) => {
     if (edit.op !== 'put') return false;
     const existing = world.get(edit.kind, edit.value.id as never);
     return mergePut({ origin: 'import' }, existing && { doc: existing, locks: [] }, edit).change !== 'none';
   });
 
-type Game = readonly [contest: string, date: string, away: string, home: string, awayPts: number | null, homePts: number | null];
-/** Game 6's schedule row swaps its score; the team box has Hofstra winning. Game 9 is the conference tournament; game 10 is not played yet. */
+const unpublished = Object.fromEntries(SDV_DATASET_NAMES.map((dataset) => [dataset, null])) as unknown as SdvSources;
+
+const side = (prefix: 'home' | 'away', name: Name) => {
+  const [id, location, mascot, abbreviation, short, color, alternate] = ESPN_TEAMS[name];
+  return {
+    [`${prefix}_id`]: id, [`${prefix}_location`]: location, [`${prefix}_name`]: mascot, [`${prefix}_abbreviation`]: abbreviation,
+    [`${prefix}_short_display_name`]: short, [`${prefix}_color`]: color, [`${prefix}_alternate_color`]: alternate,
+    [`${prefix}_logo`]: `https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`,
+  };
+};
+
+type Game = readonly [game: string, date: string, away: Name, home: Name, awayPts: number, homePts: number, more?: Partial<SdvRow<'schedule'>>];
+/**
+ * `date` is ESPN's UTC instant. Game 9 is the conference tournament, on a neutral floor;
+ * game 10 has no time yet; game 11 was postponed.
+ */
 const GAMES: readonly Game[] = [
-  ['c0', '11/05/2025', 'Penn', "Saint Joseph's", 60, 70],
-  ['c1', '11/08/2025', "Saint Joseph's", 'Drexel', 60, 70],
-  ['c2', '11/12/2025', 'Widener', 'Drexel', 50, 90],
-  ['c3', '01/10/2026', 'Hofstra', 'Drexel', 65, 70],
-  ['c4', '01/20/2026', 'Drexel', 'Towson', 60, 62],
-  ['c5', '01/25/2026', 'Towson', 'Hofstra', 70, 60],
-  ['c6', '02/10/2026', 'Drexel', 'Hofstra', 55, 75],
-  ['c7', '02/15/2026', 'Towson', 'Drexel', 60, 68],
-  ['c8', '02/20/2026', 'Hofstra', 'Towson', 70, 71],
-  ['c9', '03/09/2026', 'Towson', 'Drexel', 64, 60],
-  ['c10', '03/12/2026', 'Penn', 'Drexel', null, null],
+  ['c0', '2025-11-06T00:00Z', 'Penn', "Saint Joseph's", 60, 70],
+  ['c1', '2025-11-09T00:00Z', "Saint Joseph's", 'Drexel', 60, 70],
+  ['c2', '2025-11-12T23:00Z', 'Widener', 'Drexel', 50, 90],
+  ['c12', '2025-11-15T00:00Z', 'Le Moyne', 'Penn', 55, 80],
+  ['c3', '2026-01-10T19:00Z', 'Hofstra', 'Drexel', 65, 70],
+  ['c4', '2026-01-21T00:00Z', 'Drexel', 'Towson', 60, 62],
+  ['c5', '2026-01-25T19:00Z', 'Towson', 'Hofstra', 70, 60],
+  ['c11', '2026-02-01T00:00Z', 'Hofstra', 'Drexel', 0, 0, { status_type_name: 'STATUS_POSTPONED' }],
+  ['c6', '2026-02-10T23:00Z', 'Drexel', 'Hofstra', 55, 75],
+  ['c7', '2026-02-15T19:00Z', 'Towson', 'Drexel', 60, 68],
+  ['c8', '2026-02-20T23:00Z', 'Hofstra', 'Towson', 70, 71],
+  ['c9', '2026-03-09T23:30Z', 'Towson', 'Drexel', 64, 60, { neutral_site: true }],
+  ['c10', '2026-03-12T05:00Z', 'Penn', 'Drexel', 0, 0, { time_valid: false, status_type_name: 'STATUS_SCHEDULED' }],
 ];
 
-const schedule: SdvRow<'schedule'>[] = GAMES.map(([contest_id, game_date, away, home, away_score, home_score]) =>
-  contest_id === 'c6'
-    ? { contest_id, game_date, away, home, away_score: home_score, home_score: away_score }
-    : { contest_id, game_date, away, home, away_score, home_score },
+const schedule = GAMES.map(
+  ([game_id, date, away, home, away_score, home_score, more]) =>
+    ({
+      game_id, date, time_valid: true, neutral_site: false, season_type: 2, status_type_name: 'STATUS_FINAL', home_score, away_score,
+      ...side('home', home), ...side('away', away), ...more,
+    }) as SdvRow<'schedule'>,
 );
 
-const teamBox: SdvRow<'teamBox'>[] = GAMES.flatMap(([contest_id, , away, home, awayPts, homePts]) => {
-  if (awayPts === null || homePts === null) return [];
-  const ids = (name: string) => [ncaaOf[name] ?? null, espnOf[name] ?? null] as const;
-  const [[homeNcaa, homeEspn], [awayNcaa, awayEspn]] = [ids(home), ids(away)];
+const teamBox: SdvRow<'teamBox'>[] = GAMES.flatMap(([game_id, , away, home, awayPts, homePts, more]) => {
+  if (more?.status_type_name) return [];
   return [
     [home, homePts, awayPts],
     [away, awayPts, homePts],
-  ].flatMap(([team, pts, d_pts]) => {
-    const [ncaa, espn] = ids(team as string);
-    if (!ncaa) return [];
-    return [
-      {
-        contest_id, team: team as string, home, away,
-        team_ncaa_team_id: ncaa, team_espn_team_id: espn, home_ncaa_team_id: homeNcaa, home_espn_team_id: homeEspn, away_ncaa_team_id: awayNcaa, away_espn_team_id: awayEspn,
-        pts: pts as number, d_pts: d_pts as number, fgm: 1, fga: 1, tpm: 1, tpa: 1, ftm: 1, fta: 1, orb: 2, drb: 3, ast: 1, blk: 1, to: 1,
-      },
-    ];
-  });
+  ].map(([team, team_score, opponent_team_score]) => ({
+    game_id, team_id: ESPN_TEAMS[team as Name][0], team_score: team_score as number, opponent_team_score: opponent_team_score as number,
+    field_goals_made: 1, field_goals_attempted: 1, three_point_field_goals_made: 1, three_point_field_goals_attempted: 1, free_throws_made: 1,
+    free_throws_attempted: 1, offensive_rebounds: 2, defensive_rebounds: 3, assists: 1, steals: 1, blocks: 1, turnovers: 1, fouls: 1,
+  }));
 });
 
-const line = (contest_id: string, values: readonly number[]): SdvRow<'playerBox'> => {
-  const [mins, pts, fgm, fga, tpm, tpa, ftm, fta, orb, drb, ast, stl, blk, tov, pf] = values as number[];
-  return { player_id: '9335965', team_ncaa_team_id: '100', contest_id, mins: mins!, pts: pts!, fgm: fgm!, fga: fga!, tpm: tpm!, tpa: tpa!, ftm: ftm!, fta: fta!, orb: orb!, drb: drb!, ast: ast!, stl: stl!, blk: blk!, tov: tov!, pf: pf! };
+const athlete = (athlete_id: string, team_id: string, first_name: string, last_name: string, jersey: string | null, experience: string): SdvRow<'rosters'> => ({
+  athlete_id, team_id, first_name, last_name, jersey, position_abbreviation: 'G', experience_display_value: experience,
+  birth_place_city: 'Wyndmoor', birth_place_state: 'PA', birth_place_country: 'USA',
+  headshot_href: `https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/${athlete_id}.png`,
+});
+
+const line = (game_id: string, values: readonly number[], did_not_play = false): SdvRow<'playerBox'> => {
+  const [minutes, points, fgm, fga, tpm, tpa, ftm, fta, orb, drb, ast, stl, blk, tov, pf] = values as number[];
+  return {
+    athlete_id: '5239623', team_id: '2182', game_id, did_not_play, minutes: minutes!, points: points!, field_goals_made: fgm!, field_goals_attempted: fga!,
+    three_point_field_goals_made: tpm!, three_point_field_goals_attempted: tpa!, free_throws_made: ftm!, free_throws_attempted: fta!,
+    offensive_rebounds: orb!, defensive_rebounds: drb!, assists: ast!, steals: stl!, blocks: blk!, turnovers: tov!, fouls: pf!,
+  };
 };
 
 const SOURCES: SdvSources = {
@@ -112,21 +147,22 @@ const SOURCES: SdvSources = {
     { team_id: '2603', team_name: "Saint Joseph's Hawks", conference_id: 'mbb:atlantic-10' },
     { team_id: '219', team_name: 'Pennsylvania Quakers', conference_id: 'mbb:ivy-north' },
     { team_id: '2330', team_name: 'Le Moyne Dolphins', conference_id: 'mbb:nec' },
+    { team_id: '2385', team_name: 'Mercyhurst Lakers', conference_id: 'mbb:nec' },
   ],
-  teamIds: [...SCHOOLS.map(([, name, , id]) => ({ team: name, id, conference: 'CAA' })), { team: 'Le Moyne', id: '600', conference: 'NEC' }],
   schedule,
   teamBox,
-  priorTeamBox: [],
-  teamRosters: [
-    { player_id: '9335965', team_id: '100', clean_name: 'Josh Reed', jersey: '5', class: 'So.', position: 'G', hometown: 'Wyndmoor, PA' },
-    { player_id: '1', team_id: '100', clean_name: 'Sam Nojersey', jersey: null, class: 'Fr.', position: 'F', hometown: null },
-    { player_id: '2', team_id: '600', clean_name: 'Lee Dolphin', jersey: '3', class: '---', position: '', hometown: null },
+  rosters: [
+    athlete('5239623', '2182', 'Josh', 'Reed', '5', 'Sophomore'),
+    athlete('1', '2182', 'Sam', 'Nojersey', null, 'Freshman'),
+    athlete('2', '9001', 'Lee', 'Widener', '3', 'Junior'),
   ],
+  // Last season's file now holds this season's roster; with box scores published it is not compared.
+  priorRosters: [{ athlete_id: '5239623', team_id: '2182', experience_display_value: 'Sophomore' }],
   playerBox: [
     line('c1', [30.4, 20, 8, 15, 2, 5, 2, 2, 1, 4, 3, 1, 0, 2, 3]),
     line('c3', [25.2, 10, 4, 9, 0, 1, 2, 4, 0, 6, 5, 2, 1, 1, 2]),
     line('c3', [25.2, 10, 4, 9, 0, 1, 2, 4, 0, 6, 5, 2, 1, 1, 2]),
-    line('c4', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    line('c4', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], true),
   ],
 };
 
@@ -135,8 +171,8 @@ const plan = sportsdataverseEdits(world, SOURCES, { program: 'mbb', season, game
 const teamSeason = (school: string) => putValues(plan.edits, 'teamSeason').find((row) => row.teamId === `${school}-mbb`);
 
 describe('sportsdataverseEdits', () => {
-  test('records count every game; the conference record stops at the regular season; streaks and ranks follow', () => {
-    const rows = ['drexel', 'hofstra', 'towson', 'saint-josephs', 'pennsylvania'].map((school) => {
+  test('records count every final; the conference record stops at the regular season; streaks and ranks follow', () => {
+    const rows = ['drexel', 'hofstra', 'towson', 'saint-josephs', 'pennsylvania', 'le-moyne'].map((school) => {
       const row = teamSeason(school)!;
       return [school, row.conferenceId, `${row.overall.wins}-${row.overall.losses}`, `${row.conference.wins}-${row.conference.losses}`, row.streak, row.rank];
     });
@@ -145,7 +181,8 @@ describe('sportsdataverseEdits', () => {
       ['hofstra', 'caa', '1-3', '1-3', 'L1', 3],
       ['towson', 'caa', '4-1', '3-1', 'W2', 1],
       ['saint-josephs', 'a-10', '1-1', '0-0', 'L1', null],
-      ['pennsylvania', null, '0-1', '0-0', 'L1', null],
+      ['pennsylvania', null, '1-1', '0-0', 'W1', null],
+      ['le-moyne', 'nec', '0-1', '0-0', 'L1', null],
     ]);
   });
 
@@ -153,16 +190,17 @@ describe('sportsdataverseEdits', () => {
     expect(teamSeason('drexel')!.stats).toEqual({
       sport: 'basketball',
       gp: 7,
-      totals: { min: 0, pts: 473, fgm: 7, fga: 7, tpm: 7, tpa: 7, ftm: 7, fta: 7, reb: 35, ast: 7, stl: 0, blk: 7, to: 7, pf: 0 },
+      totals: { min: 0, pts: 473, fgm: 7, fga: 7, tpm: 7, tpa: 7, ftm: 7, fta: 7, reb: 35, ast: 7, stl: 7, blk: 7, to: 7, pf: 7 },
       opponentPts: 436,
     });
   });
 
-  test('a roster row becomes a player keyed by its NCAA id, with season totals from the player box', () => {
+  test('a roster row becomes a player keyed by its ESPN id, with season totals from the games he played', () => {
     expect(putValues(plan.edits, 'player')).toEqual([
       {
         id: 'drexel-mbb@2025-26/reed-josh', teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Josh', lastName: 'Reed', jersey: '5', position: 'G',
-        classYear: 'SO', redshirt: false, hometown: 'Wyndmoor, PA', headshot: null, motionHeadshot: null, sourceKey: 'ncaa:9335965',
+        classYear: 'SO', redshirt: false, hometown: 'Wyndmoor, PA',
+        headshot: 'https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/5239623.png', motionHeadshot: null, sourceKey: 'espn:5239623',
       },
     ] as never);
     expect(putValues(plan.edits, 'playerStats')).toEqual([
@@ -173,61 +211,112 @@ describe('sportsdataverseEdits', () => {
     ] as never);
   });
 
-  test("each Drexel home game is a game at 7 pm New York time, in Eastern Standard or Daylight Time", () => {
+  test("each Drexel home game starts at its New York time on its New York day, or 7 pm when ESPN has no time; neutral and postponed games are not home games", () => {
     expect(putValues(plan.edits, 'game').map((game) => [game.id, game.startsAt, game.venueId, game.conferenceGame])).toEqual([
       ['2025-26/2025-11-08/saint-josephs-mbb.at.drexel-mbb', '2025-11-08T19:00:00-05:00', 'daskalakis-athletic-center', false],
-      ['2025-26/2026-01-10/hofstra-mbb.at.drexel-mbb', '2026-01-10T19:00:00-05:00', 'daskalakis-athletic-center', true],
-      ['2025-26/2026-02-15/towson-mbb.at.drexel-mbb', '2026-02-15T19:00:00-05:00', 'daskalakis-athletic-center', true],
-      ['2025-26/2026-03-09/towson-mbb.at.drexel-mbb', '2026-03-09T19:00:00-04:00', 'daskalakis-athletic-center', true],
+      ['2025-26/2026-01-10/hofstra-mbb.at.drexel-mbb', '2026-01-10T14:00:00-05:00', 'daskalakis-athletic-center', true],
+      ['2025-26/2026-02-15/towson-mbb.at.drexel-mbb', '2026-02-15T14:00:00-05:00', 'daskalakis-athletic-center', true],
       ['2025-26/2026-03-12/pennsylvania-mbb.at.drexel-mbb', '2026-03-12T19:00:00-04:00', 'daskalakis-athletic-center', false],
     ]);
   });
 
-  test("before a season's team box exists, last season's box joins the schedule's names, so home games load", () => {
-    const next = SeasonId.parse('2026-27');
-    const unpublished = Object.fromEntries(SDV_DATASET_NAMES.map((dataset) => [dataset, null])) as unknown as SdvSources;
-    const upcoming = sportsdataverseEdits(
-      world,
+  test('a Division I team with no school gets one from the schedule, kept if it exists; a school we have is not written', () => {
+    const schools = plan.edits.filter((edit) => edit.op === 'put' && edit.kind === 'school');
+    expect(schools).toEqual([
       {
-        ...unpublished,
-        teamIds: SCHOOLS.map(([, name, , ncaa]) => ({ team: name, id: `9${ncaa}`, conference: 'CAA' })),
-        schedule: [{ contest_id: 'n1', game_date: '11/04/2026', home: 'Drexel', away: 'Hofstra', home_score: null, away_score: null }],
-        priorTeamBox: teamBox,
+        op: 'put',
+        kind: 'school',
+        onExisting: 'keep',
+        value: {
+          id: 'le-moyne', name: 'Le Moyne', shortName: 'Le Moyne', mascot: 'Dolphins', abbreviation: 'LEM', primaryColor: '#333333', secondaryColor: '#ffffff',
+          logo: 'https://a.espncdn.com/i/teamlogos/ncaa/500/2330.png', website: null, espnId: '2330',
+        },
       },
-      { program: 'mbb', season: next, gamesFor: HOME },
-    );
-    expect(putValues(upcoming.edits, 'game').map((game) => [game.id, game.startsAt, game.conferenceGame])).toEqual([
-      ['2026-27/2026-11-04/hofstra-mbb.at.drexel-mbb', '2026-11-04T19:00:00-05:00', true],
-    ]);
-    expect(upcoming.warnings.map((warning) => warning.code)).toEqual(['not-published']);
+    ] as never);
+    const curated = commit(world, [{ op: 'put', kind: 'school', value: parseEntity('school', { ...schools[0]!.value, name: 'Le Moyne College', primaryColor: '#00573f' }) }]);
+    const after = commit(curated, sportsdataverseEdits(curated, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits);
+    expect([after.get('school', 'le-moyne' as never)?.name, after.get('school', 'le-moyne' as never)?.primaryColor]).toEqual(['Le Moyne College', '#00573f']);
+    expect(after.get('school', 'drexel' as never)).toEqual(world.get('school', 'drexel' as never));
   });
 
   test('warnings name what the files hold that we cannot place', () => {
-    expect(plan.warnings.map((warning) => [warning.code, warning.subjects])).toEqual([
-      ['unmatched-team', ['Le Moyne', 'Le Moyne Dolphins']],
-      ['unknown-conference', ['ivy-north']],
-      ['no-jersey', ['Sam Nojersey (Drexel)']],
-      ['unmatched-opponent', ['Widener, 2025-11-12']],
+    expect(plan.warnings.map((warning) => [warning.code, warning.message, warning.subjects])).toEqual([
+      ['unmatched-team', '1 team has no school and no game in the schedule to make one from; skipped', ['Mercyhurst Lakers']],
+      ['unknown-conference', '1 conference label names no conference we have; those teams keep theirs', ['ivy-north']],
+      ['no-jersey', '1 player has no jersey number; skipped', ['Sam Nojersey (Drexel)']],
+      ['unmatched-opponent', '1 home game is against a team we have no school for; skipped', ['Widener, 2025-11-12']],
     ]);
     expect(plan.summary).toEqual({
-      rows: { groups: 6, teamIds: 6, schedule: 11, teamBox: 19, priorTeamBox: 0, teamRosters: 3, playerBox: 4 },
-      teamSeasons: 5,
+      rows: { groups: 7, schedule: 13, teamBox: 22, rosters: 3, priorRosters: 1, playerBox: 4 },
+      teamSeasons: 6,
+      newSchools: 1,
       players: 1,
       playerStats: 1,
-      games: 5,
+      games: 4,
     });
+  });
+
+  test('a new school whose id another school has is warned about, not written', () => {
+    const imposter = { ...SOURCES, groups: [{ team_id: '7777', team_name: 'Drexel Imposters', conference_id: 'mbb:caa' }] };
+    const imposterGame = { ...schedule[1]!, game_id: 'x1', away_id: '7777', away_location: 'Drexel' };
+    const next = sportsdataverseEdits(world, { ...imposter, schedule: [imposterGame] }, { program: 'mbb', season, gamesFor: null });
+    expect(putValues(next.edits, 'school')).toEqual([]);
+    expect(next.warnings.find((warning) => warning.code === 'school-id-taken')?.subjects).toEqual(['Drexel Imposters (drexel)']);
   });
 
   test('a second plan on the committed World changes nothing', () => {
     const after = commit(world, plan.edits);
     expect(after.get('player', 'drexel-mbb@2025-26/reed-josh' as never)?.jersey).toBe('5');
-    expect(unchanged(after, sportsdataverseEdits(after, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits)).toEqual([]);
+    expect(changing(after, sportsdataverseEdits(after, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits)).toEqual([]);
+  });
+
+  test('a player an earlier load keyed by his NCAA id is matched by name and takes the ESPN key', () => {
+    const ncaa = commit(world, [
+      {
+        op: 'put',
+        kind: 'player',
+        value: parseEntity('player', { id: 'drexel-mbb@2025-26/reed-josh', teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Josh', lastName: 'Reed', jersey: '5', sourceKey: 'ncaa:9335965' }),
+      },
+    ]);
+    const after = commit(ncaa, sportsdataverseEdits(ncaa, SOURCES, { program: 'mbb', season, gamesFor: HOME }).edits);
+    expect(after.all('player').map((player) => [player.id, player.sourceKey])).toEqual([['drexel-mbb@2025-26/reed-josh', 'espn:5239623']]);
+    expect(after.get('playerStats', 'drexel-mbb@2025-26/reed-josh' as never)?.stats.gp).toBe(2);
+  });
+
+  test("before tip-off, a roster whose returning players are all still in last season's class is skipped; one that moved up is planned", () => {
+    const next = SeasonId.parse('2026-27');
+    const upcoming = sportsdataverseEdits(
+      world,
+      {
+        ...unpublished,
+        groups: SOURCES.groups,
+        rosters: [
+          athlete('5239623', '2182', 'Josh', 'Reed', '5', 'Sophomore'),
+          athlete('6000001', '2182', 'New', 'Dragon', '12', 'Freshman'),
+          athlete('6000002', '2275', 'Pat', 'Pride', '3', 'Sophomore'),
+          athlete('6000003', '2275', 'Fresh', 'Face', '4', 'Freshman'),
+        ],
+        priorRosters: [
+          { athlete_id: '5239623', team_id: '2182', experience_display_value: 'Sophomore' },
+          { athlete_id: '6000002', team_id: '2275', experience_display_value: 'Freshman' },
+        ],
+      },
+      { program: 'mbb', season: next, gamesFor: HOME },
+    );
+    expect(putValues(upcoming.edits, 'player').map((player) => [player.id, player.classYear])).toEqual([
+      ['hofstra-mbb@2026-27/pride-pat', 'SO'],
+      ['hofstra-mbb@2026-27/face-fresh', 'FR'],
+    ]);
+    expect(upcoming.warnings.find((warning) => warning.code === 'stale-roster')).toEqual({
+      code: 'stale-roster',
+      message: "1 team's roster is last season's, copied forward; not loaded",
+      subjects: ['Drexel'],
+    });
   });
 
   test('with only groups published, conferences change and records stay', () => {
     const before = commit(world, plan.edits);
-    const groupsOnly = Object.fromEntries(SDV_DATASET_NAMES.map((dataset) => [dataset, null])) as unknown as SdvSources;
-    const moved = { ...groupsOnly, groups: [{ team_id: '2182', team_name: 'Drexel Dragons', conference_id: 'mbb:atlantic-10' }] };
+    const moved = { ...unpublished, groups: [{ team_id: '2182', team_name: 'Drexel Dragons', conference_id: 'mbb:atlantic-10' }] };
     const next = sportsdataverseEdits(before, moved, { program: 'mbb', season, gamesFor: HOME });
     expect(putValues(next.edits, 'teamSeason').map((row) => [row.id, row.conferenceId, row.overall, row.rank])).toEqual([
       ['drexel-mbb@2025-26', 'a-10', { wins: 4, losses: 3 }, 2],
@@ -235,14 +324,13 @@ describe('sportsdataverseEdits', () => {
     expect(next.warnings).toEqual([
       {
         code: 'not-published',
-        message: '6 datasets are not published for this season yet',
+        message: '5 datasets are not published for this season yet',
         subjects: [
-          'ncaa_mbb_player_box/ncaa_mbb_player_box_2026',
-          'ncaa_mbb_schedule/ncaa_mbb_schedule_2026',
-          'ncaa_mbb_team_box/ncaa_mbb_team_box_2025',
-          'ncaa_mbb_team_box/ncaa_mbb_team_box_2026',
-          'ncaa_mbb_team_ids/ncaa_mbb_team_ids_2026',
-          'ncaa_mbb_team_rosters/ncaa_mbb_team_rosters_2026',
+          'espn_mens_college_basketball_player_boxscores/player_box_2026',
+          'espn_mens_college_basketball_rosters/rosters_2025',
+          'espn_mens_college_basketball_rosters/rosters_2026',
+          'espn_mens_college_basketball_schedules/mbb_schedule_2026',
+          'espn_mens_college_basketball_team_boxscores/team_box_2026',
         ],
       },
     ]);
