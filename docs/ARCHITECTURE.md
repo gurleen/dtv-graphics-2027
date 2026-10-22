@@ -21,6 +21,7 @@ packages/playout        @dtv/playout: scene facts, the registry kit, the show re
 packages/graphics       @dtv/graphics: GRAPHICS, the one list of graphics, and parseCue
 packages/renderer       @dtv/renderer: draws output frames. The only code that touches the Rive runtime.
 packages/api            @dtv/api: the oRPC contract and the client helpers
+packages/sportsdataverse @dtv/sportsdataverse: downloads and reads the sportsdataverse parquet files
 packages/live-*         live-data packages (later)
 apps/server             Bun.serve: the store (the one writer), the oRPC router, static files
 apps/controller         React: the show page and the data page
@@ -37,6 +38,7 @@ apps/site               the stakeholder site: build script and viewer
 | `@dtv/graphics` | basketball-v2, playout, domain, zod |
 | `@dtv/renderer` | playout, domain, `@rive-app/canvas-single` |
 | `@dtv/api` | playout, domain, zod, `@orpc/*`, partysocket |
+| `@dtv/sportsdataverse` | domain, hyparquet, hyparquet-compressors |
 | `apps/server` | api, db, graphics, playout, domain, zod, `@orpc/server`, and the controller and `/renderer` pages as HTML imports |
 | `apps/controller` | api, renderer, graphics, playout, domain, react, React Aria Components, `@fontsource`; its proofs may import playwright |
 | `apps/renderer` | api, renderer, graphics |

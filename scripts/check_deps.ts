@@ -23,6 +23,7 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'graphics/basketball-v2/generate_': ['node:path'],
   'packages/graphics': ['@dtv/basketball-v2', '@dtv/playout', '@dtv/domain', 'zod'],
   'packages/renderer': ['@dtv/playout', '@dtv/domain', '@rive-app/canvas-single'],
+  'packages/sportsdataverse': ['@dtv/domain', 'hyparquet', 'hyparquet-compressors'],
   'packages/api': ['@dtv/playout', '@dtv/domain', '@orpc/*', 'partysocket', 'zod'],
   'packages/live-': ['@dtv/api', '@dtv/domain'],
   'apps/server': ['@dtv/api', '@dtv/db', '@dtv/controller', '@dtv/graphics', '@dtv/playout', '@dtv/domain', '@dtv/renderer-page', '@orpc/server', 'zod', 'node:fs', 'node:path'],
