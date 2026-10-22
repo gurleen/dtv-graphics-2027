@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button, Header, Input, ListBox, ListBoxItem, ListBoxSection, SearchField } from 'react-aria-components';
 import { useController } from '../app/context';
+import { LoadDialog } from './load-dialog';
 import { pinnedTeams, readRecent, searchTeams, teamEntries, touchRecent, writeRecent } from './teams';
 import { LISTS, type ListId, type View } from './types';
 
@@ -13,6 +14,7 @@ export function TeamList({ view, onView }: { readonly view: View | null; readonl
   const active = useController().show?.game ?? null;
   const [query, setQuery] = useState('');
   const [recent, setRecent] = useState(() => readRecent(localStorage));
+  const [loading, setLoading] = useState(false);
   const entries = useMemo(() => (world ? teamEntries(world) : []), [world]);
   const game = active && world ? world.get('game', active.id) : undefined;
   const pinned = pinnedTeams(entries, game ? [game.homeTeamId, game.awayTeamId] : [], recent);
@@ -40,7 +42,11 @@ export function TeamList({ view, onView }: { readonly view: View | null; readonl
 
   return (
     <section className="panel team-list" aria-label="Teams">
-      <h2 className="panel-title">Teams</h2>
+      <div className="panel-head">
+        <h2 className="panel-title">Teams</h2>
+        <Button className="button small" onPress={() => setLoading(true)}>Load…</Button>
+      </div>
+      {loading && <LoadDialog onClose={() => setLoading(false)} />}
       <SearchField className="search" aria-label="Search teams" value={query} onChange={setQuery} onSubmit={() => results[0] && open(`team:${results[0].team.id}`)}>
         <Input placeholder={`Search ${schools} schools…`} />
         <Button className="search-clear" aria-label="Clear search">
