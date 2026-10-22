@@ -127,4 +127,5 @@ lsof -nP -iTCP:8998 -sTCP:LISTEN     # prints nothing once it is down
 - `journeys/take.ts` takes a cue through preview, Take and program, and checks the controller, `/renderer` and the API at each step.
 - `journeys/restart.ts` puts two graphics on air, runs `dtv.sh stop` and `start` on the same DB, and checks the badge, the layer states, the API and that no page reloaded.
 - `journeys/next.ts` takes a one-step lower third with the scorebug on air, presses N, and checks the lower third leaves program while the scorebug stays.
+- `journeys/load.ts` loads sportsdataverse seasons on the data page and reads the records, players and home games back over the API. It needs the network.
 - `journeys/score.ts` airs the scorebug with key 1, checks the score bar has no controls, adds 3 to Drexel's score over `game.apply`, and checks the score bar, the live game over the API and the scorebug's bound score on `/renderer`.

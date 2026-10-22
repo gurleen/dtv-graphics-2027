@@ -11,6 +11,7 @@ The data page (`#/data`) is where an operator corrects reference data before or 
 - `data-branding` edits a school colour, or overrides a team's branding.
 - `data-game-record` edits a game's event title and crew from the `Games` list.
 - `data-search` filters the team list with the `Search teams` searchbox.
+- `data-load` loads a program-season from sportsdataverse with `Load…` in the team list header. The dialog picks `Program` and `Season`, and `Load` downloads the files from GitHub and commits them. `[data-testid="load-report"]` shows rows inserted and updated, locked fields skipped, the time, each dataset's row count or `not published`, and the warnings, each a `<details>` that lists its teams or files. A second load of the same season reads `Nothing changed`.
 
 ## How to get to it (user POV)
 
@@ -30,6 +31,11 @@ Preconditions:
 - **Import.** In `Saint Joseph's · MBB`, a position is locked first (`G/F`). Then a CSV with six rows goes through the file chooser of `Import CSV`. `.import-summary` reads `1 added`, `2 updated`, `1 unchanged`, `1 field skipped (locked)`, `1 missing` and `1 bad row`, and the bad row names `line 7`. Planning writes nothing. With the `.prune` box ticked, `Apply` adds Ty House, removes Marrs and keeps `G/F`. The same file again reads `Nothing to do`, and `Apply` is disabled.
 - **Edits.** `Primary colour` `0b2a4a` saves as `#0b2a4a` and locks `primaryColor`. The override `#123456` lands on the team's branding. `Abbreviation` `TOOLONG` is refused in place. In `Games`, setting the event title to `Big 5 Classic` and removing crew member 3 saves both; the show locks `crew` and the game locks `title`.
 - **Journey form.** `s.operator('alex', 'data')`, then `getByRole('option', { name: 'Drexel · MBB', exact: true })`, and wait for `.data-table`. Read `world()` after every save.
+
+## Driving the load with journeys/load.ts
+
+- **Run.** `.claude/skills/verify/journeys/load.ts --port=8998` against a `dtv.sh up` instance. It needs the network: it loads MBB 2025-26 twice, WBB 2025-26 and MBB 2026-27 from GitHub, screenshots each report, and reads Drexel's records, Josh Reed and the home games back over `world()`.
+- Only groups (conferences) are published for 2026-27 so far, so that load reports five datasets as not published and changes only conferences.
 
 ## Gotchas
 
