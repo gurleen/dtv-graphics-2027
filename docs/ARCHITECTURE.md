@@ -178,7 +178,7 @@ takes the ESPN key of the row that is him: the same name once diacritics and suf
 jersey with the first name or a family-name token. A finished season's roster file is rebuilt from what ESPN serves
 later and can leave out players who played, so a player missing from it but named in the player box is matched there.
 Any other `ncaa:` player of a team-season ESPN describes is deleted with his stats, unless a show's cue, a live game
-or a lock holds him; then he stays and the report warns `ncaa-player-kept`. A Division I team with no school gets one, named and coloured from the schedule
+or a lock on him or his stats holds him; then he stays and the report warns `ncaa-player-kept`. A Division I team with no school gets one, named and coloured from the schedule
 (`onExisting: 'keep'`, so a curated edit stands). A game's day is its New York day, and it starts at ESPN's time
 when ESPN has one and at 7 pm New York time otherwise; a neutral-site game is not a home game. Only finals count,
 postseason included. Rank breaks a tie in conference record head to head, then by overall win percentage. The

@@ -322,6 +322,18 @@ describe('sportsdataverseEdits', () => {
     expect([changing(after, again.edits), again.summary.rematched, again.summary.removed]).toEqual([[], 0, 0]);
   });
 
+  test('an NCAA-keyed player ESPN lacks is kept while a person has locked a field of his stats', () => {
+    const id = 'drexel-mbb@2025-26/gone-old';
+    const ncaa = commit(world, [
+      { op: 'put', kind: 'player', value: parseEntity('player', { id, teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Old', lastName: 'Gone', jersey: '0', sourceKey: 'ncaa:3' }) },
+      { op: 'put', kind: 'playerStats', value: parseEntity('playerStats', { id, stats: { sport: 'basketball', gp: 3, totals: { pts: 31 } } }) },
+    ]).snapshot;
+    const locked = indexWorld({ ...ncaa, locks: { ...ncaa.locks, playerStats: { [id]: [{ field: 'stats', actor: 'alex', at: null }] } } });
+    const next = sportsdataverseEdits(locked, SOURCES, OPTIONS);
+    expect(next.edits.filter((edit) => edit.op === 'delete')).toEqual([]);
+    expect([next.summary.removed, next.warnings.find((warning) => warning.code === 'ncaa-player-kept')?.subjects]).toEqual([0, ['Old Gone (Drexel)']]);
+  });
+
   test("an NCAA-keyed player missing from ESPN's roster file but in its player box takes the box's key and stats", () => {
     const ncaa = commit(world, [
       { op: 'put', kind: 'player', value: parseEntity('player', { id: 'drexel-mbb@2025-26/spearman-zee', teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Zee', lastName: 'Spearman', jersey: '11', sourceKey: 'ncaa:7' }) },

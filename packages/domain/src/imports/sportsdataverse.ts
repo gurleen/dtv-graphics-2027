@@ -548,7 +548,8 @@ function rosterEdits(
         rematched++;
         continue;
       }
-      if (context.inUse.has(player.id) || world.locks('player', player.id).length) {
+      // Deleting the player takes his stats row too, so a lock on either keeps him.
+      if (context.inUse.has(player.id) || world.locks('player', player.id).length || world.locks('playerStats', player.id).length) {
         context.warn('ncaa-player-kept', `${player.firstName} ${player.lastName} (${school.name})`);
         continue;
       }
