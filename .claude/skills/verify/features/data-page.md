@@ -34,8 +34,8 @@ Preconditions:
 
 ## Driving the load with journeys/load.ts
 
-- **Run.** `.claude/skills/verify/journeys/load.ts --port=8998` against a `dtv.sh up` instance. It needs the network: it loads MBB 2025-26 twice, WBB 2025-26 and MBB 2026-27 from GitHub, screenshots each report, and reads Drexel's records, Josh Reed and the home games back over `world()`.
-- Only groups (conferences) are published for 2026-27 so far, so that load reports five datasets as not published and changes only conferences.
+- **Run.** `.claude/skills/verify/journeys/load.ts --port=8998` against a `dtv.sh up` instance. It needs the network: it loads MBB 2025-26 twice, WBB 2025-26, MBB 2026-27 and WBB 2026-27 from GitHub, screenshots each report, and reads the CAA table, Drexel's stats, Josh Reed, the home games and the new schools back over `world()`.
+- The loader reads ESPN's files: groups, schedule, team and player box scores, rosters and last season's rosters. For 2026-27 the box scores are not published yet and ESPN's rosters are last season's copied forward, so those loads write conferences and Drexel's home games and report every roster as `stale-roster`.
 
 ## Gotchas
 
