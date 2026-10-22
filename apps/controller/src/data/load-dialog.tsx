@@ -9,11 +9,10 @@ import { Pick } from './pick';
 
 const DATASET_LABELS: { readonly [D in SdvDataset]: string } = {
   groups: 'Conferences',
-  teamIds: 'Team ids',
   schedule: 'Schedule',
   teamBox: 'Team box scores',
-  priorTeamBox: "Last season's team box scores",
-  teamRosters: 'Rosters',
+  rosters: 'Rosters',
+  priorRosters: "Last season's rosters",
   playerBox: 'Player box scores',
 };
 
@@ -59,8 +58,8 @@ function Report({ report }: { readonly report: SdvLoadReport }) {
         })}
       </p>
       <p className="faint">
-        {count(report.summary.teamSeasons, 'team')}, {count(report.summary.players, 'player')}, {count(report.summary.playerStats, 'player stat line')},{' '}
-        {count(report.summary.games, 'Drexel home game')} in the files.
+        {count(report.summary.teamSeasons, 'team')} ({count(report.summary.newSchools, 'new school')}), {count(report.summary.players, 'player')},{' '}
+        {count(report.summary.playerStats, 'player stat line')}, {count(report.summary.games, 'Drexel home game')} in the files.
       </p>
       {report.warnings.length > 0 && (
         <ul className="load-warnings">
@@ -101,7 +100,7 @@ export function LoadDialog({ onClose }: { readonly onClose: () => void }) {
         <Dialog className="dialog" aria-label="Load from sportsdataverse">
           <Heading slot="title">Load from sportsdataverse</Heading>
           <p className="hint">
-            Downloads the season's NCAA files and writes conferences, records, standings, team and player stats, rosters and Drexel's home games.
+            Downloads the season's ESPN files and writes conferences, records, standings, team and player stats, rosters and Drexel's home games.
             Locked fields stay as they are.
           </p>
           <div className="dlg-grid">

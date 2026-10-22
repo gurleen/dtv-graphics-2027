@@ -1,92 +1,127 @@
 /**
- * sportsdataverse's NCAA basketball files as import edits: each team's conference, record,
+ * sportsdataverse's ESPN basketball files as import edits: each team's conference, record,
  * streak, rank and season stats, rosters with season stats, and one school's home games.
  *
- * The files name a team three ways. Groups and the team box carry ESPN ids, which match
- * `School.espnId`; the team ids, rosters and player box carry NCAA ids, and the schedule NCAA
- * names. The team box pairs NCAA and ESPN ids, so it is the join. NCAA ids change every season
- * and names do not, so last season's team box joins schedule names before this season's box
- * exists, which is how a season's home games load before it tips off. `ncaa_<g>_rosters` is not
- * read: it has only the team name, `JOSH.REED` and games played, and the team rosters cover it.
+ * Every file keys a team by its ESPN id, which is `School.espnId`. A Division I team (the
+ * groups file) with no school yet gets one, described by the schedule; teams.json stays the
+ * curated branding of every school it has. ESPN copies last season's rosters forward before
+ * the new ones are out, so before a season's box scores exist a roster whose returning
+ * players are all still in last season's class is skipped rather than loaded as this season's.
  */
 
 import { z } from 'zod';
 import { type ImportEdit, importPut } from '../edits';
-import { type EntityKind, type Game, Player, type School, Season, Team, TeamSeason } from '../entities';
+import { type EntityKind, type Game, Player, School, Season, Team, TeamSeason } from '../entities';
 import { type ConferenceId, idFor, type SchoolId, type SeasonId, slugify, type TeamId, type VenueId } from '../ids';
-import type { Revision } from '../primitives';
+import { type Revision, Url } from '../primitives';
 import type { ProgramCode } from '../programs';
 import type { BasketballTeamSeasonStats } from '../sports/basketball';
 import type { World } from '../world';
+import { FALLBACK_PRIMARY, FALLBACK_SECONDARY, toColor } from './espn';
 import { parseClass, parsePosition, planRoster, type RosterRow } from './roster';
 import { type Result, standings } from './standings';
 
-const id = z.string().min(1);
+/** ESPN ids arrive as numbers in some files and strings in others. */
+const id = z.union([z.string().min(1), z.number().int()]).transform(String);
 /** A count; the files leave some cells empty. */
 const stat = z.number().nullable().transform((value) => value ?? 0);
+const text = z.string().nullable();
+
+/** The program's name in ESPN's release paths. */
+const ESPN_LEAGUE: { readonly [P in ProgramCode]: string } = { mbb: 'mens', wbb: 'womens' };
+const espn = (g: ProgramCode, dataset: string) => `espn_${ESPN_LEAGUE[g]}_college_basketball_${dataset}`;
+
+const rosterRow = z.object({
+  athlete_id: id,
+  team_id: id,
+  first_name: z.string(),
+  last_name: z.string(),
+  jersey: text,
+  position_abbreviation: text,
+  experience_display_value: text,
+  birth_place_city: text,
+  birth_place_state: text,
+  birth_place_country: text,
+  headshot_href: text,
+});
 
 /** Each dataset this importer reads, the columns it reads, and where it is published. `<g>` is the program, `<y>` the season's end year. */
 export const SDV_DATASETS = {
   groups: {
     path: (g: ProgramCode, y: number) => `${g}_groups/${g}_team_group_seasons_${y}`,
-    row: z.object({ team_id: id, team_name: z.string().nullable(), conference_id: z.string().nullable() }),
-  },
-  teamIds: {
-    path: (g: ProgramCode, y: number) => `ncaa_${g}_team_ids/ncaa_${g}_team_ids_${y}`,
-    row: z.object({ team: z.string(), id, conference: z.string().nullable() }),
+    row: z.object({ team_id: id, team_name: text, conference_id: text }),
   },
   schedule: {
-    path: (g: ProgramCode, y: number) => `ncaa_${g}_schedule/ncaa_${g}_schedule_${y}`,
+    path: (g: ProgramCode, y: number) => `${espn(g, 'schedules')}/${g}_schedule_${y}`,
     row: z.object({
-      contest_id: id,
-      game_date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/),
-      home: z.string(),
-      away: z.string(),
+      game_id: id,
+      /** UTC, `2026-02-27T00:00Z`; a placeholder at 05:00Z when `time_valid` is false. */
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?Z$/),
+      time_valid: z.boolean(),
+      neutral_site: z.boolean(),
+      season_type: z.number(),
+      status_type_name: z.string(),
+      home_id: id,
+      away_id: id,
       home_score: z.number().nullable(),
       away_score: z.number().nullable(),
+      home_location: text,
+      away_location: text,
+      home_name: text,
+      away_name: text,
+      home_abbreviation: text,
+      away_abbreviation: text,
+      home_short_display_name: text,
+      away_short_display_name: text,
+      home_color: text,
+      away_color: text,
+      home_alternate_color: text,
+      away_alternate_color: text,
+      home_logo: text,
+      away_logo: text,
     }),
   },
   teamBox: {
-    path: (g: ProgramCode, y: number) => `ncaa_${g}_team_box/ncaa_${g}_team_box_${y}`,
+    path: (g: ProgramCode, y: number) => `${espn(g, 'team_boxscores')}/team_box_${y}`,
     row: z.object({
-      contest_id: id,
-      team: z.string(),
-      home: z.string(),
-      away: z.string(),
-      team_ncaa_team_id: id.nullable(),
-      team_espn_team_id: id.nullable(),
-      home_ncaa_team_id: id.nullable(),
-      home_espn_team_id: id.nullable(),
-      away_ncaa_team_id: id.nullable(),
-      away_espn_team_id: id.nullable(),
-      pts: stat, d_pts: stat, fgm: stat, fga: stat, tpm: stat, tpa: stat, ftm: stat, fta: stat, orb: stat, drb: stat, ast: stat, blk: stat, to: stat,
-    }),
-  },
-  /** Last season's team box, for its names: the join before this season's box is published. */
-  priorTeamBox: {
-    path: (g: ProgramCode, y: number) => `ncaa_${g}_team_box/ncaa_${g}_team_box_${y - 1}`,
-    row: z.object({ home: z.string(), away: z.string(), home_espn_team_id: id.nullable(), away_espn_team_id: id.nullable() }),
-  },
-  teamRosters: {
-    path: (g: ProgramCode, y: number) => `ncaa_${g}_team_rosters/ncaa_${g}_team_rosters_${y}`,
-    row: z.object({
-      player_id: id,
+      game_id: id,
       team_id: id,
-      clean_name: z.string(),
-      jersey: z.string().nullable(),
-      class: z.string().nullable(),
-      position: z.string().nullable(),
-      hometown: z.string().nullable(),
+      team_score: stat,
+      opponent_team_score: stat,
+      field_goals_made: stat,
+      field_goals_attempted: stat,
+      three_point_field_goals_made: stat,
+      three_point_field_goals_attempted: stat,
+      free_throws_made: stat,
+      free_throws_attempted: stat,
+      offensive_rebounds: stat,
+      defensive_rebounds: stat,
+      assists: stat,
+      steals: stat,
+      blocks: stat,
+      turnovers: stat,
+      fouls: stat,
     }),
+  },
+  rosters: {
+    path: (g: ProgramCode, y: number) => `${espn(g, 'rosters')}/rosters_${y}`,
+    row: rosterRow,
+  },
+  /** Last season's rosters, to tell this season's from a copy of them. */
+  priorRosters: {
+    path: (g: ProgramCode, y: number) => `${espn(g, 'rosters')}/rosters_${y - 1}`,
+    row: rosterRow.pick({ athlete_id: true, team_id: true, experience_display_value: true }),
   },
   playerBox: {
-    path: (g: ProgramCode, y: number) => `ncaa_${g}_player_box/ncaa_${g}_player_box_${y}`,
+    path: (g: ProgramCode, y: number) => `${espn(g, 'player_boxscores')}/player_box_${y}`,
     row: z.object({
-      player_id: id.nullable(),
-      team_ncaa_team_id: id.nullable(),
-      contest_id: id,
-      mins: stat, pts: stat, fgm: stat, fga: stat, tpm: stat, tpa: stat, ftm: stat, fta: stat,
-      orb: stat, drb: stat, ast: stat, stl: stat, blk: stat, tov: stat, pf: stat,
+      athlete_id: id.nullable(),
+      team_id: id,
+      game_id: id,
+      did_not_play: z.boolean(),
+      minutes: stat, points: stat, field_goals_made: stat, field_goals_attempted: stat, three_point_field_goals_made: stat,
+      three_point_field_goals_attempted: stat, free_throws_made: stat, free_throws_attempted: stat, offensive_rebounds: stat,
+      defensive_rebounds: stat, assists: stat, steals: stat, blocks: stat, turnovers: stat, fouls: stat,
     }),
   },
 } as const;
@@ -101,7 +136,7 @@ export type SdvSources = { readonly [D in SdvDataset]: readonly SdvRow<D>[] | nu
 export const sdvYear = (season: SeasonId) => Number(season.slice(0, 4)) + 1;
 
 export interface SdvWarning {
-  readonly code: 'not-published' | 'unmatched-team' | 'unknown-conference' | 'no-jersey' | 'unmatched-opponent';
+  readonly code: 'not-published' | 'unmatched-team' | 'school-id-taken' | 'unknown-conference' | 'stale-roster' | 'no-jersey' | 'unmatched-opponent';
   readonly message: string;
   /** What it concerns: datasets, teams, conference labels or players, by name. */
   readonly subjects: readonly string[];
@@ -111,6 +146,8 @@ export interface SdvSummary {
   /** Rows read per dataset; null when not published. */
   readonly rows: { readonly [D in SdvDataset]: number | null };
   readonly teamSeasons: number;
+  /** Schools this load adds: Division I teams teams.json lacks. */
+  readonly newSchools: number;
   readonly players: number;
   readonly playerStats: number;
   readonly games: number;
@@ -122,31 +159,67 @@ export interface HomeGames {
   readonly venue: VenueId;
 }
 
-/**
- * Conference labels of both files (`mbb:atlantic-10` with its program stripped, `Atlantic 10`),
- * slugged, to our ids, which are slugs of teams.json's short names. A label not here is its own slug.
- */
+/** Group labels (`mbb:atlantic-10`, program stripped) to our ids, which are slugs of teams.json's short names. A label not here is its own id. */
 const CONFERENCE_ALIASES: Readonly<Record<string, string>> = {
   'atlantic-10': 'a-10',
   'america-east': 'am-east',
-  aac: 'american',
   cusa: 'c-usa',
-  mwc: 'mountain-west',
   socon: 'southern',
-  'summit-league': 'summit',
-  'ivy-league': 'ivy',
 };
 
-const isoDate = (mdy: string) => `${mdy.slice(6)}-${mdy.slice(0, 2)}-${mdy.slice(3, 5)}`;
+/** Only a final counts toward a record; a postponed or canceled game is not played on its date. */
+const FINAL = 'STATUS_FINAL';
+const NOT_ON_DATE = new Set(['STATUS_POSTPONED', 'STATUS_CANCELED']);
 
-/** `-05:00` in winter and `-04:00` in summer: New York's offset at 7 pm on `date`. */
-export function newYorkOffset(date: string): string {
-  // 23:00 UTC is 18:00 or 19:00 in New York, far from the 2 am switch, so it shares 7 pm's offset.
-  const name = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', timeZoneName: 'longOffset' })
-    .formatToParts(new Date(`${date}T23:00:00Z`))
-    .find((part) => part.type === 'timeZoneName')!.value;
-  return name.replace('GMT', '');
+const NEW_YORK = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/New_York',
+  year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+  hourCycle: 'h23',
+  timeZoneName: 'longOffset',
+});
+
+/** An instant as New York's calendar day and its wall time with offset: `2026-02-27T00:00Z` is `2026-02-26`, `2026-02-26T19:00:00-05:00`. */
+function newYork(instant: string): { readonly day: string; readonly time: string } {
+  const part = Object.fromEntries(NEW_YORK.formatToParts(new Date(instant)).map(({ type, value }) => [type, value]));
+  const day = `${part.year}-${part.month}-${part.day}`;
+  return { day, time: `${day}T${part.hour}:${part.minute}:${part.second}${part.timeZoneName!.replace('GMT', '')}` };
 }
+
+/** A game's New York day, and its start: the real time when ESPN has one, else 7 pm New York time that day. */
+function gameTime(row: SdvRow<'schedule'>): { readonly day: string; readonly startsAt: string } {
+  const { day, time } = newYork(row.date);
+  if (row.time_valid) return { day, startsAt: time };
+  // 23:00 UTC is 18:00 or 19:00 in New York, far from the 2 am switch, so it shares 7 pm's offset.
+  return { day, startsAt: `${day}T19:00:00${newYork(`${day}T23:00:00Z`).time.slice(-6)}` };
+}
+
+type Side = 'home' | 'away';
+
+/** A school made from how the schedule names a team, or null when the schedule leaves out what a school needs. */
+function schoolFrom(row: SdvRow<'schedule'>, side: Side): School | null {
+  const location = row[`${side}_location` as const];
+  if (!location) return null;
+  const color = row[`${side}_color` as const];
+  const alternate = row[`${side}_alternate_color` as const];
+  const parsed = School.safeParse({
+    id: idFor.school(location),
+    name: location,
+    shortName: row[`${side}_short_display_name` as const] || location,
+    mascot: row[`${side}_name` as const],
+    abbreviation: row[`${side}_abbreviation` as const],
+    primaryColor: (color && toColor(color)) ?? FALLBACK_PRIMARY,
+    secondaryColor: (alternate && toColor(alternate)) ?? FALLBACK_SECONDARY,
+    logo: Url.safeParse(row[`${side}_logo` as const]).data ?? null,
+    espnId: row[`${side}_id` as const],
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+const groupBy = <T>(rows: readonly T[], key: (row: T) => string) => {
+  const groups = new Map<string, T[]>();
+  for (const row of rows) groups.set(key(row), [...(groups.get(key(row)) ?? []), row]);
+  return groups;
+};
 
 export function sportsdataverseEdits(
   world: World,
@@ -155,87 +228,58 @@ export function sportsdataverseEdits(
 ): { readonly edits: ImportEdit[]; readonly warnings: SdvWarning[]; readonly summary: SdvSummary } {
   const { program, season } = options;
   const subjects = new Map<SdvWarning['code'], Set<string>>();
-  const warn = (code: SdvWarning['code'], subject: string) => subjects.set(code, (subjects.get(code) ?? new Set()).add(subject));
+  const warn: Warn = (code, subject) => subjects.set(code, (subjects.get(code) ?? new Set()).add(subject));
   for (const dataset of SDV_DATASET_NAMES) if (!sources[dataset]) warn('not-published', SDV_DATASETS[dataset].path(program, sdvYear(season)));
 
+  const edits: ImportEdit[] = [importPut('season', Season.parse({ id: season, name: season }), 'keep')];
   const schoolByEspn = new Map(world.all('school').flatMap((school) => (school.espnId ? [[school.espnId, school] as const] : [])));
-  const espnByNcaa = new Map<string, string>();
-  for (const row of sources.teamBox ?? []) {
-    for (const [ncaa, espn] of [
-      [row.team_ncaa_team_id, row.team_espn_team_id],
-      [row.home_ncaa_team_id, row.home_espn_team_id],
-      [row.away_ncaa_team_id, row.away_espn_team_id],
-    ]) {
-      if (ncaa && espn) espnByNcaa.set(ncaa, espn);
-    }
-  }
-  const espnByName = new Map<string, string>();
-  for (const row of [...(sources.priorTeamBox ?? []), ...(sources.teamBox ?? [])]) {
-    if (row.home_espn_team_id) espnByName.set(row.home, row.home_espn_team_id);
-    if (row.away_espn_team_id) espnByName.set(row.away, row.away_espn_team_id);
-  }
-  const ncaaByName = new Map((sources.teamIds ?? []).map((row) => [row.team, row.id]));
-  const nameOfNcaa = new Map((sources.teamIds ?? []).map((row) => [row.id, row.team]));
-  const ncaaByEspn = new Map([...espnByNcaa].map(([ncaa, espn]) => [espn, ncaa]));
-  /** A team the files name but teams.json lacks, by its NCAA name where the files give one, so each is warned about once. */
-  const unmatched = (name: string) => warn('unmatched-team', name);
-  const schoolOfNcaa = (ncaa: string | null) => {
-    const espn = ncaa && (espnByNcaa.get(ncaa) ?? espnByName.get(nameOfNcaa.get(ncaa) ?? ''));
-    return espn ? schoolByEspn.get(espn) : undefined;
-  };
 
-  // The teams this load writes, with the conference label each file gives.
-  const label = new Map<SchoolId, string>();
+  // Each Division I team's school, made from the schedule when we have none, and its conference label.
+  const described = new Map<string, School | null>();
+  for (const row of sources.schedule ?? []) {
+    for (const side of ['home', 'away'] as const) if (!described.get(row[`${side}_id`])) described.set(row[`${side}_id`], schoolFrom(row, side));
+  }
+  const taken = new Set<string>(world.all('school').map((school) => school.id));
   const schools = new Map<SchoolId, School>();
+  const label = new Map<SchoolId, string>();
+  let newSchools = 0;
   for (const row of sources.groups ?? []) {
-    const school = schoolByEspn.get(row.team_id);
+    let school = schoolByEspn.get(row.team_id);
     if (!school) {
-      unmatched(nameOfNcaa.get(ncaaByEspn.get(row.team_id) ?? '') ?? row.team_name ?? `ESPN team ${row.team_id}`);
-      continue;
+      const made = described.get(row.team_id);
+      if (!made) {
+        warn('unmatched-team', row.team_name ?? `ESPN team ${row.team_id}`);
+        continue;
+      }
+      if (taken.has(made.id)) {
+        warn('school-id-taken', `${row.team_name ?? made.name} (${made.id})`);
+        continue;
+      }
+      taken.add(made.id);
+      schoolByEspn.set(row.team_id, made);
+      edits.push(importPut('school', made, 'keep'));
+      newSchools++;
+      school = made;
     }
     schools.set(school.id, school);
     if (row.conference_id) label.set(school.id, row.conference_id.replace(/^[a-z]+:/, ''));
-  }
-  for (const row of sources.teamIds ?? []) {
-    const school = schoolOfNcaa(row.id);
-    if (!school) {
-      if (sources.teamBox || sources.priorTeamBox) unmatched(row.team);
-      continue;
-    }
-    schools.set(school.id, school);
-    if (row.conference && !label.has(school.id)) label.set(school.id, row.conference);
   }
 
   const teamOf = (school: SchoolId) => idFor.team(school, program);
   const existing = (school: SchoolId) => world.teamSeason(teamOf(school), season);
   const conferenceOf = new Map<SchoolId, ConferenceId | null>();
   for (const school of schools.keys()) {
-    const text = label.get(school);
-    const slug = text === undefined ? '' : slugify(text);
+    const slug = label.has(school) ? slugify(label.get(school)!) : '';
     const conference = world.get('conference', (CONFERENCE_ALIASES[slug] ?? slug) as ConferenceId);
-    if (text !== undefined && !conference) warn('unknown-conference', text);
+    if (label.has(school) && !conference) warn('unknown-conference', label.get(school)!);
     conferenceOf.set(school, conference?.id ?? existing(school)?.conferenceId ?? null);
   }
-
-  const edits: ImportEdit[] = [importPut('season', Season.parse({ id: season, name: season }), 'keep')];
   for (const school of schools.keys()) edits.push(importPut('team', Team.parse({ id: teamOf(school), schoolId: school, program }), 'keep'));
 
-  // Points by team name per contest. The team box is right where the schedule swaps the scores of a game.
-  const pointsIn = new Map<string, Map<string, number>>();
-  for (const row of sources.teamBox ?? []) {
-    const points = pointsIn.get(row.contest_id) ?? new Map<string, number>();
-    points.set(row.team, row.pts);
-    points.set(row.team === row.home ? row.away : row.home, row.d_pts);
-    pointsIn.set(row.contest_id, points);
-  }
-  const schoolOfName = (name: string) => schoolOfNcaa(ncaaByName.get(name) ?? null) ?? schoolByEspn.get(espnByName.get(name) ?? '');
   const results: Result<SchoolId>[] = (sources.schedule ?? []).flatMap((row) => {
-    const points = pointsIn.get(row.contest_id);
-    const homePts = points?.get(row.home) ?? row.home_score;
-    const awayPts = points?.get(row.away) ?? row.away_score;
-    if (homePts === null || awayPts === null) return [];
-    const [home, away] = [schoolOfName(row.home)?.id ?? null, schoolOfName(row.away)?.id ?? null];
-    return [{ contest: row.contest_id, date: isoDate(row.game_date), home, away, homePts, awayPts }];
+    if (row.status_type_name !== FINAL || row.home_score === null || row.away_score === null) return [];
+    const [home, away] = [schoolByEspn.get(row.home_id)?.id ?? null, schoolByEspn.get(row.away_id)?.id ?? null];
+    return [{ contest: row.game_id, date: gameTime(row).day, home, away, homePts: row.home_score, awayPts: row.away_score }];
   });
   const table = standings({
     results,
@@ -245,26 +289,7 @@ export function sportsdataverseEdits(
     march: `${sdvYear(season)}-03-01`,
   });
 
-  const lines = new Map<SchoolId, SdvRow<'teamBox'>[]>();
-  for (const row of sources.teamBox ?? []) {
-    const school = (row.team_espn_team_id && schoolByEspn.get(row.team_espn_team_id)) || schoolOfNcaa(row.team_ncaa_team_id);
-    if (school) lines.set(school.id, [...(lines.get(school.id) ?? []), row]);
-  }
-  const teamStats = (rows: readonly SdvRow<'teamBox'>[]): BasketballTeamSeasonStats => {
-    const sum = (pick: (row: SdvRow<'teamBox'>) => number) => rows.reduce((total, row) => total + pick(row), 0);
-    return {
-      sport: 'basketball',
-      gp: rows.length,
-      totals: {
-        min: 0, stl: 0, pf: 0,
-        pts: sum((row) => row.pts), fgm: sum((row) => row.fgm), fga: sum((row) => row.fga), tpm: sum((row) => row.tpm), tpa: sum((row) => row.tpa),
-        ftm: sum((row) => row.ftm), fta: sum((row) => row.fta), reb: sum((row) => row.orb + row.drb), ast: sum((row) => row.ast),
-        blk: sum((row) => row.blk), to: sum((row) => row.to),
-      },
-      opponentPts: sum((row) => row.d_pts),
-    };
-  };
-
+  const lines = groupBy(sources.teamBox ?? [], (row) => schoolByEspn.get(row.team_id)?.id ?? '');
   for (const school of schools.keys()) {
     const team = teamOf(school);
     const base = existing(school) ?? TeamSeason.parse({ id: idFor.teamSeason(team, season), teamId: team, seasonId: season });
@@ -275,15 +300,15 @@ export function sportsdataverseEdits(
         ...base,
         conferenceId: conferenceOf.get(school) ?? null,
         ...(standing && standing),
-        ...(sources.teamBox && rows && { stats: teamStats(rows) }),
+        ...(rows && { stats: teamStats(rows) }),
       }),
     );
   }
 
-  const players = rosterEdits(world, sources, { program, season, schoolOfNcaa, unmatched: (ncaa) => unmatched(nameOfNcaa.get(ncaa) ?? `NCAA team ${ncaa}`), warn });
+  const players = rosterEdits(world, sources, { program, season, schools, schoolByEspn, warn });
   edits.push(...players.edits);
 
-  const games = options.gamesFor ? homeGames(world, sources, { ...options, gamesFor: options.gamesFor, schoolOfName, conferenceOf, warn }) : [];
+  const games = options.gamesFor ? homeGames(world, sources, { ...options, gamesFor: options.gamesFor, schoolByEspn, conferenceOf, warn }) : [];
   edits.push(...games.map((game) => importPut('game', game)));
 
   const warnings: SdvWarning[] = [...subjects].map(([code, set]) => {
@@ -294,7 +319,7 @@ export function sportsdataverseEdits(
   return {
     edits,
     warnings,
-    summary: { rows, teamSeasons: schools.size, players: players.players, playerStats: players.playerStats, games: games.length },
+    summary: { rows, teamSeasons: schools.size, newSchools, players: players.players, playerStats: players.playerStats, games: games.length },
   };
 }
 
@@ -302,13 +327,56 @@ const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? o
 
 const WARNING_TEXT: { readonly [C in SdvWarning['code']]: (n: number) => string } = {
   'not-published': (n) => `${plural(n, 'dataset is', 'datasets are')} not published for this season yet`,
-  'unmatched-team': (n) => `${plural(n, 'team matches', 'teams match')} no school in teams.json; skipped`,
+  'unmatched-team': (n) => `${plural(n, 'team has', 'teams have')} no school and no game in the schedule to make one from; skipped`,
+  'school-id-taken': (n) => `${plural(n, 'new school', 'new schools')} would take the id of a school we have; skipped`,
   'unknown-conference': (n) => `${plural(n, 'conference label names', 'conference labels name')} no conference we have; those teams keep theirs`,
+  'stale-roster': (n) => `${plural(n, "team's roster is", "teams' rosters are")} last season's, copied forward; not loaded`,
   'no-jersey': (n) => `${plural(n, 'player has', 'players have')} no jersey number; skipped`,
   'unmatched-opponent': (n) => `${plural(n, 'home game is', 'home games are')} against a team we have no school for; skipped`,
 };
 
 type Warn = (code: SdvWarning['code'], subject: string) => void;
+
+function teamStats(rows: readonly SdvRow<'teamBox'>[]): BasketballTeamSeasonStats {
+  const sum = (pick: (row: SdvRow<'teamBox'>) => number) => rows.reduce((total, row) => total + pick(row), 0);
+  return {
+    sport: 'basketball',
+    gp: rows.length,
+    totals: {
+      min: 0,
+      pts: sum((row) => row.team_score),
+      fgm: sum((row) => row.field_goals_made),
+      fga: sum((row) => row.field_goals_attempted),
+      tpm: sum((row) => row.three_point_field_goals_made),
+      tpa: sum((row) => row.three_point_field_goals_attempted),
+      ftm: sum((row) => row.free_throws_made),
+      fta: sum((row) => row.free_throws_attempted),
+      reb: sum((row) => row.offensive_rebounds + row.defensive_rebounds),
+      ast: sum((row) => row.assists),
+      stl: sum((row) => row.steals),
+      blk: sum((row) => row.blocks),
+      to: sum((row) => row.turnovers),
+      pf: sum((row) => row.fouls),
+    },
+    opponentPts: sum((row) => row.opponent_team_score),
+  };
+}
+
+/**
+ * ESPN's copy of last season's roster: every athlete back from last season is still in last
+ * season's class. A new season's roster moves its returners up a class.
+ */
+const isStale = (rows: readonly SdvRow<'rosters'>[], prior: readonly SdvRow<'priorRosters'>[]) => {
+  const before = new Map(prior.map((row) => [row.athlete_id, row.experience_display_value]));
+  const returning = rows.filter((row) => before.has(row.athlete_id));
+  return returning.length > 0 && returning.every((row) => before.get(row.athlete_id) === row.experience_display_value);
+};
+
+/** `Lynn, MA`; `Belgrade, Serbia` for a player born outside the US. */
+const hometown = (row: SdvRow<'rosters'>) => {
+  const where = row.birth_place_state ?? (row.birth_place_country === 'USA' ? null : row.birth_place_country);
+  return row.birth_place_city ? [row.birth_place_city, where].filter(Boolean).join(', ') : null;
+};
 
 /** Players through `planRoster`, so matching and ids are the roster importer's, and their season totals from the player box. */
 function rosterEdits(
@@ -317,77 +385,89 @@ function rosterEdits(
   context: {
     readonly program: ProgramCode;
     readonly season: SeasonId;
-    readonly schoolOfNcaa: (ncaa: string) => School | undefined;
-    readonly unmatched: (ncaa: string) => void;
+    readonly schools: ReadonlyMap<SchoolId, School>;
+    readonly schoolByEspn: ReadonlyMap<string, School>;
     readonly warn: Warn;
   },
 ): { readonly edits: ImportEdit[]; readonly players: number; readonly playerStats: number } {
-  const rosters = new Map<string, SdvRow<'teamRosters'>[]>();
-  for (const row of sources.teamRosters ?? []) rosters.set(row.team_id, [...(rosters.get(row.team_id) ?? []), row]);
-
+  // Once the season's box scores exist its roster file is the season's, and last season's file
+  // may by then hold this season's roster too, so only a roster before tip-off is compared.
+  const prior = !sources.playerBox && sources.priorRosters && groupBy(sources.priorRosters, (row) => row.team_id);
   const edits: ImportEdit[] = [];
+  /** `<ESPN team id>/<athlete id>` to the player, which is how the player box names one. */
   const playerOf = new Map<string, Player['id']>();
   let players = 0;
-  for (const [ncaa, rows] of rosters) {
-    const school = context.schoolOfNcaa(ncaa);
-    if (!school) {
-      context.unmatched(ncaa);
+  for (const [espnTeam, rows] of groupBy(sources.rosters ?? [], (row) => row.team_id)) {
+    const school = context.schoolByEspn.get(espnTeam);
+    if (!school || !context.schools.has(school.id)) continue;
+    if (prior && isStale(rows, prior.get(espnTeam) ?? [])) {
+      context.warn('stale-roster', school.name);
       continue;
     }
     const team: TeamId = idFor.team(school.id, context.program);
     const roster: RosterRow[] = [];
     for (const row of rows) {
       if (!row.jersey || !/^\d{1,2}$/.test(row.jersey)) {
-        context.warn('no-jersey', `${row.clean_name} (${school.name})`);
+        context.warn('no-jersey', `${row.first_name} ${row.last_name} (${school.name})`);
         continue;
       }
-      const [first = '', ...rest] = row.clean_name.trim().split(/\s+/);
-      const parsedClass = parseClass(row.class ?? '');
-      const position = parsePosition(row.position ?? '');
+      const parsedClass = parseClass(row.experience_display_value ?? '');
+      const position = parsePosition(row.position_abbreviation ?? '');
       roster.push({
         jersey: row.jersey,
-        firstName: rest.length ? first : '',
-        lastName: rest.length ? rest.join(' ') : first,
+        firstName: row.first_name.trim(),
+        lastName: row.last_name.trim(),
         position: typeof position === 'string' ? position : '',
         classYear: typeof parsedClass === 'string' ? null : parsedClass.classYear,
-        // The files never mark a redshirt (no `R-` class), so they leave the player's flag alone.
-        redshirt: typeof parsedClass !== 'string' && parsedClass.redshirt ? true : null,
-        hometown: row.hometown || null,
-        headshot: null,
+        // The files never mark a redshirt, so they leave the player's flag alone.
+        redshirt: null,
+        hometown: hometown(row),
+        headshot: Url.safeParse(row.headshot_href).data ?? null,
         motionHeadshot: null,
-        sourceKey: `ncaa:${row.player_id}`,
+        sourceKey: `espn:${row.athlete_id}`,
       });
     }
     const plan = planRoster(world, { team, season: context.season, rows: roster, prune: false });
     edits.push(...plan.edits);
     players += roster.length;
     for (const player of [...world.roster(team, context.season), ...plan.add, ...plan.update.map((change) => change.after)]) {
-      if (player.sourceKey?.startsWith('ncaa:')) playerOf.set(player.sourceKey.slice('ncaa:'.length), player.id);
+      if (player.sourceKey?.startsWith('espn:')) playerOf.set(`${espnTeam}/${player.sourceKey.slice('espn:'.length)}`, player.id);
     }
   }
 
-  // A player's box score appears once per contest; the files repeat one now and then.
+  // A player's line appears once per game; the files repeat one now and then.
   const games = new Map<string, Map<string, SdvRow<'playerBox'>>>();
   for (const row of sources.playerBox ?? []) {
-    if (!row.player_id || !playerOf.has(row.player_id)) continue;
-    const byContest = games.get(row.player_id) ?? new Map<string, SdvRow<'playerBox'>>();
-    if (!byContest.has(row.contest_id)) byContest.set(row.contest_id, row);
-    games.set(row.player_id, byContest);
+    const key = `${row.team_id}/${row.athlete_id}`;
+    if (row.did_not_play || !playerOf.has(key)) continue;
+    const byGame = games.get(key) ?? new Map<string, SdvRow<'playerBox'>>();
+    if (!byGame.has(row.game_id)) byGame.set(row.game_id, row);
+    games.set(key, byGame);
   }
-  for (const [ncaa, byContest] of games) {
-    const rows = [...byContest.values()];
+  for (const [key, byGame] of games) {
+    const rows = [...byGame.values()];
     const sum = (pick: (row: SdvRow<'playerBox'>) => number) => rows.reduce((total, row) => total + pick(row), 0);
     edits.push(
       importPut('playerStats', {
-        id: playerOf.get(ncaa)!,
+        id: playerOf.get(key)!,
         stats: {
           sport: 'basketball',
-          gp: rows.filter((row) => row.mins > 0).length,
+          gp: rows.length,
           totals: {
-            min: Math.round(sum((row) => row.mins)),
-            pts: sum((row) => row.pts), fgm: sum((row) => row.fgm), fga: sum((row) => row.fga), tpm: sum((row) => row.tpm), tpa: sum((row) => row.tpa),
-            ftm: sum((row) => row.ftm), fta: sum((row) => row.fta), reb: sum((row) => row.orb + row.drb), ast: sum((row) => row.ast),
-            stl: sum((row) => row.stl), blk: sum((row) => row.blk), to: sum((row) => row.tov), pf: sum((row) => row.pf),
+            min: Math.round(sum((row) => row.minutes)),
+            pts: sum((row) => row.points),
+            fgm: sum((row) => row.field_goals_made),
+            fga: sum((row) => row.field_goals_attempted),
+            tpm: sum((row) => row.three_point_field_goals_made),
+            tpa: sum((row) => row.three_point_field_goals_attempted),
+            ftm: sum((row) => row.free_throws_made),
+            fta: sum((row) => row.free_throws_attempted),
+            reb: sum((row) => row.offensive_rebounds + row.defensive_rebounds),
+            ast: sum((row) => row.assists),
+            stl: sum((row) => row.steals),
+            blk: sum((row) => row.blocks),
+            to: sum((row) => row.turnovers),
+            pf: sum((row) => row.fouls),
           },
         },
       }),
@@ -396,7 +476,7 @@ function rosterEdits(
   return { edits, players, playerStats: games.size };
 }
 
-/** Each scheduled game at `gamesFor.school`, played or not, at 7 pm New York time on its day. */
+/** Each game on `gamesFor.school`'s home floor, played or not. A neutral-site game is not a home game. */
 function homeGames(
   world: World,
   sources: SdvSources,
@@ -404,22 +484,23 @@ function homeGames(
     readonly program: ProgramCode;
     readonly season: SeasonId;
     readonly gamesFor: HomeGames;
-    readonly schoolOfName: (name: string) => School | undefined;
+    readonly schoolByEspn: ReadonlyMap<string, School>;
     readonly conferenceOf: ReadonlyMap<SchoolId, ConferenceId | null>;
     readonly warn: Warn;
   },
 ): Game[] {
+  const host = world.get('school', context.gamesFor.school)?.espnId;
   const venue = world.get('venue', context.gamesFor.venue) ? context.gamesFor.venue : null;
   return (sources.schedule ?? []).flatMap((row) => {
-    if (context.schoolOfName(row.home)?.id !== context.gamesFor.school) return [];
-    const away = context.schoolOfName(row.away);
+    if (!host || row.home_id !== host || row.neutral_site || NOT_ON_DATE.has(row.status_type_name)) return [];
+    const { day, startsAt } = gameTime(row);
+    const away = context.schoolByEspn.get(row.away_id);
     if (!away) {
-      context.warn('unmatched-opponent', `${row.away}, ${isoDate(row.game_date)}`);
+      context.warn('unmatched-opponent', `${row.away_location ?? `ESPN team ${row.away_id}`}, ${day}`);
       return [];
     }
-    const date = isoDate(row.game_date);
     const [awayTeamId, homeTeamId] = [idFor.team(away.id, context.program), idFor.team(context.gamesFor.school, context.program)];
-    const gameId = idFor.game(context.season, date, awayTeamId, homeTeamId);
+    const gameId = idFor.game(context.season, day, awayTeamId, homeTeamId);
     const conference = context.conferenceOf.get(away.id);
     return [
       {
@@ -431,7 +512,7 @@ function homeGames(
         awayTeamId,
         homeTeamId,
         venueId: venue,
-        startsAt: `${date}T19:00:00${newYorkOffset(date)}`,
+        startsAt,
         conferenceGame: !!conference && conference === context.conferenceOf.get(context.gamesFor.school),
       },
     ];
