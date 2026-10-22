@@ -4,7 +4,9 @@
  *
  * The files name a team three ways. Groups and the team box carry ESPN ids, which match
  * `School.espnId`; the team ids, rosters and player box carry NCAA ids, and the schedule NCAA
- * names. The team box pairs NCAA and ESPN ids, so it is the join. `ncaa_<g>_rosters` is not
+ * names. The team box pairs NCAA and ESPN ids, so it is the join. NCAA ids change every season
+ * and names do not, so last season's team box joins schedule names before this season's box
+ * exists, which is how a season's home games load before it tips off. `ncaa_<g>_rosters` is not
  * read: it has only the team name, `JOSH.REED` and games played, and the team rosters cover it.
  */
 
@@ -59,6 +61,11 @@ export const SDV_DATASETS = {
       away_espn_team_id: id.nullable(),
       pts: stat, d_pts: stat, fgm: stat, fga: stat, tpm: stat, tpa: stat, ftm: stat, fta: stat, orb: stat, drb: stat, ast: stat, blk: stat, to: stat,
     }),
+  },
+  /** Last season's team box, for its names: the join before this season's box is published. */
+  priorTeamBox: {
+    path: (g: ProgramCode, y: number) => `ncaa_${g}_team_box/ncaa_${g}_team_box_${y - 1}`,
+    row: z.object({ home: z.string(), away: z.string(), home_espn_team_id: id.nullable(), away_espn_team_id: id.nullable() }),
   },
   teamRosters: {
     path: (g: ProgramCode, y: number) => `ncaa_${g}_team_rosters/ncaa_${g}_team_rosters_${y}`,
@@ -162,13 +169,18 @@ export function sportsdataverseEdits(
       if (ncaa && espn) espnByNcaa.set(ncaa, espn);
     }
   }
+  const espnByName = new Map<string, string>();
+  for (const row of [...(sources.priorTeamBox ?? []), ...(sources.teamBox ?? [])]) {
+    if (row.home_espn_team_id) espnByName.set(row.home, row.home_espn_team_id);
+    if (row.away_espn_team_id) espnByName.set(row.away, row.away_espn_team_id);
+  }
   const ncaaByName = new Map((sources.teamIds ?? []).map((row) => [row.team, row.id]));
   const nameOfNcaa = new Map((sources.teamIds ?? []).map((row) => [row.id, row.team]));
   const ncaaByEspn = new Map([...espnByNcaa].map(([ncaa, espn]) => [espn, ncaa]));
   /** A team the files name but teams.json lacks, by its NCAA name where the files give one, so each is warned about once. */
   const unmatched = (name: string) => warn('unmatched-team', name);
   const schoolOfNcaa = (ncaa: string | null) => {
-    const espn = ncaa && espnByNcaa.get(ncaa);
+    const espn = ncaa && (espnByNcaa.get(ncaa) ?? espnByName.get(nameOfNcaa.get(ncaa) ?? ''));
     return espn ? schoolByEspn.get(espn) : undefined;
   };
 
@@ -187,7 +199,7 @@ export function sportsdataverseEdits(
   for (const row of sources.teamIds ?? []) {
     const school = schoolOfNcaa(row.id);
     if (!school) {
-      if (sources.teamBox) unmatched(row.team);
+      if (sources.teamBox || sources.priorTeamBox) unmatched(row.team);
       continue;
     }
     schools.set(school.id, school);
@@ -216,7 +228,7 @@ export function sportsdataverseEdits(
     points.set(row.team === row.home ? row.away : row.home, row.d_pts);
     pointsIn.set(row.contest_id, points);
   }
-  const schoolOfName = (name: string) => schoolOfNcaa(ncaaByName.get(name) ?? null);
+  const schoolOfName = (name: string) => schoolOfNcaa(ncaaByName.get(name) ?? null) ?? schoolByEspn.get(espnByName.get(name) ?? '');
   const results: Result<SchoolId>[] = (sources.schedule ?? []).flatMap((row) => {
     const points = pointsIn.get(row.contest_id);
     const homePts = points?.get(row.home) ?? row.home_score;

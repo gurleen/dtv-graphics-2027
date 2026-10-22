@@ -190,6 +190,7 @@ describe('sportsdataverse', () => {
     teamIds: [{ team: 'Drexel', id: '100', conference: 'CAA' }, { team: 'Hofstra', id: '200', conference: 'CAA' }],
     schedule: [{ contest_id: 'c1', game_date: '01/10/2026', home: 'Drexel', away: 'Hofstra', home_score: 78, away_score: 70 }],
     teamBox: [box('Drexel', 78, 70), box('Hofstra', 70, 78)],
+    priorTeamBox: [],
     teamRosters: [{ player_id: '9335965', team_id: '100', clean_name: 'Josh Reed', jersey: '5', class: 'So.', position: 'G', hometown: 'Wyndmoor, PA' }],
     playerBox: [
       { player_id: '9335965', team_ncaa_team_id: '100', contest_id: 'c1', mins: 31.5, pts: 22, fgm: 9, fga: 14, tpm: 1, tpa: 3, ftm: 3, fta: 4, orb: 2, drb: 6, ast: 4, stl: 1, blk: 0, tov: 2, pf: 3 },

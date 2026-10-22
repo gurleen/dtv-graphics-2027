@@ -12,6 +12,7 @@ const DATASET_LABELS: { readonly [D in SdvDataset]: string } = {
   teamIds: 'Team ids',
   schedule: 'Schedule',
   teamBox: 'Team box scores',
+  priorTeamBox: "Last season's team box scores",
   teamRosters: 'Rosters',
   playerBox: 'Player box scores',
 };

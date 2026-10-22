@@ -172,7 +172,9 @@ The sportsdataverse loader fills a program-season from the parquet files that
 the store commits them as one import batch, so locked fields stay as people set them. It writes each team's
 conference, record, streak, rank and season stats, every roster with jerseys and season stats, and Drexel's home
 games at 7 pm New York time. The files name teams by ESPN id, NCAA id and NCAA name; the team box pairs NCAA and
-ESPN ids, so it joins them to `School.espnId`. Wins and losses come from the team box, because the schedule swaps
+ESPN ids, so it joins them to `School.espnId`. NCAA ids change every season and names do not, so before a season's
+team box exists, last season's box joins the schedule's names and the home games load ahead of tip-off. Rank breaks a
+tie in conference record head to head, then by overall win percentage. Wins and losses come from the team box, because the schedule swaps
 the score of some games. The files mark no conference tournament games, so `regularSeasonEnd` finds the end of each
 conference's regular season from the schedule's shape and the conference record stops there; overall records and
 streaks count every game. A dataset not published for the season yet is a warning, not a failure. teams.json stays

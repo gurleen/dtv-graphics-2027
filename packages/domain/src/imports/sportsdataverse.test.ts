@@ -116,6 +116,7 @@ const SOURCES: SdvSources = {
   teamIds: [...SCHOOLS.map(([, name, , id]) => ({ team: name, id, conference: 'CAA' })), { team: 'Le Moyne', id: '600', conference: 'NEC' }],
   schedule,
   teamBox,
+  priorTeamBox: [],
   teamRosters: [
     { player_id: '9335965', team_id: '100', clean_name: 'Josh Reed', jersey: '5', class: 'So.', position: 'G', hometown: 'Wyndmoor, PA' },
     { player_id: '1', team_id: '100', clean_name: 'Sam Nojersey', jersey: null, class: 'Fr.', position: 'F', hometown: null },
@@ -182,6 +183,25 @@ describe('sportsdataverseEdits', () => {
     ]);
   });
 
+  test("before a season's team box exists, last season's box joins the schedule's names, so home games load", () => {
+    const next = SeasonId.parse('2026-27');
+    const unpublished = Object.fromEntries(SDV_DATASET_NAMES.map((dataset) => [dataset, null])) as unknown as SdvSources;
+    const upcoming = sportsdataverseEdits(
+      world,
+      {
+        ...unpublished,
+        teamIds: SCHOOLS.map(([, name, , ncaa]) => ({ team: name, id: `9${ncaa}`, conference: 'CAA' })),
+        schedule: [{ contest_id: 'n1', game_date: '11/04/2026', home: 'Drexel', away: 'Hofstra', home_score: null, away_score: null }],
+        priorTeamBox: teamBox,
+      },
+      { program: 'mbb', season: next, gamesFor: HOME },
+    );
+    expect(putValues(upcoming.edits, 'game').map((game) => [game.id, game.startsAt, game.conferenceGame])).toEqual([
+      ['2026-27/2026-11-04/hofstra-mbb.at.drexel-mbb', '2026-11-04T19:00:00-05:00', true],
+    ]);
+    expect(upcoming.warnings.map((warning) => warning.code)).toEqual(['not-published']);
+  });
+
   test('warnings name what the files hold that we cannot place', () => {
     expect(plan.warnings.map((warning) => [warning.code, warning.subjects])).toEqual([
       ['unmatched-team', ['Le Moyne', 'Le Moyne Dolphins']],
@@ -190,7 +210,7 @@ describe('sportsdataverseEdits', () => {
       ['unmatched-opponent', ['Widener, 2025-11-12']],
     ]);
     expect(plan.summary).toEqual({
-      rows: { groups: 6, teamIds: 6, schedule: 11, teamBox: 19, teamRosters: 3, playerBox: 4 },
+      rows: { groups: 6, teamIds: 6, schedule: 11, teamBox: 19, priorTeamBox: 0, teamRosters: 3, playerBox: 4 },
       teamSeasons: 5,
       players: 1,
       playerStats: 1,
@@ -215,10 +235,11 @@ describe('sportsdataverseEdits', () => {
     expect(next.warnings).toEqual([
       {
         code: 'not-published',
-        message: '5 datasets are not published for this season yet',
+        message: '6 datasets are not published for this season yet',
         subjects: [
           'ncaa_mbb_player_box/ncaa_mbb_player_box_2026',
           'ncaa_mbb_schedule/ncaa_mbb_schedule_2026',
+          'ncaa_mbb_team_box/ncaa_mbb_team_box_2025',
           'ncaa_mbb_team_box/ncaa_mbb_team_box_2026',
           'ncaa_mbb_team_ids/ncaa_mbb_team_ids_2026',
           'ncaa_mbb_team_rosters/ncaa_mbb_team_rosters_2026',
