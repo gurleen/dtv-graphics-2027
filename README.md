@@ -51,7 +51,11 @@ graphic on, and takes a one-step graphic off.
 **The data page** edits teams, rosters, staff, talent, sponsors, venues and
 games. A manual edit locks the field so an import will not overwrite it; the
 lock icon says who and when, and a click unlocks it. A roster CSV import shows
-its changes as a diff before you apply it. A game is its show: games are
+its changes as a diff before you apply it. `Load…` in the team list loads a
+program and season from [sportsdataverse](https://github.com/sportsdataverse/sportsdataverse-data/releases):
+conferences, records, standings, team and player stats, rosters and Drexel's
+home games, with a report of what it wrote and what it could not place. A
+second load of the same season writes nothing. A game is its show: games are
 created, given their crew and made active here, and the show page runs the
 active game's rundown.
 
@@ -182,6 +186,7 @@ bun run site:deploy          # publish to Cloudflare Workers
 | `packages/graphics/` | `@dtv/graphics`: `GRAPHICS`, the one list of graphics |
 | `packages/renderer/` | `@dtv/renderer`: draws output frames; the only code that touches the Rive runtime |
 | `packages/api/` | `@dtv/api`: the oRPC contract and the `connect`, `watch` and `first` helpers |
+| `packages/sportsdataverse/` | `@dtv/sportsdataverse`: downloads and reads the sportsdataverse parquet files for a load |
 | `apps/server/` | The server: the store, the oRPC router and `Bun.serve` |
 | `apps/controller/` | The operator controller at `/` (React, React Aria), and its proofs |
 | `apps/renderer/` | The `/renderer` page for OBS, and its proofs and frame comparison |
