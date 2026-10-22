@@ -30,7 +30,7 @@ const scorebugInput = element<HTMLInputElement>('scorebug');
 const backdrop = element<HTMLSelectElement>('backdrop');
 
 const world = (await (await fetch('/world.json')).json()) as SiteWorld;
-const rundown = world.snapshot.entities.show.find((show) => show.id === world.showId)!.rundown;
+const rundown = world.snapshot.entities.show.find((show) => show.id === world.gameId)!.rundown;
 
 const SECTIONS = [
   { site: 'scorebug', title: 'Scorebug' },

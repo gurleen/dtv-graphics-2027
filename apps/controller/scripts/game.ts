@@ -18,8 +18,8 @@ import { Database } from 'bun:sqlite';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { connect, first, watch } from '@dtv/api';
-import { basketball, type GameId, type Side, SourceId } from '@dtv/domain';
+import { connect, watch } from '@dtv/api';
+import { basketball, GameId, type Side, SourceId } from '@dtv/domain';
 import type { LayerId, OutputFrame } from '@dtv/playout';
 import { type Browser, type BrowserContext, chromium, type Page } from 'playwright';
 
@@ -93,7 +93,7 @@ const lastSeq = () => {
 // game's authority is the operator source, so the feed writes as that source.
 
 let reader: ReturnType<typeof connect>;
-let gameId: GameId;
+const gameId = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const FEED = SourceId.parse('operator');
 
 /** Sends commands as the feed, retrying while the server is down. */
@@ -286,8 +286,6 @@ async function main() {
   mkdirSync(OUT, { recursive: true });
   await startServer(true);
   reader = connect({ url: `ws://localhost:${port}/rpc`, client: 'game-feed' });
-  const world = await first((signal) => reader.api.data.watch(undefined, { signal }));
-  gameId = world.entities.show.find((show) => show.id === 'drexel-sju')!.gameId as GameId;
   const stop = new AbortController();
   void watch((signal) => reader.api.output.watch({ bus: { kind: 'program' } }, { signal }), (frame) => (program = frame), { signal: stop.signal });
   void watch((signal) => reader.api.game.watch({ game: gameId }, { signal }), (value) => (live = value.sport === 'basketball' ? value : null), { signal: stop.signal });

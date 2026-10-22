@@ -156,7 +156,7 @@ async function operatorPage(operator: string | null, options: { readonly video?:
 
 const rows = (page: Page) => page.getByRole('grid', { name: 'Rundown cues' }).getByRole('row');
 const rundown = async (api: ReturnType<typeof connect>['api']): Promise<readonly Cue[]> =>
-  (await first((signal) => api.data.watch(undefined, { signal }))).entities.show.find((show) => show.id === 'drexel-sju')!.rundown;
+  (await first((signal) => api.data.watch(undefined, { signal }))).entities.show.find((show) => show.id === '2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb')!.rundown;
 
 async function main() {
   rmSync(OUT, { recursive: true, force: true });

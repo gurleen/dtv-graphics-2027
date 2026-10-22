@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type Db, loadLive, migrate, openDb, seed } from '@dtv/db';
-import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, SeasonId, ShowId, SourceId, TeamId } from '@dtv/domain';
+import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, SeasonId, SourceId, TeamId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import { CommandId, OperatorId, type OutputFrame, type Registry, type ShowCommand } from '@dtv/playout';
 import { type Clock, createStore, type Store } from './store';
@@ -127,34 +127,37 @@ describe('data', () => {
 
   test('a rundown cue for a graphic the registry lacks is INCONSISTENT', () => {
     const store = open();
-    const show = store.world().get('show', ShowId.parse('drexel-sju'))!;
+    const show = store.world().get('show', GAME)!;
     const rundown = [{ id: CueId.parse('mystery'), graphic: GraphicId.parse('basketball-v2/mystery'), params: {}, overrides: {}, note: '' }];
     const result = store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown } }] });
-    expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue mystery: No graphic basketball-v2/mystery' });
+    expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: `Show ${GAME}, cue mystery: No graphic basketball-v2/mystery` });
   });
 
-  test('the active show cannot be deleted; once another show is active it can', () => {
+  test('the active game cannot be deleted; another game can, and its show goes with it; a show alone cannot', () => {
     const store = open();
-    const drexelSju = ShowId.parse('drexel-sju');
-    const other = { ...store.world().get('show', drexelSju)!, id: ShowId.parse('other'), name: 'Other' };
+    const other = GameId.parse('2026-27/2026-11-20/saint-josephs-mbb.at.drexel-mbb');
     const batch = (edits: EditBatch['edits']): EditBatch => ({ origin: 'manual', basis: store.world().revision, edits } as EditBatch);
-    expect(store.applyEdits('alex', batch([{ op: 'put', kind: 'show', value: other }]))).toMatchObject({ ok: true });
-    send(store, { type: 'activate', show: drexelSju });
-    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'show', id: drexelSju }]))).toEqual({
+    const show = { ...store.world().get('show', GAME)!, id: other };
+    expect(store.applyEdits('alex', batch([{ op: 'put', kind: 'game', value: { ...store.world().get('game', GAME)!, id: other } }, { op: 'put', kind: 'show', value: show }]))).toMatchObject({ ok: true });
+    send(store, { type: 'activate', game: GAME });
+    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'game', id: GAME }]))).toEqual({
       ok: false,
       reason: 'inconsistent',
-      detail: 'Show drexel-sju is active; make another show active before deleting it',
+      detail: `Game ${GAME} is active; make another game active before deleting it`,
     });
-    expect(store.world().get('show', drexelSju)).toBeDefined();
-    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'show', id: other.id }]))).toMatchObject({ ok: true });
+    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'show', id: other }]))).toEqual({ ok: false, reason: 'inconsistent', detail: `Show ${other} is deleted only with its game` });
+    expect(store.world().get('game', GAME)).toBeDefined();
+    expect(store.applyEdits('alex', batch([{ op: 'delete', kind: 'game', id: other }]))).toMatchObject({ ok: true });
+    expect(store.world().get('show', other)).toBeUndefined();
+    expect(store.world().get('show', GAME)).toBeDefined();
   });
 
   test('a rundown cue naming a property of Object.prototype is INCONSISTENT', () => {
     const store = open();
-    const show = store.world().get('show', ShowId.parse('drexel-sju'))!;
+    const show = store.world().get('show', GAME)!;
     const rundown = [{ id: CueId.parse('x'), graphic: GraphicId.parse('constructor'), params: {}, overrides: {}, note: '' }];
     const result = store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown } }] });
-    expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: 'Show drexel-sju, cue x: No graphic constructor' });
+    expect(result).toEqual({ ok: false, reason: 'inconsistent', detail: `Show ${GAME}, cue x: No graphic constructor` });
   });
 
   test('planRoster reports a name an id cannot be made from as a bad row', () => {
@@ -224,7 +227,7 @@ describe('a second game', () => {
   const addOther = (store: Store) =>
     store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'game', value: { ...store.world().get('game', GAME)!, id: OTHER } }] });
 
-  test('a new game has live state at once: its game stream sends it, and the scorebug for its show binds', async () => {
+  test('a new game has live state at once: its game stream sends it, and once active with no show stored its scorebug binds', async () => {
     const store = open();
     const stream = collect((signal) => store.watchGame(OTHER, signal));
     await flush();
@@ -233,10 +236,11 @@ describe('a second game', () => {
     await stream.stop();
     expect(stream.values.map((live) => live.sport === 'basketball' && live.score)).toEqual([{ away: 0, home: 0 }]);
 
-    const show = { ...store.world().get('show', ShowId.parse('drexel-sju'))!, id: ShowId.parse('second'), gameId: OTHER };
-    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: show }] })).toMatchObject({ ok: true });
-    send(store, { type: 'activate', show: show.id });
+    expect(store.world().get('show', OTHER)).toBeUndefined();
+    send(store, { type: 'activate', game: OTHER });
     const view = await current(store.watchShow(alex, new AbortController().signal));
+    expect(view.game).toEqual({ id: OTHER, label: "Saint Joseph's at Drexel" });
+    expect(view.rundown).toEqual([]);
     expect(view.free.find((cue) => cue.graphic === scorebug.graphic)?.error).toBeNull();
   });
 
@@ -255,7 +259,7 @@ describe('a second game', () => {
 describe('show commands', () => {
   test('a repeated command id answers with the first result and applies once, also after a restart', async () => {
     const store = open();
-    send(store, { type: 'activate', show: ShowId.parse('drexel-sju') });
+    send(store, { type: 'activate', game: GAME });
     const toggle: ShowCommand = { type: 'toggle', operator: alex, ref: scorebug };
     const first = send(store, toggle, 'toggle-1');
     expect(first).toMatchObject({ ok: true, changed: true });
@@ -271,7 +275,7 @@ describe('show commands', () => {
 
   test('activate backs up the database', () => {
     const store = open();
-    expect(send(store, { type: 'activate', show: ShowId.parse('drexel-sju') })).toMatchObject({ ok: true, changed: true });
+    expect(send(store, { type: 'activate', game: GAME })).toMatchObject({ ok: true, changed: true });
     expect(readdirSync(join(dir, 'backups')).filter((name) => name.endsWith('-show.sqlite'))).toHaveLength(1);
   });
 
@@ -298,7 +302,7 @@ test('the show stream sends a new view when a live change alters what it shows',
   const registry: Registry = { ...GRAPHICS, [entry.id]: { ...entry, label: (_params, context) => `Scorebug ${context.live?.sport === 'basketball' && context.live.score.home}` } };
   const store = createStore({ db, registry, clock, backupDir: join(dir, 'backups') });
   stores.push(store);
-  send(store, { type: 'activate', show: ShowId.parse('drexel-sju') });
+  send(store, { type: 'activate', game: GAME });
   const stream = collect((signal) => store.watchShow(alex, signal));
   await flush();
   store.applyGame('alex', game('operator', { type: 'score', side: 'home', value: 74 }));
@@ -312,7 +316,7 @@ describe('output and the clock', () => {
 
   test('a running clock makes frames on second boundaries above a minute and tenths below; a stopped clock makes none', async () => {
     const store = open();
-    send(store, { type: 'activate', show: ShowId.parse('drexel-sju') });
+    send(store, { type: 'activate', game: GAME });
     send(store, { type: 'air', operator: alex, ref: scorebug });
     store.applyGame('alex', game('operator', { type: 'shotClock', remainingMs: null }));
     let dataWakes = 0;
@@ -356,7 +360,7 @@ describe('output and the clock', () => {
 
   test('a slow consumer gets the newest frame, not a backlog', async () => {
     const store = open();
-    send(store, { type: 'activate', show: ShowId.parse('drexel-sju') });
+    send(store, { type: 'activate', game: GAME });
     send(store, { type: 'air', operator: alex, ref: scorebug });
     const controller = new AbortController();
     const frames = store.watchOutput({ kind: 'program' }, controller.signal);
@@ -370,7 +374,7 @@ describe('output and the clock', () => {
 
   test('a preview bus shows that operator’s preview', async () => {
     const store = open();
-    send(store, { type: 'activate', show: ShowId.parse('drexel-sju') });
+    send(store, { type: 'activate', game: GAME });
     send(store, { type: 'cue', operator: sam, ref: scorebug });
     const frame = await current(store.watchOutput({ kind: 'preview', operator: sam }, new AbortController().signal));
     expect(frame.layers.map((layer) => [layer.graphic, layer.values.homeAcronym])).toEqual([['basketball-v2/scorebug', 'DREX']]);

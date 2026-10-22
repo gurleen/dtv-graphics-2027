@@ -12,7 +12,7 @@
 import { mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { first } from '@dtv/api';
-import { type Cue, PlayerId, ShowId, type Url } from '@dtv/domain';
+import { type Cue, GameId, PlayerId, type Url } from '@dtv/domain';
 import { cueOf } from '@dtv/graphics';
 import { CueRef, type LayerFrame, type LayerId, OperatorId, type SlotId } from '@dtv/playout';
 import type { Page } from 'playwright';
@@ -25,7 +25,7 @@ const port = Number(flag('port') ?? '8986');
 const out = join(ROOT, flag('out') ?? 'build/renderer/proofs');
 const only = flag('only')?.split(',');
 
-const SHOW = ShowId.parse('drexel-sju');
+const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const operator = OperatorId.parse('proof');
 const REED = PlayerId.parse('drexel-mbb@2026-27/reed-josh');
 const MOTION_CLIP = '/assets/proofs/motion-headshot.webm';
@@ -173,7 +173,7 @@ async function world(rig: Rig) {
 
 async function setRundown(rig: Rig, rundown: readonly Cue[]) {
   const snapshot = await world(rig);
-  const show = snapshot.entities.show.find((each) => each.id === SHOW)!;
+  const show = snapshot.entities.show.find((each) => each.id === GAME)!;
   await rig.api.data.apply({ origin: 'manual', basis: snapshot.revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [...rundown] } }] });
 }
 
@@ -665,7 +665,7 @@ const PROOFS: Readonly<Record<string, (rig: Rig) => Promise<void>>> = {
 
 const rig = await startRig({ port });
 try {
-  await rig.command({ type: 'activate', show: SHOW });
+  await rig.command({ type: 'activate', game: GAME });
   await record(rig.page);
   for (const [name, proof] of Object.entries(PROOFS)) {
     if (only && !only.includes(name)) continue;

@@ -1,16 +1,15 @@
-import { type EpochMs, type GameId, type GameLive, resolveGame, type ShowId, type World } from '@dtv/domain';
+import { type EpochMs, type GameId, type GameLive, resolveGame, showOf, type World } from '@dtv/domain';
 import type { ShowContext } from './graphic';
 
-/** What every bind of the active show reads, resolved once. */
+/** What every bind of the active game's show reads, resolved once. */
 export function showContext(input: {
   readonly world: World;
-  readonly showId: ShowId | null;
+  readonly gameId: GameId | null;
   readonly live: (game: GameId) => GameLive | undefined;
   readonly now: EpochMs;
 }): ShowContext {
-  const { world } = input;
-  const show = input.showId ? world.get('show', input.showId) : undefined;
-  const gameId = show?.gameId ?? null;
+  const { world, gameId } = input;
+  const show = gameId ? showOf(world, gameId) : undefined;
   const crew = (show?.crew ?? []).flatMap((member) => {
     const talent = world.get('talent', member.talentId);
     return talent ? [{ talent, role: member.role ?? talent.role }] : [];

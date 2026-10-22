@@ -48,7 +48,7 @@ const statusPage = () => {
   const rows = [
     ['Database', DB_PATH],
     ['Revision', String(status.revision)],
-    ['Active show', status.showId ?? 'none'],
+    ['Active game', status.gameId ?? 'none'],
     ['Operators', status.operators.join(', ') || 'none'],
     ['Open streams', String(status.streams)],
   ];

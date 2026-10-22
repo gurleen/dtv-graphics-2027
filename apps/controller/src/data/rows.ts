@@ -1,6 +1,6 @@
 /** Reading rows of a kind chosen at run time, and the names the page shows for them. */
 
-import { type EntityKind, type Game, type World } from '@dtv/domain';
+import { type EntityKind, type Game, matchupLabel, type World } from '@dtv/domain';
 import { type Doc } from './paths';
 
 /** The World's `get` takes a branded id of one kind; a kind and id chosen at run time cannot prove that, so the cast lives here. */
@@ -9,15 +9,6 @@ export const rowOf = (world: World, kind: EntityKind, id: string): Doc | undefin
 export const personName = (person: { readonly firstName: string; readonly lastName: string }) => [person.firstName, person.lastName].filter(Boolean).join(' ');
 
 const GAME_DAY = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
-
-/** `Drexel at Saint Joseph's`. */
-export function matchupLabel(world: World, game: Pick<Game, 'awayTeamId' | 'homeTeamId'>): string {
-  const name = (teamId: Game['homeTeamId']) => {
-    const team = world.get('team', teamId);
-    return (team && world.get('school', team.schoolId)?.shortName) ?? teamId;
-  };
-  return `${name(game.awayTeamId)} at ${name(game.homeTeamId)}`;
-}
 
 /** `Drexel at Saint Joseph's · Oct 21`. */
 export const gameLabel = (world: World, game: Game): string => `${matchupLabel(world, game)} · ${GAME_DAY.format(new Date(game.startsAt))}`;
@@ -52,8 +43,9 @@ export function rowLabel(world: World, kind: EntityKind, doc: Doc): string {
     case 'school':
     case 'sponsor':
     case 'venue':
-    case 'show':
       return text('name') || `New ${kind}`;
+    case 'game':
+      return gameLabel(world, doc as Game);
     default:
       return text('id');
   }

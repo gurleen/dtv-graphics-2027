@@ -21,7 +21,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { first } from '@dtv/api';
-import { type Cue, CueId, GraphicId, ShowId } from '@dtv/domain';
+import { type Cue, CueId, GameId, GraphicId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import { type AnyGraphic, boundProps, CueRef, type LayerFrame, OperatorId, type WireValue } from '@dtv/playout';
 import { PNG } from 'pngjs';
@@ -62,7 +62,7 @@ const withChanges = process.argv.includes('--changes');
 const dataImages = process.argv.includes('--data-images');
 mkdirSync(out, { recursive: true });
 
-const SHOW = ShowId.parse('drexel-sju');
+const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const operator = OperatorId.parse('compare');
 
 interface Measure {
@@ -155,7 +155,7 @@ async function air(rig: Rig, entry: AnyGraphic, index: number): Promise<LayerFra
   await rig.command({ type: 'clearAll' });
   await rig.settle({});
   const world = await first((signal) => rig.api.data.watch(undefined, { signal }));
-  const show = world.entities.show.find((each) => each.id === SHOW)!;
+  const show = world.entities.show.find((each) => each.id === GAME)!;
   const cue: Cue = { id: CueId.parse(`compare-${index}`), graphic: GraphicId.parse(entry.id), params: entry.params.parse(entry.demo) as Record<string, unknown>, overrides: {}, note: '' };
   await rig.api.data.apply({ origin: 'manual', basis: world.revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [cue] } }] });
   await rig.command({ type: 'air', operator, ref: CueRef.parse({ kind: 'rundown', cue: cue.id }) });
@@ -180,7 +180,7 @@ const entries = Object.values(GRAPHICS as Readonly<Record<string, AnyGraphic>>)
 const report: Record<string, unknown>[] = [];
 const rig = await startRig({ port });
 try {
-  await rig.command({ type: 'activate', show: SHOW });
+  await rig.command({ type: 'activate', game: GAME });
   const backgrounds = new Set<string>();
   for (const [index, entry] of entries.entries()) {
     const stem = entry.scene.file.replace(/\.rml$/, '');

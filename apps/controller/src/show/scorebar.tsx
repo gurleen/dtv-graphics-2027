@@ -23,7 +23,7 @@ export function ScoreBar(props: { readonly game: GameView | undefined; readonly 
   const { game, live } = props;
   const now = useNow(!!live && (live.clock.running || !!live.shotClock?.running));
   if (!game || !live) {
-    return <footer className="scorebar empty">{game ? 'Waiting for the game…' : 'This show has no game.'}</footer>;
+    return <footer className="scorebar empty">Waiting for the game…</footer>;
   }
   const program = game.program as keyof typeof basketball.BASKETBALL_FORMAT;
   const shot = live.shotClock && basketball.remainingAt(live.shotClock, now);

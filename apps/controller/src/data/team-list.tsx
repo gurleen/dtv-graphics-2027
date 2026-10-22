@@ -10,11 +10,11 @@ const keyOfView = (view: View | null) => (view?.type === 'team' ? `team:${view.t
 
 export function TeamList({ view, onView }: { readonly view: View | null; readonly onView: (view: View) => void }) {
   const { world } = useController();
-  const show = useController().show?.show ?? null;
+  const active = useController().show?.game ?? null;
   const [query, setQuery] = useState('');
   const [recent, setRecent] = useState(() => readRecent(localStorage));
   const entries = useMemo(() => (world ? teamEntries(world) : []), [world]);
-  const game = show?.gameId && world ? world.get('game', show.gameId) : undefined;
+  const game = active && world ? world.get('game', active.id) : undefined;
   const pinned = pinnedTeams(entries, game ? [game.homeTeamId, game.awayTeamId] : [], recent);
   const results = useMemo(() => searchTeams(entries, query, SEARCH_LIMIT), [entries, query]);
   const schools = world?.all('school').length ?? 0;

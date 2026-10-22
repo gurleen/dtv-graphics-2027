@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { CueId, GraphicId, Revision, ShowId, Sponsor, Sponsorship, Url } from '@dtv/domain';
+import { CueId, GameId, GraphicId, Revision, Sponsor, Sponsorship, Url } from '@dtv/domain';
 import { FALLBACK_IMAGES, flatten, project } from './project';
 import { fixtureContext, fixtureWorld, REGISTRY } from './registry.fixture';
 import type { SceneFacts } from './scene';
@@ -111,8 +111,8 @@ describe('project', () => {
   });
 
   test('the bind reads the active show', () => {
-    const other = fixtureContext(fixtureWorld(), ShowId.parse('other'));
-    expect(frame({ bug: slot('bug', 'test/bug', {}) }, other).layers[0]?.values.title).toBe('OTHER SHOW');
+    const other = fixtureContext(fixtureWorld(), GameId.parse('other'));
+    expect(frame({ bug: slot('bug', 'test/bug', {}) }, other).layers[0]?.values.title).toBe('OTHER');
   });
 });
 

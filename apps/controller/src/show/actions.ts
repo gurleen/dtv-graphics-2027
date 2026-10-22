@@ -55,7 +55,7 @@ export interface ShowActions {
 export function useShowActions(selected: CueView | undefined): ShowActions | null {
   const { operator, registry, show: view } = useController();
   const { send, pending } = useCommands();
-  if (!view?.show) return null;
+  if (!view?.game) return null;
   return {
     take() {
       // A take still on its way already holds my preview; a second would find it empty.

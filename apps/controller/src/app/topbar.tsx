@@ -1,4 +1,4 @@
-/** The show's name, who is connected, the Reconnecting badge, Clear All, and Show | Data. */
+/** The active game, who is connected, the Reconnecting badge, Clear All, and Show | Data. */
 
 import { useState } from 'react';
 import { Button, Link } from 'react-aria-components';
@@ -15,7 +15,7 @@ export function TopBar(props: { readonly route: Route }) {
   return (
     <header className="topbar">
       <span className="brand">DTV Controller</span>
-      <span className="show-name">{show?.show ? show.show.name : 'No active show'}</span>
+      <span className="show-name">{show?.game ? show.game.label : 'No active game'}</span>
       <nav className="nav" aria-label="Pages">
         <Link href="#/show" className="nav-link" data-current={props.route === 'show' || undefined}>
           Show

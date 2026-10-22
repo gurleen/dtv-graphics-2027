@@ -1,7 +1,7 @@
 import type { TeamId } from '@dtv/domain';
 import type { EditableKind } from './fields';
 
-export const LISTS = { talent: 'Talent', sponsors: 'Sponsors', venues: 'Venues', shows: 'Shows' } as const;
+export const LISTS = { talent: 'Talent', sponsors: 'Sponsors', venues: 'Venues', games: 'Games' } as const;
 export type ListId = keyof typeof LISTS;
 
 /** What the middle column shows. */

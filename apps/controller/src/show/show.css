@@ -570,7 +570,7 @@
   margin: 0;
 }
 
-/* No active show */
+/* No active game */
 
 :where(.show-page, .show-portal) .picker-page,
 .picker-page:where(.show-portal) {

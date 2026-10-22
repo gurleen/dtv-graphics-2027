@@ -6,7 +6,7 @@
 
 import {
   type Conference, type EntityKind, type EntityOf, type Game, type IdOf, type Player, type School,
-  type Season, type Sponsor, type Staff, type Team, type TeamSeason, type Venue,
+  type Season, type Show, type Sponsor, type Staff, type Team, type TeamSeason, type Venue,
 } from './entities';
 import type { Lock } from './edits';
 import type { ConferenceId, GameId, GraphicId, SeasonId, TeamId } from './ids';
@@ -167,6 +167,18 @@ export interface GameView {
   readonly venue: Venue | undefined;
   readonly sides: Sides<TeamView>;
 }
+
+/** `Saint Joseph's at Drexel`: how a game, and so its show, is named. */
+export function matchupLabel(world: World, game: Pick<Game, 'awayTeamId' | 'homeTeamId'>): string {
+  const name = (teamId: TeamId) => {
+    const team = world.get('team', teamId);
+    return (team && world.get('school', team.schoolId)?.shortName) ?? teamId;
+  };
+  return `${name(game.awayTeamId)} at ${name(game.homeTeamId)}`;
+}
+
+/** A game's show. A game with no stored show has an empty crew and rundown; the first edit stores one. */
+export const showOf = (world: World, gameId: GameId): Show => world.get('show', gameId) ?? { id: gameId, crew: [], rundown: [] };
 
 /** Undefined if the game, its season, or either team is missing. */
 export function resolveGame(world: World, gameId: GameId): GameView | undefined {

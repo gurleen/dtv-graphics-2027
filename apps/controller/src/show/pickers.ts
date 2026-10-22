@@ -46,7 +46,7 @@ const labelOf = (row: object & { readonly id: string }): string => {
 
 /** The options for `kind`, with `current` kept when the narrowing leaves it out, so a cue never shows an empty picker. */
 export function pickerOptions(world: World, show: Show, kind: EntityKind, current: string | null): readonly PickerOption[] {
-  const game = show.gameId ? resolveGame(world, show.gameId) : undefined;
+  const game = resolveGame(world, show.id);
   const options = PICKERS[kind]?.(world, show, game) ?? world.all(kind).map((row) => ({ id: row.id, label: labelOf(row) }));
   if (!current || options.some((option) => option.id === current)) return options;
   const row = world.all(kind).find((each) => each.id === current);

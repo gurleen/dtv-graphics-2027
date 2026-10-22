@@ -66,7 +66,7 @@ export interface Store {
   watchShow(operator: OperatorId, signal: AbortSignal): AsyncGenerator<ShowView, void>;
   watchOutput(bus: BusRef, signal: AbortSignal): AsyncGenerator<OutputFrame, void>;
   onChange(topics: readonly Topic[], listener: () => void): () => void;
-  status(): { readonly revision: Revision; readonly showId: string | null; readonly operators: readonly OperatorId[]; readonly streams: number };
+  status(): { readonly revision: Revision; readonly gameId: string | null; readonly operators: readonly OperatorId[]; readonly streams: number };
   close(): void;
 }
 
@@ -107,7 +107,7 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
   };
 
   const max = (...revisions: Revision[]) => revisions.reduce((a, b) => (b > a ? b : a));
-  const context = () => showContext({ world, showId: show.showId, live: (game) => lives.get(game), now: clock.now() });
+  const context = () => showContext({ world, gameId: show.gameId, live: (game) => lives.get(game), now: clock.now() });
 
   let cancelTimer: (() => void) | null = null;
   /** One timer, at the earliest moment any live game's displayed clock changes. */
@@ -167,7 +167,7 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
     world: () => world,
 
     applyEdits(actor, batch) {
-      const problems = [...checkEdits(world, batch).map((problem) => problem.message), ...rundownProblems(registry, batch), ...activeShowDeletions(show, batch)];
+      const problems = [...checkEdits(world, batch).map((problem) => problem.message), ...rundownProblems(registry, batch), ...showDeletions(show, batch)];
       if (problems.length) return { ok: false, reason: 'inconsistent', detail: problems.join('\n') };
       const result = commitEdits(db, { actor, at: clock.now(), batch });
       if (!result.ok) return result;
@@ -273,7 +273,7 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
 
     status: () => ({
       revision: max(world.revision, showRevision, liveRevision),
-      showId: show.showId,
+      gameId: show.gameId,
       operators: [...presence.keys()],
       streams: listeners.size,
     }),
@@ -285,11 +285,17 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
   };
 }
 
-/** The show on air is not deletable: its rundown is what the operators' cues resolve against. */
-function activeShowDeletions(state: ShowState, batch: EditBatch): string[] {
-  return batch.edits.flatMap((edit) =>
-    edit.op === 'delete' && edit.kind === 'show' && edit.id === state.showId ? [`Show ${edit.id} is active; make another show active before deleting it`] : [],
-  );
+/**
+ * A show goes only with its game, and the active game is not deletable: its show's rundown
+ * is what the operators' cues resolve against.
+ */
+function showDeletions(state: ShowState, batch: EditBatch): string[] {
+  return batch.edits.flatMap((edit) => {
+    if (edit.op !== 'delete') return [];
+    if (edit.kind === 'show') return [`Show ${edit.id} is deleted only with its game`];
+    if (edit.kind === 'game' && edit.id === state.gameId) return [`Game ${edit.id} is active; make another game active before deleting it`];
+    return [];
+  });
 }
 
 /** Rundown cues must name a graphic and fit its params, which SQLite cannot check. */

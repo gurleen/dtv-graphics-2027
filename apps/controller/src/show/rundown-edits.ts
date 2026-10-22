@@ -1,11 +1,12 @@
 /**
- * Rundown edits. The rundown is the Show row, so every edit is one `data.apply` that puts
- * the show with its new rundown, on the revision the editor read. An edited cue on air
+ * Rundown edits. The rundown is the active game's Show row, so every edit is one `data.apply`
+ * that puts the show with its new rundown, on the revision the editor read; the first edit of
+ * a game with no show stored creates the row. An edited cue on air
  * reaches air through `refresh`; one in my preview is cued again, since a slot is frozen
  * when it is cued.
  */
 
-import { type Cue, CueId, type GraphicId, type Revision } from '@dtv/domain';
+import { type Cue, CueId, type GraphicId, type Revision, showOf } from '@dtv/domain';
 import type { CueView } from '@dtv/playout';
 import { reasonOf, useCommands } from '../app/commands';
 import { useController } from '../app/context';
@@ -25,8 +26,8 @@ export const newCueId = (graphic: GraphicId) => CueId.parse(`${graphic.split('/'
 export function useRundownEdits(): RundownEdits | null {
   const { api, operator, world, revision, show: view } = useController();
   const { send, fail } = useCommands();
-  const show = view?.show && world?.get('show', view.show.id);
-  if (!show || revision === null) return null;
+  if (!view?.game || !world || revision === null) return null;
+  const show = showOf(world, view.game.id);
 
   const write = async (rundown: readonly Cue[], basis: Revision, onConflict = 'The rundown changed just now; nothing was saved. Try again.') => {
     try {

@@ -7,7 +7,7 @@
  * slot on air that came from it, the path an operator's rundown edit takes.
  */
 
-import { type CueId, type EpochMs, type GameId, type GameLive, indexWorld, Revision, type Show, type ShowId, type WorldSnapshot } from '@dtv/domain';
+import { type CueId, type EpochMs, type GameId, type GameLive, indexWorld, Revision, type Show, showOf, type WorldSnapshot } from '@dtv/domain';
 import { showContext } from './context';
 import type { LayerId, Registry } from './graphic';
 import { bindValues, type OutputFrame, project } from './project';
@@ -39,18 +39,17 @@ export interface LocalShow {
 export function createLocalShow(input: {
   readonly registry: Registry;
   readonly snapshot: WorldSnapshot;
-  readonly showId: ShowId;
+  readonly gameId: GameId;
   readonly live?: GameLive;
   readonly now: EpochMs;
 }): LocalShow {
   const { registry } = input;
   const world = indexWorld(input.snapshot);
-  const initial = world.get('show', input.showId);
-  if (!initial) throw new Error(`The snapshot has no show ${input.showId}`);
-  const base = showContext({ world, showId: input.showId, live: (game: GameId) => (game === input.live?.gameId ? input.live : undefined), now: input.now });
+  if (!world.get('game', input.gameId)) throw new Error(`The snapshot has no game ${input.gameId}`);
+  const base = showContext({ world, gameId: input.gameId, live: (game: GameId) => (game === input.live?.gameId ? input.live : undefined), now: input.now });
 
-  let show = initial;
-  let state: ShowState = { ...EMPTY_SHOW, showId: input.showId };
+  let show = showOf(world, input.gameId);
+  let state: ShowState = { ...EMPTY_SHOW, gameId: input.gameId };
   let revision = 0;
   let slots = 0;
   const listeners = new Set<() => void>();

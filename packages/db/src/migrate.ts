@@ -14,6 +14,14 @@ export interface DocMigration {
   readonly up: (doc: unknown) => unknown;
   /** Fields `up` renames, old name to new, so each row's locks follow them. */
   readonly renames?: Readonly<Record<string, string>>;
+  /** Fields `up` removes, so each row's lock on one goes with it. */
+  readonly drops?: readonly string[];
+  /**
+   * Work beyond one document, in the same transaction and before any row moves, so it reads
+   * the stored documents as they were: checks across rows, and tables that are not entities.
+   * It throws to refuse the migration.
+   */
+  readonly before?: (db: Db) => void;
 }
 
 /** The migration for a rename: the document's field and the row's lock on it both move. */
@@ -34,7 +42,45 @@ export const renameField = (version: number, kind: EntityKind, from: string, to:
  */
 const lockAuthors = ENTITY_KINDS.map((kind): DocMigration => ({ version: 1, kind, up: (doc) => doc }));
 
-export const DOC_MIGRATIONS: readonly DocMigration[] = [...lockAuthors];
+interface StoredShow {
+  readonly id: string;
+  readonly gameId: string | null;
+  readonly crew: unknown;
+  readonly rundown: unknown;
+}
+
+/**
+ * Version 2 makes a show its game's broadcast: keyed by the game's id, with no name or game
+ * field. A show with no game, or two shows on one game, cannot be rekeyed without losing one,
+ * so the migration refuses and names them. The show state then names the active game.
+ */
+const showIsGame: DocMigration = {
+  version: 2,
+  kind: 'show',
+  up: (doc) => {
+    const { gameId, crew, rundown } = doc as StoredShow;
+    return { id: gameId, crew, rundown };
+  },
+  drops: ['name', 'gameId'],
+  before: (db) => {
+    const shows = db.sqlite.query<{ doc: string }, []>('SELECT doc FROM shows ORDER BY id').all().map((row) => JSON.parse(row.doc) as StoredShow);
+    const gameless = shows.filter((show) => show.gameId === null);
+    if (gameless.length) throw new Error(`shows with no game cannot become a game's show: ${gameless.map((show) => show.id).join(', ')}`);
+    const byGame = new Map<string, StoredShow[]>();
+    for (const show of shows) byGame.set(show.gameId!, [...(byGame.get(show.gameId!) ?? []), show]);
+    const shared = [...byGame.values()].filter((group) => group.length > 1);
+    if (shared.length) {
+      throw new Error(`games with more than one show: ${shared.map((group) => `${group[0]!.gameId} (${group.map((show) => show.id).join(', ')})`).join('; ')}`);
+    }
+    const state = db.sqlite.query<{ doc: string }, []>('SELECT doc FROM show_state WHERE id = 1').get();
+    if (!state) return;
+    const { showId, ...rest } = JSON.parse(state.doc) as { showId?: string | null };
+    const gameId = shows.find((show) => show.id === showId)?.gameId ?? null;
+    db.sqlite.run('UPDATE show_state SET doc = ? WHERE id = 1', [JSON.stringify({ gameId, ...rest })]);
+  },
+};
+
+export const DOC_MIGRATIONS: readonly DocMigration[] = [...lockAuthors, showIsGame];
 
 export interface MigrationReport {
   readonly created: readonly string[];
@@ -60,15 +106,18 @@ interface Row {
 /** A lock from before version 1 is a bare field name, with no author. */
 const storedLock = (lock: unknown): Lock => (typeof lock === 'string' ? { field: lock, actor: null, at: null } : Lock.parse(lock));
 
-/** A row through `migrations` in order: its document reshaped and checked, its locks renamed. */
+/** A row through `migrations` in order: its document reshaped and checked, its locks renamed or dropped, its id the document's. */
 function migrateRow(kind: EntityKind, migrations: readonly DocMigration[], row: Row): Row {
   let doc: unknown = JSON.parse(row.doc);
   let locks = (JSON.parse(row.locked) as unknown[]).map(storedLock);
   for (const migration of migrations) {
     doc = migration.up(doc);
-    locks = locks.map((lock) => ({ ...lock, field: migration.renames?.[lock.field] ?? lock.field }));
+    locks = locks
+      .filter((lock) => !migration.drops?.includes(lock.field))
+      .map((lock) => ({ ...lock, field: migration.renames?.[lock.field] ?? lock.field }));
   }
-  return { ...row, doc: JSON.stringify(parseEntity(kind, doc)), locked: JSON.stringify(locks) };
+  const entity = parseEntity(kind, doc);
+  return { ...row, id: entity.id, doc: JSON.stringify(entity), locked: JSON.stringify(locks) };
 }
 
 /** SQLite's documented rebuild. `reshape` rewrites each row on the way, so generated columns read the new documents. */
@@ -133,6 +182,7 @@ export function migrate(
         db.sqlite.run(table.create);
         for (const index of table.indexes) db.sqlite.run(index);
       }
+      for (const migration of pending) migration.before?.(db);
       const reshapes = new Map<string, (row: Row) => Row>(
         ENTITY_KINDS.flatMap((kind) => {
           const own = pending.filter((migration) => migration.kind === kind);
@@ -143,10 +193,10 @@ export function migrate(
       const rebuiltNames = new Set(rebuilt.map((table) => table.table));
       for (const [table, reshape] of reshapes) {
         if (rebuiltNames.has(table)) continue;
-        const update = db.sqlite.prepare(`UPDATE "${table}" SET doc = ?, locked = ? WHERE id = ?`);
+        const update = db.sqlite.prepare(`UPDATE "${table}" SET id = ?, doc = ?, locked = ? WHERE id = ?`);
         for (const row of db.sqlite.query<Row, []>(`SELECT id, doc, seq, locked FROM "${table}"`).all()) {
           const next = reshape(row);
-          update.run(next.doc, next.locked, next.id);
+          update.run(next.id, next.doc, next.locked, row.id);
         }
       }
       db.sqlite.run(`PRAGMA user_version = ${latest}`);

@@ -4,7 +4,7 @@
  * draft until Save, which writes the rundown on the revision the draft began from.
  */
 
-import { type Cue, type GameLive, GraphicId, type Revision, sameJson, type Show, type World } from '@dtv/domain';
+import { type Cue, type GameLive, GraphicId, type Revision, sameJson, type Show, showOf, type World } from '@dtv/domain';
 import { type AnyGraphic, bindValues, blankGroup, boundProps, checkCue, type CueView, entryOf, type Overrides, paramForm, showContext } from '@dtv/playout';
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Dialog, Heading, Input, Label, ListBox, ListBoxItem, Modal, ModalOverlay, Popover, Select, SelectValue, TextField } from 'react-aria-components';
@@ -25,16 +25,16 @@ const draftOf = (cue: Cue): Draft => ({ params: cue.params, overrides: cue.overr
 function useUnedited(entry: AnyGraphic | undefined, params: Record<string, unknown>, live: GameLive | null): Readonly<Record<string, unknown>> {
   const { world, registry, show: view } = useController();
   return useMemo(() => {
-    if (!entry || !world || !view?.show) return {};
+    if (!entry || !world || !view?.game) return {};
     const check = checkCue(registry, { graphic: entry.id, params, overrides: {} });
     if (!check.ok) return {};
-    const context = showContext({ world, showId: view.show.id, live: (game) => (live?.gameId === game ? live : undefined), now: Date.now() });
+    const context = showContext({ world, gameId: view.game.id, live: (game) => (live?.gameId === game ? live : undefined), now: Date.now() });
     try {
       return bindValues(entry, { graphic: GraphicId.parse(entry.id), params: check.params, step: 0, overrides: {} }, context);
     } catch {
       return {};
     }
-  }, [entry, params, live, world, registry, view?.show]);
+  }, [entry, params, live, world, registry, view?.game]);
 }
 
 /** Params, overrides and note of one cue, as controls. */
@@ -91,9 +91,9 @@ function CueFields(props: { readonly entry: AnyGraphic; readonly draft: Draft; r
 export function Inspector(props: { readonly cue: CueView | undefined; readonly live: GameLive | null; readonly onCue: (cue: CueView) => void }) {
   const { world, revision, registry, show: view } = useController();
   const edits = useRundownEdits();
-  const show = view?.show ?? null;
+  const show = view?.game && world ? showOf(world, view.game.id) : null;
   const id = props.cue?.ref.kind === 'rundown' ? props.cue.ref.cue : null;
-  const stored = id && world && show ? world.get('show', show.id)?.rundown.find((cue) => cue.id === id) : undefined;
+  const stored = id && world && show ? show.rundown.find((cue) => cue.id === id) : undefined;
   const [draft, setDraft] = useState<(Draft & { readonly basis: Revision }) | null>(null);
   useEffect(() => setDraft(null), [id]);
 
@@ -192,7 +192,7 @@ export function AddCueDialog(props: { readonly at: number; readonly live: GameLi
               </ListBox>
             </Popover>
           </Select>
-          {entry && world && view?.show && <CueFields entry={entry} draft={draft} onChange={setDraft} live={props.live} world={world} show={view.show} />}
+          {entry && world && view?.game && <CueFields entry={entry} draft={draft} onChange={setDraft} live={props.live} world={world} show={showOf(world, view.game.id)} />}
           {check && !check.ok && <p className="problem">{check.error}</p>}
           <div className="dialog-actions">
             <Button className="button" onPress={() => props.onClose(null)}>

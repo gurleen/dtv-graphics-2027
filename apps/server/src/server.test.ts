@@ -8,13 +8,12 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type Api, type Connection, connect, first, type WatchStatus, watch } from '@dtv/api';
-import { type EditBatch, type GameApplyInput, GameId, PlayerId, ShowId, SourceId, TeamId, type WorldSnapshot } from '@dtv/domain';
+import { type EditBatch, type GameApplyInput, GameId, PlayerId, SourceId, TeamId, type WorldSnapshot } from '@dtv/domain';
 import { cueOf } from '@dtv/graphics';
 import { CommandId, CueRef, OperatorId, type OutputFrame, type ShowCommand, type ShowView } from '@dtv/playout';
 
 const MAIN = join(import.meta.dir, 'main.ts');
 const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
-const SHOW = ShowId.parse('drexel-sju');
 const REED = PlayerId.parse('drexel-mbb@2026-27/reed-josh');
 const HIPPS = PlayerId.parse('drexel-mbb@2026-27/hipps');
 const alex = OperatorId.parse('alex');
@@ -116,13 +115,13 @@ describe('two clients over one real WebSocket each', () => {
 
   test('A cues and takes the player lower third; B sees it on program, and B’s program output carries the name in capitals', async () => {
     const world = await first((signal) => a.api.data.watch(undefined, { signal }));
-    const show = world.entities.show.find((row) => row.id === SHOW)!;
+    const show = world.entities.show.find((row) => row.id === GAME)!;
     const rundown = [
       cueOf('basketball-v2/player-lower-third', { player: REED, line: { kind: 'game', stats: ['pts', 'reb'] } }, { id: 'reed' }),
       cueOf('basketball-v2/player-lower-third', { player: HIPPS }, { id: 'hipps' }),
     ];
     await a.api.data.apply({ origin: 'manual', basis: world.revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown } }] });
-    await command(a.api, { type: 'activate', show: SHOW });
+    await command(a.api, { type: 'activate', game: GAME });
     expect(await command(a.api, { type: 'cue', operator: alex, ref: CueRef.parse({ kind: 'rundown', cue: 'reed' }) })).toMatchObject({ changed: true });
     expect(await command(a.api, { type: 'take', operator: alex })).toMatchObject({ changed: true });
 

@@ -5,13 +5,14 @@
  * bottom.
  */
 
-import { type CueId, resolveGame, sameJson, type Show } from '@dtv/domain';
+import { type CueId, type GameId, resolveGame, sameJson } from '@dtv/domain';
 import { type Bus, LAYERS, type OperatorId, type Registry, type ShowCommand, type ShowView } from '@dtv/playout';
 import './show.css';
 import { useEffect, useState } from 'react';
 import { Button } from 'react-aria-components';
 import { useCommands } from '../app/commands';
 import { useController } from '../app/context';
+import { gameLabel } from '../data/rows';
 import { type ShowActions, slotLabel, stepsOf, useShowActions } from './actions';
 import { useGame } from './game';
 import { AddCueDialog, Inspector } from './inspector';
@@ -25,23 +26,23 @@ import { ScoreBar } from './scorebar';
 export function ShowPage() {
   const { show: view } = useController();
   if (!view) return <p className="loading">Connecting…</p>;
-  if (!view.show) return <ShowPicker />;
-  return <Console view={view} show={view.show} />;
+  if (!view.game) return <GamePicker />;
+  return <Console view={view} game={view.game.id} />;
 }
 
-function ShowPicker() {
+function GamePicker() {
   const { world } = useController();
   const { send } = useCommands();
-  const shows = world?.all('show') ?? [];
+  const games = [...(world?.all('game') ?? [])].sort((a, b) => b.startsAt.localeCompare(a.startsAt));
   return (
-    <section className="panel picker-page" aria-label="Choose a show">
-      <h2>No show is active</h2>
-      <p className="muted">Activating a show empties every preview; program stays on air.</p>
+    <section className="panel picker-page show-portal" aria-label="Choose a game">
+      <h2>No game is active</h2>
+      <p className="muted">Activating a game empties every preview; program stays on air.</p>
       <ul className="show-list">
-        {shows.map((show) => (
-          <li key={show.id}>
-            <span>{show.name}</span>
-            <Button className="button primary" onPress={() => void send({ type: 'activate', show: show.id })}>
+        {world && games.map((game) => (
+          <li key={game.id}>
+            <span>{gameLabel(world, game)}</span>
+            <Button className="button primary" onPress={() => void send({ type: 'activate', game: game.id })}>
               Activate
             </Button>
           </li>
@@ -51,8 +52,8 @@ function ShowPicker() {
   );
 }
 
-function Console(props: { readonly view: ShowView; readonly show: Show }) {
-  const { view, show } = props;
+function Console(props: { readonly view: ShowView; readonly game: GameId }) {
+  const { view } = props;
   const { world } = useController();
   const { clearAll } = useCommands();
   const ids = view.rundown.map((cue) => cueIdOf(cue)!);
@@ -68,8 +69,8 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
   const [dragging, setDragging] = useState(false);
   const [listingKeys, setListingKeys] = useState(false);
 
-  const live = useGame(show.gameId);
-  const game = world && show.gameId ? resolveGame(world, show.gameId) : undefined;
+  const live = useGame(props.game);
+  const game = world ? resolveGame(world, props.game) : undefined;
 
   const run = (action: KeyAction) => {
     switch (action.type) {

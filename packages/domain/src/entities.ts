@@ -10,7 +10,7 @@
 
 import { z } from 'zod';
 import {
-  ConferenceId, CueId, GameId, GraphicId, PlayerId, SchoolId, SeasonId, ShowId, SponsorId, StaffId,
+  ConferenceId, CueId, GameId, GraphicId, PlayerId, SchoolId, SeasonId, SponsorId, StaffId,
   TalentId, TeamId, TeamSeasonId, VenueId,
 } from './ids';
 import { Color, Url, WinLoss } from './primitives';
@@ -177,11 +177,9 @@ export const Cue = z.object({
 });
 export type Cue = z.infer<typeof Cue>;
 
-/** A broadcast: its game, its crew, and the rundown of show-specific cues. */
+/** A game's broadcast: its crew and the rundown of cues. Its id is the game's id. */
 export const Show = z.object({
-  id: ShowId,
-  name: z.string().min(1),
-  gameId: GameId.nullable().default(null),
+  id: GameId,
   crew: z.array(z.object({ talentId: TalentId, role: z.string().nullable().default(null) })).default([]),
   rundown: z.array(Cue).default([]),
 });
@@ -234,7 +232,7 @@ export const ENTITIES = defineEntities({
     table: 'games',
     refs: { seasonId: { to: 'season' }, awayTeamId: { to: 'team' }, homeTeamId: { to: 'team' }, venueId: { to: 'venue' } },
   },
-  show: { schema: Show, table: 'shows', refs: { gameId: { to: 'game' } } },
+  show: { schema: Show, table: 'shows', refs: { id: { to: 'game', cascade: true } } },
 });
 
 export type EntityKind = keyof typeof ENTITIES;

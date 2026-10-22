@@ -31,7 +31,6 @@ export const TalentId = slugId<'TalentId'>('talent');
 export const SponsorId = slugId<'SponsorId'>('sponsor');
 export const VenueId = slugId<'VenueId'>('venue');
 export const GameId = slugId<'GameId'>('game');
-export const ShowId = slugId<'ShowId'>('show');
 export const CueId = slugId<'CueId'>();
 /** `<package>/<graphic>`, e.g. `basketball-v2/scorebug`. Checked against the registry at the API boundary. */
 export const GraphicId = slugId<'GraphicId'>();
@@ -49,7 +48,6 @@ export type TalentId = z.infer<typeof TalentId>;
 export type SponsorId = z.infer<typeof SponsorId>;
 export type VenueId = z.infer<typeof VenueId>;
 export type GameId = z.infer<typeof GameId>;
-export type ShowId = z.infer<typeof ShowId>;
 export type CueId = z.infer<typeof CueId>;
 export type GraphicId = z.infer<typeof GraphicId>;
 export type SourceId = z.infer<typeof SourceId>;
@@ -79,7 +77,6 @@ export const idFor = {
   talent: (firstName: string, lastName: string) => TalentId.parse(slugify(`${firstName} ${lastName}`)),
   sponsor: (name: string) => SponsorId.parse(slugify(name)),
   venue: (name: string) => VenueId.parse(slugify(name)),
-  show: (name: string) => ShowId.parse(slugify(name)),
   /** `date` is the local game day, `YYYY-MM-DD`. */
   game: (season: SeasonId, date: string, away: TeamId, home: TeamId) => GameId.parse(`${season}/${date}/${away}.at.${home}`),
 };
