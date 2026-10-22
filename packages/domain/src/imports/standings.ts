@@ -67,7 +67,8 @@ export function regularSeasonEnd<T extends string>(games: readonly Result<T>[], 
  * Overall and the streak count every game. The conference record counts games between two
  * teams of the same conference up to that conference's `regularSeasonEnd`. Rank orders a
  * conference by conference win percentage, then conference wins, then overall win
- * percentage, then name.
+ * percentage, then, among the teams tied on that record, win percentage in conference games
+ * between them, then overall win percentage, then name.
  */
 export function standings<T extends string, C extends string>(input: {
   readonly results: readonly Result<T>[];
@@ -89,7 +90,7 @@ export function standings<T extends string, C extends string>(input: {
   }
   const ends = new Map([...byConference].map(([conference, games]) => [conference, regularSeasonEnd(games, input.march)]));
 
-  const records = new Map(input.teams.map((team) => [team, { overall: { wins: 0, losses: 0 }, conference: { wins: 0, losses: 0 }, outcomes: [] as ('W' | 'L')[] }]));
+  const records = new Map(input.teams.map((team) => [team, { overall: { wins: 0, losses: 0 }, conference: { wins: 0, losses: 0 }, outcomes: [] as ('W' | 'L')[], versus: new Map<T, WinLoss>() }]));
   for (const game of results) {
     const conference = conferenceGame(game);
     const end = conference && ends.get(conference);
@@ -99,7 +100,13 @@ export function standings<T extends string, C extends string>(input: {
       const record = team === null ? undefined : records.get(team);
       if (!record) continue;
       record.overall[won ? 'wins' : 'losses']++;
-      if (counts) record.conference[won ? 'wins' : 'losses']++;
+      if (counts) {
+        record.conference[won ? 'wins' : 'losses']++;
+        const opponent = team === game.home ? game.away! : game.home!;
+        const versus = record.versus.get(opponent) ?? { wins: 0, losses: 0 };
+        versus[won ? 'wins' : 'losses']++;
+        record.versus.set(opponent, versus);
+      }
       record.outcomes.push(won ? 'W' : 'L');
     }
   }
@@ -118,16 +125,29 @@ export function standings<T extends string, C extends string>(input: {
     const conference = input.conferenceOf(team);
     if (conference && byConference.has(conference)) members.set(conference, [...(members.get(conference) ?? []), team]);
   }
+  const sameRecord = (a: WinLoss, b: WinLoss) => a.wins === b.wins && a.losses === b.losses;
   for (const teams of members.values()) {
     const order = teams.map((team) => ({ team, ...records.get(team)! }));
-    order.sort(
-      (a, b) =>
-        pct(b.conference) - pct(a.conference) ||
-        b.conference.wins - a.conference.wins ||
-        pct(b.overall) - pct(a.overall) ||
-        input.nameOf(a.team).localeCompare(input.nameOf(b.team)),
-    );
-    order.forEach(({ team }, index) => ranks.set(team, index + 1));
+    order.sort((a, b) => pct(b.conference) - pct(a.conference) || b.conference.wins - a.conference.wins);
+    const placed: typeof order = [];
+    for (let start = 0; start < order.length; ) {
+      const end = order.findIndex((row, index) => index > start && !sameRecord(row.conference, order[start]!.conference));
+      const tied = order.slice(start, end === -1 ? order.length : end);
+      const amongTied = (row: (typeof order)[number]) => {
+        const games = tied.flatMap((other) => row.versus.get(other.team) ?? []);
+        return pct({ wins: games.reduce((n, g) => n + g.wins, 0), losses: games.reduce((n, g) => n + g.losses, 0) });
+      };
+      const headToHead = new Map(tied.map((row) => [row.team, amongTied(row)]));
+      tied.sort(
+        (a, b) =>
+          headToHead.get(b.team)! - headToHead.get(a.team)! ||
+          pct(b.overall) - pct(a.overall) ||
+          input.nameOf(a.team).localeCompare(input.nameOf(b.team)),
+      );
+      placed.push(...tied);
+      start += tied.length;
+    }
+    placed.forEach(({ team }, index) => ranks.set(team, index + 1));
   }
 
   return new Map(

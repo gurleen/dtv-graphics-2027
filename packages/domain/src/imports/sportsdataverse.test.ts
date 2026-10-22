@@ -229,7 +229,30 @@ describe('sportsdataverseEdits', () => {
 });
 
 describe('standings', () => {
-  test('ties in conference record go to overall win percentage, then name', () => {
+  test('a tie in conference record goes to head-to-head before overall win percentage', () => {
+    const result = (contest: string, date: string, away: string, home: string, awayPts: number, homePts: number) => ({ contest, date, away, home, awayPts, homePts });
+    const table = standings({
+      results: [
+        result('1', '2026-01-01', 'b', 'a', 60, 70),
+        result('2', '2026-01-02', 'a', 'c', 60, 70),
+        result('3', '2026-01-03', 'd', 'b', 60, 70),
+        result('4', '2026-01-04', 'd', 'c', 60, 70),
+        result('5', '2025-11-10', 'x', 'b', 60, 70),
+      ],
+      teams: ['a', 'b', 'c', 'd'],
+      conferenceOf: (team) => (team === 'x' ? 'other' : 'east'),
+      nameOf: (team) => team,
+      march: '2026-03-01',
+    });
+    expect([...table].map(([team, row]) => [team, row.rank, `${row.overall.wins}-${row.overall.losses}`, `${row.conference.wins}-${row.conference.losses}`])).toEqual([
+      ['a', 2, '1-1', '1-1'],
+      ['b', 3, '2-1', '1-1'],
+      ['c', 1, '2-0', '2-0'],
+      ['d', 4, '0-2', '0-2'],
+    ]);
+  });
+
+  test('a tie head-to-head does not settle goes to overall win percentage, then name', () => {
     const result = (contest: string, date: string, away: string, home: string, awayPts: number, homePts: number) => ({ contest, date, away, home, awayPts, homePts });
     const table = standings({
       results: [
