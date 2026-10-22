@@ -33,10 +33,10 @@ export interface ImportWarning {
 }
 
 const LOGO_BASE = 'https://images.dragonstv.io/logos';
-const FALLBACK_PRIMARY = Color.parse('#333333');
-const FALLBACK_SECONDARY = Color.parse('#ffffff');
+export const FALLBACK_PRIMARY = Color.parse('#333333');
+export const FALLBACK_SECONDARY = Color.parse('#ffffff');
 
-const toColor = (value: string): Color | null => (/^[0-9a-fA-F]{6}$/.test(value) ? Color.parse(`#${value.toLowerCase()}`) : null);
+export const toColor = (value: string): Color | null => (/^[0-9a-fA-F]{6}$/.test(value) ? Color.parse(`#${value.toLowerCase()}`) : null);
 const toLogo = (logoName: string): Url | null => (logoName ? Url.parse(`${LOGO_BASE}/${logoName.replace(/\.png$/i, '')}.PNG`) : null);
 
 const recordCount = (n: number) => `${n} record${n === 1 ? '' : 's'}`;
