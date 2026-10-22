@@ -25,6 +25,8 @@ export interface RendererOptions {
   readonly rivUrl: (scene: SceneFacts) => string;
   /** Bound in place of an image that fails to load, so a scene's embedded test image never shows. */
   readonly blankImage: string;
+  /** Hold each intro until every other layer's outro has finished, for a preview that shows one cue at a time. */
+  readonly sequential?: boolean;
   /** A layer's problem, such as a failed load, for a status line. */
   readonly onProblem?: (layer: LayerId, message: string) => void;
 }
@@ -77,6 +79,9 @@ export function createRenderer(options: RendererOptions): Renderer {
     }),
   );
   let disposed = false;
+  /** Layers loaded and entering whose intro waits on another layer's outro. */
+  const held = new Set<LayerId>();
+  const leaving = () => [...runs.values()].some((run) => run.state.phase === 'leaving');
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const after = (ms: number, then: () => void) => {
     const timer = setTimeout(() => {
@@ -92,6 +97,9 @@ export function createRenderer(options: RendererOptions): Renderer {
     const { state, effects } = transition(run.state, event, rulesOf);
     run.state = state;
     for (const effect of effects) perform(layer, run, effect);
+    if (!held.size || leaving()) return;
+    for (const waiting of held) play(waiting, runs.get(waiting)!);
+    held.clear();
   };
 
   const problem = (layer: LayerId, message: string) => {
@@ -114,12 +122,9 @@ export function createRenderer(options: RendererOptions): Renderer {
       case 'media':
         void run.overlay?.setMedia(effect.url);
         return;
-      case 'play': {
-        run.instance?.setPlaying(true);
-        run.overlay?.setPlaying(true);
-        const slot = frame!.slot;
-        return after(entry?.scene.animations[INTRO] ?? 0, () => dispatch(layer, { type: 'animated', slot }));
-      }
+      case 'play':
+        if (options.sequential && leaving()) return void held.add(layer);
+        return play(layer, run);
       case 'animate': {
         const slot = frame!.slot;
         return after(entry?.scene.animations[effect.animation] ?? 0, () => dispatch(layer, { type: 'animated', slot }));
@@ -147,6 +152,13 @@ export function createRenderer(options: RendererOptions): Renderer {
         run.instance = null;
         return;
     }
+  }
+
+  function play(layer: LayerId, run: LayerRun): void {
+    const frame = frameOf(run)!;
+    run.instance?.setPlaying(true);
+    run.overlay?.setPlaying(true);
+    after(registry[frame.graphic]?.scene.animations[INTRO] ?? 0, () => dispatch(layer, { type: 'animated', slot: frame.slot }));
   }
 
   async function load(layer: LayerId, run: LayerRun, frame: LayerFrame): Promise<void> {

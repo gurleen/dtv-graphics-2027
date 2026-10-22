@@ -32,6 +32,8 @@ export function Monitor(props: { readonly name: string; readonly bus: BusRef; re
       registry,
       rivUrl: (scene) => `/riv/${scene.file.replace(/\.rml$/, '.riv')}`,
       blankImage: '/assets/images/blank.png',
+      // A preview shows one cue at a time, so a cue on another layer waits for the last one to play out.
+      sequential: props.bus.kind === 'preview',
     });
     const created: MonitorHandle = { renderer, frame: null };
     window.dtvMonitors = { ...window.dtvMonitors, [props.name]: created };

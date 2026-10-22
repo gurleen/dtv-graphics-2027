@@ -503,6 +503,11 @@ site. Each layer runs this table, as a pure function of state and event that ret
 `entering` covers any animation that must land before the next change: the Intro, or a step's transition timeline.
 A step change during one is held and played when it lands.
 
+Layers run independently, so on program the scorebug stays up while a lower third comes and goes. With
+`sequential: true`, as the controller's preview monitors set it, a layer that reaches `entering` holds its `isPlaying`
+until no other layer is `leaving`. A preview shows one cue at a time, so a cue on another layer starts its intro only
+after the last cue has played out.
+
 The intro finishes before an outro starts because of how the scenes are built. In `basketball_scorebug.rml`,
 clearing `isPlaying` during the Intro jumps to the Outro state with no exit time, and the Outro resets to its own
 first frame. A half-played intro would snap to the full pose before leaving.
