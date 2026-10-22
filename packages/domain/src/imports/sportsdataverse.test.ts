@@ -405,18 +405,20 @@ describe('sportsdataverseEdits', () => {
     const lastFile = [prior('5239623', '2182', 'Sophomore'), prior('6000002', '2275', 'Sophomore'), prior('6000004', '119', 'Senior')];
     const played = (athlete_id: string, team_id: string) => ({ ...line('n1', [10, 2, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]), athlete_id, team_id });
 
+    /** A player a 2025-26 load wrote, keyed by his ESPN athlete id. */
+    const player = (team: string, slug: string, athleteId: string, classYear: string) =>
+      ({
+        op: 'put',
+        kind: 'player',
+        value: parseEntity('player', { id: `${team}@2025-26/${slug}`, teamId: team, seasonId: '2025-26', firstName: 'A', lastName: slug, jersey: '1', classYear, sourceKey: `espn:${athleteId}` }),
+      }) as const;
+
     test('a team is decided alone: one with a box score is loaded, one without stays guarded; a senior staying a senior proves nothing', () => {
       const { loaded, stale } = guarded(world, { rosters, priorRosters: lastFile, playerBox: [played('6000002', '2275')] });
       expect([loaded, stale]).toEqual([['hofstra-mbb', 'towson-mbb'], ['Drexel']]);
     });
 
     test("last season's players an earlier load wrote outrank last season's file, which ESPN rebuilds", () => {
-      const player = (team: string, slug: string, athleteId: string, classYear: string) =>
-        ({
-          op: 'put',
-          kind: 'player',
-          value: parseEntity('player', { id: `${team}@2025-26/${slug}`, teamId: team, seasonId: '2025-26', firstName: 'A', lastName: slug, jersey: '1', classYear, sourceKey: `espn:${athleteId}` }),
-        }) as const;
       const loadedLastSeason = commit(world, [player('drexel-mbb', 'reed', '5239623', 'FR'), player('hofstra-mbb', 'pride', '6000002', 'SO')]);
       // The rebuilt file has Reed a sophomore already and Pride a freshman; the World remembers otherwise.
       const rebuilt = [prior('5239623', '2182', 'Sophomore'), prior('6000002', '2275', 'Freshman'), prior('6000004', '119', 'Senior')];
@@ -424,6 +426,26 @@ describe('sportsdataverseEdits', () => {
       expect([loaded, stale]).toEqual([['drexel-mbb', 'towson-mbb'], ['Hofstra']]);
       const after = commit(loadedLastSeason, result.edits);
       expect(changing(after, guarded(after, { rosters, priorRosters: rebuilt }).result.edits)).toEqual([]);
+    });
+
+    test('a returner with no class on one side, or one a class lower than the World has him, proves nothing; one moving up loads the team', () => {
+      // Drexel's World classes came from the NCAA files: Gregwer a senior there, a junior to ESPN.
+      const loadedLastSeason = commit(world, [
+        player('drexel-mbb', 'reed', '5239623', 'SO'),
+        player('drexel-mbb', 'nolan', '6000010', 'JR'),
+        player('drexel-mbb', 'gregwer', '6000011', 'SR'),
+        player('hofstra-mbb', 'pride', '6000002', 'FR'),
+        player('hofstra-mbb', 'down', '6000012', 'SR'),
+      ]);
+      const copiedForward = [
+        athlete('5239623', '2182', 'Josh', 'Reed', '5', 'Sophomore'),
+        { ...athlete('6000010', '2182', 'Kim', 'Nolan', '20', ''), experience_display_value: null },
+        athlete('6000011', '2182', 'Claire', 'Gregwer', '21', 'Junior'),
+        athlete('6000002', '2275', 'Pat', 'Pride', '3', 'Sophomore'),
+        athlete('6000012', '2275', 'Dee', 'Down', '22', 'Junior'),
+      ];
+      const { loaded, stale } = guarded(loadedLastSeason, { rosters: copiedForward });
+      expect([loaded, stale]).toEqual([['hofstra-mbb'], ['Drexel']]);
     });
 
     test("last season's file is reported missing only when a team needed it", () => {

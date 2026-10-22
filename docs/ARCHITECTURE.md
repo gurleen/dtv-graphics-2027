@@ -185,9 +185,10 @@ postseason included. Rank breaks a tie in conference record head to head, then b
 files mark no conference tournament games reliably, so `regularSeasonEnd` finds the end of each conference's
 regular season from the schedule's shape and the conference record stops there; overall records and streaks count
 every game. ESPN copies last season's rosters forward before the new ones are out, so a team with no box score yet
-this season is skipped with a `stale-roster` warning when none of its returners changed class and at least one
-freshman, sophomore or junior should have. A senior, or a player with no class, stays put in a new season too, so
-he decides nothing. Last season's classes come from the `espn:` players an earlier load wrote, since ESPN rebuilds
+this season is skipped with a `stale-roster` warning when none of its returners moved up a class and at least one
+freshman, sophomore or junior should have. Only a returner with a class on both sides counts. A player taken over
+from the NCAA files can have no ESPN class or a higher one than ESPN gives him, so a missing class or one that
+moved down decides nothing, and a senior stays put in a new season too. Last season's classes come from the `espn:` players an earlier load wrote, since ESPN rebuilds
 last season's roster file from whatever it serves at rebuild time; that file is read only for a team the World has
 none of. A dataset not published for the season yet is a warning, not a failure. teams.json stays the curated
 branding of the schools it has: its colours and `images.dragonstv.io` logos differ from ESPN's for 173 of them,

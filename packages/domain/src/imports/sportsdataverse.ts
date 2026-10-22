@@ -11,7 +11,7 @@
 
 import { z } from 'zod';
 import { type ImportEdit, importPut } from '../edits';
-import { type ClassYear, type EntityKind, type Game, Player, School, Season, Team, TeamSeason } from '../entities';
+import { ClassYear, type EntityKind, type Game, Player, School, Season, Team, TeamSeason } from '../entities';
 import { type ConferenceId, idFor, type SchoolId, SeasonId, slugify, type TeamId, type VenueId } from '../ids';
 import { type Revision, Url } from '../primitives';
 import type { ProgramCode } from '../programs';
@@ -395,16 +395,22 @@ const classOf = (experience: string | null): ClassYear | null => {
 };
 
 /** The classes a new season moves a returner out of. ESPN's class stops at Senior. */
-const MOVES_UP: ReadonlySet<ClassYear | null> = new Set(['FR', 'SO', 'JR']);
+const MOVES_UP: ReadonlySet<ClassYear> = new Set(['FR', 'SO', 'JR']);
+const rank = (classYear: ClassYear) => ClassYear.options.indexOf(classYear);
 
 /**
- * ESPN's copy of last season's roster: no returner changed class, and at least one of them
- * should have. A senior or a player with no class stays put in a new season too, so he is
- * evidence of neither; a team whose returners are all such players is loaded.
+ * ESPN's copy of last season's roster: no returner moved up a class, and at least one of them
+ * should have. Only a returner with a class on both sides is evidence: a player the World took
+ * over from the NCAA files may have no ESPN class, or a higher one than ESPN gives him, so a
+ * class that is missing or moved down says nothing about a new roster. A senior stays put in a
+ * new season too, so a team whose returners are all seniors or classless is loaded.
  */
 const isStale = (rows: readonly SdvRow<'rosters'>[], before: ReadonlyMap<string, ClassYear | null>) => {
-  const returners = rows.filter((row) => before.has(row.athlete_id)).map((row) => [classOf(row.experience_display_value), before.get(row.athlete_id)] as const);
-  return returners.every(([now, then]) => now === then) && returners.some(([now]) => MOVES_UP.has(now));
+  const returners = rows.flatMap((row) => {
+    const [now, then] = [classOf(row.experience_display_value), before.get(row.athlete_id)];
+    return now && then ? [[now, then] as const] : [];
+  });
+  return returners.some(([now]) => MOVES_UP.has(now)) && !returners.some(([now, then]) => rank(now) > rank(then));
 };
 
 /** `2026-27` is preceded by `2025-26`. */
