@@ -10,8 +10,9 @@
 
 import { z } from 'zod';
 import { type ImportEdit, importPut } from '../edits';
-import { type Game, Player, type School, Season, Team, TeamSeason } from '../entities';
+import { type EntityKind, type Game, Player, type School, Season, Team, TeamSeason } from '../entities';
 import { type ConferenceId, idFor, type SchoolId, type SeasonId, slugify, type TeamId, type VenueId } from '../ids';
+import type { Revision } from '../primitives';
 import type { ProgramCode } from '../programs';
 import type { BasketballTeamSeasonStats } from '../sports/basketball';
 import type { World } from '../world';
@@ -423,4 +424,20 @@ function homeGames(
       },
     ];
   });
+}
+
+/** What a load committed, for the data page. */
+export interface SdvLoadReport {
+  readonly program: ProgramCode;
+  readonly season: SeasonId;
+  /** The revision after the commit; unchanged when the load wrote nothing. */
+  readonly revision: Revision;
+  readonly inserted: number;
+  readonly updated: number;
+  /** Locked fields the load left alone, per row. */
+  readonly skipped: readonly { readonly kind: EntityKind; readonly id: string; readonly fields: readonly string[] }[];
+  readonly warnings: readonly SdvWarning[];
+  readonly summary: SdvSummary;
+  /** Download, plan and commit, in milliseconds. */
+  readonly ms: number;
 }

@@ -10,13 +10,14 @@
  */
 
 import {
-  backup, commitEdits, commitLive, commitShowState, type Db, loadJournal, loadLive, loadShowState, loadSnapshot, type SkippedFields,
+  backup, type CommitResult, commitEdits, commitLive, commitShowState, type Db, loadJournal, loadLive, loadShowState, loadSnapshot, type SkippedFields,
 } from '@dtv/db';
 import {
-  checkEdits, type EditBatch, type EpochMs, type GameApplyInput, type GameId, type GameLive, indexWorld, parseRosterCsv, planRoster,
-  type PlayerId, playerOutsideGame, PROGRAMS, type Revision, type RosterError, type RosterPlan, sameJson, type SeasonId, SPORT_MODULES, type TeamId, type World,
-  type WorldSnapshot,
+  checkEdits, type EditBatch, type EpochMs, type GameApplyInput, type GameId, type GameLive, type HomeGames, indexWorld, parseRosterCsv, planRoster,
+  type PlayerId, playerOutsideGame, type ProgramCode, PROGRAMS, type Revision, type RosterError, type RosterPlan, sameJson, SchoolId, type SdvLoadReport,
+  type SeasonId, SPORT_MODULES, sportsdataverseEdits, type TeamId, VenueId, type World, type WorldSnapshot,
 } from '@dtv/domain';
+import { fetchSportsdataverse, type SdvFetcher } from '@dtv/sportsdataverse';
 import {
   type BusRef, checkCue, CommandId, EMPTY_SHOW, type OperatorId, type OutputFrame, previewOf, project, type Registry, reduceShow, type ShowCommand,
   showContext, ShowState, type ShowView, SlotId, viewShow,
@@ -40,9 +41,15 @@ export const systemClock: Clock = {
 /** What can change. Each stream wakes only on the topics its value reads. */
 export type Topic = 'data' | 'live' | 'show' | 'clock' | 'presence';
 
-export type DataResult =
-  | { readonly ok: true; readonly revision: Revision; readonly skipped: readonly SkippedFields[] }
-  | { readonly ok: false; readonly reason: 'conflict' | 'invalid-reference' | 'duplicate' | 'inconsistent'; readonly detail: string };
+type Refused = { readonly ok: false; readonly reason: 'conflict' | 'invalid-reference' | 'duplicate' | 'inconsistent'; readonly detail: string };
+
+export type DataResult = { readonly ok: true; readonly revision: Revision; readonly skipped: readonly SkippedFields[] } | Refused;
+
+/** `unavailable`: a file could not be downloaded or read. */
+export type LoadResult = { readonly ok: true; readonly report: SdvLoadReport } | Refused | { readonly ok: false; readonly reason: 'unavailable'; readonly detail: string };
+
+/** The school whose home games a load adds, at its arena. */
+const HOME_GAMES: HomeGames = { school: SchoolId.parse('drexel'), venue: VenueId.parse('daskalakis-athletic-center') };
 
 export type GameResult =
   | { readonly ok: true; readonly revision: Revision; readonly live: GameLive }
@@ -58,6 +65,8 @@ export interface Store {
   world(): World;
   applyEdits(actor: string, batch: EditBatch): DataResult;
   planRoster(input: { readonly team: TeamId; readonly season: SeasonId; readonly csv: string; readonly prune: boolean }): RosterResult;
+  /** Downloads the program-season's sportsdataverse files and commits what they change as one import batch. */
+  loadSportsdataverse(actor: string, input: { readonly program: ProgramCode; readonly season: SeasonId }): Promise<LoadResult>;
   applyGame(actor: string, input: GameApplyInput): GameResult;
   command(actor: string, input: { readonly id: CommandId; readonly command: ShowCommand }): CommandResult;
   watchData(signal: AbortSignal): AsyncGenerator<WorldSnapshot, void>;
@@ -75,8 +84,16 @@ const REMEMBERED_COMMANDS = 256;
 
 const ShowJournalPayload = z.object({ id: CommandId });
 
-export function createStore(options: { readonly db: Db; readonly registry: Registry; readonly clock: Clock; readonly backupDir: string }): Store {
+export function createStore(options: {
+  readonly db: Db;
+  readonly registry: Registry;
+  readonly clock: Clock;
+  readonly backupDir: string;
+  /** Where `loadSportsdataverse` gets its files; GitHub unless a test stubs it. */
+  readonly sportsdataverse?: SdvFetcher;
+}): Store {
   const { db, registry, clock } = options;
+  const fetchSources = options.sportsdataverse ?? fetchSportsdataverse();
 
   let world = indexWorld(loadSnapshot(db));
   let lives = new Map(loadLive(db));
@@ -163,22 +180,43 @@ export function createStore(options: { readonly db: Db; readonly registry: Regis
     }
   }
 
+  const commit = (actor: string, batch: EditBatch): CommitResult | Refused => {
+    const problems = [...checkEdits(world, batch).map((problem) => problem.message), ...rundownProblems(registry, batch), ...showDeletions(show, batch)];
+    if (problems.length) return { ok: false, reason: 'inconsistent', detail: problems.join('\n') };
+    const result = commitEdits(db, { actor, at: clock.now(), batch });
+    if (result.ok && result.revision !== world.revision) {
+      world = indexWorld(loadSnapshot(db));
+      lives = new Map(loadLive(db));
+      // A commit can add or remove a game, and its live state with it.
+      notify('data', 'live');
+      schedule();
+    }
+    return result;
+  };
+
   return {
     world: () => world,
 
     applyEdits(actor, batch) {
-      const problems = [...checkEdits(world, batch).map((problem) => problem.message), ...rundownProblems(registry, batch), ...showDeletions(show, batch)];
-      if (problems.length) return { ok: false, reason: 'inconsistent', detail: problems.join('\n') };
-      const result = commitEdits(db, { actor, at: clock.now(), batch });
-      if (!result.ok) return result;
-      if (result.revision !== world.revision) {
-        world = indexWorld(loadSnapshot(db));
-        lives = new Map(loadLive(db));
-        // A commit can add or remove a game, and its live state with it.
-        notify('data', 'live');
-        schedule();
+      const result = commit(actor, batch);
+      return result.ok ? { ok: true, revision: result.revision, skipped: result.skipped } : result;
+    },
+
+    async loadSportsdataverse(actor, { program, season }) {
+      const started = performance.now();
+      let sources;
+      try {
+        sources = await fetchSources(program, season);
+      } catch (error) {
+        return { ok: false, reason: 'unavailable', detail: error instanceof Error ? error.message : String(error) };
       }
-      return { ok: true, revision: result.revision, skipped: result.skipped };
+      // Planned on the World as it is after the download, and committed before anything else can write.
+      const plan = sportsdataverseEdits(world, sources, { program, season, gamesFor: HOME_GAMES });
+      const result = commit(actor, { origin: 'import', edits: plan.edits });
+      if (!result.ok) return result;
+      const { revision, inserted, updated, skipped } = result;
+      const ms = Math.round(performance.now() - started);
+      return { ok: true, report: { program, season, revision, inserted, updated, skipped, warnings: plan.warnings, summary: plan.summary, ms } };
     },
 
     planRoster(input) {

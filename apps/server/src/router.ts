@@ -29,6 +29,16 @@ export function createRouter(store: Store) {
         throw errors.INVALID_REFERENCE({ data });
       }),
       planRoster: os.data.planRoster.handler(({ input }) => store.planRoster(input)),
+      load: os.data.load.handler(async ({ input, context, errors }) => {
+        const result = await store.loadSportsdataverse(context.client, input);
+        if (result.ok) return result.report;
+        const data = { detail: result.detail };
+        if (result.reason === 'unavailable') throw errors.UNAVAILABLE({ data });
+        if (result.reason === 'conflict') throw errors.CONFLICT({ data });
+        if (result.reason === 'duplicate') throw errors.DUPLICATE({ data });
+        if (result.reason === 'inconsistent') throw errors.INCONSISTENT({ data });
+        throw errors.INVALID_REFERENCE({ data });
+      }),
     },
     game: {
       watch: os.game.watch.handler(({ input, signal }) => store.watchGame(input.game, signal ?? NEVER)),

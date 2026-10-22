@@ -39,7 +39,7 @@ apps/site               the stakeholder site: build script and viewer
 | `@dtv/renderer` | playout, domain, `@rive-app/canvas-single` |
 | `@dtv/api` | playout, domain, zod, `@orpc/*`, partysocket |
 | `@dtv/sportsdataverse` | domain, hyparquet, hyparquet-compressors |
-| `apps/server` | api, db, graphics, playout, domain, zod, `@orpc/server`, and the controller and `/renderer` pages as HTML imports |
+| `apps/server` | api, db, graphics, playout, domain, sportsdataverse, zod, `@orpc/server`, and the controller and `/renderer` pages as HTML imports |
 | `apps/controller` | api, renderer, graphics, playout, domain, react, React Aria Components, `@fontsource`; its proofs may import playwright |
 | `apps/renderer` | api, renderer, graphics |
 | `apps/site` | its build script may import db; its browser code may not |
@@ -166,6 +166,18 @@ unchanged count, players missing from the file, and the edits. The data page sho
 commits it with `data.apply`. Planning the same file again returns an empty plan. Missing players are deleted only
 when the operator asks (`prune`).
 
+The sportsdataverse loader fills a program-season from the parquet files that
+[sportsdataverse-data](https://github.com/sportsdataverse/sportsdataverse-data/releases) publishes nightly.
+`data.load` downloads them (`@dtv/sportsdataverse`), `sportsdataverseEdits` plans the edits on the current World, and
+the store commits them as one import batch, so locked fields stay as people set them. It writes each team's
+conference, record, streak, rank and season stats, every roster with jerseys and season stats, and Drexel's home
+games at 7 pm New York time. The files name teams by ESPN id, NCAA id and NCAA name; the team box pairs NCAA and
+ESPN ids, so it joins them to `School.espnId`. Wins and losses come from the team box, because the schedule swaps
+the score of some games. The files mark no conference tournament games, so `regularSeasonEnd` finds the end of each
+conference's regular season from the schedule's shape and the conference record stops there; overall records and
+streaks count every game. A dataset not published for the season yet is a warning, not a failure. teams.json stays
+the source of schools: no parquet file has colours, logos, abbreviations or mascots.
+
 ### Storage
 
 Each entity kind is one table of JSON documents. The referencing and unique fields are lifted into STORED generated
@@ -248,6 +260,7 @@ SQLite.
 | `data.watch` | none | stream of `WorldSnapshot` | none |
 | `data.apply` | `EditBatch` | `{ revision, skipped }` | `CONFLICT`, `INVALID_REFERENCE`, `DUPLICATE`, `INCONSISTENT` |
 | `data.planRoster` | team, season, csv, prune | the plan, or the bad rows | none |
+| `data.load` | program, season | the load's report: rows inserted and updated, skipped locks, warnings | `UNAVAILABLE`, and `data.apply`'s |
 | `game.watch` | game | stream of `GameLive` | none |
 | `game.apply` | `GameApplyInput` | `{ revision, live }` | `NOT_AUTHORITY`, `NOT_IN_GAME`, `NO_GAME` |
 | `show.watch` | operator | stream of `ShowView` | none |
@@ -255,7 +268,7 @@ SQLite.
 | `output.watch` | bus | stream of `OutputFrame` | none |
 
 There are no per-entity procedures. `data.watch` gives every client the whole World, and `data.apply` is the one
-data write. A live-data package needs only `data.apply` for reference data and `game.apply` for live state.
+data write a client composes; `data.load` is an import the server plans itself. A live-data package needs only `data.apply` for reference data and `game.apply` for live state.
 
 Every client talks over one WebSocket at `/rpc`, with `RPCHandler` from `@orpc/server/bun-ws` and `RPCLink` from
 `@orpc/client/websocket` over partysocket's `ReconnectingWebSocket`. The controller holds about five streams at
