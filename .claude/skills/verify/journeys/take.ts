@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Preview, take and program, the way an operator runs them, with OBS's page watching: alex
- * activates the seeded show, cues Zach Spiker's staff lower third into his preview, takes it,
+ * activates the seeded game, cues Zach Spiker's staff lower third into his preview, takes it,
  * and clears it. Each step is read three ways: alex's monitors, a /renderer page (program and
  * alex's preview bus), and the server's show view over @dtv/api.
  *
@@ -24,7 +24,7 @@ await s.run(async () => {
     await activate.click();
   }
   await rows.first().waitFor();
-  s.check((await alex.locator('.topbar .show-name').innerText()) === "Saint Joseph's at Drexel", "the top bar names the active show, Saint Joseph's at Drexel");
+  s.check((await alex.locator('.topbar .show-name').innerText()) === "Saint Joseph's at Drexel", "the top bar names the active game, Saint Joseph's at Drexel");
 
   const program = await s.renderer('/renderer');
   const alexPreview = await s.renderer('/renderer?bus=preview&operator=alex');

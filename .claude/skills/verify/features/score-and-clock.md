@@ -13,7 +13,6 @@ The score bar along the bottom of the show page shows the live game: the score, 
 
 - The `footer.scorebar[aria-label="Game"]` sits at the bottom of `#/show`. The away side is on the left and the home side is on the right, each in a `[data-side="away|home"]` group.
 - `[data-testid="score-away|home"]`, `[data-testid="game-clock"]` and `[data-testid="shot-clock"]` show the score and clocks.
-- The bar reads `This show has no game.` when the active show has no game.
 
 ## Driving it with journeys/score.ts and lib.ts
 

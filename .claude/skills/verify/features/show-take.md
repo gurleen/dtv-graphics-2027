@@ -4,7 +4,7 @@ On the show page an operator cues a rundown cue into their own preview, takes it
 
 ## Sub-features
 
-- `take-activate` opens the show picker when no show is active, and `Activate` loads the console.
+- `take-activate` opens the game picker when no game is active, and `Activate` loads the console.
 - `take-cue` puts the selected rundown cue into my preview: the preview monitor draws it and the row gets the PVW tag.
 - `take-take` moves my preview to program, empties my preview, and replaces whatever was on that layer.
 - `take-next` moves a stepped graphic (Starting Five, Burning Question, Halftime Adjustments) one step, and past the last step takes it off air.

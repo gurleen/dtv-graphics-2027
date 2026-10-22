@@ -74,7 +74,12 @@ transform.
 | Sponsorship | the graphic's id | the sponsor that presents a graphic | fixtures |
 | Venue | `daskalakis-athletic-center` | name, city, state | fixtures |
 | Game | `2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb` | season, program, away and home team, venue, start, conference game, event title | fixtures |
-| Show | `drexel-sju` | name, game, crew (talent with an optional role for the night), rundown (cues) | fixtures |
+| Show | the game's id | the game's broadcast: crew (talent with an optional role for the night), rundown (cues) | fixtures |
+
+A game is its show. The Show row is the game's broadcast facet, keyed by the game's id and deleted with the game.
+It is optional: a game with no Show row has an empty crew and rundown (`showOf`), and the first crew or rundown edit
+stores the row. A show has no name; it is named from its game's matchup (`matchupLabel`, `Saint Joseph's at
+Drexel`). Operators only ever see games.
 
 A Team is one program of a school. `PROGRAMS` maps each program code to its sport and gender (`mbb` is men's
 basketball, `wbb` women's basketball). Women's soccer is one more row there plus a soccer module in `sports/`.
@@ -185,8 +190,8 @@ Three more tables hold what is not an entity.
 - `journal (seq, at, actor, kind, payload)` records every data batch, live command, and show command. A
   `Revision` is a journal sequence number, so revisions only grow, across restarts too.
 - `live (game_id, doc, seq)` holds each game's live state.
-- `show_state (id = 1, doc, seq)` holds program and the operators' previews, so a restart brings program back as
-  it was.
+- `show_state (id = 1, doc, seq)` holds the active game, program and the operators' previews, so a restart brings
+  program back as it was.
 
 `migrate` compares each table's SQL with what `tableSql(kind)` derives and rebuilds the tables that differ, with
 SQLite's documented rebuild. A second run finds nothing to do. An added field needs no migration, because every
@@ -197,11 +202,18 @@ renamed field. A document that fails its schema on load stops the server and nam
 
 Document migration 1 gave locks their author. Before it, the `locked` column held bare field names. It sends every
 row through the migration once and rewrites each name as a lock with a null actor and time, so the store reads only
-one form and refuses a malformed lock the way it refuses a malformed document. Later migrations take version 2 on.
+one form and refuses a malformed lock the way it refuses a malformed document.
 
-`VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every show
+Document migration 2 made a show its game's broadcast. Each show is rekeyed to its old `gameId` and loses `name`
+and `gameId`, with their locks. A rebuilt row takes its id from the migrated document, so the primary key follows. A
+migration's `before` runs first in the same transaction and sees the stored documents as they were: it refuses the
+migration, naming the shows, when a show has no game or two shows share one, because a rekey would lose one. It also
+rewrites `show_state`'s `showId` to the old show's `gameId`. Old journal rows of `activate {show}` stay as they
+are; they only feed the command-id memory. Later migrations take version 3 on.
+
+`VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every game
 activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept, and the newest of
-each reason, so a run of show activations never evicts the only backup taken before a migration.
+each reason, so a run of activations never evicts the only backup taken before a migration.
 
 After a data commit the server reloads the World from SQLite instead of patching memory, so a cascaded delete can
 never leave memory behind the file. A candidate measured a median of 1.22 ms to load 2,527 seed-shaped rows.
@@ -217,8 +229,9 @@ on every write and refuses the batch with `INCONSISTENT`.
 - A `game.apply` names only players of the game's teams that season, and starters only of their side's team. It
   fails with `NOT_IN_GAME` otherwise, so a typo cannot grow the live player lines.
 - Every rundown cue names a graphic in the registry, and its params and overrides fit that graphic.
-- The active show is not deleted. The store holds the active show, so it refuses the batch with `INCONSISTENT` and
-  names the show. Another show must be activated first.
+- The active game is not deleted. The store holds the active game, so it refuses the batch with `INCONSISTENT` and
+  names the game. Another game must be activated first. Deleting any other game deletes its show and live state.
+- A show is deleted only with its game. A batch that deletes a show row alone is `INCONSISTENT`.
 
 ## 3. The API
 
@@ -337,7 +350,7 @@ layer is what tells a renderer to play out and then in.
 | `step layer slot to` | Moves a graphic to step `to`. A step past the last takes it off air; a graphic without steps has one, so Next takes it off. |
 | `refresh layer slot` | Re-reads the on-air cue's params from the rundown. Refused if the cue now names another graphic. |
 | `patch layer slot overrides` | Replaces the on-air overrides, for a last-second text fix. A resend changes nothing. |
-| `activate show` | Makes a show active, takes a backup, and empties previews. Program stays on air. |
+| `activate game` | Makes a game, and so its show, active, takes a backup, and empties previews. Program stays on air. Refused for a game that does not exist; a game with no Show row runs with an empty crew and rundown. |
 
 ### Two operators at once
 
@@ -370,7 +383,8 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
   the left and the rundown is in the middle, at equal width. The right rail holds my preview,
   Take, Next and program, then thumbnails of the other operators' previews. The live game (score, clocks, period, possession, timeouts, fouls, bonus) shows along the bottom, read only.
 - The data page has a team list on the left, tables per team (roster, staff, season stats, team and branding) in
-  the middle, and the selected record on the right. Each locked field shows who locked it and when, and unlocks
+  the middle, and the selected record on the right. Its Games list shows each game with its crew and rundown; a
+  selected game shows its fields, its crew editor and Make active. Each locked field shows who locked it and when, and unlocks
   with a click. A roster import shows a diff table before it applies. A refused edit shows theirs beside yours.
 - Keyboard first, with every action also on a click. Space takes, Up and Down
   select a rundown row and my preview follows it, Enter cues the selected row again, N is Next (it takes a one-step graphic off air), Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
@@ -485,7 +499,7 @@ from a CDN that a venue network may block.
 ### The site
 
 The site build seeds an in-memory database and writes `world.json` with the snapshot, the demo game's live state,
-and a show with one cue per graphic from each entry's `demo`. It copies the signed scenes, the images the cues bind,
+and the demo game's show with one cue per graphic from each entry's `demo`. It copies the signed scenes, the images the cues bind,
 and the fonts. In the browser, `createLocalShow` (in `@dtv/playout`, pure) runs the same reducer and projector as the
 server over that fixed World, and the same renderer draws it. The site needs no server.
 

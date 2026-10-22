@@ -38,10 +38,10 @@ contract in `@dtv/api` over one WebSocket at `/rpc`.
 | `/` | The operator controller. The first visit asks for your name. `#/show` is the console, `#/data` the data page |
 | `/renderer` | The transparent 1920 x 1080 page OBS loads. It draws program |
 | `/renderer?bus=preview&operator=<name>` | One operator's preview, for a monitor |
-| `/status` | The revision, the active show and the connected operators |
+| `/status` | The revision, the active game and the connected operators |
 
 **The show page** has the free panel (the scorebug and Score to Break, always
-one key away), the rundown of the active show's cues, an inspector for the
+one key away), the rundown of the active game's cues, an inspector for the
 selected cue's fields, your own preview beside program, the other operators'
 previews, and the score bar, which shows the live game and has no controls
 (a live data feed will drive the game). Cue a graphic to your preview, then Take puts it on
@@ -49,10 +49,11 @@ program for every controller and for `/renderer`. Next steps a multi-step
 graphic on, and takes a one-step graphic off.
 
 **The data page** edits teams, rosters, staff, talent, sponsors, venues and
-shows. A manual edit locks the field so an import will not overwrite it; the
+games. A manual edit locks the field so an import will not overwrite it; the
 lock icon says who and when, and a click unlocks it. A roster CSV import shows
-its changes as a diff before you apply it. Shows are created, duplicated onto
-another game and made active here; the show page always runs the active show.
+its changes as a diff before you apply it. A game is its show: games are
+created, given their crew and made active here, and the show page runs the
+active game's rundown.
 
 **Keys** on the show page (`?` lists them; none fire while you type):
 
@@ -103,7 +104,7 @@ under `build/`, and exits non-zero when a check fails:
 bun apps/controller/scripts/proofs.ts        # two operators, all 17 graphics through preview, Take and program, a restart
 bun apps/controller/scripts/game.ts          # a whole game from tip-off to final, fed over game.apply, with a SIGKILL mid-half
 bun apps/controller/scripts/data-proofs.ts   # locks, edit conflicts, roster import
-bun apps/controller/scripts/shows-proofs.ts  # create, duplicate and activate a show
+bun apps/controller/scripts/games-proofs.ts  # create a game, give it a crew, activate it, delete another
 bun apps/renderer/scripts/proofs.ts          # steps, exits, reloads and rapid takes on /renderer
 bun apps/renderer/scripts/compare.ts --baseline=<dir>   # every graphic's on-air frame against a capture
 ```

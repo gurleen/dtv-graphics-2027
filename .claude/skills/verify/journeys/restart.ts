@@ -58,8 +58,8 @@ await s.run(async () => {
   s.check(JSON.stringify(await s.rendered(program)) === renderedBefore, '/renderer holds the same slots and phases');
   const viewAfter = await s.view('alex');
   s.check(
-    viewAfter.show?.id === viewBefore.show?.id && viewAfter.program.bug?.id === viewBefore.program.bug?.id && viewAfter.program.lower?.id === viewBefore.program.lower?.id,
-    `the server came back with the same show (${viewAfter.show?.id}) and the same program slots`,
+    viewAfter.game?.id === viewBefore.game?.id && viewAfter.program.bug?.id === viewBefore.program.bug?.id && viewAfter.program.lower?.id === viewBefore.program.lower?.id,
+    `the server came back with the same game (${viewAfter.game?.id}) and the same program slots`,
   );
   for (const [name, page] of [['alex', alex], ['/renderer', program]] as const) {
     s.check((await page.evaluate('window.verifyMarker === true')) === true, `${name} did not reload across the restart`);

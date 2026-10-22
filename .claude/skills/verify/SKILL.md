@@ -7,7 +7,7 @@ description: Drive the DTV show server the way operators and OBS use it (the ope
 
 The app is one Bun process (`apps/server/src/main.ts`). It serves:
 
-- `/`: the operator controller. `#/show` holds preview, Take and program. `#/data` holds teams, rosters and shows.
+- `/`: the operator controller. `#/show` holds preview, Take and program. `#/data` holds teams, rosters and games.
 - `/renderer`: the transparent 1920 x 1080 page that OBS loads. It draws program. `/renderer?bus=preview&operator=<id>` draws one operator's preview.
 - `/status`: a plain status page.
 - `/rpc`: the oRPC WebSocket. `@dtv/api` has `connect`, `watch` and `first`.
@@ -39,7 +39,7 @@ The doctor fails when `build/riv/` lacks a scene or holds a `.riv` that is older
 .claude/skills/verify/scripts/dtv.sh up --port=8998
 ```
 
-This command deletes the instance's scratch dir, migrates and seeds a new database, and starts the server with `nohup`. It returns when the log prints `dtv server on http://localhost:8998`. Seeding finishes before the server listens, so at that point the server is ready to drive. The seed has no active show. The show page opens on a picker with an `Activate` button for `Saint Joseph's at Drexel` (`drexel-sju`).
+This command deletes the instance's scratch dir, migrates and seeds a new database, and starts the server with `nohup`. It returns when the log prints `dtv server on http://localhost:8998`. Seeding finishes before the server listens, so at that point the server is ready to drive. The seed has no active game. The show page opens on a picker with an `Activate` button beside `Saint Joseph's at Drexel · Nov 8`.
 
 Scratch state lives in `$TMPDIR/dtv-verify-<port>/`: `dtv.sqlite`, `backups/`, `server.log`, `server.pid` and `root`.
 
@@ -51,7 +51,7 @@ For the restart recovery journey, `dtv.sh stop` sends SIGTERM and keeps the DB, 
 .claude/skills/verify/scripts/dtv.sh doctor --port=8998
 ```
 
-The doctor is read-only. It exits 1 on any `FAIL`. It checks that the pid is alive and runs this checkout's `main.ts`, that the port's listener is that pid, that `/status` serves the scratch DB, and that `/`, `/renderer` and one `.riv` answer 200. It also checks that `build/riv` is complete and fresh. It prints the revision, the active show, the connected operators, the commit and whether the checkout has uncommitted changes. Run it first, and run it again whenever something looks off.
+The doctor is read-only. It exits 1 on any `FAIL`. It checks that the pid is alive and runs this checkout's `main.ts`, that the port's listener is that pid, that `/status` serves the scratch DB, and that `/`, `/renderer` and one `.riv` answer 200. It also checks that `build/riv` is complete and fresh. It prints the revision, the active game, the connected operators, the commit and whether the checkout has uncommitted changes. Run it first, and run it again whenever something looks off.
 
 ## Drive
 
@@ -81,7 +81,7 @@ Use two harnesses. Both use Playwright from `apps/controller`.
 |---|---|---|
 | `apps/controller/scripts/proofs.ts` | `--port=8999 [--quick]` | `build/controller/proofs/`, `build/controller/runthrough.webm` (wiped first; no `--out`) |
 | `apps/controller/scripts/data-proofs.ts` | `--port=8999 --out=build/verify/<run>/data [--only=lock,conflicts,import,edits]` | `--out` |
-| `apps/controller/scripts/shows-proofs.ts` | `--port=8999 --out=build/verify/<run>/shows` | `--out` |
+| `apps/controller/scripts/games-proofs.ts` | `--port=8999 --out=build/verify/<run>/games` | `--out` |
 | `apps/renderer/scripts/drive.ts` | `--port=8999 --out=build/verify/<run>/drive` | `--out` |
 | `apps/renderer/scripts/proofs.ts` | `--port=8998 --out=... [--only=steps,score-to-break,motion-headshot,reload,two-renderers,rapid]` | `--out`; **also binds port + 1** |
 | `apps/renderer/scripts/compare.ts` | `--port=8999 --baseline=<dir> --out=...` | `--out`, plus `report.json` |
@@ -93,7 +93,7 @@ Stable handles. These are the names the code uses, so do not guess:
 - `window.dtvRenderer.layers()` gives the same shape on `/renderer` and on a site page.
 - `[data-monitor="preview|program|other:<id>"]` is a monitor's element. Its canvases show what was drawn.
 - `[data-testid="reconnecting"]` is the top bar's badge while any stream is down.
-- `.topbar .show-name` shows the active show's name, or `No active show`.
+- `.topbar .show-name` shows the active game's matchup, or `No active game`.
 - The rundown is `getByRole('grid', { name: 'Rundown cues' })`. A rundown row is `.cue-row` with `data-pvw` and `data-pgm`. The inspector has `Cue to my preview`, `Save` and `Add cue`.
 - The rail has the buttons `/^Take/`, `/^Next/` and `Clear PVW`, and `.problem-strip` (role `alert`) for a refused command.
 - The on-air rows are `.layer-row[data-layer="bug|lower|card"]`. Each has a `Clear` button.

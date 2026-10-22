@@ -153,7 +153,7 @@ export async function session(journey: string) {
       log(`     ${path.replace(`${ROOT}/`, '')}`);
     },
 
-    /** The server's view for one operator: active show, rundown, my preview, program. */
+    /** The server's view for one operator: active game, rundown, my preview, program. */
     view: (operator: string) => first((signal) => connection.api.show.watch({ operator: operator as never }, { signal })),
     world: () => first((signal) => connection.api.data.watch(undefined, { signal })),
     /** A game's live state: score, clock, shot clock, period, possession. */
