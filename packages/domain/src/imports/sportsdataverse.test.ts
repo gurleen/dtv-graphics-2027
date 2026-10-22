@@ -338,6 +338,19 @@ describe('sportsdataverseEdits', () => {
     expect([next.summary.rematched, next.summary.removed]).toEqual([1, 0]);
   });
 
+  test('an NCAA-keyed twin of a player an earlier ESPN load already wrote is deleted, not given the same key', () => {
+    const put = (slug: string, lastName: string, sourceKey: string) =>
+      ({ op: 'put', kind: 'player', value: parseEntity('player', { id: `drexel-mbb@2025-26/${slug}`, teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Labaron', lastName, jersey: '0', sourceKey }) }) as const;
+    const twins = commit(world, [put('philon-jr-labaron', 'Philon Jr.', 'espn:4873090'), put('philon-labaron', 'Philon', 'ncaa:9333106')]);
+    const boxOnly = { ...line('c1', [20, 8, 3, 6, 0, 1, 2, 2, 1, 2, 1, 0, 0, 1, 2]), athlete_id: '4873090', athlete_display_name: 'Labaron Philon Jr.', athlete_jersey: '0' };
+    const after = commit(twins, sportsdataverseEdits(twins, { ...SOURCES, playerBox: [...SOURCES.playerBox!, boxOnly] }, OPTIONS).edits);
+    expect(after.all('player').map((player) => [player.id, player.sourceKey])).toEqual([
+      ['drexel-mbb@2025-26/philon-jr-labaron', 'espn:4873090'],
+      ['drexel-mbb@2025-26/reed-josh', 'espn:5239623'],
+    ]);
+    expect(after.get('playerStats', 'drexel-mbb@2025-26/philon-jr-labaron' as never)?.stats.totals.pts).toBe(8);
+  });
+
   test("before tip-off, a roster whose returning players are all still in last season's class is skipped; one that moved up is planned", () => {
     const next = SeasonId.parse('2026-27');
     const upcoming = sportsdataverseEdits(

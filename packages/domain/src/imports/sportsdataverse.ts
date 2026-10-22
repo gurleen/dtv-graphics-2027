@@ -525,10 +525,10 @@ function rosterEdits(
     rematched += plan.update.filter(({ before }) => before.sourceKey?.startsWith(NCAA)).length;
     // ESPN rebuilds a finished season's roster file from the rosters it serves then, so it can
     // leave out a player its box scores show played that season: the box names him instead.
-    const planned = new Set(roster.map((row) => row.sourceKey));
+    const keyed = new Set([...roster, ...world.roster(team, context.season)].map((row) => row.sourceKey));
     const boxed = new Map<string, { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }>();
     for (const line of boxByTeam.get(espnTeam) ?? []) {
-      if (!line.athlete_id || planned.has(`espn:${line.athlete_id}`) || boxed.get(line.athlete_id)?.jersey) continue;
+      if (!line.athlete_id || keyed.has(`espn:${line.athlete_id}`) || boxed.get(line.athlete_id)?.jersey) continue;
       const [firstName = '', ...last] = (line.athlete_display_name ?? '').trim().split(/\s+/);
       boxed.set(line.athlete_id, { jersey: line.athlete_jersey, firstName, lastName: last.join(' ') });
     }
