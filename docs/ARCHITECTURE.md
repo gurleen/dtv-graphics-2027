@@ -173,16 +173,23 @@ season's rosters. `data.load` downloads them (`@dtv/sportsdataverse`), `sportsda
 the current World, and the store commits them as one import batch, so locked fields stay as people set them. It
 writes each team's conference, record, streak, rank and season stats, every roster with jerseys, headshots and
 season stats, and Drexel's home games. Every file keys a team by ESPN id, which is `School.espnId`, and a player
-by ESPN athlete id, which becomes `sourceKey: 'espn:<id>'`; a player an earlier load keyed `ncaa:` is matched by
-name and takes the new key. A Division I team with no school gets one, named and coloured from the schedule
+by ESPN athlete id, which becomes `sourceKey: 'espn:<id>'`. A player the retired stats.ncaa.org loader keyed `ncaa:`
+takes the ESPN key of the row that is him: the same name once diacritics and suffixes like Jr. fold away, or the same
+jersey with the first name or a family-name token. A finished season's roster file is rebuilt from what ESPN serves
+later and can leave out players who played, so a player missing from it but named in the player box is matched there.
+Any other `ncaa:` player of a team-season ESPN describes is deleted with his stats, unless a show's cue, a live game
+or a lock holds him; then he stays and the report warns `ncaa-player-kept`. A Division I team with no school gets one, named and coloured from the schedule
 (`onExisting: 'keep'`, so a curated edit stands). A game's day is its New York day, and it starts at ESPN's time
 when ESPN has one and at 7 pm New York time otherwise; a neutral-site game is not a home game. Only finals count,
 postseason included. Rank breaks a tie in conference record head to head, then by overall win percentage. The
 files mark no conference tournament games reliably, so `regularSeasonEnd` finds the end of each conference's
 regular season from the schedule's shape and the conference record stops there; overall records and streaks count
-every game. ESPN copies last season's rosters forward before the new ones are out, so until a season's box scores
-exist, a team whose returning players are all still in last season's class is skipped with a `stale-roster`
-warning. A dataset not published for the season yet is a warning, not a failure. teams.json stays the curated
+every game. ESPN copies last season's rosters forward before the new ones are out, so a team with no box score yet
+this season is skipped with a `stale-roster` warning when none of its returners changed class and at least one
+freshman, sophomore or junior should have. A senior, or a player with no class, stays put in a new season too, so
+he decides nothing. Last season's classes come from the `espn:` players an earlier load wrote, since ESPN rebuilds
+last season's roster file from whatever it serves at rebuild time; that file is read only for a team the World has
+none of. A dataset not published for the season yet is a warning, not a failure. teams.json stays the curated
 branding of the schools it has: its colours and `images.dragonstv.io` logos differ from ESPN's for 173 of them,
 Drexel included, so the loader never writes a school that exists.
 
