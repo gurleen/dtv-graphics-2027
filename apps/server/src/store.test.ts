@@ -253,6 +253,37 @@ describe('sportsdataverse', () => {
     expect(second).toMatchObject({ ok: true, report: { revision: first.report.revision, inserted: 0, updated: 0 } });
   });
 
+  test("an NCAA-keyed player ESPN's roster lacks is deleted with his stats, unless a show's cue names him", async () => {
+    const store = loader(async () => SOURCES);
+    const ncaa = (slug: string, firstName: string, jersey: string) => ({
+      op: 'put' as const,
+      kind: 'player' as const,
+      value: { id: PlayerId.parse(`drexel-mbb@2025-26/${slug}`), teamId: TeamId.parse('drexel-mbb'), seasonId: season, firstName, lastName: slug, jersey, sourceKey: `ncaa:${jersey}` },
+    });
+    const seeded = store.applyEdits('alex', {
+      origin: 'import',
+      edits: [
+        { op: 'put', kind: 'season', value: { id: season, name: season } },
+        ncaa('held', 'Amaris', '4'),
+        ncaa('gone', 'Old', '20'),
+        { op: 'put', kind: 'playerStats', value: { id: PlayerId.parse('drexel-mbb@2025-26/gone'), stats: { sport: 'basketball', gp: 3, totals: { pts: 30 } } } },
+      ] as EditBatch['edits'],
+    });
+    expect(seeded).toMatchObject({ ok: true });
+    const cue = { id: CueId.parse('watch'), graphic: GraphicId.parse('basketball-v2/player-to-watch'), params: { player: 'drexel-mbb@2025-26/held', body: { kind: 'season' } }, overrides: {}, note: '' };
+    const show = store.world().get('show', GAME)!;
+    expect(store.applyEdits('alex', { origin: 'manual', basis: store.world().revision, edits: [{ op: 'put', kind: 'show', value: { ...show, rundown: [cue] } }] })).toMatchObject({ ok: true });
+
+    const load = await store.loadSportsdataverse('alex', { program: 'mbb', season });
+    expect(load).toMatchObject({ ok: true, report: { deleted: 1, summary: { removed: 1 }, warnings: [{ code: 'ncaa-player-kept', subjects: ['Amaris held (Drexel)'] }] } });
+    const world = store.world();
+    expect(world.roster(TeamId.parse('drexel-mbb'), season).map((player) => [player.id, player.sourceKey])).toEqual([
+      ['drexel-mbb@2025-26/held', 'ncaa:4'],
+      ['drexel-mbb@2025-26/reed-josh', 'espn:5239623'],
+    ]);
+    expect(world.get('playerStats', PlayerId.parse('drexel-mbb@2025-26/gone'))).toBeUndefined();
+  });
+
   test('a download that fails is UNAVAILABLE and writes nothing', async () => {
     const store = loader(async () => {
       throw new Error('https://github.com/...: HTTP 503');
