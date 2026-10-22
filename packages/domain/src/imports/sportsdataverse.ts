@@ -505,9 +505,11 @@ function rosterEdits(
       continue;
     }
     const roster: RosterRow[] = [];
+    const unnumbered: SdvRow<'rosters'>[] = [];
     for (const row of rows) {
       if (!row.jersey || !/^\d{1,2}$/.test(row.jersey)) {
         context.warn('no-jersey', `${row.first_name} ${row.last_name} (${school.name})`);
+        unnumbered.push(row);
         continue;
       }
       const position = parsePosition(row.position_abbreviation ?? '');
@@ -530,9 +532,12 @@ function rosterEdits(
     players += roster.length;
     rematched += plan.update.filter(({ before }) => before.sourceKey?.startsWith(NCAA)).length;
     // ESPN rebuilds a finished season's roster file from the rosters it serves then, so it can
-    // leave out a player its box scores show played that season: the box names him instead.
+    // leave out a player its box scores show played that season: the box names him instead. A
+    // roster row with no jersey names him too, but only by his whole name.
     const keyed = new Set([...roster, ...world.roster(team, context.season)].map((row) => row.sourceKey));
-    const boxed = new Map<string, { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }>();
+    const boxed = new Map<string, { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }>(
+      unnumbered.filter((row) => !keyed.has(`espn:${row.athlete_id}`)).map((row) => [row.athlete_id, { jersey: null, firstName: row.first_name.trim(), lastName: row.last_name.trim() }]),
+    );
     for (const line of boxByTeam.get(espnTeam) ?? []) {
       if (!line.athlete_id || keyed.has(`espn:${line.athlete_id}`) || boxed.get(line.athlete_id)?.jersey) continue;
       const [firstName = '', ...last] = (line.athlete_display_name ?? '').trim().split(/\s+/);

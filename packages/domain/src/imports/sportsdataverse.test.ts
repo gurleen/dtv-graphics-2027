@@ -350,6 +350,21 @@ describe('sportsdataverseEdits', () => {
     expect([next.summary.rematched, next.summary.removed]).toEqual([1, 0]);
   });
 
+  test("an NCAA-keyed player whose whole name is a jersey-less row of ESPN's roster takes that row's key and keeps his jersey", () => {
+    const put = (slug: string, firstName: string, jersey: string, sourceKey: string) =>
+      ({ op: 'put', kind: 'player', value: parseEntity('player', { id: `drexel-mbb@2025-26/${slug}`, teamId: 'drexel-mbb', seasonId: '2025-26', firstName, lastName: 'Nojersey', jersey, sourceKey }) }) as const;
+    // ESPN's Sam Nojersey has no jersey; Pat shares only his family name, so he is not ESPN's row.
+    const ncaa = commit(world, [put('nojersey-sam', 'Sam', '14', 'ncaa:9'), put('nojersey-pat', 'Pat', '15', 'ncaa:10')]);
+    const next = sportsdataverseEdits(ncaa, SOURCES, OPTIONS);
+    const after = commit(ncaa, next.edits);
+    expect(after.all('player').map((player) => [player.id, player.jersey, player.sourceKey])).toEqual([
+      ['drexel-mbb@2025-26/nojersey-sam', '14', 'espn:1'],
+      ['drexel-mbb@2025-26/reed-josh', '5', 'espn:5239623'],
+    ]);
+    expect([next.summary.rematched, next.summary.removed]).toEqual([1, 1]);
+    expect(changing(after, sportsdataverseEdits(after, SOURCES, OPTIONS).edits)).toEqual([]);
+  });
+
   test('an NCAA-keyed twin of a player an earlier ESPN load already wrote is deleted, not given the same key', () => {
     const put = (slug: string, lastName: string, sourceKey: string) =>
       ({ op: 'put', kind: 'player', value: parseEntity('player', { id: `drexel-mbb@2025-26/${slug}`, teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Labaron', lastName, jersey: '0', sourceKey }) }) as const;

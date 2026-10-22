@@ -177,6 +177,7 @@ by ESPN athlete id, which becomes `sourceKey: 'espn:<id>'`. A player the retired
 takes the ESPN key of the row that is him: the same name once diacritics and suffixes like Jr. fold away, or the same
 jersey with the first name or a family-name token. A finished season's roster file is rebuilt from what ESPN serves
 later and can leave out players who played, so a player missing from it but named in the player box is matched there.
+A roster row with no jersey is not loaded, but an `ncaa:` player with its whole name takes its key and keeps his jersey.
 Any other `ncaa:` player of a team-season ESPN describes is deleted with his stats, unless a show's cue, a live game
 or a lock on him or his stats holds him; then he stays and the report warns `ncaa-player-kept`. A Division I team with no school gets one, named and coloured from the schedule
 (`onExisting: 'keep'`, so a curated edit stands). A game's day is its New York day, and it starts at ESPN's time
