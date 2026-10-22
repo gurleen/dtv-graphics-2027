@@ -230,8 +230,7 @@ describe('sportsdataverse', () => {
     expect(first).toMatchObject({
       ok: true,
       report: {
-        program: 'mbb', season: '2025-26', inserted: 3, updated: 2, skipped: [],
-        warnings: [{ code: 'not-published', subjects: ['espn_mens_college_basketball_rosters/rosters_2025'] }],
+        program: 'mbb', season: '2025-26', inserted: 3, updated: 2, deleted: 0, skipped: [], warnings: [],
       },
     });
     if (!first.ok) throw new Error(first.reason);

@@ -369,6 +369,60 @@ describe('sportsdataverseEdits', () => {
     });
   });
 
+  describe("the stale guard, for a season ESPN may still serve last season's rosters as", () => {
+    const next = SeasonId.parse('2026-27');
+    const prior = (athlete_id: string, team_id: string, experience_display_value: string) => ({ athlete_id, team_id, experience_display_value });
+    const guarded = (on: World, sources: Partial<SdvSources>) => {
+      const result = sportsdataverseEdits(on, { ...unpublished, groups: SOURCES.groups, ...sources }, { ...OPTIONS, season: next });
+      return {
+        result,
+        loaded: [...new Set(putValues(result.edits, 'player').map((player) => player.teamId))],
+        stale: result.warnings.find((warning) => warning.code === 'stale-roster')?.subjects ?? [],
+        unpublished: result.warnings.find((warning) => warning.code === 'not-published')?.subjects ?? [],
+      };
+    };
+    /** Drexel's returner is still a sophomore, Hofstra's too, Towson's only returner is a senior. */
+    const rosters = [
+      athlete('5239623', '2182', 'Josh', 'Reed', '5', 'Sophomore'),
+      athlete('6000001', '2182', 'New', 'Dragon', '12', 'Freshman'),
+      athlete('6000002', '2275', 'Pat', 'Pride', '3', 'Sophomore'),
+      athlete('6000004', '119', 'Old', 'Hand', '10', 'Senior'),
+      athlete('6000005', '119', 'Fresh', 'Face', '4', 'Freshman'),
+    ];
+    const lastFile = [prior('5239623', '2182', 'Sophomore'), prior('6000002', '2275', 'Sophomore'), prior('6000004', '119', 'Senior')];
+    const played = (athlete_id: string, team_id: string) => ({ ...line('n1', [10, 2, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]), athlete_id, team_id });
+
+    test('a team is decided alone: one with a box score is loaded, one without stays guarded; a senior staying a senior proves nothing', () => {
+      const { loaded, stale } = guarded(world, { rosters, priorRosters: lastFile, playerBox: [played('6000002', '2275')] });
+      expect([loaded, stale]).toEqual([['hofstra-mbb', 'towson-mbb'], ['Drexel']]);
+    });
+
+    test("last season's players an earlier load wrote outrank last season's file, which ESPN rebuilds", () => {
+      const player = (team: string, slug: string, athleteId: string, classYear: string) =>
+        ({
+          op: 'put',
+          kind: 'player',
+          value: parseEntity('player', { id: `${team}@2025-26/${slug}`, teamId: team, seasonId: '2025-26', firstName: 'A', lastName: slug, jersey: '1', classYear, sourceKey: `espn:${athleteId}` }),
+        }) as const;
+      const loadedLastSeason = commit(world, [player('drexel-mbb', 'reed', '5239623', 'FR'), player('hofstra-mbb', 'pride', '6000002', 'SO')]);
+      // The rebuilt file has Reed a sophomore already and Pride a freshman; the World remembers otherwise.
+      const rebuilt = [prior('5239623', '2182', 'Sophomore'), prior('6000002', '2275', 'Freshman'), prior('6000004', '119', 'Senior')];
+      const { result, loaded, stale } = guarded(loadedLastSeason, { rosters, priorRosters: rebuilt });
+      expect([loaded, stale]).toEqual([['drexel-mbb', 'towson-mbb'], ['Hofstra']]);
+      const after = commit(loadedLastSeason, result.edits);
+      expect(changing(after, guarded(after, { rosters, priorRosters: rebuilt }).result.edits)).toEqual([]);
+    });
+
+    test("last season's file is reported missing only when a team needed it", () => {
+      const path = 'espn_mens_college_basketball_rosters/rosters_2026';
+      const drexel = rosters.slice(0, 2);
+      const unguarded = guarded(world, { rosters: drexel, priorRosters: null });
+      expect([unguarded.loaded, unguarded.stale, unguarded.unpublished.includes(path)]).toEqual([['drexel-mbb'], [], true]);
+      const tippedOff = guarded(world, { rosters: drexel, priorRosters: null, playerBox: [played('5239623', '2182')] });
+      expect([tippedOff.loaded, tippedOff.unpublished.includes(path)]).toEqual([['drexel-mbb'], false]);
+    });
+  });
+
   test('with only groups published, conferences change and records stay', () => {
     const before = commit(world, plan.edits);
     const moved = { ...unpublished, groups: [{ team_id: '2182', team_name: 'Drexel Dragons', conference_id: 'mbb:atlantic-10' }] };
@@ -379,10 +433,9 @@ describe('sportsdataverseEdits', () => {
     expect(next.warnings).toEqual([
       {
         code: 'not-published',
-        message: '5 datasets are not published for this season yet',
+        message: '4 datasets are not published for this season yet',
         subjects: [
           'espn_mens_college_basketball_player_boxscores/player_box_2026',
-          'espn_mens_college_basketball_rosters/rosters_2025',
           'espn_mens_college_basketball_rosters/rosters_2026',
           'espn_mens_college_basketball_schedules/mbb_schedule_2026',
           'espn_mens_college_basketball_team_boxscores/team_box_2026',
