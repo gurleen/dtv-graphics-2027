@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type Db, loadLive, migrate, openDb, seed } from '@dtv/db';
-import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, type SdvSources, SeasonId, SourceId, TeamId } from '@dtv/domain';
+import { type basketball, CueId, type EditBatch, GameApplyInput, GameId, GraphicId, PlayerId, Revision, type SdvRow, type SdvSources, SeasonId, SourceId, TeamId } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import { CommandId, OperatorId, type OutputFrame, type Registry, type ShowCommand } from '@dtv/playout';
 import type { SdvFetcher } from '@dtv/sportsdataverse';
@@ -179,21 +179,37 @@ describe('data', () => {
 });
 
 describe('sportsdataverse', () => {
-  const box = (team: string, pts: number, d_pts: number) => ({
-    contest_id: 'c1', team, home: 'Drexel', away: 'Hofstra',
-    team_ncaa_team_id: team === 'Drexel' ? '100' : '200', team_espn_team_id: team === 'Drexel' ? '2182' : '2275',
-    home_ncaa_team_id: '100', home_espn_team_id: '2182', away_ncaa_team_id: '200', away_espn_team_id: '2275',
-    pts, d_pts, fgm: 30, fga: 60, tpm: 8, tpa: 20, ftm: 10, fta: 14, orb: 9, drb: 25, ast: 15, blk: 4, to: 11,
+  const team = (side: 'home' | 'away', id: string, location: string, mascot: string, abbreviation: string) => ({
+    [`${side}_id`]: id, [`${side}_location`]: location, [`${side}_name`]: mascot, [`${side}_abbreviation`]: abbreviation,
+    [`${side}_short_display_name`]: location, [`${side}_color`]: null, [`${side}_alternate_color`]: null, [`${side}_logo`]: null,
+  });
+  const box = (team_id: string, team_score: number, opponent_team_score: number) => ({
+    game_id: '401', team_id, team_score, opponent_team_score, field_goals_made: 30, field_goals_attempted: 60, three_point_field_goals_made: 8,
+    three_point_field_goals_attempted: 20, free_throws_made: 10, free_throws_attempted: 14, offensive_rebounds: 9, defensive_rebounds: 25, assists: 15,
+    steals: 6, blocks: 4, turnovers: 11, fouls: 17,
   });
   const SOURCES: SdvSources = {
     groups: [{ team_id: '2182', team_name: 'Drexel Dragons', conference_id: 'mbb:caa' }, { team_id: '2275', team_name: 'Hofstra Pride', conference_id: 'mbb:caa' }],
-    teamIds: [{ team: 'Drexel', id: '100', conference: 'CAA' }, { team: 'Hofstra', id: '200', conference: 'CAA' }],
-    schedule: [{ contest_id: 'c1', game_date: '01/10/2026', home: 'Drexel', away: 'Hofstra', home_score: 78, away_score: 70 }],
-    teamBox: [box('Drexel', 78, 70), box('Hofstra', 70, 78)],
-    priorTeamBox: [],
-    teamRosters: [{ player_id: '9335965', team_id: '100', clean_name: 'Josh Reed', jersey: '5', class: 'So.', position: 'G', hometown: 'Wyndmoor, PA' }],
+    schedule: [
+      {
+        game_id: '401', date: '2026-01-10T19:00Z', time_valid: true, neutral_site: false, season_type: 2, status_type_name: 'STATUS_FINAL', home_score: 78, away_score: 70,
+        ...team('home', '2182', 'Drexel', 'Dragons', 'DREX'), ...team('away', '2275', 'Hofstra', 'Pride', 'HOF'),
+      } as SdvRow<'schedule'>,
+    ],
+    teamBox: [box('2182', 78, 70), box('2275', 70, 78)],
+    rosters: [
+      {
+        athlete_id: '5239623', team_id: '2182', first_name: 'Josh', last_name: 'Reed', jersey: '5', position_abbreviation: 'G', experience_display_value: 'Sophomore',
+        birth_place_city: 'Wyndmoor', birth_place_state: 'PA', birth_place_country: 'USA', headshot_href: null,
+      },
+    ],
+    priorRosters: null,
     playerBox: [
-      { player_id: '9335965', team_ncaa_team_id: '100', contest_id: 'c1', mins: 31.5, pts: 22, fgm: 9, fga: 14, tpm: 1, tpa: 3, ftm: 3, fta: 4, orb: 2, drb: 6, ast: 4, stl: 1, blk: 0, tov: 2, pf: 3 },
+      {
+        athlete_id: '5239623', team_id: '2182', game_id: '401', did_not_play: false, minutes: 31.5, points: 22, field_goals_made: 9, field_goals_attempted: 14,
+        three_point_field_goals_made: 1, three_point_field_goals_attempted: 3, free_throws_made: 3, free_throws_attempted: 4, offensive_rebounds: 2,
+        defensive_rebounds: 6, assists: 4, steals: 1, blocks: 0, turnovers: 2, fouls: 3,
+      },
     ],
   };
   const season = SeasonId.parse('2025-26');
@@ -213,7 +229,10 @@ describe('sportsdataverse', () => {
     const first = await store.loadSportsdataverse('alex', { program: 'mbb', season });
     expect(first).toMatchObject({
       ok: true,
-      report: { program: 'mbb', season: '2025-26', inserted: 3, updated: 2, skipped: [], warnings: [] },
+      report: {
+        program: 'mbb', season: '2025-26', inserted: 3, updated: 2, skipped: [],
+        warnings: [{ code: 'not-published', subjects: ['espn_mens_college_basketball_rosters/rosters_2025'] }],
+      },
     });
     if (!first.ok) throw new Error(first.reason);
     expect(first.report.revision).toBeGreaterThan(before);
@@ -228,7 +247,7 @@ describe('sportsdataverse', () => {
       totals: { min: 32, pts: 22, fgm: 9, fga: 14, tpm: 1, tpa: 3, ftm: 3, fta: 4, reb: 8, ast: 4, stl: 1, blk: 0, to: 2, pf: 3 },
     });
     const game = GameId.parse('2025-26/2026-01-10/hofstra-mbb.at.drexel-mbb');
-    expect(world.get('game', game)?.startsAt).toBe('2026-01-10T19:00:00-05:00');
+    expect(world.get('game', game)?.startsAt).toBe('2026-01-10T14:00:00-05:00');
     expect(loadLive(db).get(game)?.phase).toBe('pregame');
 
     const second = await store.loadSportsdataverse('alex', { program: 'mbb', season });
