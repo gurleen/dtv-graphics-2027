@@ -34,7 +34,7 @@ const count = (n: number, one: string, many = `${one}s`) => `${n.toLocaleString(
 
 function Report({ report }: { readonly report: SdvLoadReport }) {
   const skipped = report.skipped.reduce((total, row) => total + row.fields.length, 0);
-  const wrote = report.inserted + report.updated > 0;
+  const wrote = report.inserted + report.updated + report.deleted > 0;
   return (
     <div className="load-report" data-testid="load-report">
       <p className="import-summary" role="status">
@@ -43,6 +43,7 @@ function Report({ report }: { readonly report: SdvLoadReport }) {
         </span>
         <span className="add">{count(report.inserted, 'row')} inserted</span>
         <span className="warn">{count(report.updated, 'row')} updated</span>
+        {report.deleted > 0 && <span className="warn">{count(report.deleted, 'row')} deleted</span>}
         {skipped > 0 && <span className="warn">{count(skipped, 'locked field')} skipped</span>}
         <span className="faint">{(report.ms / 1000).toFixed(1)} s</span>
       </p>
@@ -61,6 +62,12 @@ function Report({ report }: { readonly report: SdvLoadReport }) {
         {count(report.summary.teamSeasons, 'team')} ({count(report.summary.newSchools, 'new school')}), {count(report.summary.players, 'player')},{' '}
         {count(report.summary.playerStats, 'player stat line')}, {count(report.summary.games, 'Drexel home game')} in the files.
       </p>
+      {report.summary.rematched + report.summary.removed > 0 && (
+        <p className="faint">
+          Players from the retired NCAA files: {count(report.summary.rematched, 'player')} rekeyed to ESPN, {count(report.summary.removed, 'player')} on no
+          ESPN roster deleted with their stats.
+        </p>
+      )}
       {report.warnings.length > 0 && (
         <ul className="load-warnings">
           {report.warnings.map((warning) => (

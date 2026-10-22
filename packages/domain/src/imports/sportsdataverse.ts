@@ -5,14 +5,14 @@
  * Every file keys a team by its ESPN id, which is `School.espnId`. A Division I team (the
  * groups file) with no school yet gets one, described by the schedule; teams.json stays the
  * curated branding of every school it has. ESPN copies last season's rosters forward before
- * the new ones are out, so before a season's box scores exist a roster whose returning
- * players are all still in last season's class is skipped rather than loaded as this season's.
+ * the new ones are out, so a team with no box score yet whose returning players are all still
+ * in last season's class is skipped rather than loaded as this season's.
  */
 
 import { z } from 'zod';
 import { type ImportEdit, importPut } from '../edits';
-import { type EntityKind, type Game, Player, School, Season, Team, TeamSeason } from '../entities';
-import { type ConferenceId, idFor, type SchoolId, type SeasonId, slugify, type TeamId, type VenueId } from '../ids';
+import { ClassYear, type EntityKind, type Game, Player, School, Season, Team, TeamSeason } from '../entities';
+import { type ConferenceId, idFor, type SchoolId, SeasonId, slugify, type TeamId, type VenueId } from '../ids';
 import { type Revision, Url } from '../primitives';
 import type { ProgramCode } from '../programs';
 import type { BasketballTeamSeasonStats } from '../sports/basketball';
@@ -116,6 +116,8 @@ export const SDV_DATASETS = {
     path: (g: ProgramCode, y: number) => `${espn(g, 'player_boxscores')}/player_box_${y}`,
     row: z.object({
       athlete_id: id.nullable(),
+      athlete_display_name: text,
+      athlete_jersey: text,
       team_id: id,
       game_id: id,
       did_not_play: z.boolean(),
@@ -136,7 +138,9 @@ export type SdvSources = { readonly [D in SdvDataset]: readonly SdvRow<D>[] | nu
 export const sdvYear = (season: SeasonId) => Number(season.slice(0, 4)) + 1;
 
 export interface SdvWarning {
-  readonly code: 'not-published' | 'unmatched-team' | 'school-id-taken' | 'unknown-conference' | 'stale-roster' | 'no-jersey' | 'unmatched-opponent';
+  readonly code:
+    | 'not-published' | 'unmatched-team' | 'school-id-taken' | 'unknown-conference' | 'stale-roster' | 'no-jersey' | 'ncaa-player-kept'
+    | 'unmatched-opponent';
   readonly message: string;
   /** What it concerns: datasets, teams, conference labels or players, by name. */
   readonly subjects: readonly string[];
@@ -150,6 +154,9 @@ export interface SdvSummary {
   readonly newSchools: number;
   readonly players: number;
   readonly playerStats: number;
+  /** Players keyed by the retired NCAA files: matched to an ESPN row and rekeyed, or deleted with their stats. */
+  readonly rematched: number;
+  readonly removed: number;
   readonly games: number;
 }
 
@@ -224,12 +231,20 @@ const groupBy = <T>(rows: readonly T[], key: (row: T) => string) => {
 export function sportsdataverseEdits(
   world: World,
   sources: SdvSources,
-  options: { readonly program: ProgramCode; readonly season: SeasonId; readonly gamesFor: HomeGames | null },
+  options: {
+    readonly program: ProgramCode;
+    readonly season: SeasonId;
+    readonly gamesFor: HomeGames | null;
+    /** Ids a show or a live game holds; a player among them is never deleted. */
+    readonly inUse: ReadonlySet<string>;
+  },
 ): { readonly edits: ImportEdit[]; readonly warnings: SdvWarning[]; readonly summary: SdvSummary } {
   const { program, season } = options;
   const subjects = new Map<SdvWarning['code'], Set<string>>();
   const warn: Warn = (code, subject) => subjects.set(code, (subjects.get(code) ?? new Set()).add(subject));
-  for (const dataset of SDV_DATASET_NAMES) if (!sources[dataset]) warn('not-published', SDV_DATASETS[dataset].path(program, sdvYear(season)));
+  const unpublished = (dataset: SdvDataset) => warn('not-published', SDV_DATASETS[dataset].path(program, sdvYear(season)));
+  // Last season's rosters matter only when the stale guard reads them.
+  for (const dataset of SDV_DATASET_NAMES) if (!sources[dataset] && dataset !== 'priorRosters') unpublished(dataset);
 
   const edits: ImportEdit[] = [importPut('season', Season.parse({ id: season, name: season }), 'keep')];
   const schoolByEspn = new Map(world.all('school').flatMap((school) => (school.espnId ? [[school.espnId, school] as const] : [])));
@@ -305,7 +320,8 @@ export function sportsdataverseEdits(
     );
   }
 
-  const players = rosterEdits(world, sources, { program, season, schools, schoolByEspn, warn });
+  const players = rosterEdits(world, sources, { program, season, schools, schoolByEspn, inUse: options.inUse, warn });
+  if (players.priorNeeded && !sources.priorRosters) unpublished('priorRosters');
   edits.push(...players.edits);
 
   const games = options.gamesFor ? homeGames(world, sources, { ...options, gamesFor: options.gamesFor, schoolByEspn, conferenceOf, warn }) : [];
@@ -319,7 +335,16 @@ export function sportsdataverseEdits(
   return {
     edits,
     warnings,
-    summary: { rows, teamSeasons: schools.size, newSchools, players: players.players, playerStats: players.playerStats, games: games.length },
+    summary: {
+      rows,
+      teamSeasons: schools.size,
+      newSchools,
+      players: players.players,
+      playerStats: players.playerStats,
+      rematched: players.rematched,
+      removed: players.removed,
+      games: games.length,
+    },
   };
 }
 
@@ -332,6 +357,8 @@ const WARNING_TEXT: { readonly [C in SdvWarning['code']]: (n: number) => string 
   'unknown-conference': (n) => `${plural(n, 'conference label names', 'conference labels name')} no conference we have; those teams keep theirs`,
   'stale-roster': (n) => `${plural(n, "team's roster is", "teams' rosters are")} last season's, copied forward; not loaded`,
   'no-jersey': (n) => `${plural(n, 'player has', 'players have')} no jersey number; skipped`,
+  'ncaa-player-kept': (n) =>
+    `${plural(n, 'player', 'players')} from the retired NCAA files ${n === 1 ? 'is' : 'are'} on no ESPN roster, but a show, a live game or a person's edit holds ${n === 1 ? 'it' : 'them'}; kept`,
   'unmatched-opponent': (n) => `${plural(n, 'home game is', 'home games are')} against a team we have no school for; skipped`,
 };
 
@@ -362,14 +389,63 @@ function teamStats(rows: readonly SdvRow<'teamBox'>[]): BasketballTeamSeasonStat
   };
 }
 
+const classOf = (experience: string | null): ClassYear | null => {
+  const parsed = parseClass(experience ?? '');
+  return typeof parsed === 'string' ? null : parsed.classYear;
+};
+
+/** The classes a new season moves a returner out of. ESPN's class stops at Senior. */
+const MOVES_UP: ReadonlySet<ClassYear> = new Set(['FR', 'SO', 'JR']);
+const rank = (classYear: ClassYear) => ClassYear.options.indexOf(classYear);
+
 /**
- * ESPN's copy of last season's roster: every athlete back from last season is still in last
- * season's class. A new season's roster moves its returners up a class.
+ * ESPN's copy of last season's roster: no returner moved up a class, and at least one of them
+ * should have. Only a returner with a class on both sides is evidence: a player the World took
+ * over from the NCAA files may have no ESPN class, or a higher one than ESPN gives him, so a
+ * class that is missing or moved down says nothing about a new roster. A senior stays put in a
+ * new season too, so a team whose returners are all seniors or classless is loaded.
  */
-const isStale = (rows: readonly SdvRow<'rosters'>[], prior: readonly SdvRow<'priorRosters'>[]) => {
-  const before = new Map(prior.map((row) => [row.athlete_id, row.experience_display_value]));
-  const returning = rows.filter((row) => before.has(row.athlete_id));
-  return returning.length > 0 && returning.every((row) => before.get(row.athlete_id) === row.experience_display_value);
+const isStale = (rows: readonly SdvRow<'rosters'>[], before: ReadonlyMap<string, ClassYear | null>) => {
+  const returners = rows.flatMap((row) => {
+    const [now, then] = [classOf(row.experience_display_value), before.get(row.athlete_id)];
+    return now && then ? [[now, then] as const] : [];
+  });
+  return returners.some(([now]) => MOVES_UP.has(now)) && !returners.some(([now, then]) => rank(now) > rank(then));
+};
+
+/** `2026-27` is preceded by `2025-26`. */
+const seasonBefore = (season: SeasonId) => {
+  const start = Number(season.slice(0, 4)) - 1;
+  return SeasonId.parse(`${start}-${String((start + 1) % 100).padStart(2, '0')}`);
+};
+
+/** The retired stats.ncaa.org loader's player keys. A team-season ESPN describes keeps none. */
+const NCAA = 'ncaa:';
+
+const SUFFIXES = new Set(['jr', 'sr', 'ii', 'iii', 'iv', 'v']);
+/** `Philon Jr.` is `philon`, `Guimarães` is `guimaraes`, `Blue-Smith` is `blue`, `smith`. */
+const nameTokens = (name: string) =>
+  name
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[.']/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token && !SUFFIXES.has(token));
+
+/**
+ * The NCAA files spelled some names their own way (`Philon` for ESPN's `Philon Jr.`, `Palomo`
+ * for `Palomo Vicente`, `Guimares` for `Guimarães`) and gave some players another jersey, so
+ * an NCAA-keyed player of the team-season is the row's player when the two names fold to the
+ * same one, or when the jersey is the same and they share the first name or a family name token.
+ */
+const sameNcaaPlayer = (row: { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }, player: Player) => {
+  if (!player.sourceKey?.startsWith(NCAA)) return false;
+  const first = nameTokens(row.firstName).join(' ');
+  const sameFirst = first !== '' && first === nameTokens(player.firstName).join(' ');
+  if (sameFirst && nameTokens(row.lastName).join(' ') === nameTokens(player.lastName).join(' ')) return true;
+  const last = new Set(nameTokens(player.lastName));
+  return row.jersey === player.jersey && (sameFirst || nameTokens(row.lastName).some((token) => last.has(token)));
 };
 
 /** `Lynn, MA`; `Belgrade, Serbia` for a player born outside the US. */
@@ -387,38 +463,62 @@ function rosterEdits(
     readonly season: SeasonId;
     readonly schools: ReadonlyMap<SchoolId, School>;
     readonly schoolByEspn: ReadonlyMap<string, School>;
+    readonly inUse: ReadonlySet<string>;
     readonly warn: Warn;
   },
-): { readonly edits: ImportEdit[]; readonly players: number; readonly playerStats: number } {
-  // Once the season's box scores exist its roster file is the season's, and last season's file
-  // may by then hold this season's roster too, so only a roster before tip-off is compared.
-  const prior = !sources.playerBox && sources.priorRosters && groupBy(sources.priorRosters, (row) => row.team_id);
+): {
+  readonly edits: ImportEdit[];
+  readonly players: number;
+  readonly playerStats: number;
+  readonly rematched: number;
+  readonly removed: number;
+  /** Whether the stale guard wanted last season's rosters file. */
+  readonly priorNeeded: boolean;
+} {
+  const boxByTeam = groupBy(sources.playerBox ?? [], (row) => row.team_id);
+  const priorFile = groupBy(sources.priorRosters ?? [], (row) => row.team_id);
+  const lastSeason = seasonBefore(context.season);
+  let priorNeeded = false;
+  /**
+   * Each athlete's class last season. What an earlier load wrote is the season as ESPN served
+   * it then; last season's file is rebuilt from whatever ESPN serves now, so it is read only
+   * for a team the World has no ESPN players of last season for. Null when neither says.
+   */
+  const lastClasses = (team: TeamId, espnTeam: string): ReadonlyMap<string, ClassYear | null> | null => {
+    const known = world.roster(team, lastSeason).flatMap((player) => (player.sourceKey?.startsWith('espn:') ? [[player.sourceKey.slice('espn:'.length), player.classYear] as const] : []));
+    if (known.length) return new Map(known);
+    priorNeeded = true;
+    return sources.priorRosters && new Map((priorFile.get(espnTeam) ?? []).map((row) => [row.athlete_id, classOf(row.experience_display_value)]));
+  };
   const edits: ImportEdit[] = [];
   /** `<ESPN team id>/<athlete id>` to the player, which is how the player box names one. */
   const playerOf = new Map<string, Player['id']>();
-  let players = 0;
+  let [players, rematched, removed] = [0, 0, 0];
   for (const [espnTeam, rows] of groupBy(sources.rosters ?? [], (row) => row.team_id)) {
     const school = context.schoolByEspn.get(espnTeam);
     if (!school || !context.schools.has(school.id)) continue;
-    if (prior && isStale(rows, prior.get(espnTeam) ?? [])) {
+    const team: TeamId = idFor.team(school.id, context.program);
+    // A team with a box score this season has this season's roster.
+    const before = boxByTeam.has(espnTeam) ? null : lastClasses(team, espnTeam);
+    if (before && isStale(rows, before)) {
       context.warn('stale-roster', school.name);
       continue;
     }
-    const team: TeamId = idFor.team(school.id, context.program);
     const roster: RosterRow[] = [];
+    const unnumbered: SdvRow<'rosters'>[] = [];
     for (const row of rows) {
       if (!row.jersey || !/^\d{1,2}$/.test(row.jersey)) {
         context.warn('no-jersey', `${row.first_name} ${row.last_name} (${school.name})`);
+        unnumbered.push(row);
         continue;
       }
-      const parsedClass = parseClass(row.experience_display_value ?? '');
       const position = parsePosition(row.position_abbreviation ?? '');
       roster.push({
         jersey: row.jersey,
         firstName: row.first_name.trim(),
         lastName: row.last_name.trim(),
         position: typeof position === 'string' ? position : '',
-        classYear: typeof parsedClass === 'string' ? null : parsedClass.classYear,
+        classYear: classOf(row.experience_display_value),
         // The files never mark a redshirt, so they leave the player's flag alone.
         redshirt: null,
         hometown: hometown(row),
@@ -427,9 +527,40 @@ function rosterEdits(
         sourceKey: `espn:${row.athlete_id}`,
       });
     }
-    const plan = planRoster(world, { team, season: context.season, rows: roster, prune: false });
+    const plan = planRoster(world, { team, season: context.season, rows: roster, prune: false, lastPass: sameNcaaPlayer });
     edits.push(...plan.edits);
     players += roster.length;
+    rematched += plan.update.filter(({ before }) => before.sourceKey?.startsWith(NCAA)).length;
+    // ESPN rebuilds a finished season's roster file from the rosters it serves then, so it can
+    // leave out a player its box scores show played that season: the box names him instead. A
+    // roster row with no jersey names him too, but only by his whole name.
+    const keyed = new Set([...roster, ...world.roster(team, context.season)].map((row) => row.sourceKey));
+    const boxed = new Map<string, { readonly jersey: string | null; readonly firstName: string; readonly lastName: string }>(
+      unnumbered.filter((row) => !keyed.has(`espn:${row.athlete_id}`)).map((row) => [row.athlete_id, { jersey: null, firstName: row.first_name.trim(), lastName: row.last_name.trim() }]),
+    );
+    for (const line of boxByTeam.get(espnTeam) ?? []) {
+      if (!line.athlete_id || keyed.has(`espn:${line.athlete_id}`) || boxed.get(line.athlete_id)?.jersey) continue;
+      const [firstName = '', ...last] = (line.athlete_display_name ?? '').trim().split(/\s+/);
+      boxed.set(line.athlete_id, { jersey: line.athlete_jersey, firstName, lastName: last.join(' ') });
+    }
+    for (const player of plan.missing) {
+      if (!player.sourceKey?.startsWith(NCAA)) continue;
+      const athlete = [...boxed].find(([, named]) => sameNcaaPlayer(named, player))?.[0];
+      if (athlete) {
+        boxed.delete(athlete);
+        edits.push(importPut('player', { ...player, sourceKey: `espn:${athlete}` }));
+        playerOf.set(`${espnTeam}/${athlete}`, player.id);
+        rematched++;
+        continue;
+      }
+      // Deleting the player takes his stats row too, so a lock on either keeps him.
+      if (context.inUse.has(player.id) || world.locks('player', player.id).length || world.locks('playerStats', player.id).length) {
+        context.warn('ncaa-player-kept', `${player.firstName} ${player.lastName} (${school.name})`);
+        continue;
+      }
+      edits.push({ op: 'delete', kind: 'player', id: player.id });
+      removed++;
+    }
     for (const player of [...world.roster(team, context.season), ...plan.add, ...plan.update.map((change) => change.after)]) {
       if (player.sourceKey?.startsWith('espn:')) playerOf.set(`${espnTeam}/${player.sourceKey.slice('espn:'.length)}`, player.id);
     }
@@ -473,7 +604,7 @@ function rosterEdits(
       }),
     );
   }
-  return { edits, players, playerStats: games.size };
+  return { edits, players, playerStats: games.size, rematched, removed, priorNeeded };
 }
 
 /** Each game on `gamesFor.school`'s home floor, played or not. A neutral-site game is not a home game. */
@@ -527,6 +658,7 @@ export interface SdvLoadReport {
   readonly revision: Revision;
   readonly inserted: number;
   readonly updated: number;
+  readonly deleted: number;
   /** Locked fields the load left alone, per row. */
   readonly skipped: readonly { readonly kind: EntityKind; readonly id: string; readonly fields: readonly string[] }[];
   readonly warnings: readonly SdvWarning[];
