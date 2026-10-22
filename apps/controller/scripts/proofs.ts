@@ -165,7 +165,7 @@ async function main() {
   const { api, close } = connect({ url: `ws://localhost:${port}/rpc`, client: 'controller-proof' });
   browser = await chromium.launch();
   try {
-    await provesTwoOperators();
+    await provesTwoOperators(api);
     await provesRunThrough(api);
     await provesProblems(api);
     await provesRestart();
@@ -183,7 +183,7 @@ async function main() {
 let alex: { context: BrowserContext; page: Page };
 let sam: { context: BrowserContext; page: Page };
 
-async function provesTwoOperators() {
+async function provesTwoOperators(api: ReturnType<typeof connect>['api']) {
   console.log('two operators');
   alex = await operatorPage('alex');
   await alex.page.getByRole('button', { name: 'Activate' }).click();
@@ -202,11 +202,12 @@ async function provesTwoOperators() {
   check(true, 'alex sees sam among the operators');
 
   const staff = 'basketball-v2/staff-lower-third';
+  const top = (await rundown(api))[0]!.graphic;
+  await waitDrawn(sam.page, 'preview', { [layerOf(top)]: { graphic: top } }, "sam's preview opens on sam's selected row, the first");
   await rows(alex.page).filter({ hasText: 'Zach Spiker' }).click();
-  await alex.page.keyboard.press('Enter');
-  await waitDrawn(alex.page, 'preview', { lower: { graphic: staff } }, "alex's cue is in alex's preview");
-  await waitDrawn(sam.page, 'other:alex', { lower: { graphic: staff } }, "alex's cue shows in sam's thumbnail of alex");
-  await waitDrawn(sam.page, 'preview', { lower: 'empty' }, "sam's own preview stays empty");
+  await waitDrawn(alex.page, 'preview', { lower: { graphic: staff } }, "selecting a row puts it in alex's preview, with no Enter");
+  await waitDrawn(sam.page, 'other:alex', { lower: { graphic: staff } }, "alex's preview shows in sam's thumbnail of alex");
+  await waitDrawn(sam.page, 'preview', { [layerOf(top)]: { graphic: top } }, "sam's own preview keeps sam's selection");
   await shoot(sam.page, '02-sam-sees-alex-preview');
 
   await alex.page.getByRole('button', { name: /^Take/ }).click();
@@ -344,8 +345,7 @@ async function provesRunThrough(api: ReturnType<typeof connect>['api']) {
   await waitDrawn(page, 'program', { bug: { graphic: 'basketball-v2/scorebug' } }, '1 airs the first free-panel button');
   for (let i = 0; i < 20; i++) await page.keyboard.press('ArrowUp');
   await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Enter');
-  await waitDrawn(page, 'preview', { lower: { graphic: 'basketball-v2/starting-five' } }, 'Up, Down and Enter cue the second row (Starting Five)');
+  await waitDrawn(page, 'preview', { lower: { graphic: 'basketball-v2/starting-five' } }, 'Up and Down move my preview to the second row (Starting Five)');
   await page.keyboard.press('Escape');
   await waitDrawn(page, 'preview', { lower: 'empty' }, 'Esc clears my preview');
   await page.keyboard.press('Enter');

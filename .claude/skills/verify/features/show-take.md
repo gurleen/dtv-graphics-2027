@@ -16,7 +16,7 @@ On the show page an operator cues a rundown cue into their own preview, takes it
 ## How to get to it (user POV)
 
 - Open `http://localhost:<port>/#/show` (the default route). On a first visit, type a name in `Your name` and press `Start`.
-- Choose a row in the `Rundown` grid, then press `Cue to my preview` in the Selected cue panel, or press Enter.
+- Choose a row in the `Rundown` grid: your preview follows the selection. After a take, press `Cue to my preview` in the Selected cue panel, or Enter, to cue the same row again.
 - Press `Take` (Space), `Next` (N) and `Clear PVW` (Esc) in the right rail.
 - Press `Clear` on a row of On air by layer. Shift+Esc clears the lower third.
 - Hold `Clear all` in the top bar, or hold Shift+Backspace for about 0.6 s.
@@ -32,7 +32,7 @@ Preconditions:
 - **Take.** It presses `/^Take/`. The program monitor and program `/renderer` draw the staff lower third, the preview monitor empties, and `view('alex').program.lower` holds it.
 - **Clear.** It presses `Clear` in `.layer-row[data-layer="lower"]`. Program `/renderer` and the monitor go empty, and the API shows no lower slot.
 - **Run it.** `.claude/skills/verify/journeys/take.ts --port=8998` exits 0 with 14 checks passed.
-- **Next and keys.** `bun apps/controller/scripts/proofs.ts --port=8999 --quick` runs the keyboard stretch. 1 airs the scorebug. Up, Down and Enter cue Starting Five. Esc clears preview. Space takes. N steps, and N past the last step takes it off air.
+- **Next and keys.** `bun apps/controller/scripts/proofs.ts --port=8999 --quick` runs the keyboard stretch. 1 airs the scorebug. Up and Down move preview to Starting Five. Esc clears preview, and Enter cues it again. Space takes. N steps, and N past the last step takes it off air.
 - **Next on a one-step graphic.** `.claude/skills/verify/journeys/next.ts --port=8998` airs the scorebug, takes a staff lower third and presses N: the lower third leaves program and `/renderer`, and the scorebug stays. Without a selection N moves the topmost rundown graphic on program; it never reaches a free-panel graphic (scorebug, Score to Break) unless that graphic's cue is selected. A tap of Shift+Backspace changes nothing, and a hold clears all.
 - **Every graphic.** The same suite without `--quick` takes all 15 rundown cues and the 2 free-panel graphics through preview, Take, each step and Clear. It checks `all 17 graphics reached program`, and it records `build/controller/runthrough.webm`.
 

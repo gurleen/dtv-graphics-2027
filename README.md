@@ -43,7 +43,8 @@ contract in `@dtv/api` over one WebSocket at `/rpc`.
 **The show page** has the free panel (the scorebug and Score to Break, always
 one key away), the rundown of the active show's cues, an inspector for the
 selected cue's fields, your own preview beside program, the other operators'
-previews, and the score bar. Cue a graphic to your preview, then Take puts it on
+previews, and the score bar, which shows the live game and has no controls
+(a live data feed will drive the game). Cue a graphic to your preview, then Take puts it on
 program for every controller and for `/renderer`. Next steps a multi-step
 graphic on, and takes a one-step graphic off.
 
@@ -57,20 +58,13 @@ another game and made active here; the show page always runs the active show.
 
 | Key | Does |
 |---|---|
-| ↑ ↓ | Move the rundown selection |
-| Enter | Cue the selected row to your preview |
+| ↑ ↓ | Move the rundown selection; your preview follows it |
+| Enter | Cue the selected row to your preview again, as after a take |
 | Space | Take your preview |
 | N | Next on the graphic on program |
 | Esc / Shift+Esc | Clear your preview / clear the program lower third |
 | Shift+Backspace | Clear All, held for 600 ms or pressed twice |
 | 1, 2 | Air or clear the free-panel buttons |
-| Q W E / I O P | Away / home +1, +2, +3 |
-| Shift+Q / Shift+I | Away / home −1 |
-| C | Start or stop the game clock |
-| R / T | Shot clock to 30 / 20 |
-| [ / ] | Possession to away / home |
-
-Timeouts, fouls, the period and the phase are on the score bar, by mouse.
 
 ## Data
 
@@ -107,7 +101,7 @@ under `build/`, and exits non-zero when a check fails:
 
 ```bash
 bun apps/controller/scripts/proofs.ts        # two operators, all 17 graphics through preview, Take and program, a restart
-bun apps/controller/scripts/game.ts          # a whole game from tip-off to final by keys and clicks, with a SIGKILL mid-half
+bun apps/controller/scripts/game.ts          # a whole game from tip-off to final, fed over game.apply, with a SIGKILL mid-half
 bun apps/controller/scripts/data-proofs.ts   # locks, edit conflicts, roster import
 bun apps/controller/scripts/shows-proofs.ts  # create, duplicate and activate a show
 bun apps/renderer/scripts/proofs.ts          # steps, exits, reloads and rapid takes on /renderer

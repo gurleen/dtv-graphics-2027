@@ -1,9 +1,11 @@
 /**
- * The phase 5 gate: a whole game, tip-off to final, run through the controller's UI only,
- * keys and clicks, against the real server on a scratch database, with /renderer drawing
- * program beside it. The API is used only to read what program shows. Partway through the
- * second half the server is killed with SIGKILL while the clock runs and started again on
- * the same file.
+ * The phase 5 gate: a whole game, tip-off to final, against the real server on a scratch
+ * database, with /renderer drawing program beside it. The show is run through the controller's
+ * UI, keys and clicks. The game itself (score, clocks, possession, timeouts, fouls, bonus,
+ * period, phase) is driven through `api.game.apply` over the @dtv/api client, standing in for
+ * the live data feed; the controller's score bar is read-only and must reflect it. Partway
+ * through the second half the server is killed with SIGKILL while the clock runs and started
+ * again on the same file.
  *
  *   bun run riv:build                               once: the signed scenes
  *   bun apps/controller/scripts/game.ts [--port=8994]
@@ -17,7 +19,7 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { connect, first, watch } from '@dtv/api';
-import { basketball, type GameId } from '@dtv/domain';
+import { basketball, type GameId, type Side, SourceId } from '@dtv/domain';
 import type { LayerId, OutputFrame } from '@dtv/playout';
 import { type Browser, type BrowserContext, chromium, type Page } from 'playwright';
 
@@ -86,6 +88,27 @@ const lastSeq = () => {
     db.close();
   }
 };
+
+// The live feed's stand-in: every game-state change is an absolute-value game.apply. The seeded
+// game's authority is the operator source, so the feed writes as that source.
+
+let reader: ReturnType<typeof connect>;
+let gameId: GameId;
+const FEED = SourceId.parse('operator');
+
+/** Sends commands as the feed, retrying while the server is down. */
+async function feed(...commands: basketball.BasketballCommand[]) {
+  const deadline = Date.now() + 20_000;
+  for (;;) {
+    try {
+      await reader.api.game.apply({ sport: 'basketball', gameId, source: FEED, commands });
+      return;
+    } catch (error) {
+      if (Date.now() > deadline) throw error;
+      await Bun.sleep(100);
+    }
+  }
+}
 
 // What program shows, read from output.watch, and the game's live state from game.watch.
 
@@ -232,24 +255,39 @@ async function cueAndTake(label: string, graphic: string, layer: LayerId) {
 const inMyPreview = (graphic: string) =>
   controller.page.waitForFunction(`window.dtvMonitors?.preview?.frame?.layers.some((layer) => layer.graphic === '${graphic}')`, null, { timeout: 15_000 });
 
-async function setClock(text: string) {
-  await controller.page.getByTestId('game-clock').click();
-  await controller.page.getByLabel('Game clock').fill(text);
-  await controller.page.getByLabel('Game clock').press('Enter');
+/** Waits until the controller's read-only score bar shows the score, and checks it. */
+async function barScore(away: number, home: number, what: string) {
+  try {
+    await controller.page.waitForFunction(
+      `document.querySelector('[data-testid="score-away"]')?.textContent === '${away}' && document.querySelector('[data-testid="score-home"]')?.textContent === '${home}'`,
+      null,
+      { timeout: 15_000 },
+    );
+    check(true, `${what} (score bar ${away}-${home})`);
+  } catch {
+    const seen = await controller.page.evaluate("document.querySelector('[data-testid=\"score-away\"]')?.textContent + '-' + document.querySelector('[data-testid=\"score-home\"]')?.textContent");
+    check(false, `${what} (score bar wanted ${away}-${home}, shows ${seen})`);
+  }
 }
 
-async function choose(select: 'Period' | 'Phase', option: string) {
-  await controller.page.getByRole('button', { name: new RegExp(`${select}$`) }).click();
-  await controller.page.getByRole('option', { name: option, exact: true }).click();
+/** Waits until the score bar's `testid` text satisfies `ok`, and checks it. */
+async function barText(testid: 'game-clock' | 'shot-clock', ok: (text: string) => boolean, what: string) {
+  const text = () => controller.page.getByTestId(testid).textContent().then((each) => each ?? '');
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    if (ok(await text())) return check(true, `${what} (${testid} ${await text()})`);
+    await Bun.sleep(50);
+  }
+  check(false, `${what} (${testid} shows ${await text()})`);
 }
 
 async function main() {
   rmSync(OUT, { recursive: true, force: true });
   mkdirSync(OUT, { recursive: true });
   await startServer(true);
-  const reader = connect({ url: `ws://localhost:${port}/rpc`, client: 'game-reader' });
+  reader = connect({ url: `ws://localhost:${port}/rpc`, client: 'game-feed' });
   const world = await first((signal) => reader.api.data.watch(undefined, { signal }));
-  const gameId = world.entities.show.find((show) => show.id === 'drexel-sju')!.gameId as GameId;
+  gameId = world.entities.show.find((show) => show.id === 'drexel-sju')!.gameId as GameId;
   const stop = new AbortController();
   void watch((signal) => reader.api.output.watch({ bus: { kind: 'program' } }, { signal }), (frame) => (program = frame), { signal: stop.signal });
   void watch((signal) => reader.api.game.watch({ game: gameId }, { signal }), (value) => (live = value.sport === 'basketball' ? value : null), { signal: stop.signal });
@@ -293,19 +331,26 @@ async function main() {
 
 async function beforeTipOff() {
   console.log('before tip-off');
-  // The seed's game is mid-second-half; the operator sets the board for tip-off by hand.
-  await press('Shift+KeyQ', live!.score.away);
-  await press('Shift+KeyI', live!.score.home);
-  await choose('Period', '1st Half');
-  await choose('Phase', 'Pregame');
-  await setClock('20:00');
-  if (live!.timeouts.away < 4) await controller.page.locator('.team.away').getByRole('button', { name: '4 timeouts' }).click();
-  if (live!.bonus.home) await controller.page.locator('.team.home').getByRole('button', { name: 'Bonus' }).click();
-  if (live!.possession) await controller.page.getByRole('button', { name: /^Possession DREX/ }).click();
+  // The seed's game is mid-second-half; the feed sets the board for tip-off.
+  await feed(
+    { type: 'score', side: 'away', value: 0 },
+    { type: 'score', side: 'home', value: 0 },
+    { type: 'period', period: 1 },
+    { type: 'phase', phase: 'pregame' },
+    { type: 'clockSet', remainingMs: 1_200_000, running: false },
+    { type: 'shotClock', remainingMs: null },
+    { type: 'timeouts', side: 'away', remaining: 4 },
+    { type: 'timeouts', side: 'home', remaining: 4 },
+    { type: 'bonus', side: 'home', value: false },
+    { type: 'bonus', side: 'away', value: false },
+    { type: 'possession', side: null },
+  );
   await until(
     () => live?.score.away === 0 && live.score.home === 0 && live.period === 1 && live.phase === 'pregame' && live.clock.remainingMs === 1_200_000 && live.timeouts.away === 4 && !live.bonus.home && live.possession === null,
-    () => `Shift+Q and Shift+I take the seed's 68-72 to 0-0, and the period, phase, clock, timeouts, bonus and possession are set by mouse (${JSON.stringify(live && { score: live.score, period: live.period, phase: live.phase, clock: live.clock })})`,
+    () => `the feed takes the seed's 68-72 to 0-0 and sets the period, phase, clock, timeouts, bonus and possession (${JSON.stringify(live && { score: live.score, period: live.period, phase: live.phase, clock: live.clock })})`,
   );
+  await barScore(0, 0, "the read-only score bar follows the feed's reset");
+  await barText('game-clock', (text) => text === '20:00', 'the bar reads the tip-off clock');
 
   await press('Shift+Slash');
   await controller.page.getByRole('dialog', { name: 'Keys' }).waitFor();
@@ -341,51 +386,49 @@ async function beforeTipOff() {
 
 async function firstHalf() {
   console.log('first half');
-  await choose('Phase', 'Live');
-  await press('KeyC');
-  await until(() => live?.clock.running === true, 'C starts the game clock');
-  await press('BracketLeft');
-  await press('KeyR');
-  await until(() => live?.possession === 'away' && live.shotClock?.running === true && live.shotClock.remainingMs === 30_000, '[ gives away the ball and R starts a 30-second shot clock with the game clock');
+  await feed({ type: 'phase', phase: 'live' }, { type: 'clock', action: 'start' }, { type: 'possession', side: 'away' }, { type: 'shotClock', remainingMs: 30_000, running: true });
+  await until(() => live?.clock.running === true && live.possession === 'away' && live.shotClock?.running === true && live.shotClock.remainingMs === 30_000, 'the feed starts the game clock, gives away the ball and starts a 30-second shot clock');
+  await barText('shot-clock', (text) => Number(text) > 20 && Number(text) <= 30, 'the bar shows the 30-second shot clock running');
   await expectProgram({ bug: G('scorebug') }, 'the scorebug shows away possession');
   check(bug().awayPossession === true && bug().homePossession === false, `possession arrow away (${String(bug().awayPossession)}, ${String(bug().homePossession)})`);
 
-  const possessions: [key: string, away: number, home: number, ball: string][] = [
-    ['KeyW', 2, 0, 'BracketRight'],
-    ['KeyO', 2, 2, 'BracketLeft'],
-    ['KeyE', 5, 2, 'BracketRight'],
-    ['KeyP', 5, 5, 'BracketLeft'],
+  const possessions: [side: Side, away: number, home: number, ball: Side][] = [
+    ['away', 2, 0, 'home'],
+    ['home', 2, 2, 'away'],
+    ['away', 5, 2, 'home'],
+    ['home', 5, 5, 'away'],
   ];
-  for (const [key, away, home, ball] of possessions) {
-    await press(key);
-    await press(ball);
-    await press('KeyR');
-    await expectProgram({ away, home }, `${key.slice(3)} scores: program reads ${away}-${home}`);
+  for (const [side, away, home, ball] of possessions) {
+    await feed({ type: 'score', side, value: side === 'away' ? away : home }, { type: 'possession', side: ball }, { type: 'shotClock', remainingMs: 30_000 });
+    await expectProgram({ away, home }, `${side} scores: program reads ${away}-${home}`);
   }
-  await until(() => live?.possession === 'away', 'the brackets passed the ball each time');
+  await until(() => live?.possession === 'away', 'the ball changed hands each time');
+  await barScore(5, 5, 'the score bar reads 5-5');
   await shootRenderer('first-half-5-5', { bug: G('scorebug') });
 
-  await press('KeyI', 2);
-  await expectProgram({ home: 7 }, 'I twice: two free throws, 5-7');
-  await press('Shift+KeyI');
-  await expectProgram({ home: 6 }, 'Shift+I takes one back, 5-6');
-  await press('KeyT');
-  await until(() => live?.shotClock?.remainingMs === 20_000, 'T resets the shot clock to 20');
+  await feed({ type: 'score', side: 'home', value: 7 });
+  await expectProgram({ home: 7 }, 'two free throws: 5-7');
+  await feed({ type: 'score', side: 'home', value: 6 });
+  await expectProgram({ home: 6 }, 'one taken back: 5-6');
+  await barScore(5, 6, 'the score bar reads 5-6');
+  await feed({ type: 'shotClock', remainingMs: 20_000 });
+  await until(() => live?.shotClock?.remainingMs === 20_000, 'the shot clock resets to 20');
   await until(() => bug().shotClock === '20' || bug().shotClock === '19', () => `program's shot clock reads ${String(bug().shotClock)}`);
 
-  await setClock('11:30');
-  await until(() => live?.clock.running === true && clockMs(bug().clock) <= 11 * 60_000 + 30_000 && clockMs(bug().clock) > 11 * 60_000, () => `typing 11:30 sets the running clock (program ${String(bug().clock)})`);
+  await feed({ type: 'clockSet', remainingMs: 690_000 });
+  await until(() => live?.clock.running === true && clockMs(bug().clock) <= 11 * 60_000 + 30_000 && clockMs(bug().clock) > 11 * 60_000, () => `setting 11:30 moves the running clock (program ${String(bug().clock)})`);
+  await barText('game-clock', (text) => clockMs(text) <= 11 * 60_000 + 30_000 && clockMs(text) > 11 * 60_000, 'the bar clock follows');
 
-  await press('KeyC');
-  await until(() => live?.clock.running === false && live.shotClock?.running === false, 'C stops the game clock and the shot clock with it');
-  await controller.page.locator('.team.away').getByRole('button', { name: '4 timeouts' }).click();
+  await feed({ type: 'clock', action: 'stop' });
+  await until(() => live?.clock.running === false && live.shotClock?.running === false, 'stopping the game clock stops the shot clock with it');
+  await feed({ type: 'timeouts', side: 'away', remaining: 3 });
   await expectProgram({ bug: G('scorebug') }, 'the scorebug is on for the timeout');
   await until(() => bug().awayTimeouts === 3, () => `away's timeout: program shows ${String(bug().awayTimeouts)} left`);
 
-  await controller.page.getByRole('button', { name: 'Foul on home' }).click();
-  await controller.page.getByRole('button', { name: 'Foul on home' }).click();
-  await controller.page.getByRole('button', { name: 'Foul on away' }).click();
-  await until(() => live?.team.home.pf === 2 && live.team.away.pf === 1, () => `fouls by mouse: home ${live?.team.home.pf}, away ${live?.team.away.pf}`);
+  await feed({ type: 'teamLine', side: 'home', line: { pf: 2 } }, { type: 'teamLine', side: 'away', line: { pf: 1 } });
+  await until(() => live?.team.home.pf === 2 && live.team.away.pf === 1, () => `fouls by the feed: home ${live?.team.home.pf}, away ${live?.team.away.pf}`);
+  await controller.page.locator('.scorebar .team.home .fouls .mono').waitFor();
+  check((await controller.page.locator('.scorebar .team.home .fouls .mono').textContent()) === '2' && (await controller.page.locator('.scorebar .team.away .fouls .mono').textContent()) === '1', 'the bar shows the fouls, 2 and 1');
   await shootController('first-half');
 
   await cueAndTake('Josh Reed #5 · game', G('player-lower-third'), 'lower');
@@ -395,7 +438,6 @@ async function firstHalf() {
   await press('Shift+Escape');
   await expectProgram({ lower: 'empty' }, 'Shift+Esc clears it');
 
-  await press('KeyC');
   await press('Digit2');
   await expectProgram({ bug: G('score-to-break') }, '2 airs Score to Break on the bug layer');
   await shootRenderer('score-to-break', { bug: G('score-to-break') });
@@ -413,15 +455,16 @@ async function firstHalf() {
 
 async function endOfHalf() {
   console.log('the end of the half');
-  await press('KeyW');
+  await feed({ type: 'score', side: 'away', value: 7 }, { type: 'clock', action: 'start' });
   await expectProgram({ away: 7, home: 6 }, 'a last basket: 7-6');
-  await setClock('0:03');
+  await feed({ type: 'clockSet', remainingMs: 3_000, running: true });
   await until(() => live?.clock.running === true, 'the clock runs from 0:03');
   await until(() => bug().clock === '0:00.0', () => `the clock runs out: program reads ${String(bug().clock)}`, 8_000);
-  await press('KeyC');
-  await until(() => live?.clock.running === false, 'C stops the expired clock');
+  await barText('game-clock', (text) => text === '0:00.0', 'the bar reads the expired clock');
+  await feed({ type: 'clock', action: 'stop' });
+  await until(() => live?.clock.running === false, 'the feed stops the expired clock');
   await shootRenderer('end-of-half', { bug: G('scorebug') });
-  await choose('Phase', 'Halftime');
+  await feed({ type: 'phase', phase: 'halftime' });
   await expectProgram({ bug: G('scorebug'), period: 'HALF' }, 'the halftime phase: the scorebug reads Half');
 
   await cueAndTake('Halftime stats', G('halftime-statistics'), 'card');
@@ -441,20 +484,14 @@ async function endOfHalf() {
 
 async function secondHalf() {
   console.log('second half');
-  await choose('Period', '2nd Half');
-  await choose('Phase', 'Live');
-  await setClock('20:00');
+  await feed({ type: 'period', period: 2 }, { type: 'phase', phase: 'live' }, { type: 'clockSet', remainingMs: 1_200_000, running: false });
   await press('Digit1');
   await expectProgram({ bug: G('scorebug'), period: '2ND HALF', away: 7, home: 6 }, 'the period change: the scorebug reads 2nd Half');
-  await press('KeyC');
-  await press('BracketRight');
-  await press('KeyR');
-  await press('KeyO');
-  await press('BracketLeft');
-  await press('KeyR');
-  await press('KeyE');
+  await feed({ type: 'clock', action: 'start' }, { type: 'possession', side: 'home' }, { type: 'shotClock', remainingMs: 30_000 }, { type: 'score', side: 'home', value: 8 });
+  await feed({ type: 'possession', side: 'away' }, { type: 'shotClock', remainingMs: 30_000 }, { type: 'score', side: 'away', value: 10 });
   await expectProgram({ away: 10, home: 8 }, 'more scoring in the second half: 10-8');
-  await setClock('9:15');
+  await barScore(10, 8, 'the score bar reads 10-8');
+  await feed({ type: 'clockSet', remainingMs: 555_000 });
   await until(() => live?.clock.running === true && clockMs(bug().clock) <= 9 * 60_000 + 15_000, () => `the running clock set to 9:15 (program ${String(bug().clock)})`);
 
   await rows().filter({ hasText: 'Drexel · stats' }).first().click();
@@ -478,11 +515,8 @@ async function secondHalf() {
   check(true, 'the controller shows Reconnecting');
 
   await press('Space');
-  await press('KeyI');
   await controller.page.locator('.button.take[data-pending]').waitFor({ timeout: 2_000 });
   check(true, 'Take shows pending while the server is down');
-  check((await controller.page.getByTestId('score-home').getAttribute('data-pending')) !== null, 'the home score shows pending');
-  check((await controller.page.getByTestId('score-home').textContent()) === '9', 'the pending basket already reads 9 on the score bar');
   await shootController('reconnecting');
   await Bun.sleep(2_000);
   const restartAt = Date.now();
@@ -491,10 +525,13 @@ async function secondHalf() {
   await controller.page.getByTestId('reconnecting').waitFor({ state: 'detached', timeout: 15_000 });
   check(true, `Reconnecting clears ${Date.now() - restartAt} ms after the restart`);
 
-  await expectProgram({ lower: G('team-lower-third'), bug: G('scorebug'), home: 9 }, 'the Take and the basket pressed during the outage both landed');
+  await expectProgram({ lower: G('team-lower-third'), bug: G('scorebug') }, 'the Take pressed during the outage landed');
+  await feed({ type: 'score', side: 'home', value: 9 });
+  await expectProgram({ home: 9 }, 'the feed reconnects and its basket lands: 10-9');
   const takes = journaledShow(seqBefore).filter((row) => row.type === 'take');
   check(takes.length === 1 && takes[0]!.actor === 'alex', `the journal holds exactly one take from the outage (${JSON.stringify(takes)})`);
   await until(() => live?.score.home === 9, 'the game stream is back, with the basket');
+  await barScore(10, 9, 'the score bar is back, with the basket');
   check((await controller.page.locator('.button.take[data-pending]').count()) === 0, 'Take is no longer pending');
 
   await renderer.page.evaluate('clearInterval(window.sampler)');
@@ -528,11 +565,11 @@ async function secondHalf() {
 
 async function theFinal() {
   console.log('the final');
-  await press('KeyP');
+  await feed({ type: 'score', side: 'home', value: 12 });
   await expectProgram({ away: 10, home: 12 }, 'a late three: 10-12');
-  await setClock('0:02');
+  await feed({ type: 'clockSet', remainingMs: 2_000, running: true });
   await until(() => bug().clock === '0:00.0', () => `the clock runs out (program ${String(bug().clock)})`, 8_000);
-  await choose('Phase', 'Final');
+  await feed({ type: 'clock', action: 'stop' }, { type: 'phase', phase: 'final' });
   await expectProgram({ bug: G('scorebug'), period: 'FINAL', away: 10, home: 12 }, 'the final phase: the scorebug reads Final, 10-12');
   await shootRenderer('final', { bug: G('scorebug') });
   await cueAndTake('Player of the game', G('player-of-the-game'), 'lower');
@@ -546,7 +583,7 @@ async function theFinal() {
   await controller.page.keyboard.up('Shift');
   await expectProgram({ bug: 'empty', lower: 'empty', card: 'empty' }, 'Clear All, held, empties program');
   await shootRenderer('clear-all', { bug: 'empty', lower: 'empty', card: 'empty' });
-  check((await controller.page.getByTestId('score-home').textContent()) === '12', 'the score bar still reads the final, 10-12');
+  await barScore(10, 12, 'the score bar still reads the final');
 }
 
 /** A command that cannot land fails plainly after 10 s, beside Take. */

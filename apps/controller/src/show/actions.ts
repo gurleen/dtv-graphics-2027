@@ -42,6 +42,8 @@ export function nextTarget(program: Bus, selected: CueView | undefined): { reado
 export interface ShowActions {
   take(): void;
   cue(cue: CueView): void;
+  /** Make my preview the cue alone, or empty when it cannot air: the rundown selection calls it. */
+  preview(cue: CueView): void;
   /** Next on the graphic on program; past its last step, or at once for a one-step graphic, it leaves air. */
   next(): void;
   clearPreview(): void;
@@ -60,6 +62,11 @@ export function useShowActions(selected: CueView | undefined): ShowActions | nul
       if (!pending.some((command) => command.type === 'take')) void send({ type: 'take', operator });
     },
     cue: (cue) => void send({ type: 'cue', operator, ref: cue.ref }),
+    preview(cue) {
+      const keep = cue.error ? null : cue.layer;
+      for (const layer of LAYERS) if (view.preview[layer] && layer !== keep) void send({ type: 'uncue', operator, layer });
+      if (keep) void send({ type: 'cue', operator, ref: cue.ref });
+    },
     next() {
       const target = nextTarget(view.program, selected);
       if (target) void send({ type: 'step', layer: target.layer, slot: target.slot.id, to: target.slot.step + 1 });

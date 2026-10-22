@@ -366,21 +366,19 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
 - A dark, dense broadcast console for laptops (1440 x 900 first), with red for program and green for preview,
   set in IBM Plex Sans and Mono. React Aria Components with plain CSS and the tokens in
   `apps/controller/src/app/tokens.css`.
-- The show page has three columns. The free panel and the on-air layers are on the left and the rundown is in the
-  middle, at equal width, with an inspector for the selected cue under them. The right rail holds my preview,
-  Take, Next and program, then thumbnails of the other operators' previews. Score and clock run along the bottom.
+- The show page has three columns. The free panel, the on-air layers and an inspector for the selected cue are on
+  the left and the rundown is in the middle, at equal width. The right rail holds my preview,
+  Take, Next and program, then thumbnails of the other operators' previews. The live game (score, clocks, period, possession, timeouts, fouls, bonus) shows along the bottom, read only.
 - The data page has a team list on the left, tables per team (roster, staff, season stats, team and branding) in
   the middle, and the selected record on the right. Each locked field shows who locked it and when, and unlocks
   with a click. A roster import shows a diff table before it applies. A refused edit shows theirs beside yours.
-- Keyboard first, with every action also on a click. Space takes, Enter cues the selected rundown row, Up and Down
-  select, N is Next (it takes a one-step graphic off air), Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
+- Keyboard first, with every action also on a click. Space takes, Up and Down
+  select a rundown row and my preview follows it, Enter cues the selected row again, N is Next (it takes a one-step graphic off air), Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
   Keys do nothing while typing. Only Clear All is guarded, by a hold or a second press.
-- The game keys (phase 5): Q, W, E score 1, 2, 3 for away and I, O, P for home; Shift+Q and Shift+I take one
-  back. C starts or stops the game clock, R and T reset the shot clock to 30 and 20, and [ and ] give possession
-  to away and home. Each sends an absolute value computed from what the page shows, with any command still on its
-  way laid over it. Timeouts, fouls, period and phase stay on the mouse. `?` lists every key, from the same table
-  the key handler reads.
-- A show command or a `game.apply` that the socket drops is sent again, under the same id, until the server
+- The controller never changes the game. Phase 5 had game keys and score-bar controls; they were removed because
+  a live data feed, still to be built, will drive the game over `game.apply`. `?` lists every key, from the same
+  table the key handler reads.
+- A show command that the socket drops is sent again, under the same id, until the server
   answers or 10 s pass. Its control shows it pending meanwhile, and a plain failure after.
 
 ### The clock

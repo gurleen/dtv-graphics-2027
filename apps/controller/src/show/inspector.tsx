@@ -122,7 +122,7 @@ export function Inspector(props: { readonly cue: CueView | undefined; readonly l
     <section className="panel inspector" aria-label="Selected cue">
       <header className="panel-header">
         <h2>
-          Selected cue · <span className="strong">{props.cue.label}</span> <span className="muted">{props.cue.name}</span>
+          Selected cue · <span className="strong">{props.cue.label}</span>
         </h2>
         <div className="actions">
           {dirty && (

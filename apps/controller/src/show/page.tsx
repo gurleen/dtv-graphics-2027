@@ -1,6 +1,6 @@
 /**
- * The show page (Show A): the free panel and what is on air by layer on the left, the
- * rundown in the middle, the selected cue's inspector under both, my preview, Take and
+ * The show page (Show A): the free panel, what is on air by layer and the selected cue's
+ * inspector on the left, the rundown in the middle, my preview, Take and
  * program on the right rail with the other operators' previews, and the game along the
  * bottom.
  */
@@ -8,7 +8,7 @@
 import { type CueId, resolveGame, sameJson, type Show } from '@dtv/domain';
 import { type Bus, LAYERS, type OperatorId, type Registry, type ShowCommand, type ShowView } from '@dtv/playout';
 import './show.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from 'react-aria-components';
 import { useCommands } from '../app/commands';
 import { useController } from '../app/context';
@@ -60,11 +60,15 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
   const selectedId = chosen && ids.includes(chosen) ? chosen : (ids[0] ?? null);
   const selected = view.rundown.find((cue) => cueIdOf(cue) === selectedId);
   const actions = useShowActions(selected)!;
+  // My preview follows the selection; Enter cues the selected row again after a take.
+  useEffect(() => {
+    if (selected) actions.preview(selected);
+  }, [selectedId]);
   const [adding, setAdding] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [listingKeys, setListingKeys] = useState(false);
 
-  const board = useGame(show.gameId);
+  const live = useGame(show.gameId);
   const game = world && show.gameId ? resolveGame(world, show.gameId) : undefined;
 
   const run = (action: KeyAction) => {
@@ -91,14 +95,6 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
         const cue = view.free[action.index];
         return cue && actions.free(cue);
       }
-      case 'score':
-        return board.actions?.score(action.side, action.by);
-      case 'clock':
-        return board.actions?.clock();
-      case 'shotClock':
-        return board.actions?.shotClock(action.seconds);
-      case 'possession':
-        return board.actions?.possession(action.side);
       case 'keys':
         return setListingKeys(true);
     }
@@ -110,14 +106,14 @@ function Console(props: { readonly view: ShowView; readonly show: Show }) {
       <FreePanel view={view} actions={actions} onKeys={() => setListingKeys(true)} />
       <OnAir view={view} actions={actions} />
       <Rundown view={view} selected={selectedId} onSelect={setChosen} onCue={actions.cue} onAdd={() => setAdding(true)} onDragging={setDragging} />
-      <Inspector cue={selected} live={board.live} onCue={actions.cue} />
+      <Inspector cue={selected} live={live} onCue={actions.cue} />
       <Rail view={view} actions={actions} />
-      <ScoreBar game={game} board={board} />
+      <ScoreBar game={game} live={live} />
       {listingKeys && <KeyList onClose={() => setListingKeys(false)} />}
       {adding && (
         <AddCueDialog
           at={selectedId ? ids.indexOf(selectedId) + 1 : ids.length}
-          live={board.live}
+          live={live}
           onClose={(added) => {
             setAdding(false);
             if (added) setChosen(added.id);
