@@ -40,9 +40,13 @@ function Control(props: { readonly label: string; readonly node: FormNode; reado
   switch (node.kind) {
     case 'text':
       return (
-        <TextField className="field" value={typeof value === 'string' ? value : ''} onChange={onChange}>
+        <TextField
+          className={node.numeric ? 'field numeric' : 'field'}
+          value={typeof value === 'string' ? value : ''}
+          onChange={node.numeric ? (next) => onChange(next.replace(/\D/g, '')) : onChange}
+        >
           <Label>{label}</Label>
-          <Input />
+          <Input {...(node.numeric ? { inputMode: 'numeric', maxLength: 2 } : {})} />
         </TextField>
       );
     case 'choice':
@@ -104,7 +108,7 @@ function Control(props: { readonly label: string; readonly node: FormNode; reado
       const items = Array.isArray(value) ? value : [];
       const fixed = node.max !== null && node.min === node.max;
       return (
-        <fieldset className="group">
+        <fieldset className={node.item.kind === 'text' && node.item.numeric ? 'group numbers' : 'group'}>
           <legend>{label}</legend>
           {items.map((item, index) => (
             <div className="list-item" key={index}>

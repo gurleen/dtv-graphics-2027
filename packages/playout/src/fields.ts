@@ -30,7 +30,8 @@ export function paramFields(params: z.ZodType): readonly ParamField[] {
 
 /** One control of a params form. */
 export type FormNode =
-  | { readonly kind: 'text' }
+  /** `numeric` is a short whole number, such as a jersey: a small digits-only input. */
+  | { readonly kind: 'text'; readonly numeric?: true }
   | { readonly kind: 'choice'; readonly options: readonly string[]; readonly labels: Labels }
   /** An id of a row of `ref`, offered as a picker. */
   | { readonly kind: 'ref'; readonly ref: EntityKind }
@@ -70,6 +71,8 @@ export type Labels = Readonly<Record<string, string>>;
 const refOf = (schema: z.ZodType): EntityKind | undefined => (schema.meta() as { ref?: EntityKind } | undefined)?.ref;
 const labelsOf = (schema: z.ZodType): Labels => (schema.meta() as { labels?: Labels } | undefined)?.labels ?? {};
 
+const numericOf = (schema: z.ZodType): boolean => (schema.meta() as { numeric?: boolean } | undefined)?.numeric === true;
+
 function fieldsOf(shape: Record<string, z.ZodType>, skip?: string): FormField[] {
   return Object.entries(shape)
     .filter(([name]) => name !== skip)
@@ -85,7 +88,7 @@ function nodeOf(schema: z.ZodType): FormNode {
   const ref = refOf(schema);
   if (ref) return { kind: 'ref', ref };
   if (schema instanceof z.ZodEnum) return { kind: 'choice', options: schema.options.map(String), labels: labelsOf(schema) };
-  if (schema instanceof z.ZodString) return { kind: 'text' };
+  if (schema instanceof z.ZodString) return numericOf(schema) ? { kind: 'text', numeric: true } : { kind: 'text' };
   if (schema instanceof z.ZodObject) return { kind: 'group', fields: fieldsOf(schema.shape as Record<string, z.ZodType>) };
   if (schema instanceof z.ZodArray) {
     const item = nodeOf(innermost(schema.element as z.ZodType));

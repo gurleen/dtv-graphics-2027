@@ -312,6 +312,32 @@
   flex: 1;
 }
 
+/* A run of short numeric inputs (jerseys) sits on one row. */
+:where(.show-page, .show-portal) .cue-fields .group.numbers,
+.cue-fields:where(.show-portal) .group.numbers {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+:where(.show-page, .show-portal) .cue-fields .group.numbers > legend,
+.cue-fields:where(.show-portal) .group.numbers > legend {
+  flex-basis: 100%;
+}
+
+:where(.show-page, .show-portal) .cue-fields .group.numbers > .list-item > .field,
+.cue-fields:where(.show-portal) .group.numbers > .list-item > .field {
+  flex: none;
+  width: 3.5rem;
+}
+
+:where(.show-page, .show-portal) .cue-fields .field.numeric input,
+.cue-fields:where(.show-portal) .field.numeric input {
+  text-align: center;
+}
+
 /* Rail */
 
 :where(.show-page, .show-portal) .rail,
