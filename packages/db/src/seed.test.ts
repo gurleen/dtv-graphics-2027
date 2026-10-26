@@ -30,10 +30,10 @@ describe('seed', () => {
     const report = await seed(db, { dir: SEED_DIR, at: 1 });
     const counts = Object.fromEntries(Object.entries(loadSnapshot(db).entities).map(([kind, rows]) => [kind, rows.length]));
     expect(counts).toEqual({
-      conference: 34, school: 361, team: 722, season: 2, teamSeason: 735, player: 10, playerStats: 1, staff: 1, talent: 3,
+      conference: 34, school: 361, team: 722, season: 2, teamSeason: 735, player: 10, playerStats: 1, staff: 21, talent: 3,
       sponsor: 5, sponsorship: 10, venue: 1, game: 1, show: 1,
     });
-    expect(report).toMatchObject({ inserted: 1887, updated: 0, liveInserted: 1 });
+    expect(report).toMatchObject({ inserted: 1907, updated: 0, liveInserted: 1 });
   });
 
   test('a second run inserts and updates nothing and writes no journal row', async () => {

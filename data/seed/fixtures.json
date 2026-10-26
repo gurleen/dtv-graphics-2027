@@ -43,7 +43,27 @@
       }
     ],
     "staff": [
-      { "id": "drexel-mbb@2026-27/spiker-zach", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Zach", "lastName": "Spiker", "title": "Head Coach", "detail": "11th season" }
+      { "id": "drexel-mbb@2026-27/spiker-zach", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Zach", "lastName": "Spiker", "title": "Head Coach", "detail": "11th season" },
+      { "id": "drexel-mbb@2026-27/fortier-paul", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Paul", "lastName": "Fortier", "title": "Assistant Coach", "detail": "" },
+      { "id": "drexel-mbb@2026-27/massenat-frantz", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Frantz", "lastName": "Massenat", "title": "Assistant Coach", "detail": "" },
+      { "id": "drexel-mbb@2026-27/brooks-tim", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Tim", "lastName": "Brooks", "title": "Assistant Coach", "detail": "" },
+      { "id": "drexel-mbb@2026-27/duffy-zack", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Zack", "lastName": "Duffy", "title": "Assistant Coach / Director of Basketball Operations", "detail": "" },
+      { "id": "drexel-mbb@2026-27/graham-nat", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Nat", "lastName": "Graham", "title": "Assistant Coach", "detail": "" },
+      { "id": "drexel-mbb@2026-27/johnson-palmer", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Palmer", "lastName": "Johnson", "title": "Head Strength and Conditioning Coach", "detail": "" },
+      { "id": "drexel-mbb@2026-27/kim-stephen", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Stephen", "lastName": "Kim", "title": "Associate Athletic Trainer", "detail": "" },
+      { "id": "drexel-mbb@2026-27/veras-rianna", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Rianna", "lastName": "Veras", "title": "Head Manager", "detail": "" },
+      { "id": "drexel-mbb@2026-27/keita-justin", "teamId": "drexel-mbb", "seasonId": "2026-27", "firstName": "Justin", "lastName": "Keita", "title": "Manager", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/rhoades-mike", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Mike", "lastName": "Rhoades", "title": "Head Coach", "detail": "4th season" },
+      { "id": "penn-state-mbb@2026-27/scott-brent", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Brent", "lastName": "Scott", "title": "Associate Head Coach", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/battle-talor", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Talor", "lastName": "Battle", "title": "Assistant Coach", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/stephens-dwayne", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Dwayne", "lastName": "Stephens", "title": "Assistant Coach", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/conner-clay", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Clay", "lastName": "Conner", "title": "Assistant Coach", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/pera-scott", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Scott", "lastName": "Pera", "title": "General Manager", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/szczecina-jake", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Jake", "lastName": "Szczecina", "title": "Director of Operations", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/little-sam", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Sam", "lastName": "Little", "title": "Video Coordinator / Player Development", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/grumer-alex", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Alex", "lastName": "Grumer", "title": "Assistant Director of Operations", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/dawry-peter", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Peter", "lastName": "Dawry", "title": "Athletic Trainer", "detail": "" },
+      { "id": "penn-state-mbb@2026-27/janota-tyler", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Tyler", "lastName": "Janota", "title": "Director of Athletic Performance", "detail": "" }
     ],
     "talent": [
       { "id": "rob-brooks", "firstName": "Rob", "lastName": "Brooks", "role": "Play-by-Play" },

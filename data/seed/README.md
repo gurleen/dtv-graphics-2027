@@ -41,6 +41,7 @@ The values come from the generators and hand-written scenes in `graphics/basketb
 | Drexel's 2026-27 points for and against over 20 games (78.4 and 66.9 a game) | `generate_team_lower_third.ts` |
 | Josh Reed's 2026-27 season (18.4 PPG, 7.2 RPG, 3.1 APG, 48.2% FG over 20 games) | `generate_player_feature_lower_thirds.ts` |
 | Zach Spiker, head coach, 11th season | `staff_lower_third.rml` |
+| The rest of Drexel's 2026-27 staff and Penn State's (Mike Rhoades, head coach, 4th season), with titles shortened for the lower third | drexeldragons.com and gopsusports.com coaches pages, October 2026 |
 | Rob Brooks, Mike Tuberosa and Tessa Peloso | `generate_talent_lower_thirds.ts` |
 | The five sponsors and the graphics they present | Every scene that shows a sponsor |
 | Daskalakis Athletic Center, Philadelphia, PA | `matchup_locator.rml` |
