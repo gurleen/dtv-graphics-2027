@@ -7,7 +7,7 @@ follows the design language below. The earlier ports (`graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 47), naming, and a five-step checklist
+the id namespace registry (next free: 48), naming, and a five-step checklist
 from scene to registry entry. This README describes the finished graphics.
 Intro and outro lengths are not kept by hand: `bun run codegen` reads every
 timeline's length from the scene into `scenes.gen.ts`, and the renderer waits
@@ -778,6 +778,66 @@ The registry entry exposes the side as `side`, `left` or `right`, and lists
 on air is held until the scene reports through `_onScreen` (its `exitSignal`)
 that the outro has ended. If the graphic is taken again before then, the side
 waits for the following outro.
+
+## Scorebug Slider (`scorebug_slider.rml`)
+
+A one-line strip of dark glass that slides out of the scorebug's right edge, beside its
+home row: a title, then a subtitle (`VENUE  DASKALAKIS ATHLETIC CENTER · PHILADELPHIA, PA`,
+`COMMENTATORS  ROB BROOKS AND MIKE TUBEROSA`). It is 64 high, from (530, 958) to the home
+row's foot at y 1022, 4 from the scorebug's right edge (x 526). It takes the lower-third
+layer, so it replaces a lower third on air and a lower third replaces it.
+
+- **Generated.** `generate_scorebug_slider.ts` writes the `.rml`. Edit the generator, then
+  run `bun graphics/basketball-v2/generate_scorebug_slider.ts`. Never edit the `.rml`
+  output by hand.
+- **Glass:** neutral dark glass (`D10E1116`) with the glaze fill, the hairline stroke and
+  the block shadow. There is no team colour and no marker: the left edge is the seam with
+  the scorebug. The corners are 3 on the left (the seam) and 12 on the right.
+- **Width:** the glass is as wide as its text plus 24 on the left and 28 on the right, up
+  to 1294, so its right edge never passes the action-safe margin (x 1824). The venue line
+  is about 700 wide.
+- **Text:** one line, centred in the 64. The title is Zuume Bold 36 (letter spacing 1,
+  white), then a gap of three spaces, then the subtitle in Zuume Regular 34 (letter
+  spacing 2, 85% white). Its caps centre on y 989, level with the scorebug's scores. A
+  line wider than 1242 scales down to fit, so a 120-character subtitle stays inside the
+  margin at about 80% size.
+- **How the glass follows the text.** A timeline keys values fixed in advance, and the
+  width of the text is not one of them, so the width comes from layout. A `Panel` box hugs
+  a `Content` box, which holds the line and its padding. The glass is an absolute child
+  box of the panel whose width is a percentage of the panel, and the Intro keys that
+  percentage from 0 to 100 (`LayoutComponent` width, key 7). The glass therefore wipes
+  open from the seam with its rounded edge leading, at any text length. The shadow and the
+  runs that carry the sheen and the edge light are percentage boxes keyed the same way,
+  and the light is pinned to its run's right end. Two layout rules set the structure. A
+  percentage resolves against the parent's content box, so the padding is on `Content`,
+  not on the panel. A box's own fill and stroke ignore an ancestor's `ClippingShape`,
+  while `Text` and `Shape` obey it. So a square mask inside the glass clips the text and
+  the sheen, and the edge light and the shadow are boxes: the light shows in the seam gap
+  before any glass opens, and the shadow falls outside the glass.
+- **Intro (1.2 s):** a white edge light ignites in the gap at the seam (frames 0 to 12).
+  The glass wipes open left to right with the ignition-split ease (frames 6 to 40), with
+  the light on its leading edge and the glow trailing over the glass. The text drifts in
+  22 behind the edge and rises in letter by letter (frames 18 to 46). The shadow fades in,
+  the light fades out (frames 24 to 44), and one sheen crosses the glass (frames 34 to
+  72). The whole line reads by about 0.6 s (frame 36).
+- **Outro (0.4 s):** the text sinks 10 and fades as it drifts toward the seam (gone by
+  frame 16). The glass closes right to left back into the scorebug with a brief edge
+  light (frames 2 to 22). The shadow is gone by frame 20, and the last frame is empty.
+- **Motion maintenance:** Hold and Outro key every property the Intro animates at its
+  resting value, so a second take matches the first. Hidden sets the glass, text, edge
+  light, shadow and sheen to opacity 0. The glass shows from frame 6: at zero width its
+  stroke would draw a hairline at the seam.
+- **State machine:** one layer, Display (Hidden → Intro → Hold → Outro), gated on
+  `isPlaying`.
+
+View model `BasketballScorebugSliderV2`, public properties: `isPlaying`, `title`,
+`subtitle`. Send text in capitals. The test data is the venue line. The registry entry's
+params are a union on `kind`: `venue` (the game's venue as `<name> · <city>, <state>`, and
+the cue's error when the game has none), `commentators` (one to three talents, joined
+`A and B` or `A, B and C`) or `custom` (a title and a subtitle). It has no free-panel
+button. To review long text, render the hold pose with a long subtitle, and pass the same
+`--data` to `render_frames.ts` for the wipe:
+`rive . --artboard="Basketball Scorebug Slider v2" --data=isPlaying=true --data=title=NOTE "--data=subtitle=A VERY LONG SUBTITLE THAT KEEPS GOING · WELL PAST THE ACTION SAFE MARGIN OF THE FRAME · ONE HUNDRED AND TWENTY CHARACTERS" --advance=120 --screenshot=build/scorebug_slider_long.png`.
 
 ## Test data
 

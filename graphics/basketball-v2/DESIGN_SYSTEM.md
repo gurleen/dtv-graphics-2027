@@ -21,6 +21,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A bottom-right lower third, or a panel a toggle opens on air | `generate_burning_question.ts` output |
 | A persistent corner bug | `basketball_scorebug.rml` |
 | A corner block the operator can stand on either side | `generate_score_to_break.ts` output |
+| A strip as wide as its text (the venue, the commentators) | `generate_scorebug_slider.ts` output |
 
 ## Colour and material
 
@@ -119,7 +120,8 @@ letter spacing 2; Bold values take 0.5 (1 for short strip values).
 Text rules:
 
 - Set `originValue="baseline"`. In an 84 panel a one-line name sits on
-  baseline y 60; in a 44 strip the line sits on baseline y 31–32.
+  baseline y 60; in a 44 strip the line sits on baseline y 31–32. Text inside a
+  layout box is the exception; see [Width that follows the text](#width-that-follows-the-text).
 - Any line that takes live data gets `wrapValue="noWrap"`,
   `sizingValue="fixed"`, a `width`, and `overflowValue="fitFontSize"`, so a
   long value shrinks instead of spilling. Alignment also needs the fixed width.
@@ -152,6 +154,38 @@ triple do.
 
 `Image` anchors at its centre; `Text` and `Shape` anchor at their origin
 (top-left for rectangles with `originX="0" originY="0"`).
+
+### Width that follows the text
+
+A panel as wide as its text is built from layout boxes, because a timeline cannot key a
+width it does not know. The Scorebug Slider does it this way:
+
+- A hug `Panel` box, pinned absolute at its node's origin, holds a hug `Content` box. The
+  padding is on `Content`, which holds the `Text` with a hug `LayoutParticipant`.
+- The glass is an absolute child box of the panel with `widthUnitsValue="percent"` and its
+  fills, stroke and corner radii on the box itself. The Intro keys its width
+  (`LayoutComponent` width, key 7) from 0 to 100, which wipes it open with its rounded
+  edge leading. The shadow, the sheen and the edge light sit on percentage boxes keyed
+  the same way, each pinned to its box's right end. Keep them out of the glass box: a
+  box's opacity reaches its children, so hiding the glass would hide the light too.
+- A percent width resolves against the parent's content box, padding excluded. Put the
+  padding on the text's own box, never on the panel, or the glass stops short of it.
+- A box's own fill and stroke ignore an ancestor's `ClippingShape`. `Text` and `Shape`
+  obey it. Clip text and sweeps with a `Shape` inside the glass that fills it (a `fill`
+  participant and an unpainted `Rectangle`). Make anything that must show outside the
+  glass, such as the shadow or a light in the seam gap before the glass opens, a box.
+- A `fill` participant stretches its shape's path, corner radii included, so that mask is
+  square. A box's `clip` is square too. A glow that must keep the glass's rounded corners
+  is a box pinned to the glass's edge with the same radii and a `maxWidth`.
+- `originValue="baseline"` on a `Text` inside a layout box misplaces it vertically. Leave
+  it unset and let the box's `layoutAlignmentType="centerLeft"` centre the line.
+- `overflowValue="fitFontSize"` on a hug text with no maximum shrinks it to nothing. Cap
+  the participant (`maxWidth` with `maxWidthUnitsValue="points"`) at the width the panel
+  may reach less its padding, and set `overflowValue="fit"`: a longer line scales down and
+  stays centred. `fitFontSize` with the cap also fits, but sits the line high.
+- A box style's `linkCornerRadius` defaults to true, which applies the top-left radius to
+  every corner. Set it false for a 3 and 12 pair. Paddings and insets need their
+  `*UnitsValue="points"`, or they do nothing.
 
 ### Mirroring a block
 
@@ -312,7 +346,8 @@ Namespaces in use:
 | 44 | Halftime adjustments | 19400 |
 | 45 | Burning Question | 20600 |
 | 46 | Score to Break | 21800 |
-| **47** | **Next free** | **23000** |
+| 47 | Scorebug Slider | 23000 |
+| **48** | **Next free** | **24200** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
@@ -348,6 +383,7 @@ other with `rive schema <Type>`.
 | 327 / 317 | `TextModifierRange` modifyFrom / falloffFrom |
 | 336 / 318 | `TextModifierRange` modifyTo / falloffTo (a backward reveal) |
 | 25 | `StraightVertex` y (a shadow outline that follows moving panels) |
+| 7 | `LayoutComponent` width (a percentage-width wipe, as on the Scorebug Slider) |
 
 ## Building a new graphic
 

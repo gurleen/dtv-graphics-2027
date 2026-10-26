@@ -355,7 +355,7 @@ graphics that would overlap are never on air together.
 | Layer | Graphics |
 |---|---|
 | `bug` | Scorebug, Score to Break, Halftime Adjustments |
-| `lower` | Player, staff, team, and talent lower thirds, Starting Five, Player To Watch, Player Of The Game, Matchup Locator lower third, Burning Question |
+| `lower` | Player, staff, team, and talent lower thirds, Starting Five, Player To Watch, Player Of The Game, Matchup Locator lower third, Burning Question, Scorebug Slider |
 | `card` | Matchup Locator, Halftime Statistics, Conference Standings |
 
 An entry can name layers it covers in `clears`. The double and triple talent lower thirds clear `bug`, because they

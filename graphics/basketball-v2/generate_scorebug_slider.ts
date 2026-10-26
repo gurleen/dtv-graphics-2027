@@ -154,7 +154,7 @@ const text = `<LayoutComponent name="Content" id="${CONTENT}" clip="false" width
         </Text>
       </LayoutComponent>`;
 
-// The sheen rides the end of a run that sweeps across the panel after the wipe.
+// The sheen is pinned to the end of a run whose width sweeps across the panel after the wipe.
 const sheen = `<LayoutComponent name="Sheen Run" id="${SHEEN_RUN}" clip="false" width="0" height="100" styleId="${id(601)}">
         ${runStyle('Sheen Run', id(601))}
         <LayoutComponent name="Sheen Anchor" id="${SHEEN_ANCHOR}" clip="false" width="0" height="${HEIGHT}" styleId="${id(603)}">
@@ -247,7 +247,7 @@ const sheenFade: Key[] = [
   { frame: INTRO_FRAMES - 10, value: 0.65, linear: true }, { frame: INTRO_FRAMES, value: 0, linear: true },
 ];
 
-// The light ignites in the gap at the seam and rides the glass's leading edge out to the
+// The light ignites in the gap at the seam and moves with the glass's leading edge to the
 // end of the text; the text drifts in behind it and rises letter by letter. The glass
 // shows only once the wipe starts: at zero width its stroke draws a hairline at the seam.
 const intro: Track[] = [
