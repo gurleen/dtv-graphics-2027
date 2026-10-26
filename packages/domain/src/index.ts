@@ -1,6 +1,7 @@
 export * from './primitives';
 export * from './ids';
 export * from './programs';
+export * from './headshots';
 export * from './entities';
 export * from './edits';
 export * from './world';

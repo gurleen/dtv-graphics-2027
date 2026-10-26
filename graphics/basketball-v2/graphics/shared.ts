@@ -1,7 +1,7 @@
 /** What several basketball binds read the same way. Each throws a message an operator can act on. */
 
-import { type basketball, type GameView, type Player, type PlayerId, resolveTeam, type Staff, type StaffId, type TeamId, type TeamView, type WinLoss, type World } from '@dtv/domain';
-import type { ShowContext } from '@dtv/playout';
+import { type basketball, type GameView, headshotUrl, type Player, type PlayerId, resolveTeam, type Staff, type StaffId, type TeamId, type TeamView, type WinLoss, type World } from '@dtv/domain';
+import { FALLBACK_IMAGES, type ShowContext } from '@dtv/playout';
 import { z } from 'zod';
 
 export const fail = (message: string): never => {
@@ -18,6 +18,10 @@ export const playerOf = (world: World, id: PlayerId): { player: Player; team: Te
   const team = resolveTeam(world, player.teamId, player.seasonId) ?? fail(`Team ${player.teamId} is gone`);
   return { player, team };
 };
+
+/** The player's own headshot, else the one the server caches from the bucket for their school, program and jersey. */
+export const headshotOf = (player: Player, team: TeamView) =>
+  player.headshot ?? (team.school.espnId ? headshotUrl(team.school.espnId, team.team.program, player.jersey) : FALLBACK_IMAGES.headshot);
 
 export const staffOf = (world: World, id: StaffId): { staff: Staff; team: TeamView } => {
   const staff = world.get('staff', id) ?? fail(`Staff ${id} is gone`);

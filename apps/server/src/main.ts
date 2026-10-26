@@ -13,6 +13,9 @@
  *   /renderer           the page OBS loads; it draws program
  *   /riv/<stem>.riv     the signed scenes, from build/riv (`bun run riv:build`)
  *   /assets/...         images and fonts, from assets/
+ *   /headshots/...      <espnId>/<program>/<jersey>.png, cached in data/cache/headshots from the R2 bucket
+ *
+ * `DTV_HEADSHOT_ORIGIN` overrides the bucket's public URL.
  */
 
 import { mkdirSync } from 'node:fs';
@@ -22,11 +25,13 @@ import controllerPage from '@dtv/controller';
 import { GRAPHICS } from '@dtv/graphics';
 import rendererPage from '@dtv/renderer-page';
 import { rpcWebSocket } from './router';
+import { headshotHandler } from './headshots';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
 const PORT = Number(process.env.PORT ?? 8975);
 const { path: DB_PATH, backups: BACKUPS } = dbLocation();
+const HEADSHOT_ORIGIN = process.env.DTV_HEADSHOT_ORIGIN ?? 'https://pub-64b137d0bba74538ba1be1f9a07df1ce.r2.dev';
 
 mkdirSync(dirname(DB_PATH), { recursive: true });
 const db = openDb(DB_PATH);
@@ -87,6 +92,11 @@ const server = Bun.serve({
     '/renderer': rendererPage,
     '/riv/*': staticFiles('riv', join(ROOT, 'build/riv')),
     '/assets/*': staticFiles('assets', join(ROOT, 'assets')),
+    '/headshots/*': headshotHandler({
+      cacheDir: join(ROOT, 'data/cache/headshots'),
+      origin: HEADSHOT_ORIGIN,
+      placeholder: Bun.file(join(ROOT, 'assets/images/headshots/placeholder.png')),
+    }),
   },
   fetch(request, server) {
     const url = new URL(request.url);

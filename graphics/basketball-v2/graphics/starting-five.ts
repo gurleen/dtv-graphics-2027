@@ -1,14 +1,14 @@
-import { type Player, type Side } from '@dtv/domain';
-import { defineGraphic, FALLBACK_IMAGES } from '@dtv/playout';
+import { type Player, type Side, type TeamView } from '@dtv/domain';
+import { defineGraphic } from '@dtv/playout';
 import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
-import { playerOf, requireBasketball, requireGame } from './shared';
+import { headshotOf, playerOf, requireBasketball, requireGame } from './shared';
 
-const row = (player: Player) => ({
+const row = (player: Player, team: TeamView) => ({
   number: player.jersey,
   lastName: player.lastName,
   position: player.position,
-  headshot: player.headshot ?? FALLBACK_IMAGES.headshot,
+  headshot: headshotOf(player, team),
 });
 
 export const startingFive = defineGraphic({
@@ -25,7 +25,10 @@ export const startingFive = defineGraphic({
   bind(_params, context) {
     const { sides } = requireGame(context);
     const live = requireBasketball(context);
-    const starters = (side: Side) => live.starters[side].map((id) => row(playerOf(context.world, id).player));
+    const starters = (side: Side) => live.starters[side].map((id) => {
+      const { player, team } = playerOf(context.world, id);
+      return row(player, team);
+    });
     const { away, home } = sides;
     return {
       step: 0,

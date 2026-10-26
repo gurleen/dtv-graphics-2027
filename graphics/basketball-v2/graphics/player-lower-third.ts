@@ -1,8 +1,8 @@
 import { basketball, PlayerId } from '@dtv/domain';
-import { defineGraphic, FALLBACK_IMAGES } from '@dtv/playout';
+import { defineGraphic } from '@dtv/playout';
 import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
-import { classYearName, fullName, playerOf, seasonStatsOf, statKey, tonightOf } from './shared';
+import { classYearName, fullName, headshotOf, playerOf, seasonStatsOf, statKey, tonightOf } from './shared';
 
 const { PLAYER_GAME_STATS, PLAYER_SEASON_STATS, positionName } = basketball;
 
@@ -54,7 +54,7 @@ export const playerLowerThird = defineGraphic({
       classYear: classYearName(player),
       statLabel,
       statLine,
-      headshot: player.headshot ?? FALLBACK_IMAGES.headshot,
+      headshot: headshotOf(player, team),
       teamLogo: team.brand.logo,
       teamPrimaryColor: team.brand.primaryColor,
       teamSecondaryColor: team.brand.secondaryColor,

@@ -23,7 +23,8 @@
     "site:preview": "wrangler dev",
     "site:serve": "bun apps/site/scripts/serve.ts",
     "site:screenshots": "bun apps/site/scripts/screenshots.ts",
-    "site:deploy": "wrangler deploy"
+    "site:deploy": "wrangler deploy",
+    "headshots:push": "bun scripts/headshots.ts push"
   },
   "dependencies": {
     "@rive-app/canvas-single": "^2.42.2"

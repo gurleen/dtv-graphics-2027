@@ -1,9 +1,9 @@
 /** What Player To Watch and Player Of The Game share: one scene layout, a player's identity and body, and the motion headshot. */
 
 import { basketball, PlayerId } from '@dtv/domain';
-import { type BindContext, FALLBACK_IMAGES } from '@dtv/playout';
+import type { BindContext } from '@dtv/playout';
 import { z } from 'zod';
-import { classYearName, opponentOf, playerOf, seasonStatsOf, statKey, tonightOf } from './shared';
+import { classYearName, headshotOf, opponentOf, playerOf, seasonStatsOf, statKey, tonightOf } from './shared';
 
 const { PLAYER_GAME_STATS, PLAYER_SEASON_STATS, positionName } = basketball;
 
@@ -43,7 +43,7 @@ export function featureValues(params: FeatureParams, context: BindContext) {
     contextLabel,
     stat,
     bodyText: body.kind === 'text' ? body.text : '',
-    headshot: player.headshot ?? FALLBACK_IMAGES.headshot,
+    headshot: headshotOf(player, team),
     teamLogo: team.brand.logo,
     teamPrimaryColor: team.brand.primaryColor,
     teamSecondaryColor: team.brand.secondaryColor,
