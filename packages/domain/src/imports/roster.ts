@@ -14,6 +14,7 @@ import { type ImportEdit, mergePut } from '../edits';
 import { ClassYear, parseEntity, Player } from '../entities';
 import { idFor, personSlug, type PlayerId, type SeasonId, type TeamId } from '../ids';
 import { Url } from '../primitives';
+import { type CsvError, csvRecords } from './csv';
 import type { World } from '../world';
 
 export interface RosterRow {
@@ -53,56 +54,12 @@ export const ROSTER_COLUMNS = {
 
 type Column = keyof typeof ROSTER_COLUMNS;
 
-export interface RosterError {
-  /** 1-based line in the file where the record starts. */
-  readonly line: number;
-  readonly message: string;
-}
+/** A bad row, as the data page and the rundown import list it. */
+export type RosterError = CsvError;
 
 export type RosterParse =
   | { readonly ok: true; readonly rows: readonly RosterRow[] }
   | { readonly ok: false; readonly errors: readonly RosterError[] };
-
-/** RFC 4180 records: quoted fields may hold commas, quotes (doubled) and line breaks. */
-function csvRecords(text: string): { line: number; fields: string[] }[] {
-  const records: { line: number; fields: string[] }[] = [];
-  let fields: string[] = [];
-  let field = '';
-  let quoted = false;
-  let line = 1;
-  let start = 1;
-  const source = text.replace(/^﻿/, '');
-  for (let index = 0; index < source.length; index++) {
-    const char = source[index]!;
-    if (quoted) {
-      if (char === '"' && source[index + 1] === '"') {
-        field += '"';
-        index++;
-      } else if (char === '"') quoted = false;
-      else {
-        if (char === '\n') line++;
-        field += char;
-      }
-    } else if (char === '"') quoted = true;
-    else if (char === ',') {
-      fields.push(field);
-      field = '';
-    } else if (char === '\n' || char === '\r') {
-      if (char === '\r' && source[index + 1] === '\n') index++;
-      fields.push(field);
-      records.push({ line: start, fields });
-      fields = [];
-      field = '';
-      line++;
-      start = line;
-    } else field += char;
-  }
-  if (field || fields.length) {
-    fields.push(field);
-    records.push({ line: start, fields });
-  }
-  return records.filter((record) => record.fields.some((value) => value.trim()));
-}
 
 const headerKey = (header: string) => header.trim().toLowerCase().replace(/[._]/g, ' ').replace(/\s+/g, ' ').trim();
 
