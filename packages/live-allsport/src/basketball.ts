@@ -75,7 +75,9 @@ export function readBasketball(buffer: RtdBuffer): Scoreboard {
 
   // The tenths field is the more exact one, so it wins when it parses.
   const shown = [text('clockTenths'), text('clockMain')].flatMap((value) => (value === null ? [] : [parseTime(value)])).find((time) => time !== null);
-  const stopped = text('clockStopped')?.trim() === 's';
+  // A clock with no stop marker yet reads as stopped, so an unknown never starts the server's clock.
+  const marker = text('clockStopped');
+  const stopped = marker === null || marker.trim() === 's';
   const zero = text('clockZero')?.trim() === 'z';
   const shot = text('shotClock');
 

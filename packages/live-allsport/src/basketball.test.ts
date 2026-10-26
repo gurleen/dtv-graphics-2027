@@ -41,7 +41,8 @@ describe('readBasketball', () => {
   });
 
   test('reads the clock, preferring the tenths field, and whether it runs', () => {
-    expect(show({ clockMain: '16:09', clockTenths: '16:09' }).clock).toEqual({ remainingMs: 969_000, running: true, precisionMs: 1000 });
+    expect(show({ clockMain: '16:09', clockTenths: '16:09', clockStopped: ' ' }).clock).toEqual({ remainingMs: 969_000, running: true, precisionMs: 1000 });
+    expect(show({ clockMain: '16:09' }).clock).toMatchObject({ running: false });
     expect(show({ clockMain: ' 8.3', clockTenths: ' 8.3', clockStopped: 's' }).clock).toEqual({ remainingMs: 8300, running: false, precisionMs: 100 });
     expect(show({ clockMain: '16:09', clockTenths: '16:09.4' }).clock).toMatchObject({ remainingMs: 969_400, precisionMs: 100 });
     expect(show({ clockMain: '16:09', clockTenths: '        ' }).clock).toMatchObject({ remainingMs: 969_000 });
