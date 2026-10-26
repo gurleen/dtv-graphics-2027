@@ -25,7 +25,8 @@
     "site:screenshots": "bun apps/site/scripts/screenshots.ts",
     "site:deploy": "wrangler deploy",
     "headshots:push": "bun scripts/headshots.ts push",
-    "live:statcrew": "bun packages/live-statcrew/src/main.ts"
+    "live:statcrew": "bun packages/live-statcrew/src/main.ts",
+    "live:allsport": "bun packages/live-allsport/src/main.ts"
   },
   "dependencies": {
     "@rive-app/canvas-single": "^2.42.2"

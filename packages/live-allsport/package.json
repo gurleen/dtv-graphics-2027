@@ -1,0 +1,13 @@
+{
+  "name": "@dtv/live-allsport",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/rtd.ts"
+  },
+  "dependencies": {
+    "@dtv/api": "workspace:*",
+    "@dtv/domain": "workspace:*",
+    "zod": "^4.6.7"
+  }
+}

@@ -121,6 +121,14 @@
         "zod": "^4.6.7",
       },
     },
+    "packages/live-allsport": {
+      "name": "@dtv/live-allsport",
+      "dependencies": {
+        "@dtv/api": "workspace:*",
+        "@dtv/domain": "workspace:*",
+        "zod": "^4.6.7",
+      },
+    },
     "packages/live-statcrew": {
       "name": "@dtv/live-statcrew",
       "dependencies": {
@@ -182,6 +190,8 @@
     "@dtv/domain": ["@dtv/domain@workspace:packages/domain"],
 
     "@dtv/graphics": ["@dtv/graphics@workspace:packages/graphics"],
+
+    "@dtv/live-allsport": ["@dtv/live-allsport@workspace:packages/live-allsport"],
 
     "@dtv/live-statcrew": ["@dtv/live-statcrew@workspace:packages/live-statcrew"],
 
