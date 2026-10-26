@@ -18,7 +18,7 @@
  * `DTV_HEADSHOT_ORIGIN` overrides the bucket's public URL.
  */
 
-import { existsSync, mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { backup, dbLocation, migrate, openDb, seed } from '@dtv/db';
 import controllerPage from '@dtv/controller';
@@ -28,7 +28,7 @@ import rendererPage from '@dtv/renderer-page';
 import { rpcWebSocket } from './router';
 import { headshotHandler } from './headshots';
 import { createFeedSupervisor } from './feed-supervisor';
-import { type Feeds, serialPorts } from './feeds';
+import { type Feeds, portExists, serialPorts } from './feeds';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
@@ -64,7 +64,7 @@ const feeds: Feeds = {
   allsport: createFeedSupervisor({
     inputs: ['port', 'game', 'score'],
     command: ({ port, game, score }) => [process.execPath, join(ROOT, 'packages/live-allsport/src/main.ts'), `--port=${port}`, `--game=${game}`, `--score=${score}`, serverUrl],
-    validate: ({ port, game }) => (!isBasketball(game) ? 'no-game' : existsSync(port) ? null : 'no-port'),
+    validate: ({ port, game }) => (!isBasketball(game) ? 'no-game' : portExists(port) ? null : 'no-port'),
   }),
   ports: serialPorts,
 };

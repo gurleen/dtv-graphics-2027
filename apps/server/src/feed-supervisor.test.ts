@@ -89,7 +89,7 @@ describe('the feed supervisor', () => {
     expect(again).toMatchObject({ ok: true, feed: { state: 'running' } });
   });
 
-  test('stop is idempotent, and kills a process that ignores SIGINT', async () => {
+  test('stop is idempotent, and kills a process that ignores the stop', async () => {
     const stubborn = supervise('stubborn', { killAfterMs: 300 });
     expect((await stubborn.stop()).state).toBe('stopped');
     await stubborn.start({ file, game: A });

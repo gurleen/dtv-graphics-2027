@@ -3,8 +3,9 @@
  * ordinary API client that can also be run by hand; this module only starts it, stops it, and keeps what it printed.
  * The server never imports a tool.
  *
- * Stopping sends SIGINT, which a tool answers by handing its field groups back to the operator, and waits for the
- * process to end; a process that ignores SIGINT is killed after `killAfterMs`.
+ * Stopping writes a `stop` line to the tool's stdin, which it answers by handing its field groups back to the
+ * operator, and waits for the process to end; a process that ignores it is killed after `killAfterMs`. Not SIGINT:
+ * on Windows that kills the child before it can hand back.
  */
 
 import type { Feed, FeedStatus } from '@dtv/api';
@@ -42,7 +43,7 @@ export function createFeedSupervisor<I extends object, Reason extends string>(op
     log: [],
   } as unknown as Feed<I>;
   /** The process that is running and not yet asked to stop. */
-  let current: { readonly process: Bun.Subprocess; readonly finished: Promise<void> } | null = null;
+  let current: { readonly process: Bun.Subprocess<'pipe'>; readonly finished: Promise<void> } | null = null;
   /** The newest process, running or not: its output is the log, down to what it prints while stopping. */
   let latest: Bun.Subprocess | null = null;
   const wakes = new Set<() => void>();
@@ -75,7 +76,8 @@ export function createFeedSupervisor<I extends object, Reason extends string>(op
     if (!current) return;
     const { process, finished } = current;
     current = null;
-    process.kill('SIGINT');
+    process.stdin.write('stop\n');
+    process.stdin.end();
     const timer = setTimeout(() => process.kill('SIGKILL'), killAfterMs);
     await process.exited;
     clearTimeout(timer);
@@ -84,7 +86,7 @@ export function createFeedSupervisor<I extends object, Reason extends string>(op
   }
 
   async function begin(input: I) {
-    const process = Bun.spawn(options.command(input), { stdin: 'ignore', stdout: 'pipe', stderr: 'pipe' });
+    const process = Bun.spawn(options.command(input), { stdin: 'pipe', stdout: 'pipe', stderr: 'pipe' });
     latest = process;
     const isLatest = () => latest === process;
     const finished = (async () => {

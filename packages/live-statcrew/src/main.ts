@@ -114,6 +114,8 @@ async function shutdown() {
   await hand(basketball.OPERATOR).catch((error) => log(`could not hand back: ${refusal(error).message}`));
   stop.abort();
   close();
+  // A listening stdin would keep the process alive.
+  process.stdin.destroy();
 }
 
 function fail(message: string): never {
@@ -127,3 +129,5 @@ watchFile(file, { interval: POLL_MS }, () => void push());
 void push();
 log(`watching ${file} for ${view.sides.away.team.id} at ${view.sides.home.team.id}, writing as ${source}`);
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => void shutdown());
+// The server stops a feed with a `stop` line on stdin: Windows has no SIGINT to send a child.
+process.stdin.on('data', (chunk) => /^stop\r?$/m.test(String(chunk)) && void shutdown());

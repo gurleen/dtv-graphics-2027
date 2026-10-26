@@ -47,7 +47,7 @@ apps/site               the stakeholder site: build script and viewer
 | `apps/site` | its build script may import db; its browser code may not |
 | `packages/live-*` | api, domain |
 | `@dtv/live-statcrew` | api, domain, fast-xml-parser, zod, `node:*` |
-| `@dtv/live-allsport` | api, domain, zod, `node:*` |
+| `@dtv/live-allsport` | api, domain, zod, `node:*`, `bun:ffi` (Windows COM ports) |
 
 Bun hoists every dependency into one `node_modules`, so an undeclared import still compiles. `scripts/check_deps.ts`
 fails `bun run check` when a file imports a package its directory may not, or reaches into another package's files.
@@ -301,13 +301,15 @@ data write a client composes; `data.load` is an import the server plans itself. 
 `tools.*` controls processes the server supervises, for the Tools page. A browser cannot start a process, so
 `apps/server/src/feed-supervisor.ts` spawns a feed tool as a child, one supervisor each for `packages/live-statcrew`
 and `packages/live-allsport`. It keeps the child's last 200 output lines and its state (`stopped`, `running`, or
-`exited` for a process that ended on its own), and stops it with SIGINT so the tool hands its field groups back to the
-operator; a process that ignores SIGINT is killed after 5 s. Each tool supplies its own argv and a `validate` that
+`exited` for a process that ended on its own), and stops it with a `stop` line on its stdin so the tool hands its field groups back
+to the operator; a process that ignores it is killed after 5 s. Not SIGINT: on Windows that kills the child before it
+can hand back. Each tool supplies its own argv and a `validate` that
 says why a start is refused (`NO_GAME`, `NO_FILE`, `NO_PORT`). A tool stays an ordinary API client that also runs by
 hand, and the server never imports it. `start` is idempotent: the same inputs while running change nothing, and other
 values stop the old run first. The server's own SIGINT and SIGTERM handler stops every feed before it closes the
 socket, so the handback lands. `tools.allsport.ports` lists the serial devices a console could be on:
-`/dev/cu.*` on macOS and `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux.
+`/dev/cu.*` on macOS, `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux, and the non-Bluetooth COM ports in the registry on
+Windows.
 
 Every client talks over one WebSocket at `/rpc`, with `RPCHandler` from `@orpc/server/bun-ws` and `RPCLink` from
 `@orpc/client/websocket` over partysocket's `ReconnectingWebSocket`. The controller holds about five streams at

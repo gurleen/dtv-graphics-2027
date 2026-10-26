@@ -26,7 +26,8 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'packages/sportsdataverse': ['@dtv/domain', 'hyparquet', 'hyparquet-compressors'],
   'packages/api': ['@dtv/playout', '@dtv/domain', '@orpc/*', 'partysocket', 'zod'],
   'packages/live-': ['@dtv/api', '@dtv/domain'],
-  'packages/live-allsport': ['@dtv/api', '@dtv/domain', 'zod', 'node:*'],
+  // bun:ffi opens a Windows COM port through kernel32, so the tool needs no native serial module.
+  'packages/live-allsport': ['@dtv/api', '@dtv/domain', 'zod', 'node:*', 'bun:ffi'],
   'packages/live-statcrew': ['@dtv/api', '@dtv/domain', 'fast-xml-parser', 'zod', 'node:*'],
   'apps/server': ['@dtv/api', '@dtv/db', '@dtv/controller', '@dtv/graphics', '@dtv/playout', '@dtv/domain', '@dtv/renderer-page', '@dtv/sportsdataverse', '@orpc/server', 'zod', 'node:fs', 'node:path'],
   'apps/controller': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', 'react-aria-components', '@fontsource/*'],
@@ -76,8 +77,9 @@ for (const workspace of workspaces.sort()) {
     problems.push(`${workspace}/package.json: exports must name only "." (found ${JSON.stringify(manifest.exports)})`);
   }
   for await (const path of new Glob('**/*.{ts,tsx}').scan({ cwd: join(ROOT, workspace) })) {
-    if (path.includes('node_modules/')) continue;
-    const file = join(workspace, path);
+    // The rules are written with `/`; Windows paths come back with `\`.
+    const file = join(workspace, path).replaceAll('\\', '/');
+    if (file.includes('node_modules/')) continue;
     const rules = rulesFor(file);
     if (!rules) {
       problems.push(`${file}: no rule in scripts/check_deps.ts`);

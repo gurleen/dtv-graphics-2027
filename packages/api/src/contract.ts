@@ -106,7 +106,7 @@ export const contract = {
         }),
       /** Interrupts the feed so it hands the clock and score back to the operator, then waits for it to end. Idempotent. */
       stop: oc.output(type<AllsportFeed>()),
-      /** The serial devices on the server that could be a console: `/dev/cu.*` on macOS, `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux. */
+      /** The serial devices on the server that could be a console: `/dev/cu.*` on macOS, `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux, the registry's non-Bluetooth COM ports on Windows. */
       ports: oc.output(type<readonly string[]>()),
     },
   },

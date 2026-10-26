@@ -7,7 +7,7 @@ The Tools page (`#/tools`) has a tab list down the left, one tab per tool. Its S
 - `tools-tabs` selects a tab from the hash: `#/tools/statcrew` or `#/tools/allsport`, and `#/tools` gives the first.
 - `statcrew-start` starts the feed on a file and a game. A missing file shows `No file at that path on the server` inline.
 - `statcrew-stop` interrupts the feed, which hands score and stats back to the operator.
-- `allsport-start` starts the feed on a serial device, a game and the Score switch. The Port field lists the server's `/dev/cu.*` (macOS) or `/dev/ttyUSB*` and `/dev/ttyACM*` (Linux) devices, takes any typed path, and has a Refresh button. A missing device shows `No device at that path on the server` inline. Changing Score offers Restart.
+- `allsport-start` starts the feed on a serial device, a game and the Score switch. The Port field lists the server's `/dev/cu.*` (macOS), `/dev/ttyUSB*` and `/dev/ttyACM*` (Linux) or non-Bluetooth `COMn` (Windows) devices, takes any typed path, and has a Refresh button. A missing device shows `No device at that path on the server` inline. Changing Score offers Restart.
 - `allsport-stop` interrupts the feed, which hands the clock, and the score when it was on, back to the operator.
 - `feed-shutdown` stops both feeds first when the server gets SIGTERM, so the handback lands.
 

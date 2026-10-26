@@ -40,6 +40,8 @@ export interface Scoreboard {
   /** `precisionMs` is how far the display can be from the true time: a whole second without tenths, 100 ms with. */
   readonly clock: { readonly remainingMs: number; readonly running: boolean; readonly precisionMs: number } | undefined;
   readonly shotClock: { readonly remainingMs: number; readonly precisionMs: number } | null | undefined;
+  /** Whether the shot clock runs, for a format that can tell; without it the shot clock follows the game clock. */
+  readonly shotClockRunning?: boolean;
   readonly period: number | undefined;
   readonly score: Sides<number | undefined>;
   readonly timeouts: Sides<number | undefined>;

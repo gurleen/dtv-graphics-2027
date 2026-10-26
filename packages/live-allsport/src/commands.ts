@@ -62,7 +62,7 @@ export function commandsFor(board: Scoreboard, sent: Sent, now: number, groups: 
   };
 
   if (groups.includes('clock')) {
-    const running = board.clock?.running ?? clock?.running ?? false;
+    const shotRunning = board.shotClockRunning ?? board.clock?.running ?? clock?.running ?? false;
     if (board.clock && needsWrite(clock, board.clock, board.clock.running, now)) {
       if (board.clock.running && !clock?.running) commands.push({ type: 'phase', phase: 'live' });
       commands.push({ type: 'clockSet', remainingMs: board.clock.remainingMs, running: board.clock.running });
@@ -71,9 +71,9 @@ export function commandsFor(board: Scoreboard, sent: Sent, now: number, groups: 
     if (board.shotClock === null && shotClock !== null) {
       commands.push({ type: 'shotClock', remainingMs: null });
       shotClock = null;
-    } else if (board.shotClock && needsWrite(shotClock, board.shotClock, running, now)) {
-      commands.push({ type: 'shotClock', remainingMs: board.shotClock.remainingMs, running });
-      shotClock = { remainingMs: board.shotClock.remainingMs, running, at: now };
+    } else if (board.shotClock && needsWrite(shotClock, board.shotClock, shotRunning, now)) {
+      commands.push({ type: 'shotClock', remainingMs: board.shotClock.remainingMs, running: shotRunning });
+      shotClock = { remainingMs: board.shotClock.remainingMs, running: shotRunning, at: now };
     }
     if (board.period !== undefined) absolute('period', { type: 'period', period: board.period });
   }

@@ -38,7 +38,7 @@ operator keeps the game clock. Plays and last-score information are ignored, bec
 
 Every game starts with its operator as the writer of `score` and `stats`, and the controller has no control to hand
 a group to a feed. On start the tool sends `authority` commands as source `operator` that give both groups to
-`--source`, and logs the handover. On SIGINT or SIGTERM it hands both groups back to `operator`. If the operator
+`--source`, and logs the handover. On SIGINT, SIGTERM or a `stop` line on stdin (how the server stops it, since Windows cannot send a child SIGINT) it hands both groups back to `operator`. If the operator
 takes a group back while the tool runs, the next push logs `the operator took <group> back` and the tool keeps
 watching.
 

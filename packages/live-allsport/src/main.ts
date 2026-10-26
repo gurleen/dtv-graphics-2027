@@ -1,43 +1,49 @@
 /**
  * Pushes a Daktronics AllSport 5000 console's basketball clock, score and more into the running show server.
  *
- *   bun packages/live-allsport/src/main.ts --port=<path> --game=<GameId> [--score=true|false] [--baud=19200] [--server=ws://localhost:8975/rpc] [--source=allsport]
+ *   bun packages/live-allsport/src/main.ts --port=<path> --game=<GameId> [--score=true|false] [--format=rtd|cg] [--baud=<rate>] [--server=ws://localhost:8975/rpc] [--source=allsport]
+ *
+ * `--format` is `cg` on Windows and `rtd` elsewhere; `--baud` follows it, 9600 for `cg` and 19200 for `rtd`.
  */
 
 import { connect, untilAnswered, watch } from '@dtv/api';
 import { basketball, GameId, indexWorld, PROGRAMS, resolveGame, SourceId, type World } from '@dtv/domain';
-import { closeSync, createReadStream, openSync, type ReadStream } from 'node:fs';
+import { closeSync, createReadStream, openSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import { z } from 'zod';
-import { readBasketball } from './basketball';
 import { type AllsportGroup, commandsFor, NOTHING_SENT } from './commands';
-import { createFramer, createRtdBuffer } from './rtd';
+import { createDecoder, DEFAULT_BAUD, FORMATS } from './decoder';
+import { openComPort } from './windows';
 
 const USAGE =
-  'usage: bun packages/live-allsport/src/main.ts --port=<path> --game=<GameId> [--score=true|false] [--baud=19200] [--server=ws://localhost:8975/rpc] [--source=allsport]';
+  'usage: bun packages/live-allsport/src/main.ts --port=<path> --game=<GameId> [--score=true|false] [--format=rtd|cg] [--baud=<rate>] [--server=ws://localhost:8975/rpc] [--source=allsport]';
 const SEND_WITHIN_MS = 10_000;
 const MIN_PUSH_GAP_MS = 100;
 const RETRY_MS = 1_000;
 const DROPPED_REPORT_MS = 10_000;
+/** How often a Windows COM port is read. At 19200 baud 20 ms is under 400 bytes, well inside the driver's buffer. */
+const POLL_MS = 20;
 
 const Args = z.object({
   port: z.string().min(1),
   game: GameId,
   score: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
-  baud: z.coerce.number().int().positive().default(19200),
+  format: z.enum(FORMATS).default(process.platform === 'win32' ? 'cg' : 'rtd'),
+  baud: z.coerce.number().int().positive().optional(),
   server: z.string().default('ws://localhost:8975/rpc'),
   source: SourceId.default(SourceId.parse('allsport')),
 });
 
 const parsedArgs = Args.safeParse(
-  parseArgs({ options: { port: { type: 'string' }, game: { type: 'string' }, score: { type: 'string' }, baud: { type: 'string' }, server: { type: 'string' }, source: { type: 'string' } }, strict: false }).values,
+  parseArgs({ options: { port: { type: 'string' }, game: { type: 'string' }, score: { type: 'string' }, format: { type: 'string' }, baud: { type: 'string' }, server: { type: 'string' }, source: { type: 'string' } }, strict: false }).values,
 );
 if (!parsedArgs.success) {
   console.error(`${z.prettifyError(parsedArgs.error)}\n${USAGE}`);
   process.exit(2);
 }
-const { port, game: gameId, score, baud, server, source } = parsedArgs.data;
+const { port, game: gameId, score, format, server, source } = parsedArgs.data;
+const baud = parsedArgs.data.baud ?? DEFAULT_BAUD[format];
 const groups: readonly AllsportGroup[] = score ? ['clock', 'score'] : ['clock'];
 
 const log = (message: string) => console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
@@ -72,7 +78,7 @@ const hand = (to: SourceId) =>
     { withinMs: SEND_WITHIN_MS },
   ).then(() => log(`handed ${groups.join(' and ')} to ${to}`));
 
-const buffer = createRtdBuffer();
+const decoder = createDecoder(format);
 let sent = NOTHING_SENT;
 let running = true;
 let lastPushAt = 0;
@@ -80,7 +86,7 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 let problem = '';
 let dropped = 0;
 let queue: Promise<void> = Promise.resolve();
-let reading: ReadStream | undefined;
+let reading: { destroy(): void } | undefined;
 /** The last reason the device could not be read, so a missing device is reported once and not every second. */
 let reported = '';
 
@@ -97,7 +103,7 @@ async function pushOnce() {
   if (!running) return;
   lastPushAt = Date.now();
   try {
-    const next = commandsFor(readBasketball(buffer), sent, Date.now(), groups);
+    const next = commandsFor(decoder.read(), sent, Date.now(), groups);
     if (!next.commands.length) return;
     await untilAnswered((signal) => api.game.apply({ sport: 'basketball', gameId, source, commands: next.commands }, { signal }), { withinMs: SEND_WITHIN_MS });
     describe(next.commands, sent.clock?.running);
@@ -122,31 +128,57 @@ function describe(commands: readonly basketball.BasketballCommand[], wasRunning:
   }
 }
 
+/** Decodes what the console sent and schedules a push. */
+function take(chunk: Buffer) {
+  dropped += decoder.push(chunk, Date.now());
+  schedule();
+}
+
 /** Opens the console's device and reads it until it ends or fails. */
 function readDevice(): Promise<void> {
+  if (process.platform === 'win32') return readComPort();
   const fd = openSync(port, 'r');
   const flag = process.platform === 'darwin' ? '-f' : '-F';
   // The settings last while this descriptor stays open.
   const configured = spawnSync('stty', [flag, port, String(baud), 'cs8', '-cstopb', '-parenb', 'raw', '-echo']);
   if (configured.status !== 0) {
     closeSync(fd);
-    throw new Error(`stty failed: ${configured.stderr.toString().trim()}`);
+    throw new Error(`stty failed: ${configured.error?.message ?? configured.stderr.toString().trim()}`);
   }
-  log(`reading ${port} at ${baud} baud`);
+  log(`reading ${port} at ${baud} baud, ${format} format`);
   reported = '';
-  const framer = createFramer();
   const stream = createReadStream('', { fd });
   reading = stream;
   return new Promise((resolve, reject) => {
-    stream.on('data', (chunk) => {
-      for (const frame of framer.push(chunk as Buffer)) {
-        if (frame.kind === 'rejected') dropped++;
-        else buffer.apply(frame);
-      }
-      schedule();
-    });
+    stream.on('data', (chunk) => take(chunk as Buffer));
     stream.on('error', reject);
     stream.on('close', resolve);
+  });
+}
+
+/** The Windows path: a COM port has no stream to listen to, so poll it; each read returns at once. */
+function readComPort(): Promise<void> {
+  const device = openComPort(port, baud);
+  log(`reading ${port} at ${baud} baud, ${format} format`);
+  reported = '';
+  return new Promise((resolve, reject) => {
+    const poll = setInterval(() => {
+      try {
+        const chunk = device.read();
+        if (chunk.length) take(chunk);
+      } catch (error) {
+        clearInterval(poll);
+        device.close();
+        reject(error);
+      }
+    }, POLL_MS);
+    reading = {
+      destroy() {
+        clearInterval(poll);
+        device.close();
+        resolve();
+      },
+    };
   });
 }
 
@@ -192,4 +224,6 @@ function fail(message: string): never {
 await hand(source);
 log(`${view.sides.away.team.id} at ${view.sides.home.team.id}, writing ${groups.join(' and ')} as ${source}`);
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => void shutdown());
+// The server stops a feed with a `stop` line on stdin: Windows has no SIGINT to send a child.
+process.stdin.on('data', (chunk) => /^stop\r?$/m.test(String(chunk)) && void shutdown());
 await readForever();
