@@ -12,12 +12,13 @@ The free panel airs a graphic straight to program with one press, and the same p
 - `rundown-refresh` saves a cue that is on program, and program redraws with the new values.
 - `rundown-reorder` drags a row by its handle, with the mouse or from the keyboard.
 - `rundown-remove` removes a cue with its row's `Remove` button.
+- `rundown-csv` exports the rundown as `rundown.csv` (`graphic,note,params,overrides`, no ids, no game) and imports one at the end of the rundown. A bad row, a bad JSON cell or a graphic the registry rejects fails the whole import into `.problem-strip`, with nothing written.
 - `rundown-error` shows why a cue cannot air on its row (`.cue-error`).
 
 ## How to get to it (user POV)
 
 - The `Free panel` region is on the show page's left. Each `.free-button` shows its key (1 to 5 in the seed).
-- The `Rundown` region is in the middle. `Add cue` is in its header. The `Selected cue` panel below it holds the fields, `Save` and `Cue to my preview`.
+- The `Rundown` region is in the middle. `Export CSV`, `Import CSV` and `Add cue` are in its header. The `Selected cue` panel below it holds the fields, `Save` and `Cue to my preview`.
 - Each row has a `Move <label>` drag handle and a `Remove <label>` button.
 
 ## Driving it with controller proofs.ts and lib.ts
@@ -33,6 +34,7 @@ Preconditions:
 - **Edit on air.** Take the `Josh Reed #5 · game` row. In the inspector, toggle the `threes` and `stl` stat chips and press `Save`. `dtvMonitors.program.frame.layers` for `lower` has a `statLine` that ends in `STL` and no longer holds `3PT`. The cue in `world()` has `line.stats` set to `pts, reb, ast, stl`.
 - **Reorder.** Click the last row, then press Right (to its handle), Enter, Up and Enter. In `world()`, the last two cue ids have swapped.
 - **Remove.** Press `Remove Talent · Rob Brooks`. The rundown length in `world()` is back to 15.
+- **CSV.** Press `Export CSV` (a download named `rundown.csv`), then `setInputFiles` on the page's `input[type=file]` with it. The rundown length in `world()` doubles, with the same graphics and notes under new ids. A file with `{nope}` in a params cell leaves `world()` as it was, and `.problem-strip` reads `Line N: params is not valid JSON`. `journeys/rundown-csv.ts` drives this.
 - **Suite.** `bun apps/controller/scripts/proofs.ts --port=8999 --quick` checks all of the above under `rundown edits`. Its screenshots are `40-add-cue.png`, `42-edited-on-air.png` and `43-reordered.png` in `build/controller/proofs/`.
 
 ## Gotchas
