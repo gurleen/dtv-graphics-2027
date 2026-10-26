@@ -112,3 +112,31 @@
 .tool-log:focus-visible {
   outline: 2px solid var(--focus);
 }
+
+.tool-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--row);
+  outline: none;
+}
+
+.tool-check .check-box {
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: var(--text-xs);
+  line-height: 1;
+}
+
+.tool-check[data-focus-visible] .check-box {
+  outline: 2px solid var(--focus);
+}
+
+.tool-form .combo-button {
+  padding: 0 var(--space-4);
+}
