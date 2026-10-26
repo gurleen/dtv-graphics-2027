@@ -4,7 +4,7 @@
  */
 
 import type { EntityKind } from '@dtv/domain';
-import { blankGroup, blankValue, type FormField, type FormNode } from '@dtv/playout';
+import { blankGroup, blankValue, type FormField, type FormNode, type ParamsNode } from '@dtv/playout';
 import {
   Button, ComboBox, Input, Label, ListBox, ListBoxItem, Popover, Select, SelectValue, TextField, ToggleButton, ToggleButtonGroup,
 } from 'react-aria-components';
@@ -18,6 +18,13 @@ export const humanize = (name: string) => {
   const words = name.replace(/([a-z])([A-Z0-9])/g, '$1 $2').toLowerCase();
   return words[0]!.toUpperCase() + words.slice(1);
 };
+
+/** A cue's whole params: an object's fields side by side, or a union's variant picker and the picked variant's fields. */
+export function CueParams(props: { readonly form: ParamsNode; readonly value: Value; readonly onChange: (value: Value) => void; readonly options: Options }) {
+  const { form } = props;
+  if (form.kind === 'group') return <ParamsForm fields={form.fields} value={props.value} onChange={props.onChange} options={props.options} />;
+  return <Control label={humanize(form.key)} node={form} value={props.value} onChange={(next) => props.onChange(next as Value)} options={props.options} />;
+}
 
 export function ParamsForm(props: { readonly fields: readonly FormField[]; readonly value: Value; readonly onChange: (value: Value) => void; readonly options: Options }) {
   const { value, onChange } = props;

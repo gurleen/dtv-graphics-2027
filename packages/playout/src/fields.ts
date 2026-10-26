@@ -106,9 +106,13 @@ function nodeOf(schema: z.ZodType): FormNode {
   return { kind: 'fixed' };
 }
 
-/** The form for a params schema: one field per property of its object. */
-export function paramForm(params: z.ZodType): readonly FormField[] {
-  return params instanceof z.ZodObject ? fieldsOf(params.shape as Record<string, z.ZodType>) : [];
+/** A whole params schema: an object's fields, or a discriminated union's variants. */
+export type ParamsNode = Extract<FormNode, { readonly kind: 'group' | 'variants' }>;
+
+/** The form for a params schema: one field per property of its object, or a variant picker for a union of objects. */
+export function paramForm(params: z.ZodType): ParamsNode {
+  const node = nodeOf(params);
+  return node.kind === 'group' || node.kind === 'variants' ? node : { kind: 'group', fields: [] };
 }
 
 /** A value for a node a person has not filled in yet: empty, or the first variant. */
@@ -124,11 +128,8 @@ export function blankValue(node: FormNode): unknown {
     case 'list':
       return Array.from({ length: node.min }, () => blankValue(node.item));
     case 'group':
-      return blankGroup(node.fields);
-    case 'variants': {
-      const first = node.variants[0]!;
-      return { [node.key]: first.value, ...blankGroup(first.fields) };
-    }
+    case 'variants':
+      return blankParams(node);
     case 'fixed':
       return undefined;
   }
@@ -136,3 +137,10 @@ export function blankValue(node: FormNode): unknown {
 
 export const blankGroup = (fields: readonly FormField[]): Record<string, unknown> =>
   Object.fromEntries(fields.flatMap((field) => (field.optional ? [] : [[field.name, blankValue(field.node)]])));
+
+/** Params a person has not filled in yet: the object's required fields empty, or the union's first variant. */
+export function blankParams(node: ParamsNode): Record<string, unknown> {
+  if (node.kind === 'group') return blankGroup(node.fields);
+  const first = node.variants[0]!;
+  return { [node.key]: first.value, ...blankGroup(first.fields) };
+}

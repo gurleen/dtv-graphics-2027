@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { CueId, GameId } from '@dtv/domain';
+import { z } from 'zod';
 import { createLocalShow } from './local';
-import { paramFields } from './fields';
+import { blankParams, paramFields, paramForm } from './fields';
 import { fixtureWorld, REGISTRY } from './registry.fixture';
 import type { CueRef } from './show';
 
@@ -97,5 +98,30 @@ describe('paramFields', () => {
     expect(paramFields(REGISTRY['test/steps']!.params)).toEqual([{ name: 'title', kind: 'text' }]);
     expect(paramFields(REGISTRY['test/name']!.params)).toEqual([]);
     expect(paramFields(REGISTRY['test/table']!.params)).toEqual([]);
+  });
+});
+
+describe('paramForm', () => {
+  test('an object of params is a group of fields, blank in its required ones', () => {
+    const form = paramForm(z.object({ title: z.string(), side: z.enum(['left', 'right']).default('left') }));
+    expect(form.kind === 'group' && form.fields.map((field) => [field.name, field.node.kind, field.optional])).toEqual([
+      ['title', 'text', false],
+      ['side', 'choice', true],
+    ]);
+    expect(blankParams(form)).toEqual({ title: '' });
+  });
+
+  test('a union of params is a variant picker, blank as its first variant', () => {
+    const form = paramForm(
+      z.discriminatedUnion('kind', [z.object({ kind: z.literal('venue') }), z.object({ kind: z.literal('custom'), title: z.string(), subtitle: z.string() })]),
+    );
+    expect(form.kind === 'variants' && [form.key, form.variants.map((variant) => [variant.value, variant.fields.map((field) => field.name)])]).toEqual([
+      'kind',
+      [
+        ['venue', []],
+        ['custom', ['title', 'subtitle']],
+      ],
+    ]);
+    expect(blankParams(form)).toEqual({ kind: 'venue' });
   });
 });

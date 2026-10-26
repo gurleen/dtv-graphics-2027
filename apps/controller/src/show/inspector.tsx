@@ -5,11 +5,11 @@
  */
 
 import { type Cue, type GameLive, GraphicId, type Revision, sameJson, type Show, showOf, type World } from '@dtv/domain';
-import { type AnyGraphic, bindValues, blankGroup, boundProps, checkCue, type CueView, entryOf, type Overrides, paramForm, showContext } from '@dtv/playout';
+import { type AnyGraphic, bindValues, blankParams, boundProps, checkCue, type CueView, entryOf, type Overrides, paramForm, showContext } from '@dtv/playout';
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Dialog, Heading, Input, Label, ListBox, ListBoxItem, Modal, ModalOverlay, Popover, Select, SelectValue, TextField } from 'react-aria-components';
 import { useController } from '../app/context';
-import { humanize, ParamsForm } from './form';
+import { CueParams, humanize } from './form';
 import { pickerOptions } from './pickers';
 import { newCueId, useRundownEdits } from './rundown-edits';
 
@@ -40,7 +40,7 @@ function useUnedited(entry: AnyGraphic | undefined, params: Record<string, unkno
 /** Params, overrides and note of one cue, as controls. */
 function CueFields(props: { readonly entry: AnyGraphic; readonly draft: Draft; readonly onChange: (draft: Draft) => void; readonly live: GameLive | null; readonly world: World; readonly show: Show }) {
   const { entry, draft, onChange } = props;
-  const fields = useMemo(() => paramForm(entry.params), [entry]);
+  const form = useMemo(() => paramForm(entry.params), [entry]);
   const unedited = useUnedited(entry, draft.params, props.live);
   const texts = [...boundProps(entry.scene)].filter(([, kind]) => kind === 'string').map(([name]) => name);
   const open = texts.filter((name) => !(name in draft.overrides));
@@ -51,7 +51,7 @@ function CueFields(props: { readonly entry: AnyGraphic; readonly draft: Draft; r
   return (
     <div className="cue-fields">
       <div className="form-row">
-        <ParamsForm fields={fields} value={draft.params} onChange={(params) => onChange({ ...draft, params })} options={(kind, current) => pickerOptions(props.world, props.show, kind, current)} />
+        <CueParams form={form} value={draft.params} onChange={(params) => onChange({ ...draft, params })} options={(kind, current) => pickerOptions(props.world, props.show, kind, current)} />
         <TextField className="field note" value={draft.note} onChange={(note) => onChange({ ...draft, note })}>
           <Label>Note</Label>
           <Input />
@@ -178,7 +178,7 @@ export function AddCueDialog(props: { readonly at: number; readonly live: GameLi
             onSelectionChange={(key) => {
               const picked = key === null ? undefined : entryOf(registry, String(key));
               setGraphic(picked?.id ?? null);
-              setDraft({ params: picked ? blankGroup(paramForm(picked.params)) : {}, overrides: {}, note: '' });
+              setDraft({ params: picked ? blankParams(paramForm(picked.params)) : {}, overrides: {}, note: '' });
             }}
           >
             <Label>Graphic</Label>

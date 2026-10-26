@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { GraphicId } from '@dtv/domain';
-import { type FormField, paramForm } from '@dtv/playout';
+import { type FormField, type ParamsNode, paramForm } from '@dtv/playout';
 import { cueOf, GRAPHICS, parseCue } from './index';
 
 test('the list holds every entry under its own id', () => {
@@ -33,7 +33,8 @@ test('every graphic’s params fit the generic form, with a picker for each id',
       if (node.kind === 'variants') return node.variants.flatMap((variant) => refs(variant.fields));
       return [];
     });
-  const found = Object.fromEntries(Object.values(GRAPHICS).map((entry) => [entry.id, refs(paramForm(entry.params))]));
+  const fieldsOf = (form: ParamsNode) => (form.kind === 'group' ? form.fields : form.variants.flatMap((variant) => variant.fields));
+  const found = Object.fromEntries(Object.values(GRAPHICS).map((entry) => [entry.id, refs(fieldsOf(paramForm(entry.params)))]));
   expect(found).toEqual({
     'basketball-v2/burning-question': ['team: team'],
     'basketball-v2/conference-standings': ['season: season'],
@@ -56,7 +57,8 @@ test('every graphic’s params fit the generic form, with a picker for each id',
 });
 
 test('the player lower third’s stat line is a union of stat picks and text', () => {
-  const line = paramForm(GRAPHICS['basketball-v2/player-lower-third']!.params).find((field) => field.name === 'line')!;
+  const form = paramForm(GRAPHICS['basketball-v2/player-lower-third']!.params);
+  const line = (form.kind === 'group' ? form.fields : []).find((field) => field.name === 'line')!;
   expect(line.optional).toBe(true);
   expect(line.fallback).toEqual({ kind: 'season', stats: ['ppg', 'rpg', 'apg'] });
   expect(line.node.kind === 'variants' && line.node.variants.map((variant) => [variant.value, variant.fields.map((field) => field.node.kind)])).toEqual([
