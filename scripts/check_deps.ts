@@ -26,6 +26,7 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   'packages/sportsdataverse': ['@dtv/domain', 'hyparquet', 'hyparquet-compressors'],
   'packages/api': ['@dtv/playout', '@dtv/domain', '@orpc/*', 'partysocket', 'zod'],
   'packages/live-': ['@dtv/api', '@dtv/domain'],
+  'packages/live-statcrew': ['@dtv/api', '@dtv/domain', 'fast-xml-parser', 'zod', 'node:*'],
   'apps/server': ['@dtv/api', '@dtv/db', '@dtv/controller', '@dtv/graphics', '@dtv/playout', '@dtv/domain', '@dtv/renderer-page', '@dtv/sportsdataverse', '@orpc/server', 'zod', 'node:fs', 'node:path'],
   'apps/controller': ['@dtv/api', '@dtv/renderer', '@dtv/graphics', '@dtv/playout', '@dtv/domain', 'react', 'react-dom', 'react-dom/*', 'react-aria-components', '@fontsource/*'],
   'apps/renderer': ['@dtv/api', '@dtv/renderer', '@dtv/graphics'],

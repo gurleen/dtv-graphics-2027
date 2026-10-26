@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bbgame source="synthetic fixture">
+  <team vh="V" id="SJU" name="Saint Joseph's">
+    <linescore line="24,40" score="64"/>
+    <totals>
+      <stats fgm="21" fga="45" fgm3="5" fga3="17" ftm="6" fta="8" tp="64" treb="24" ast="9" stl="4" blk="3" to="9" pf="13"/>
+    </totals>
+    <player uni="TM" name="TEAM" checkname="TEAM">
+      <stats treb="3"/>
+    </player>
+    <player uni="1" name="Carey, Jordan" checkname="CAREY, JORDAN" gs="1">
+      <stats min="30" fgm="4" fga="9" fgm3="2" fga3="5" ftm="1" fta="2" tp="11" oreb="1" dreb="4" treb="5" ast="2" stl="1" blk="0" to="2" pf="2"/>
+    </player>
+    <player uni="2" name="Johnson, Dante" checkname="JOHNSON, DANTE" gs="1">
+      <stats min="34" fgm="6" fga="12" fgm3="1" fga3="4" ftm="2" fta="2" tp="15" oreb="1" dreb="2" treb="3" ast="5" stl="2" blk="0" to="3" pf="1"/>
+    </player>
+    <player uni="3" name="Okafor, Sam" checkname="OKAFOR, SAM" gs="1">
+      <stats min="28" fgm="3" fga="6" fgm3="0" fga3="0" ftm="0" fta="0" tp="6" oreb="1" dreb="6" treb="7" ast="1" stl="0" blk="2" to="1" pf="3"/>
+    </player>
+    <player uni="4" name="Price, Malik" checkname="PRICE, MALIK" gs="1">
+      <stats min="25" fgm="2" fga="7" fgm3="2" fga3="6" ftm="0" fta="0" tp="6" oreb="1" dreb="1" treb="2" ast="1" stl="1" blk="0" to="0" pf="2"/>
+    </player>
+    <player uni="5" name="Lane, Eli" checkname="LANE, ELI" gs="1">
+      <stats min="31" fgm="5" fga="8" fgm3="0" fga3="1" ftm="3" fta="4" tp="13" oreb="1" dreb="5" treb="6" ast="0" stl="0" blk="1" to="2" pf="4"/>
+    </player>
+    <player uni="6" name="Young, Cole" checkname="YOUNG, COLE">
+      <stats min="9" fgm="1" fga="3" fgm3="0" fga3="1" ftm="0" fta="0" tp="2" oreb="1" dreb="0" treb="1" ast="0" stl="0" blk="0" to="1" pf="1"/>
+    </player>
+  </team>
+  <team vh="H" id="DREX" name="Drexel">
+    <linescore line="32,40" score="72"/>
+    <totals>
+      <stats fgm="19" fga="42" fgm3="6" fga3="15" ftm="7" fta="10" tp="72" treb="27" ast="12" stl="5" blk="4" to="8" pf="9"/>
+    </totals>
+    <player uni="TM" name="TEAM" checkname="TEAM">
+      <stats treb="3"/>
+    </player>
+    <player uni="5" name="Reed, Josh" checkname="REED, JOSH" gs="1">
+      <stats min="33" fgm="7" fga="14" fgm3="3" fga3="7" ftm="2" fta="2" tp="19" oreb="1" dreb="3" treb="4" ast="3" stl="2" blk="0" to="1" pf="2"/>
+    </player>
+    <player uni="0" name="Hipps, Ty" checkname="HIPPS, TY" gs="1">
+      <stats min="29" fgm="3" fga="8" fgm3="1" fga3="3" ftm="0" fta="0" tp="7" oreb="1" dreb="1" treb="2" ast="6" stl="1" blk="0" to="2" pf="1"/>
+    </player>
+    <player uni="23" name="Tingler, Mo" checkname="TINGLER, MO" gs="1">
+      <stats min="30" fgm="4" fga="7" fgm3="0" fga3="0" ftm="4" fta="6" tp="12" oreb="1" dreb="7" treb="8" ast="1" stl="0" blk="3" to="3" pf="3"/>
+    </player>
+    <player uni="6" name="Edomwonyin, Amari" checkname="EDOMWONYIN, AMARI" gs="1">
+      <stats min="27" fgm="2" fga="5" fgm3="0" fga3="0" ftm="1" fta="2" tp="5" oreb="1" dreb="8" treb="9" ast="0" stl="1" blk="1" to="1" pf="2"/>
+    </player>
+    <player uni="11" name="De Laporterie, Luc" checkname="DE LAPORTERIE, LUC" gs="1">
+      <stats min="26" fgm="3" fga="6" fgm3="2" fga3="4" ftm="0" fta="0" tp="8" oreb="1" dreb="2" treb="3" ast="2" stl="1" blk="0" to="0" pf="1"/>
+    </player>
+    <player uni="99" name="SMITH,JOHN" checkname="SMITH,JOHN">
+      <stats min="5" fgm="0" fga="2" fgm3="0" fga3="1" ftm="0" fta="0" tp="0" oreb="1" dreb="0" treb="1" ast="0" stl="0" blk="0" to="1" pf="0"/>
+    </player>
+  </team>
+</bbgame>

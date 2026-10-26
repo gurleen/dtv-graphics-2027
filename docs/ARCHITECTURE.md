@@ -2,7 +2,7 @@
 
 This repo is becoming a Bun monorepo that runs DragonsTV shows from the basketball-v2 Rive scenes. It holds the
 scenes, a data model in SQLite, an oRPC API, a server, an operator controller, a `/renderer` page for OBS, and the
-stakeholder site at `preview.dragonstv.io`. Live-data packages come later and use the same API.
+stakeholder site at `preview.dragonstv.io`. The live-data packages are separate processes that use the same API.
 
 This document describes the target design and why it has this shape. The shared plan doc tracks progress phase by
 phase. Section 8 says how the design was chosen.
@@ -22,7 +22,8 @@ packages/graphics       @dtv/graphics: GRAPHICS, the one list of graphics, and p
 packages/renderer       @dtv/renderer: draws output frames. The only code that touches the Rive runtime.
 packages/api            @dtv/api: the oRPC contract and the client helpers
 packages/sportsdataverse @dtv/sportsdataverse: downloads and reads the sportsdataverse parquet files
-packages/live-*         live-data packages (later)
+packages/live-*         live-data packages: separate processes that write through the API
+packages/live-statcrew  @dtv/live-statcrew: watches a StatCrew XML file and pushes the box score to a game
 apps/server             Bun.serve: the store (the one writer), the oRPC router, static files
 apps/controller         React: the show page and the data page
 apps/renderer           the /renderer page for OBS
@@ -44,6 +45,7 @@ apps/site               the stakeholder site: build script and viewer
 | `apps/renderer` | api, renderer, graphics |
 | `apps/site` | its build script may import db; its browser code may not |
 | `packages/live-*` | api, domain |
+| `@dtv/live-statcrew` | api, domain, fast-xml-parser, zod, `node:*` |
 
 Bun hoists every dependency into one `node_modules`, so an undeclared import still compiles. `scripts/check_deps.ts`
 fails `bun run check` when a file imports a package its directory may not, or reaches into another package's files.
