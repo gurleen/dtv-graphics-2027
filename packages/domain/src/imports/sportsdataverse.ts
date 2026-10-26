@@ -42,7 +42,6 @@ const rosterRow = z.object({
   birth_place_city: text,
   birth_place_state: text,
   birth_place_country: text,
-  headshot_href: text,
 });
 
 /** Each dataset this importer reads, the columns it reads, and where it is published. `<g>` is the program, `<y>` the season's end year. */
@@ -522,7 +521,8 @@ function rosterEdits(
         // The files never mark a redshirt, so they leave the player's flag alone.
         redshirt: null,
         hometown: hometown(row),
-        headshot: Url.safeParse(row.headshot_href).data ?? null,
+        // Headshots come from the R2 bucket by school, program and jersey; ESPN's photos keep their backgrounds.
+        headshot: null,
         motionHeadshot: null,
         sourceKey: `espn:${row.athlete_id}`,
       });

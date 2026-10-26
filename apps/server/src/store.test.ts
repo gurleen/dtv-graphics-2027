@@ -200,7 +200,7 @@ describe('sportsdataverse', () => {
     rosters: [
       {
         athlete_id: '5239623', team_id: '2182', first_name: 'Josh', last_name: 'Reed', jersey: '5', position_abbreviation: 'G', experience_display_value: 'Sophomore',
-        birth_place_city: 'Wyndmoor', birth_place_state: 'PA', birth_place_country: 'USA', headshot_href: null,
+        birth_place_city: 'Wyndmoor', birth_place_state: 'PA', birth_place_country: 'USA',
       },
     ],
     priorRosters: null,

@@ -131,7 +131,6 @@ const teamBox: SdvRow<'teamBox'>[] = GAMES.flatMap(([game_id, , away, home, away
 const athlete = (athlete_id: string, team_id: string, first_name: string, last_name: string, jersey: string | null, experience: string): SdvRow<'rosters'> => ({
   athlete_id, team_id, first_name, last_name, jersey, position_abbreviation: 'G', experience_display_value: experience,
   birth_place_city: 'Wyndmoor', birth_place_state: 'PA', birth_place_country: 'USA',
-  headshot_href: `https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/${athlete_id}.png`,
 });
 
 const line = (game_id: string, values: readonly number[], did_not_play = false): SdvRow<'playerBox'> => {
@@ -204,7 +203,7 @@ describe('sportsdataverseEdits', () => {
       {
         id: 'drexel-mbb@2025-26/reed-josh', teamId: 'drexel-mbb', seasonId: '2025-26', firstName: 'Josh', lastName: 'Reed', jersey: '5', position: 'G',
         classYear: 'SO', redshirt: false, hometown: 'Wyndmoor, PA',
-        headshot: 'https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/5239623.png', motionHeadshot: null, sourceKey: 'espn:5239623',
+        headshot: null, motionHeadshot: null, sourceKey: 'espn:5239623',
       },
     ] as never);
     expect(putValues(plan.edits, 'playerStats')).toEqual([
