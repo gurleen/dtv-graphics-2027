@@ -98,6 +98,19 @@ describe('what the entries do beyond their values', async () => {
     expect(values.talent1Role).toBe('HOST');
   });
 
+  test('the scorebug slider joins the commentators, takes custom text, and needs a venue', () => {
+    const slider = BASKETBALL_V2['basketball-v2/scorebug-slider'];
+    const said = (params: unknown, at = context) => {
+      const { title, subtitle } = bound(slider, params, 0, at);
+      return [title, subtitle];
+    };
+    expect(said({ kind: 'commentators', talents: ['rob-brooks'] })).toEqual(['COMMENTATORS', 'ROB BROOKS']);
+    expect(said({ kind: 'commentators', talents: ['rob-brooks', 'mike-tuberosa', 'tessa-peloso'] })).toEqual(['COMMENTATORS', 'ROB BROOKS, MIKE TUBEROSA AND TESSA PELOSO']);
+    expect(said({ kind: 'custom', title: 'Attendance', subtitle: '4,212' })).toEqual(['ATTENDANCE', '4,212']);
+    expect(() => said({ kind: 'venue' }, { ...context, game: { ...context.game!, venue: undefined } })).toThrow('The game has no venue');
+    expect(slider.label(slider.params.parse({ kind: 'commentators', talents: ['rob-brooks', 'mike-tuberosa'] }), { ...context, sponsor: undefined })).toBe('Slider · Rob Brooks and Mike Tuberosa');
+  });
+
   test('Next moves a stepped graphic: the answer, then the home team', () => {
     expect(bound(BASKETBALL_V2['basketball-v2/burning-question'], { question: 'Q', answer: 'A', team: 'drexel-mbb' }, 0).showAnswer).toBe(false);
     expect(bound(BASKETBALL_V2['basketball-v2/burning-question'], { question: 'Q', answer: 'A', team: 'drexel-mbb' }, 1).showAnswer).toBe(true);
@@ -119,7 +132,7 @@ describe('what the entries do beyond their values', async () => {
 test('the demo show’s rundown cues every graphic the free panel lacks, each ready to air', async () => {
   const context = await seededContext();
   const view = viewShow({ registry: BASKETBALL_V2, state: EMPTY_SHOW, operator: OperatorId.parse('golden'), operators: [], revision: context.world.revision, context });
-  const aired = [...view.free, ...view.rundown].map((cue) => cue.graphic).sort();
+  const aired = [...new Set([...view.free, ...view.rundown].map((cue) => cue.graphic))].sort();
   expect(aired).toEqual(ENTRIES.map((entry) => entry.id).sort());
   expect(view.rundown.filter((cue) => cue.error).map((cue) => `${cue.graphic}: ${cue.error}`)).toEqual([]);
 });

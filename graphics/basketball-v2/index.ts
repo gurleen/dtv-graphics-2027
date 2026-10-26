@@ -15,6 +15,7 @@ import { scorebug } from './graphics/scorebug';
 import { playerOfTheGame } from './graphics/player-of-the-game';
 import { playerToWatch } from './graphics/player-to-watch';
 import { scoreToBreak } from './graphics/score-to-break';
+import { scorebugSlider } from './graphics/scorebug-slider';
 import { startingFive } from './graphics/starting-five';
 import { staffLowerThird } from './graphics/staff-lower-third';
 import { talentLowerThirdDouble } from './graphics/talent-lower-third-double';
@@ -22,7 +23,7 @@ import { talentLowerThirdSingle } from './graphics/talent-lower-third-single';
 import { talentLowerThirdTriple } from './graphics/talent-lower-third-triple';
 import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings] as const;
 
 type Entry = (typeof ENTRIES)[number];
 

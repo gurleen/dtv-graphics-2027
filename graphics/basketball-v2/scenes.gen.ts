@@ -853,6 +853,33 @@ export const SCENES = {
       "sponsorLogo": "asset:Score to Break v2 Independence Blue Cross"
     }
   },
+  "scorebug_slider": {
+    "file": "scorebug_slider.rml",
+    "artboard": "Basketball Scorebug Slider v2",
+    "stateMachine": "Scorebug Slider",
+    "viewModel": "BasketballScorebugSliderV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 1200,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17
+    },
+    "props": {
+      "title": "string",
+      "subtitle": "string",
+      "isPlaying": "boolean"
+    },
+    "groups": {},
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "title": "VENUE",
+      "subtitle": "DASKALAKIS ATHLETIC CENTER · PHILADELPHIA, PA"
+    }
+  },
   "staff_lower_third": {
     "file": "staff_lower_third.rml",
     "artboard": "Basketball Staff Lower Third v2",

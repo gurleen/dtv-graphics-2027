@@ -115,6 +115,8 @@
           { "id": "talent-single", "graphic": "basketball-v2/talent-lower-third-single", "params": { "talents": ["rob-brooks"] } },
           { "id": "talent-double", "graphic": "basketball-v2/talent-lower-third-double", "params": { "talents": ["rob-brooks", "mike-tuberosa"] } },
           { "id": "talent-triple", "graphic": "basketball-v2/talent-lower-third-triple", "params": { "talents": ["rob-brooks", "mike-tuberosa", "tessa-peloso"] } },
+          { "id": "slider-venue", "graphic": "basketball-v2/scorebug-slider", "params": { "kind": "venue" } },
+          { "id": "slider-commentators", "graphic": "basketball-v2/scorebug-slider", "params": { "kind": "commentators", "talents": ["rob-brooks", "mike-tuberosa"] } },
           { "id": "matchup-locator-lower-third", "graphic": "basketball-v2/matchup-locator-lower-third", "params": {} },
           { "id": "player-to-watch", "graphic": "basketball-v2/player-to-watch", "params": { "player": "drexel-mbb@2026-27/reed-josh" } },
           {
