@@ -265,10 +265,27 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="132"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="132"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Clock Body" x="0" y="0">
-    <Rectangle width="194" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="12"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
+</Node>
+
+<!-- ============================ Block backing ============================ -->
+<!-- One dark glass slab behind the rows and the clock panel, so the seams
+     between them read as glass rather than video. It is split at the seam,
+     and each half opens with its side's leading edge. -->
+<Node name="Block Backing" id="30:15" x="0" y="0">
+  <Node name="Rows Backing" x="0" y="0">
+    <ClippingShape name="Rows Backing Clip" sourceId="30:501"/>
+    <Shape name="Rows Backing Body" x="0" y="0">
+      <Rectangle width="236" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="0" cornerRadiusBL="12" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
+  </Node>
+  <Node name="Clock Backing" x="0" y="0">
+    <ClippingShape name="Clock Backing Clip" sourceId="30:506"/>
+    <Shape name="Clock Backing Body" x="236" y="0">
+      <Rectangle width="196" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="12" cornerRadiusBL="0" cornerRadiusBR="12"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
+  </Node>
 </Node>
 
 <!-- Separation from bright video: a feathered dark stroke around the block. Its
@@ -282,9 +299,7 @@
 <!-- ============================= Clip sources ============================= -->
 <!-- Unpainted, so it contributes geometry and draws nothing. -->
 <Shape name="Block Silhouette" id="30:610" x="0" y="0">
-  <Rectangle x="0" y="0" width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-  <Rectangle x="0" y="68" width="234" height="64" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
-  <Rectangle x="238" y="0" width="194" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="12"/>
+  <Rectangle x="0" y="0" width="432" height="132" originX="0" originY="0" cornerRadiusTL="12"/>
 </Shape>
 </Node>
 
@@ -306,6 +321,7 @@
   <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:300"><KeyedProperty propertyKey="14"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:15"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
 
   <!-- Ignition: the seam light extends from the block centre, then fades as
        the edges carry it outward. -->
@@ -540,6 +556,7 @@
   <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:300"><KeyedProperty propertyKey="14"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:15"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:21"><KeyedProperty propertyKey="20"><KeyFrameDouble frame="0" value="430" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:500"><KeyedProperty propertyKey="13"><KeyFrameDouble frame="0" value="-8" interpolationType="hold"/></KeyedProperty></KeyedObject>
@@ -604,6 +621,7 @@
   <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:15"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="1" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/>
     <KeyFrameDouble frame="2" value="0.6" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
@@ -786,6 +804,7 @@
      outside the rows and the clock panel. -->
 <LinearAnimation name="Hidden" id="30:33" fps="60" duration="1" loopValue="oneShot">
   <KeyedObject objectId="30:300"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
+  <KeyedObject objectId="30:15"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:100"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:200"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
   <KeyedObject objectId="30:20"><KeyedProperty propertyKey="18"><KeyFrameDouble frame="0" value="0" interpolationType="hold"/></KeyedProperty></KeyedObject>
