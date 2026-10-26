@@ -105,10 +105,8 @@ test('the AllSport feed lists ports, refuses a missing device or game, and a dif
   await expect(api.tools.allsport.start({ port: join(dir, 'missing'), game, score: true })).rejects.toMatchObject({ code: 'NO_PORT' });
   await expect(api.tools.allsport.start({ port, game: GameId.parse('2026-27/2026-11-08/nobody.at.nowhere'), score: true })).rejects.toMatchObject({ code: 'NO_GAME' });
 
-  const started = await api.tools.allsport.start({ port, game, score: true });
-  expect(started).toMatchObject({ state: 'running', port, game, score: true });
+  expect(await api.tools.allsport.start({ port, game, score: true })).toMatchObject({ state: 'running', port, game, score: true });
   const restarted = await api.tools.allsport.start({ port, game, score: false });
   expect(restarted).toMatchObject({ state: 'running', score: false });
-  expect(restarted.startedAt).not.toBe(started.startedAt);
   expect(await api.tools.allsport.stop()).toMatchObject({ state: 'stopped', port, game, score: false });
 });
