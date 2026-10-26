@@ -2,29 +2,31 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { StatcrewFeed } from '@dtv/api';
+import type { Feed } from '@dtv/api';
 import { GameId } from '@dtv/domain';
-import { createStatcrewSupervisor, type StatcrewSupervisor } from './statcrew-feed';
+import { createFeedSupervisor, type FeedSupervisor } from './feed-supervisor';
+import type { StatcrewSupervisor } from './feeds';
 
-const FAKE = join(import.meta.dir, 'statcrew-fake-tool.ts');
+const FAKE = join(import.meta.dir, 'feed-fake-tool.ts');
 const A = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const B = GameId.parse('2026-27/2026-11-12/drexel-mbb.at.hofstra-mbb');
 
 let dir: string;
 let file: string;
-let supervisors: StatcrewSupervisor[] = [];
+let supervisors: { stop(): Promise<unknown> }[] = [];
 
 const supervise = (mode: 'run' | 'crash' | 'stubborn', extra: { readonly killAfterMs?: number } = {}) => {
-  const supervisor = createStatcrewSupervisor({
+  const supervisor: StatcrewSupervisor = createFeedSupervisor({
+    inputs: ['file', 'game'],
     command: ({ file, game }) => [process.execPath, FAKE, mode, file, game],
-    hasGame: (game) => game === A || game === B,
+    validate: async ({ file, game }) => (game !== A && game !== B ? 'no-game' : (await Bun.file(file).exists()) ? null : 'no-file'),
     ...extra,
   });
   supervisors.push(supervisor);
   return supervisor;
 };
 
-const until = async (what: string, supervisor: StatcrewSupervisor, ready: (feed: StatcrewFeed) => boolean) => {
+const until = async <I>(what: string, supervisor: FeedSupervisor<I, string>, ready: (feed: Feed<I>) => boolean) => {
   const deadline = Date.now() + 8_000;
   while (!ready(supervisor.feed())) {
     if (Date.now() > deadline) throw new Error(`timed out waiting for ${what}; feed is ${JSON.stringify(supervisor.feed())}`);
@@ -33,7 +35,7 @@ const until = async (what: string, supervisor: StatcrewSupervisor, ready: (feed:
 };
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'statcrew-feed-'));
+  dir = mkdtempSync(join(tmpdir(), 'feed-supervisor-'));
   file = join(dir, 'game.xml');
   writeFileSync(file, '<bbgame/>');
 });
@@ -44,7 +46,7 @@ afterEach(async () => {
   rmSync(dir, { recursive: true, force: true });
 });
 
-describe('the StatCrew feed supervisor', () => {
+describe('the feed supervisor', () => {
   test('starts stopped, runs a start, and stops with the tool having handed back', async () => {
     const supervisor = supervise('run');
     expect(supervisor.feed()).toMatchObject({ state: 'stopped', file: null, game: null, startedAt: null, log: [] });
@@ -94,6 +96,22 @@ describe('the StatCrew feed supervisor', () => {
     await until('the first log line', stubborn, (feed) => feed.log.length > 0);
     expect((await stubborn.stop()).state).toBe('stopped');
     expect((await stubborn.stop()).state).toBe('stopped');
+  });
+
+  test('a start with another value of any input restarts the run, whatever the type', async () => {
+    const supervisor = createFeedSupervisor<{ port: string; score: boolean }, never>({
+      inputs: ['port', 'score'],
+      command: ({ port, score }) => [process.execPath, FAKE, 'run', port, String(score)],
+      validate: () => null,
+    });
+    supervisors.push(supervisor);
+    const first = await supervisor.start({ port: 'tty', score: true });
+    await until('the first log line', supervisor, (feed) => feed.log.length > 0);
+    const same = await supervisor.start({ port: 'tty', score: true });
+    expect(same.ok && first.ok && same.feed.startedAt === first.feed.startedAt).toBe(true);
+    await supervisor.start({ port: 'tty', score: false });
+    await until('the new run', supervisor, (feed) => feed.log.length > 0);
+    expect(supervisor.feed()).toMatchObject({ state: 'running', port: 'tty', score: false, log: ['started tty false'] });
   });
 
   test('refuses a game that is not a basketball game in the World and a file that does not exist', async () => {

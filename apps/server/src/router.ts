@@ -3,7 +3,7 @@
 import { contract } from '@dtv/api';
 import { implement } from '@orpc/server';
 import { RPCHandler } from '@orpc/server/bun-ws';
-import type { StatcrewSupervisor } from './statcrew-feed';
+import type { Feeds } from './feeds';
 import type { Store } from './store';
 
 /** Who sent a call, from the socket's `?client=` label: a name for the journal, not authentication. */
@@ -16,7 +16,7 @@ const os = implement(contract).$context<CallContext>();
 /** oRPC passes a signal on every streamed call; this one stands in where the types allow none. */
 const NEVER = new AbortController().signal;
 
-export function createRouter(store: Store, statcrew: StatcrewSupervisor) {
+export function createRouter(store: Store, feeds: Feeds) {
   return os.router({
     data: {
       watch: os.data.watch.handler(({ signal }) => store.watchData(signal ?? NEVER)),
@@ -61,13 +61,23 @@ export function createRouter(store: Store, statcrew: StatcrewSupervisor) {
     },
     tools: {
       statcrew: {
-        watch: os.tools.statcrew.watch.handler(({ signal }) => statcrew.watch(signal ?? NEVER)),
+        watch: os.tools.statcrew.watch.handler(({ signal }) => feeds.statcrew.watch(signal ?? NEVER)),
         start: os.tools.statcrew.start.handler(async ({ input, errors }) => {
-          const result = await statcrew.start(input);
+          const result = await feeds.statcrew.start(input);
           if (result.ok) return result.feed;
           throw result.reason === 'no-game' ? errors.NO_GAME() : errors.NO_FILE();
         }),
-        stop: os.tools.statcrew.stop.handler(() => statcrew.stop()),
+        stop: os.tools.statcrew.stop.handler(() => feeds.statcrew.stop()),
+      },
+      allsport: {
+        watch: os.tools.allsport.watch.handler(({ signal }) => feeds.allsport.watch(signal ?? NEVER)),
+        start: os.tools.allsport.start.handler(async ({ input, errors }) => {
+          const result = await feeds.allsport.start(input);
+          if (result.ok) return result.feed;
+          throw result.reason === 'no-game' ? errors.NO_GAME() : errors.NO_PORT();
+        }),
+        stop: os.tools.allsport.stop.handler(() => feeds.allsport.stop()),
+        ports: os.tools.allsport.ports.handler(() => feeds.ports()),
       },
     },
     output: {
@@ -77,8 +87,8 @@ export function createRouter(store: Store, statcrew: StatcrewSupervisor) {
 }
 
 /** `websocket` for `Bun.serve`, upgraded with `data: { client }`. */
-export function rpcWebSocket(store: Store, statcrew: StatcrewSupervisor): Bun.WebSocketHandler<CallContext> {
-  const handler = new RPCHandler(createRouter(store, statcrew));
+export function rpcWebSocket(store: Store, feeds: Feeds): Bun.WebSocketHandler<CallContext> {
+  const handler = new RPCHandler(createRouter(store, feeds));
   return {
     data: {} as CallContext,
     // A World snapshot is about 430 KB of JSON and 34 KB compressed.

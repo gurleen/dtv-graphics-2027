@@ -1,45 +1,53 @@
 /**
- * Supervises the StatCrew feed tool (`packages/live-statcrew`) as a child process. The tool stays an ordinary API
- * client that can also be run by hand; this module only starts it, stops it, and keeps what it printed. The server
- * never imports the tool.
+ * Supervises a feed tool (`packages/live-statcrew`, `packages/live-allsport`) as a child process. A tool stays an
+ * ordinary API client that can also be run by hand; this module only starts it, stops it, and keeps what it printed.
+ * The server never imports a tool.
  *
- * Stopping sends SIGINT, which the tool answers by handing score and stats back to the operator, and waits for the
+ * Stopping sends SIGINT, which a tool answers by handing its field groups back to the operator, and waits for the
  * process to end; a process that ignores SIGINT is killed after `killAfterMs`.
  */
 
-import type { StatcrewFeed } from '@dtv/api';
-import type { GameId } from '@dtv/domain';
+import type { Feed, FeedStatus } from '@dtv/api';
 
 const LOG_LINES = 200;
 
-export type StartResult = { readonly ok: true; readonly feed: StatcrewFeed } | { readonly ok: false; readonly reason: 'no-game' | 'no-file' };
+export type StartResult<I, Reason extends string> = { readonly ok: true; readonly feed: Feed<I> } | { readonly ok: false; readonly reason: Reason };
 
-export interface StatcrewSupervisor {
-  feed(): StatcrewFeed;
-  start(input: { readonly file: string; readonly game: GameId }): Promise<StartResult>;
-  stop(): Promise<StatcrewFeed>;
-  watch(signal: AbortSignal): AsyncGenerator<StatcrewFeed, void>;
+export interface FeedSupervisor<I, Reason extends string> {
+  feed(): Feed<I>;
+  start(input: I): Promise<StartResult<I, Reason>>;
+  stop(): Promise<Feed<I>>;
+  watch(signal: AbortSignal): AsyncGenerator<Feed<I>, void>;
 }
 
-export function createStatcrewSupervisor(options: {
-  /** The argv that runs the tool on `file` for `game`. */
-  readonly command: (input: { readonly file: string; readonly game: GameId }) => string[];
-  /** True for a game in the World that is basketball. */
-  readonly hasGame: (game: GameId) => boolean;
+/** `I` is what a start asks for; `Reason` is why one is refused. */
+export function createFeedSupervisor<I extends object, Reason extends string>(options: {
+  /** The keys of `I`: what the feed remembers of its last start, and what makes a start the same as the running one. */
+  readonly inputs: readonly (keyof I)[];
+  /** The argv that runs the tool for `input`. */
+  readonly command: (input: I) => string[];
+  /** Why `input` cannot start, or null when it can. */
+  readonly validate: (input: I) => Promise<Reason | null> | Reason | null;
   readonly now?: () => number;
   readonly killAfterMs?: number;
-}): StatcrewSupervisor {
+}): FeedSupervisor<I, Reason> {
   const now = options.now ?? Date.now;
   const killAfterMs = options.killAfterMs ?? 5_000;
 
-  let feed: StatcrewFeed = { state: 'stopped', file: null, game: null, startedAt: null, exitCode: null, log: [] };
+  let feed = {
+    state: 'stopped',
+    ...Object.fromEntries(options.inputs.map((key) => [key, null])),
+    startedAt: null,
+    exitCode: null,
+    log: [],
+  } as unknown as Feed<I>;
   /** The process that is running and not yet asked to stop. */
   let current: { readonly process: Bun.Subprocess; readonly finished: Promise<void> } | null = null;
   /** The newest process, running or not: its output is the log, down to what it prints while stopping. */
   let latest: Bun.Subprocess | null = null;
   const wakes = new Set<() => void>();
-  const set = (patch: Partial<StatcrewFeed>) => {
-    feed = { ...feed, ...patch };
+  const set = (patch: Partial<FeedStatus> | I) => {
+    feed = { ...feed, ...patch } as Feed<I>;
     for (const wake of wakes) wake();
   };
   const append = (lines: string[]) => lines.length && set({ log: [...feed.log, ...lines].slice(-LOG_LINES) });
@@ -75,7 +83,7 @@ export function createStatcrewSupervisor(options: {
     set({ state: 'stopped', exitCode: null });
   }
 
-  async function begin(input: { readonly file: string; readonly game: GameId }) {
+  async function begin(input: I) {
     const process = Bun.spawn(options.command(input), { stdin: 'ignore', stdout: 'pipe', stderr: 'pipe' });
     latest = process;
     const isLatest = () => latest === process;
@@ -89,7 +97,8 @@ export function createStatcrewSupervisor(options: {
       }
     })();
     current = { process, finished };
-    set({ state: 'running', file: input.file, game: input.game, startedAt: now(), exitCode: null, log: [] });
+    set(input);
+    set({ state: 'running', startedAt: now(), exitCode: null, log: [] });
   }
 
   return {
@@ -97,9 +106,9 @@ export function createStatcrewSupervisor(options: {
 
     start: (input) =>
       serial(async () => {
-        if (!options.hasGame(input.game)) return { ok: false, reason: 'no-game' };
-        if (!(await Bun.file(input.file).exists())) return { ok: false, reason: 'no-file' };
-        if (current && feed.file === input.file && feed.game === input.game) return { ok: true, feed };
+        const reason = await options.validate(input);
+        if (reason) return { ok: false, reason };
+        if (current && options.inputs.every((key) => feed[key] === input[key])) return { ok: true, feed };
         await end();
         await begin(input);
         return { ok: true, feed };

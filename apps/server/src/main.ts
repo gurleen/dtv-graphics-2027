@@ -18,16 +18,17 @@
  * `DTV_HEADSHOT_ORIGIN` overrides the bucket's public URL.
  */
 
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { backup, dbLocation, migrate, openDb, seed } from '@dtv/db';
 import controllerPage from '@dtv/controller';
-import { PROGRAMS } from '@dtv/domain';
+import { type GameId, PROGRAMS } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import rendererPage from '@dtv/renderer-page';
 import { rpcWebSocket } from './router';
 import { headshotHandler } from './headshots';
-import { createStatcrewSupervisor } from './statcrew-feed';
+import { createFeedSupervisor } from './feed-supervisor';
+import { type Feeds, serialPorts } from './feeds';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
@@ -48,13 +49,25 @@ if (process.argv.includes('--seed')) {
 
 const store = createStore({ db, registry: GRAPHICS, clock: systemClock, backupDir: BACKUPS });
 
-const statcrew = createStatcrewSupervisor({
-  command: ({ file, game }) => [process.execPath, join(ROOT, 'packages/live-statcrew/src/main.ts'), `--file=${file}`, `--game=${game}`, `--server=ws://localhost:${PORT}/rpc`],
-  hasGame: (id) => {
-    const game = store.world().get('game', id);
-    return game !== undefined && PROGRAMS[game.program].sport === 'basketball';
-  },
-});
+const isBasketball = (id: GameId) => {
+  const game = store.world().get('game', id);
+  return game !== undefined && PROGRAMS[game.program].sport === 'basketball';
+};
+const serverUrl = `--server=ws://localhost:${PORT}/rpc`;
+
+const feeds: Feeds = {
+  statcrew: createFeedSupervisor({
+    inputs: ['file', 'game'],
+    command: ({ file, game }) => [process.execPath, join(ROOT, 'packages/live-statcrew/src/main.ts'), `--file=${file}`, `--game=${game}`, serverUrl],
+    validate: async ({ file, game }) => (!isBasketball(game) ? 'no-game' : (await Bun.file(file).exists()) ? null : 'no-file'),
+  }),
+  allsport: createFeedSupervisor({
+    inputs: ['port', 'game', 'score'],
+    command: ({ port, game, score }) => [process.execPath, join(ROOT, 'packages/live-allsport/src/main.ts'), `--port=${port}`, `--game=${game}`, `--score=${score}`, serverUrl],
+    validate: ({ port, game }) => (!isBasketball(game) ? 'no-game' : existsSync(port) ? null : 'no-port'),
+  }),
+  ports: serialPorts,
+};
 
 const escape = (text: string) => text.replace(/[&<>"]/g, (character) => `&#${character.charCodeAt(0)};`);
 
@@ -117,7 +130,7 @@ const server = Bun.serve({
     if (url.pathname === '/status') return statusPage();
     return new Response('Not found', { status: 404 });
   },
-  websocket: rpcWebSocket(store, statcrew),
+  websocket: rpcWebSocket(store, feeds),
 });
 console.info(`dtv server on http://localhost:${server.port} with ${DB_PATH}`);
 
@@ -125,8 +138,8 @@ let shuttingDown = false;
 const shutdown = async () => {
   if (shuttingDown) return;
   shuttingDown = true;
-  // The feed hands score and stats back over this server's socket, so it stops first.
-  await statcrew.stop();
+  // A feed hands its field groups back over this server's socket, so the feeds stop first.
+  await Promise.all([feeds.statcrew.stop(), feeds.allsport.stop()]);
   store.close();
   void server.stop(true);
   backup(db, BACKUPS, 'shutdown');
