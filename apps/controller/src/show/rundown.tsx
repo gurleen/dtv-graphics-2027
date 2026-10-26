@@ -11,6 +11,7 @@ import { useCommands } from '../app/commands';
 import { useController } from '../app/context';
 import { stepsOf } from './actions';
 import { cueIdOf, useRundownEdits } from './rundown-edits';
+import { RundownCsv } from './rundown-csv';
 
 export function Rundown(props: {
   readonly view: ShowView;
@@ -42,9 +43,12 @@ export function Rundown(props: {
         <h2>
           Rundown <span className="muted">· ↑↓ select to preview</span>
         </h2>
-        <Button className="button small" onPress={props.onAdd} isDisabled={!edits}>
-          Add cue
-        </Button>
+        <div className="actions">
+          <RundownCsv edits={edits} />
+          <Button className="button small" onPress={props.onAdd} isDisabled={!edits}>
+            Add cue
+          </Button>
+        </div>
       </header>
       {view.rundown.length === 0 ? (
         <p className="empty">No cues yet. Add one to build the show.</p>

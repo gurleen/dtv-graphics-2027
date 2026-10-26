@@ -15,6 +15,8 @@ export interface RundownEdits {
   /** Replaces one cue. `basis` is the revision the editor began from, so a change by someone else since is a CONFLICT. */
   save(cue: Cue, basis: Revision): Promise<boolean>;
   add(cue: Cue, at: number): Promise<boolean>;
+  /** Adds the cues at the end of the rundown in one write. */
+  append(cues: readonly Cue[]): Promise<boolean>;
   remove(id: CueId): Promise<boolean>;
   /** Moves the cues `ids` to sit before `before`, or to the end. */
   move(ids: readonly CueId[], before: CueId | null): Promise<boolean>;
@@ -50,6 +52,7 @@ export function useRundownEdits(): RundownEdits | null {
       return true;
     },
     add: (cue, at) => write([...show.rundown.slice(0, at), cue, ...show.rundown.slice(at)], revision),
+    append: (cues) => write([...show.rundown, ...cues], revision),
     remove: (id) => write(show.rundown.filter((cue) => cue.id !== id), revision),
     move(ids, before) {
       const moving = show.rundown.filter((cue) => ids.includes(cue.id));
