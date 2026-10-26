@@ -20,9 +20,9 @@ Preconditions:
 - `build/riv` is complete. The build fetches team logos from `images.dragonstv.io`, so it needs the network.
 - Port 8999 is free. The site has no `dtv.sh` instance; it is static files.
 
-- **Build.** `bun run site:assemble` reuses `build/riv/` and prints `Built build/site/ with 17 graphics, 17 scenes and 9 images.` (`bun run site:build` signs every scene again first.)
+- **Build.** `bun run site:assemble` reuses `build/riv/` and prints `Built build/site/ with 18 graphics, 18 scenes and 9 images.` (`bun run site:build` signs every scene again first.)
 - **Serve.** `nohup bun apps/site/scripts/serve.ts 8999 > $TMPDIR/dtv-site-8999.log 2>&1 & echo $! > $TMPDIR/dtv-site-8999.pid`. The log prints `build/site on http://localhost:8999`.
-- **Drive.** `bun apps/site/scripts/screenshots.ts http://localhost:8999 build/verify/<run>/site`. It waits on `window.dtvRenderer.layers()` until every layer is `on` or `empty`, screenshots each of the 17 graphics, Burning Question after Next and after an answer edit, Score to Break set to `right`, and the Belfor sponsor filter. It exits 1 and lists the problems on any console error or failed expectation.
+- **Drive.** `bun apps/site/scripts/screenshots.ts http://localhost:8999 build/verify/<run>/site`. It waits on `window.dtvRenderer.layers()` until every layer is `on` or `empty`, screenshots each of the 18 graphics, Burning Question after Next and after an answer edit, Score to Break set to `right`, and the Belfor sponsor filter. It exits 1 and lists the problems on any console error or failed expectation.
 - **Stop.** `kill -TERM $(cat $TMPDIR/dtv-site-8999.pid)`, then `lsof -nP -iTCP:8999 -sTCP:LISTEN` prints nothing.
 
 ## Gotchas

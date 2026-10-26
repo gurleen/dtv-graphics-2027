@@ -28,7 +28,7 @@ Read [features/README.md](features/README.md) before you drive anything. It is t
 ```bash
 bun install
 rive whoami             # signing needs `rive login`; an unsigned .riv never loads and logs nothing
-bun run riv:build       # 17 signed scenes into build/riv/; about 2 minutes
+bun run riv:build       # 18 signed scenes into build/riv/; about 2 minutes
 ```
 
 The doctor fails when `build/riv/` lacks a scene or holds a `.riv` that is older than its `.rml`. Without the scenes, the controller's monitors and `/renderer` stay blank, and nothing reports an error. Chromium comes from the controller's Playwright. If it is missing, run `cd apps/controller && bunx playwright install chromium`.
@@ -109,7 +109,7 @@ Proof standards:
 - Capture the action and the state that results from it: a screenshot before and after, not only the final screen.
 - Check each claim through a second surface. A monitor's layer state agrees with `/renderer`, and both agree with `view()` or `world()` over the API. A data edit is proven by reading the World back, not by the table cell.
 - A screenshot of a blank monitor proves nothing. The scenes may be missing, so run the doctor.
-- The `--quick` flag of `proofs.ts` skips the 17-graphic run-through. Report that a run skipped it. Do not report it as covered.
+- The `--quick` flag of `proofs.ts` skips the 18-graphic run-through. Report that a run skipped it. Do not report it as covered.
 
 ## Cleanup
 

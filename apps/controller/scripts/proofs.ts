@@ -26,7 +26,7 @@ const origin = `http://localhost:${port}`;
 const OUT = join(ROOT, 'build/controller/proofs');
 const VIDEO = join(ROOT, 'build/controller/runthrough.webm');
 const VIEWPORT = { width: 1440, height: 900 };
-/** `--quick` skips the seventeen graphics, to work on the proofs after them. */
+/** `--quick` skips the run through every graphic, to work on the proofs after them. */
 const quick = process.argv.includes('--quick');
 
 const failures: string[] = [];

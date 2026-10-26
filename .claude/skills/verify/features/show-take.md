@@ -35,7 +35,7 @@ Preconditions:
 - **Run it.** `.claude/skills/verify/journeys/take.ts --port=8998` exits 0 with 14 checks passed.
 - **Next and keys.** `bun apps/controller/scripts/proofs.ts --port=8999 --quick` runs the keyboard stretch. 1 airs the scorebug. Up and Down move preview to Starting Five. Esc clears preview, and Enter cues it again. Space takes. N steps, and N past the last step takes it off air.
 - **Next on a one-step graphic.** `.claude/skills/verify/journeys/next.ts --port=8998` airs the scorebug, takes a staff lower third and presses N: the lower third leaves program and `/renderer`, and the scorebug stays. Without a selection N moves the topmost rundown graphic on program; it never reaches a free-panel graphic (scorebug, Score to Break) unless that graphic's cue is selected. A tap of Shift+Backspace changes nothing, and a hold clears all.
-- **Every graphic.** The same suite without `--quick` takes all 15 rundown cues and the 2 free-panel graphics through preview, Take, each step and Clear. It checks `all 17 graphics reached program`, and it records `build/controller/runthrough.webm`.
+- **Every graphic.** The same suite without `--quick` takes all 17 rundown cues and the 2 free-panel graphics through preview, Take, each step and Clear. It checks `all 18 graphics reached program`, and it records `build/controller/runthrough.webm`.
 
 ## Gotchas
 
@@ -43,4 +43,4 @@ Preconditions:
 - `Take` is disabled while my preview is empty. A click on it does nothing and raises no error.
 - A Take on a layer that is still in its intro waits for the intro to finish before the outro starts. Wait for `phase === 'on'`, not a fixed sleep.
 - `proofs.ts` deletes `build/controller/proofs/` when it starts, and it has no `--out` flag. Copy what you need into `build/verify/` before you run it again.
-- `proofs.ts` also covers two operators, rundown edits, problems and a restart in one run. `--quick` skips only the 17-graphic loop.
+- `proofs.ts` also covers two operators, rundown edits, problems and a restart in one run. `--quick` skips only the 18-graphic loop.
