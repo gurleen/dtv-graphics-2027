@@ -7,7 +7,7 @@ description: Drive the DTV show server the way operators and OBS use it (the ope
 
 The app is one Bun process (`apps/server/src/main.ts`). It serves:
 
-- `/`: the operator controller. `#/show` holds preview, Take and program. `#/data` holds teams, rosters and games. `#/tools` holds the tools, starting with the StatCrew feed.
+- `/`: the operator controller. `#/show` holds preview, Take and program. `#/data` holds teams, rosters and games. `#/tools` holds the tools: the StatCrew and AllSport feeds.
 - `/renderer`: the transparent 1920 x 1080 page that OBS loads. It draws program. `/renderer?bus=preview&operator=<id>` draws one operator's preview.
 - `/status`: a plain status page.
 - `/rpc`: the oRPC WebSocket. `@dtv/api` has `connect`, `watch` and `first`.
@@ -129,4 +129,5 @@ lsof -nP -iTCP:8998 -sTCP:LISTEN     # prints nothing once it is down
 - `journeys/next.ts` takes a one-step lower third with the scorebug on air, presses N, and checks the lower third leaves program while the scorebug stays.
 - `journeys/load.ts` loads sportsdataverse seasons on the data page and reads the records, players and home games back over the API. It needs the network.
 - `journeys/tools.ts` starts and stops the StatCrew feed on the Tools page and reads the score and authority back over the API.
+- `journeys/allsport.ts` starts and stops the AllSport feed on the Tools page against a pseudo-terminal that plays a console, and reads the clock, shot clock, period, score, timeouts and authority back over the API. It needs `python3`.
 - `journeys/score.ts` airs the scorebug with key 1, checks the score bar has no controls, adds 3 to Drexel's score over `game.apply`, and checks the score bar, the live game over the API and the scorebug's bound score on `/renderer`.

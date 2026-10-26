@@ -24,6 +24,7 @@ packages/api            @dtv/api: the oRPC contract and the client helpers
 packages/sportsdataverse @dtv/sportsdataverse: downloads and reads the sportsdataverse parquet files
 packages/live-*         live-data packages: separate processes that write through the API
 packages/live-statcrew  @dtv/live-statcrew: watches a StatCrew XML file and pushes the box score to a game
+packages/live-allsport  @dtv/live-allsport: reads a Daktronics AllSport 5000 serial stream and pushes the clock, score and more to a game
 apps/server             Bun.serve: the store (the one writer), the oRPC router, static files
 apps/controller         React: the show, data and tools pages
 apps/renderer           the /renderer page for OBS
@@ -46,6 +47,7 @@ apps/site               the stakeholder site: build script and viewer
 | `apps/site` | its build script may import db; its browser code may not |
 | `packages/live-*` | api, domain |
 | `@dtv/live-statcrew` | api, domain, fast-xml-parser, zod, `node:*` |
+| `@dtv/live-allsport` | api, domain, zod, `node:*` |
 
 Bun hoists every dependency into one `node_modules`, so an undeclared import still compiles. `scripts/check_deps.ts`
 fails `bun run check` when a file imports a package its directory may not, or reaches into another package's files.
@@ -287,18 +289,25 @@ SQLite.
 | `tools.statcrew.watch` | none | stream of `StatcrewFeed` | none |
 | `tools.statcrew.start` | file, game | `StatcrewFeed` | `NO_GAME`, `NO_FILE` |
 | `tools.statcrew.stop` | none | `StatcrewFeed` | none |
+| `tools.allsport.watch` | none | stream of `AllsportFeed` | none |
+| `tools.allsport.start` | port, game, score | `AllsportFeed` | `NO_GAME`, `NO_PORT` |
+| `tools.allsport.stop` | none | `AllsportFeed` | none |
+| `tools.allsport.ports` | none | the serial devices on the server | none |
 | `output.watch` | bus | stream of `OutputFrame` | none |
 
 There are no per-entity procedures. `data.watch` gives every client the whole World, and `data.apply` is the one
 data write a client composes; `data.load` is an import the server plans itself. A live-data package needs only `data.apply` for reference data and `game.apply` for live state.
 
 `tools.*` controls processes the server supervises, for the Tools page. A browser cannot start a process, so
-`apps/server/src/statcrew-feed.ts` spawns `packages/live-statcrew` as a child, keeps its last 200 output lines and
-its state (`stopped`, `running`, or `exited` for a process that ended on its own), and stops it with SIGINT so the tool
-hands score and stats back to the operator; a process that ignores SIGINT is killed after 5 s. The tool stays an
-ordinary API client that also runs by hand, and the server never imports it. `start` is idempotent: the same file and
-game while running changes nothing, and other values stop the old run first. The server's own SIGINT and SIGTERM
-handler stops the feed before it closes the socket, so the handback lands.
+`apps/server/src/feed-supervisor.ts` spawns a feed tool as a child, one supervisor each for `packages/live-statcrew`
+and `packages/live-allsport`. It keeps the child's last 200 output lines and its state (`stopped`, `running`, or
+`exited` for a process that ended on its own), and stops it with SIGINT so the tool hands its field groups back to the
+operator; a process that ignores SIGINT is killed after 5 s. Each tool supplies its own argv and a `validate` that
+says why a start is refused (`NO_GAME`, `NO_FILE`, `NO_PORT`). A tool stays an ordinary API client that also runs by
+hand, and the server never imports it. `start` is idempotent: the same inputs while running change nothing, and other
+values stop the old run first. The server's own SIGINT and SIGTERM handler stops every feed before it closes the
+socket, so the handback lands. `tools.allsport.ports` lists the serial devices a console could be on:
+`/dev/cu.*` on macOS and `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux.
 
 Every client talks over one WebSocket at `/rpc`, with `RPCHandler` from `@orpc/server/bun-ws` and `RPCLink` from
 `@orpc/client/websocket` over partysocket's `ReconnectingWebSocket`. The controller holds about five streams at
@@ -433,7 +442,8 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
   with a click. A roster import shows a diff table before it applies. A refused edit shows theirs beside yours.
 - The tools page (`#/tools`) has a tab list down the left side, one row of a table in
   `apps/controller/src/tools/registry.ts` per tool, and each tab deep-links as `#/tools/<id>`. The StatCrew tab
-  starts and stops the live-statcrew feed and shows its state and log.
+  starts and stops the live-statcrew feed and shows its state and log. The AllSport tab does the same for the
+  live-allsport feed, with a port field that lists the server's serial devices and a Score switch.
 - Keyboard first, with every action also on a click. Space takes, Up and Down
   select a rundown row and my preview follows it, Enter cues the selected row again, N is Next (it takes a one-step graphic off air), Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
   Keys do nothing while typing. Only Clear All is guarded, by a hold or a second press.
