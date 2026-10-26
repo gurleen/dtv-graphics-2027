@@ -6,3 +6,4 @@ node_modules/
 .claude/worktrees/
 data/cache/
 data/headshots/**/*.png
+.audit/

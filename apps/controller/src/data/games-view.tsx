@@ -17,7 +17,7 @@ export function GamesView({ selected, onSelect }: { readonly selected: Target | 
   const [adding, setAdding] = useState(false);
   if (!world) return null;
 
-  const games = [...world.all('game')].sort((a, b) => b.startsAt.localeCompare(a.startsAt));
+  const games = [...world.all('game')].sort((a, b) => a.startsAt.localeCompare(b.startsAt));
   const showOfRow = (id: string) => showOf(world, id as GameId);
   const label = (doc: Readonly<Record<string, unknown>>) => gameLabel(world, doc as Game);
   const columns: TableColumn[] = [
