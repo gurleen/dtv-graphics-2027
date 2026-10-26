@@ -1,6 +1,6 @@
 /**
  * The controller's frame: one connection per page, named for this browser's operator; the
- * World and the show view every page reads; the top bar; and the route, `#/show` or `#/data`.
+ * World and the show view every page reads; the top bar; and the route, `#/show`, `#/data` or `#/tools`.
  */
 
 import { type Api, connect, first } from '@dtv/api';
@@ -10,6 +10,7 @@ import { OperatorId } from '@dtv/playout';
 import { useEffect, useMemo, useState } from 'react';
 import { DataPage } from '../data';
 import { ShowPage } from '../show/page';
+import { ToolsPage } from '../tools/page';
 import { CommandsProvider } from './commands';
 import { type Controller, ControllerContext } from './context';
 import { NameDialog } from './name';
@@ -19,17 +20,19 @@ import { TopBar } from './topbar';
 
 const RPC = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/rpc`;
 
-export type Route = 'show' | 'data';
+export type Route = 'show' | 'data' | 'tools';
 
-function useRoute(): Route {
-  const read = (): Route => (location.hash === '#/data' ? 'data' : 'show');
-  const [route, setRoute] = useState(read);
+const routeOf = (hash: string): Route => (hash === '#/data' ? 'data' : hash === '#/tools' || hash.startsWith('#/tools/') ? 'tools' : 'show');
+
+/** The page the hash names, and the hash itself, which the Tools page reads its tab from. */
+function useHash(): string {
+  const [hash, setHash] = useState(() => location.hash);
   useEffect(() => {
-    const changed = () => setRoute(read());
+    const changed = () => setHash(location.hash);
     window.addEventListener('hashchange', changed);
     return () => window.removeEventListener('hashchange', changed);
   }, []);
-  return route;
+  return hash;
 }
 
 export function Shell() {
@@ -70,13 +73,16 @@ function Pages(props: { readonly api: Api; readonly operator: OperatorId; readon
   const snapshot = useStream((signal) => api.data.watch(undefined, { signal }), [api]);
   const world = useMemo(() => (snapshot ? indexWorld(snapshot) : null), [snapshot]);
   const show = useStream((signal) => api.show.watch({ operator }, { signal }), [api, operator]);
-  const route = useRoute();
+  const hash = useHash();
+  const route = routeOf(hash);
   const controller: Controller = { api, operator, world, revision: world?.revision ?? null, status: props.status, registry: GRAPHICS, show };
   return (
     <ControllerContext.Provider value={controller}>
       <div className="app" data-route={route}>
         <TopBar route={route} />
-        <main className="page">{route === 'data' ? <DataPage /> : <ShowPage />}</main>
+        <main className="page">
+          {route === 'data' ? <DataPage /> : route === 'tools' ? <ToolsPage hash={hash} /> : <ShowPage />}
+        </main>
       </div>
     </ControllerContext.Provider>
   );

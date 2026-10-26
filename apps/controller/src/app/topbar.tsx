@@ -1,4 +1,4 @@
-/** The active game, who is connected, the Reconnecting badge, Clear All, and Show | Data. */
+/** The active game, who is connected, the Reconnecting badge, Clear All, and Show | Data | Tools. */
 
 import { useState } from 'react';
 import { Button, Link } from 'react-aria-components';
@@ -22,6 +22,9 @@ export function TopBar(props: { readonly route: Route }) {
         </Link>
         <Link href="#/data" className="nav-link" data-current={props.route === 'data' || undefined}>
           Data
+        </Link>
+        <Link href="#/tools" className="nav-link" data-current={props.route === 'tools' || undefined}>
+          Tools
         </Link>
       </nav>
       <div className="spacer" />

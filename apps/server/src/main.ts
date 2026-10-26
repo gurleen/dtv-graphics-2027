@@ -7,7 +7,7 @@
  *
  * `PORT` and `DTV_DB` override the port and the database file.
  *
- *   /                   the controller: the show page (#/show) and the data page (#/data)
+ *   /                   the controller: the show (#/show), data (#/data) and tools (#/tools) pages
  *   /status             a plain status page
  *   /rpc                the oRPC WebSocket
  *   /renderer           the page OBS loads; it draws program
@@ -22,10 +22,12 @@ import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { backup, dbLocation, migrate, openDb, seed } from '@dtv/db';
 import controllerPage from '@dtv/controller';
+import { PROGRAMS } from '@dtv/domain';
 import { GRAPHICS } from '@dtv/graphics';
 import rendererPage from '@dtv/renderer-page';
 import { rpcWebSocket } from './router';
 import { headshotHandler } from './headshots';
+import { createStatcrewSupervisor } from './statcrew-feed';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
@@ -45,6 +47,14 @@ if (process.argv.includes('--seed')) {
 }
 
 const store = createStore({ db, registry: GRAPHICS, clock: systemClock, backupDir: BACKUPS });
+
+const statcrew = createStatcrewSupervisor({
+  command: ({ file, game }) => [process.execPath, join(ROOT, 'packages/live-statcrew/src/main.ts'), `--file=${file}`, `--game=${game}`, `--server=ws://localhost:${PORT}/rpc`],
+  hasGame: (id) => {
+    const game = store.world().get('game', id);
+    return game !== undefined && PROGRAMS[game.program].sport === 'basketball';
+  },
+});
 
 const escape = (text: string) => text.replace(/[&<>"]/g, (character) => `&#${character.charCodeAt(0)};`);
 
@@ -107,11 +117,16 @@ const server = Bun.serve({
     if (url.pathname === '/status') return statusPage();
     return new Response('Not found', { status: 404 });
   },
-  websocket: rpcWebSocket(store),
+  websocket: rpcWebSocket(store, statcrew),
 });
 console.info(`dtv server on http://localhost:${server.port} with ${DB_PATH}`);
 
-const shutdown = () => {
+let shuttingDown = false;
+const shutdown = async () => {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  // The feed hands score and stats back over this server's socket, so it stops first.
+  await statcrew.stop();
   store.close();
   void server.stop(true);
   backup(db, BACKUPS, 'shutdown');

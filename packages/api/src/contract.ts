@@ -1,5 +1,5 @@
 /**
- * The whole API: nine procedures. Every caller depends on this package and never on the
+ * The whole API: twelve procedures. Every caller depends on this package and never on the
  * server, so no client's typecheck pulls in SQLite. Inputs are validated with the domain's
  * zod schemas; outputs are the server's own values, typed and not re-validated.
  *
@@ -16,6 +16,19 @@ import { eventIterator, oc, type } from '@orpc/contract';
 import { z } from 'zod';
 
 const detail = z.object({ detail: z.string() });
+
+/** The StatCrew feed process the server supervises. `exited` is a process that ended on its own (a crash, bad arguments); `exitCode` says how. */
+export interface StatcrewFeed {
+  readonly state: 'stopped' | 'running' | 'exited';
+  /** What was last requested, kept after a stop so a form prefills after a reload. */
+  readonly file: string | null;
+  readonly game: GameId | null;
+  /** Epoch ms the running or last run began. */
+  readonly startedAt: number | null;
+  readonly exitCode: number | null;
+  /** The last 200 stdout and stderr lines of the current or last run, newest last. */
+  readonly log: readonly string[];
+}
 
 /** Why a data commit is refused. */
 const refusals = {
@@ -62,6 +75,21 @@ export const contract = {
       .input(z.object({ id: CommandId, command: ShowCommand }))
       .output(type<{ revision: Revision; changed: boolean }>())
       .errors({ REJECTED: { message: 'The command cannot apply', data: z.object({ reason: z.string() }) } }),
+  },
+  tools: {
+    statcrew: {
+      watch: oc.output(eventIterator(type<StatcrewFeed>())),
+      /** Idempotent: the same file and game while running changes nothing; other values restart the feed. */
+      start: oc
+        .input(z.object({ file: z.string().min(1), game: GameId }))
+        .output(type<StatcrewFeed>())
+        .errors({
+          NO_GAME: { message: 'No such basketball game' },
+          NO_FILE: { message: 'No file at that path on the server' },
+        }),
+      /** Interrupts the feed so it hands score and stats back to the operator, then waits for it to end. Idempotent. */
+      stop: oc.output(type<StatcrewFeed>()),
+    },
   },
   output: {
     watch: oc.input(z.object({ bus: BusRef })).output(eventIterator(type<OutputFrame>())),

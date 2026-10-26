@@ -38,4 +38,5 @@ Each feature file starts with an H1 and a paragraph on what the user sees. Then 
 - [Server restart recovery](./restart-recovery.md) covers the Reconnecting badge, program and show surviving a restart, and pages that do not reload.
 - [Frame comparison](./frame-comparison.md) covers every graphic on `/renderer` against the phase 0 captures.
 - [Score and clock](./score-and-clock.md) covers the read-only score bar, driving the game over `game.apply`, the shot clock at the buzzer, and the scripted tip-off-to-final game.
+- [Tools page](./tools.md) covers the StatCrew tab: starting and stopping the feed, its log, and the authority handback.
 - [Stakeholder site](./site.md) covers the static preview site built from the same renderer.

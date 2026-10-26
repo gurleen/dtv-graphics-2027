@@ -3,6 +3,7 @@
 import { contract } from '@dtv/api';
 import { implement } from '@orpc/server';
 import { RPCHandler } from '@orpc/server/bun-ws';
+import type { StatcrewSupervisor } from './statcrew-feed';
 import type { Store } from './store';
 
 /** Who sent a call, from the socket's `?client=` label: a name for the journal, not authentication. */
@@ -15,7 +16,7 @@ const os = implement(contract).$context<CallContext>();
 /** oRPC passes a signal on every streamed call; this one stands in where the types allow none. */
 const NEVER = new AbortController().signal;
 
-export function createRouter(store: Store) {
+export function createRouter(store: Store, statcrew: StatcrewSupervisor) {
   return os.router({
     data: {
       watch: os.data.watch.handler(({ signal }) => store.watchData(signal ?? NEVER)),
@@ -58,6 +59,17 @@ export function createRouter(store: Store) {
         throw errors.REJECTED({ data: { reason: result.reason } });
       }),
     },
+    tools: {
+      statcrew: {
+        watch: os.tools.statcrew.watch.handler(({ signal }) => statcrew.watch(signal ?? NEVER)),
+        start: os.tools.statcrew.start.handler(async ({ input, errors }) => {
+          const result = await statcrew.start(input);
+          if (result.ok) return result.feed;
+          throw result.reason === 'no-game' ? errors.NO_GAME() : errors.NO_FILE();
+        }),
+        stop: os.tools.statcrew.stop.handler(() => statcrew.stop()),
+      },
+    },
     output: {
       watch: os.output.watch.handler(({ input, signal }) => store.watchOutput(input.bus, signal ?? NEVER)),
     },
@@ -65,8 +77,8 @@ export function createRouter(store: Store) {
 }
 
 /** `websocket` for `Bun.serve`, upgraded with `data: { client }`. */
-export function rpcWebSocket(store: Store): Bun.WebSocketHandler<CallContext> {
-  const handler = new RPCHandler(createRouter(store));
+export function rpcWebSocket(store: Store, statcrew: StatcrewSupervisor): Bun.WebSocketHandler<CallContext> {
+  const handler = new RPCHandler(createRouter(store, statcrew));
   return {
     data: {} as CallContext,
     // A World snapshot is about 430 KB of JSON and 34 KB compressed.
