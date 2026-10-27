@@ -4,7 +4,7 @@
  *   bun packages/live-statcrew/src/main.ts --file=<path> --game=<GameId> [--server=ws://localhost:8975/rpc] [--source=statcrew]
  */
 
-import { connect, untilAnswered, watch } from '@dtv/api';
+import { connect, FEED_EVENTS, untilAnswered, watch } from '@dtv/api';
 import { basketball, GameId, indexWorld, PROGRAMS, resolveGame, SIDES, SourceId, type World } from '@dtv/domain';
 import { readFile } from 'node:fs/promises';
 import { unwatchFile, watchFile } from 'node:fs';
@@ -66,6 +66,7 @@ const hand = (to: SourceId) =>
   ).then(() => log(`handed ${GROUPS.join(' and ')} to ${to}`));
 
 let lastSent = '';
+let lastPlays = '';
 const reported = new Set<string>();
 let queue: Promise<void> = Promise.resolve();
 let armed = false;
@@ -84,11 +85,17 @@ async function pushOnce() {
   } catch (error) {
     return log(`waiting for the next change: ${(error as Error).message.split('\n')[0]}`);
   }
+  // The play list goes to whoever runs the tool, the server's StatCrew tab; the API has no place for plays.
+  const plays = JSON.stringify(parsed.plays);
+  if (plays !== lastPlays) {
+    lastPlays = plays;
+    console.log(FEED_EVENTS + plays);
+  }
   const rosters = {
     away: new Map(world.roster(game.awayTeamId, game.seasonId).map((player) => [player.jersey, player.id])),
     home: new Map(world.roster(game.homeTeamId, game.seasonId).map((player) => [player.jersey, player.id])),
   };
-  const { commands, unmatched } = commandsFor(parsed, rosters);
+  const { commands, unmatched } = commandsFor(parsed, rosters, view!.program);
   for (const player of unmatched.filter((name) => !reported.has(name))) {
     reported.add(player);
     log(`not on the roster, skipped: ${player}`);

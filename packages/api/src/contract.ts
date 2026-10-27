@@ -9,7 +9,7 @@
 
 import {
   EditBatch, type EntityKind, GameApplyInput, GameId, type GameLive, ProgramCode, type Revision, type RosterError, type RosterPlan, type SdvLoadReport,
-  SeasonId, TeamId, type WorldSnapshot,
+  SeasonId, type Side, type Sides, TeamId, type WorldSnapshot,
 } from '@dtv/domain';
 import { BusRef, CommandId, type OutputFrame, OperatorId, ShowCommand, type ShowView } from '@dtv/playout';
 import { eventIterator, oc, type } from '@orpc/contract';
@@ -27,10 +27,33 @@ export interface FeedStatus {
   readonly log: readonly string[];
 }
 
-/** A feed's status and what it was last started with, kept after a stop so a form prefills after a reload. */
-export type Feed<Input> = FeedStatus & { readonly [Key in keyof Input]: Input[Key] | null };
+/**
+ * A feed's status and what it was last started with, kept after a stop so a form prefills after a reload. `events` is the
+ * newest list the tool reported on a `FEED_EVENTS` line, empty until it reports one and for a tool that reports none.
+ */
+export type Feed<Input, Event = never> = FeedStatus & { readonly events: readonly Event[] } & { readonly [Key in keyof Input]: Input[Key] | null };
 
-export type StatcrewFeed = Feed<{ file: string; game: GameId }>;
+/** A stdout line that starts with this carries a feed's whole event list as JSON, and replaces the last one instead of joining the log. */
+export const FEED_EVENTS = '@events ';
+
+/** One play in a StatCrew file's play by play, as the file has it. `score` is on scoring plays only. */
+export interface StatcrewPlay {
+  readonly period: number;
+  /** The game clock at the play, such as `19:40`. */
+  readonly time: string;
+  readonly side: Side | null;
+  /** The team's StatCrew id, such as `DREX`. */
+  readonly team: string;
+  /** Jersey, or `TM` for a team play. */
+  readonly uni: string;
+  readonly name: string;
+  /** StatCrew's tokens, such as `GOOD` and `3PTR`. */
+  readonly action: string;
+  readonly type: string;
+  readonly score: Sides<number> | null;
+}
+
+export type StatcrewFeed = Feed<{ file: string; game: GameId }, StatcrewPlay>;
 
 export type AllsportFeed = Feed<{ port: string; game: GameId; score: boolean }>;
 

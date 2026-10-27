@@ -54,4 +54,15 @@
       <stats min="5" fgm="0" fga="2" fgm3="0" fga3="1" ftm="0" fta="0" tp="0" oreb="1" dreb="0" treb="1" ast="0" stl="0" blk="0" to="1" pf="0"/>
     </player>
   </team>
+  <plays format="tokens">
+    <period number="1" time="20:00">
+      <play vh="V" time="19:41" uni="1" team="SJU" checkname="CAREY, JORDAN" action="MISS" type="3PTR" paint="N"/>
+      <play vh="H" time="19:38" uni="23" team="DREX" checkname="TINGLER, MO" action="REBOUND" type="DEF"/>
+      <play vh="H" time="19:20" uni="5" team="DREX" checkname="REED, JOSH" action="GOOD" type="JUMPER" vscore="0" hscore="2" paint="N"/>
+      <play vh="V" time="18:02" uni="TM" checkname="TEAM" action="TIMEOUT" type="30SEC"/>
+    </period>
+    <period number="2" time="20:00">
+      <play vh="H" time="19:44" uni="0" team="DREX" checkname="HIPPS, TY" action="GOOD" type="3PTR" vscore="24" hscore="35"/>
+    </period>
+  </plays>
 </bbgame>

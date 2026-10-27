@@ -1,0 +1,538 @@
+<bbgame source="Basketball LiveStats In-Arena Tool" toolVersion="2.9.0" version="1.1.1" generated="Oct 26, 2026">
+  <venue gameid="6640781" visid="PSU" visname="Penn St." homeid="Drexel" homename="Drexel" date="10/26/2026" location="Daskalakis Athletic Center" start="04:00 AM" leaguegame="N" neutralgame="N" nitegame="N" postseason="N">
+    <officials text="Ed Corliss, Steven Perry Jr, Tim Kelly">
+    </officials>
+    <rules prds="2" minutes="20" minutesot="5" fouls="5" qh="H">
+    </rules>
+  </venue>
+  <status complete="N" period="1" clock="05:41" running="F">
+  </status>
+  <team vh="V" code="539" id="PSU" name="Penn St.">
+    <linescore line="17" score="17">
+      <lineprd prd="1" score="17">
+      </lineprd>
+    </linescore>
+    <totals>
+      <stats fgm="5" fga="15" fgm3="1" fga3="7" ftm="6" fta="8" tp="17" blk="1" stl="3" ast="3" min="70" oreb="3" dreb="10" treb="13" pf="3" tf="0" to="8" dq="0" fgpct="33.3" fg3pct="14.3" ftpct="75">
+      </stats>
+      <special vh="V" pts_to="6" pts_ch2="6" pts_paint="8" pts_fastb="2" pts_bench="6" ties="1" leads="2" lead_time="209" large_lead="3">
+      </special>
+      <statsbyprd prd="1" fgm="5" fga="15" fgm3="1" fga3="7" ftm="6" fta="8" tp="17" blk="1" stl="3" ast="3" min="70" oreb="3" dreb="10" treb="13" pf="3" tf="0" to="8" dq="0">
+      </statsbyprd>
+    </totals>
+    <player uni="1" code="1" name="Rodgers, Jay" checkname="RODGERS,JAY" class="SR" gp="1" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="3" sec="+" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="1" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="3" sec="+" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="3" code="3" name="Juric, Ivan" checkname="JURIC,IVAN" class="SO" gp="1" gs="1" pos="F" oncourt="Y">
+      <stats fgm="1" fga="2" fgm3="0" fga3="0" ftm="3" fta="4" tp="5" blk="0" stl="0" ast="0" min="9" sec="+" oreb="1" dreb="1" treb="2" pf="0" tf="0" to="1" dq="0" fgpct="50" fg3pct="0" ftpct="75">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="2" fgm3="0" fga3="0" ftm="3" fta="4" tp="5" blk="0" stl="0" ast="0" min="9" sec="+" oreb="1" dreb="1" treb="2" pf="0" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="5" code="5" name="Bowen, Dasonte" checkname="BOWEN,DASONTE" class="SR" gp="1" gs="1" pos="G" oncourt="Y">
+      <stats fgm="0" fga="1" fgm3="0" fga3="0" ftm="2" fta="2" tp="2" blk="0" stl="0" ast="2" min="11" sec="+" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="1" dq="0" fgpct="0" fg3pct="0" ftpct="100">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="1" fgm3="0" fga3="0" ftm="2" fta="2" tp="2" blk="0" stl="0" ast="2" min="11" sec="+" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="7" code="7" name="Gemao, Andy" checkname="GEMAO,ANDY" class="FR" gp="0" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="8" code="8" name="Prkačin, Roko" checkname="PRKAČIN,ROKO" class="" gp="0" gs="0" pos="F" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="9" code="9" name="Spacciapolli, Grant" checkname="SPACCIAPOLLI,GRANT" class="FR" gp="0" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="10" code="10" name="Reed, Josh" checkname="REED,JOSH" class="SR" gp="1" gs="1" pos="F" oncourt="Y">
+      <stats fgm="1" fga="4" fgm3="0" fga3="2" ftm="0" fta="0" tp="2" blk="0" stl="0" ast="0" min="12" sec="-" oreb="0" dreb="2" treb="2" pf="1" tf="0" to="1" dq="0" fgpct="25" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="4" fgm3="0" fga3="2" ftm="0" fta="0" tp="2" blk="0" stl="0" ast="0" min="12" sec="-" oreb="0" dreb="2" treb="2" pf="1" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="11" code="11" name="Wibaut, François" checkname="WIBAUT,FRANÇOIS" class="" gp="1" gs="0" pos="F" oncourt="Y">
+      <stats fgm="0" fga="1" fgm3="0" fga3="0" ftm="1" fta="2" tp="1" blk="0" stl="1" ast="0" min="6" sec="+" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="1" dq="0" fgpct="0" fg3pct="0" ftpct="50">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="1" fgm3="0" fga3="0" ftm="1" fta="2" tp="1" blk="0" stl="1" ast="0" min="6" sec="+" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="12" code="12" name="Grodin, Reggie" checkname="GRODIN,REGGIE" class="FR" gp="0" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="14" code="14" name="Allard, Thomas" checkname="ALLARD,THOMAS" class="SR" gp="1" gs="1" pos="G" oncourt="Y">
+      <stats fgm="0" fga="2" fgm3="0" fga3="2" ftm="0" fta="0" tp="0" blk="1" stl="1" ast="1" min="11" sec="-" oreb="1" dreb="0" treb="1" pf="0" tf="0" to="1" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="2" fgm3="0" fga3="2" ftm="0" fta="0" tp="0" blk="1" stl="1" ast="1" min="11" sec="-" oreb="1" dreb="0" treb="1" pf="0" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="22" code="22" name="Byers, Brant" checkname="BYERS,BRANT" class="JR" gp="1" gs="0" pos="F" oncourt="N">
+      <stats fgm="1" fga="3" fgm3="1" fga3="3" ftm="0" fta="0" tp="3" blk="0" stl="0" ast="0" min="8" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="0" dq="0" fgpct="33.3" fg3pct="33.3" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="3" fgm3="1" fga3="3" ftm="0" fta="0" tp="3" blk="0" stl="0" ast="0" min="8" sec="+" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="33" code="33" name="Oboh, Tim" checkname="OBOH,TIM" class="JR" gp="1" gs="0" pos="C" oncourt="N">
+      <stats fgm="1" fga="1" fgm3="0" fga3="0" ftm="0" fta="0" tp="2" blk="0" stl="0" ast="0" min="5" sec="-" oreb="1" dreb="1" treb="2" pf="0" tf="0" to="0" dq="0" fgpct="100" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="1" fgm3="0" fga3="0" ftm="0" fta="0" tp="2" blk="0" stl="0" ast="0" min="5" sec="-" oreb="1" dreb="1" treb="2" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="45" code="45" name="Blums, Roberts" checkname="BLUMS,ROBERTS" class="JR" gp="1" gs="1" pos="G" oncourt="N">
+      <stats fgm="1" fga="1" fgm3="0" fga3="0" ftm="0" fta="0" tp="2" blk="0" stl="1" ast="0" min="5" sec="-" oreb="0" dreb="0" treb="0" pf="2" tf="0" to="1" dq="0" fgpct="100" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="1" fgm3="0" fga3="0" ftm="0" fta="0" tp="2" blk="0" stl="1" ast="0" min="5" sec="-" oreb="0" dreb="0" treb="0" pf="2" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="77" code="77" name="Zečević, Aleksander" checkname="ZEČEVIĆ,ALEKSANDER" class="FR" gp="0" gs="0" pos="F" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="TM" code="TM" name="TEAM" checkname="TEAM" class="" gp="1" gs="0" oncourt="N">
+      <stats oreb="0" dreb="4" treb="4" pf="0" tf="0" to="1" dq="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="0" oreb="0" dreb="4" treb="4" pf="0" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+  </team>
+  <team vh="H" code="191" id="Drexel" name="Drexel">
+    <linescore line="20" score="20">
+      <lineprd prd="1" score="20">
+      </lineprd>
+    </linescore>
+    <totals>
+      <stats fgm="8" fga="21" fgm3="4" fga3="11" ftm="0" fta="2" tp="20" blk="0" stl="3" ast="5" min="70" oreb="3" dreb="7" treb="10" pf="9" tf="0" to="4" dq="0" fgpct="38.1" fg3pct="36.4" ftpct="0">
+      </stats>
+      <special vh="H" pts_to="7" pts_ch2="5" pts_paint="8" pts_fastb="0" pts_bench="7" ties="2" leads="2" lead_time="452" large_lead="4">
+      </special>
+      <statsbyprd prd="1" fgm="8" fga="21" fgm3="4" fga3="11" ftm="0" fta="2" tp="20" blk="0" stl="3" ast="5" min="70" oreb="3" dreb="7" treb="10" pf="9" tf="0" to="4" dq="0">
+      </statsbyprd>
+    </totals>
+    <player uni="0" code="0" name="Hipps, Moses" checkname="HIPPS,MOSES" class="SO" gp="0" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="1" code="1" name="Lorenzano-White, Latief" checkname="LORENZANO-WHITE,LATIEF" class="FR" gp="1" gs="1" pos="G" oncourt="Y">
+      <stats fgm="1" fga="3" fgm3="1" fga3="3" ftm="0" fta="0" tp="3" blk="0" stl="0" ast="0" min="7" sec="+" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="0" dq="0" fgpct="33.3" fg3pct="33.3" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="3" fgm3="1" fga3="3" ftm="0" fta="0" tp="3" blk="0" stl="0" ast="0" min="7" sec="+" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="2" code="2" name="Brown, BJ" checkname="BROWN,BJ" class="FR" gp="1" gs="0" pos="F" oncourt="Y">
+      <stats fgm="2" fga="2" fgm3="1" fga3="1" ftm="0" fta="0" tp="5" blk="0" stl="0" ast="0" min="4" sec="-" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="0" dq="0" fgpct="100" fg3pct="100" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="2" fga="2" fgm3="1" fga3="1" ftm="0" fta="0" tp="5" blk="0" stl="0" ast="0" min="4" sec="-" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="3" code="3" name="Pittman, LaDricus" checkname="PITTMAN,LADRICUS" class="SR" gp="1" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="1" fgm3="0" fga3="1" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="4" sec="+" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="1" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="1" fgm3="0" fga3="1" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="4" sec="+" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="4" code="4" name="Simonovic, David" checkname="SIMONOVIC,DAVID" class="FR" gp="1" gs="1" pos="F" oncourt="Y">
+      <stats fgm="2" fga="2" fgm3="1" fga3="1" ftm="0" fta="0" tp="5" blk="0" stl="2" ast="1" min="11" sec="-" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="1" dq="0" fgpct="100" fg3pct="100" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="2" fga="2" fgm3="1" fga3="1" ftm="0" fta="0" tp="5" blk="0" stl="2" ast="1" min="11" sec="-" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="5" code="5" name="Reed, Josh" checkname="REED,JOSH" class="JR" gp="1" gs="1" pos="G" oncourt="Y">
+      <stats fgm="1" fga="5" fgm3="0" fga3="2" ftm="0" fta="2" tp="2" blk="0" stl="1" ast="0" min="9" sec="+" oreb="0" dreb="4" treb="4" pf="2" tf="0" to="1" dq="0" fgpct="20" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="5" fgm3="0" fga3="2" ftm="0" fta="2" tp="2" blk="0" stl="1" ast="0" min="9" sec="+" oreb="0" dreb="4" treb="4" pf="2" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="6" code="6" name="Edomwonyin, Clem" checkname="EDOMWONYIN,CLEM" class="JR" gp="1" gs="1" pos="F" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="1" min="8" sec="+" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="1" min="8" sec="+" oreb="0" dreb="0" treb="0" pf="1" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="11" code="11" name="de Laporterie, Martin" checkname="DE LAPORTERIE,MARTIN" class="SR" gp="0" gs="0" pos="F" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="13" code="13" name="Paulding III, Rickey" checkname="PAULDING III,RICKEY" class="FR" gp="1" gs="0" pos="G" oncourt="Y">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="1" min="4" sec="-" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="1" min="4" sec="-" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="15" code="15" name="Petkovic, Adrian" checkname="PETKOVIC,ADRIAN" class="FR" gp="1" gs="1" pos="G" oncourt="N">
+      <stats fgm="1" fga="1" fgm3="1" fga3="1" ftm="0" fta="0" tp="3" blk="0" stl="0" ast="0" min="6" sec="-" oreb="0" dreb="0" treb="0" pf="2" tf="0" to="1" dq="0" fgpct="100" fg3pct="100" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="1" fgm3="1" fga3="1" ftm="0" fta="0" tp="3" blk="0" stl="0" ast="0" min="6" sec="-" oreb="0" dreb="0" treb="0" pf="2" tf="0" to="1" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="23" code="23" name="Tingler, Dillon" checkname="TINGLER,DILLON" class="JR" gp="1" gs="0" pos="G" oncourt="N">
+      <stats fgm="1" fga="2" fgm3="0" fga3="1" ftm="0" fta="0" tp="2" blk="0" stl="0" ast="1" min="5" sec="+" oreb="1" dreb="0" treb="1" pf="0" tf="0" to="0" dq="0" fgpct="50" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="1" fga="2" fgm3="0" fga3="1" ftm="0" fta="0" tp="2" blk="0" stl="0" ast="1" min="5" sec="+" oreb="1" dreb="0" treb="1" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="25" code="25" name="Davis, Max" checkname="DAVIS,MAX" class="SR" gp="0" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="30" code="30" name="Abram, Amaree" checkname="ABRAM,AMAREE" class="SR" gp="1" gs="0" pos="G" oncourt="N">
+      <stats fgm="0" fga="3" fgm3="0" fga3="1" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="1" min="7" sec="-" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="3" fgm3="0" fga3="1" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="1" min="7" sec="-" oreb="0" dreb="1" treb="1" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="33" code="33" name="Akuta, Ralph" checkname="AKUTA,RALPH" class="JR" gp="0" gs="0" pos="F" oncourt="N">
+      <stats fgm="0" fga="0" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="0" oreb="0" dreb="0" treb="0" pf="0" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+    </player>
+    <player uni="99" code="99" name="Pagonis, Panagiotis" checkname="PAGONIS,PANAGIOTIS" class="SO" gp="1" gs="0" pos="F" oncourt="N">
+      <stats fgm="0" fga="2" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="5" sec="+" oreb="1" dreb="1" treb="2" pf="1" tf="0" to="0" dq="0" fgpct="0" fg3pct="0" ftpct="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="2" fgm3="0" fga3="0" ftm="0" fta="0" tp="0" blk="0" stl="0" ast="0" min="5" sec="+" oreb="1" dreb="1" treb="2" pf="1" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+    <player uni="TM" code="TM" name="TEAM" checkname="TEAM" class="" gp="1" gs="0" oncourt="N">
+      <stats oreb="1" dreb="0" treb="1" pf="0" tf="0" to="0" dq="0">
+      </stats>
+      <statsbyprd prd="1" fgm="0" fga="0" oreb="1" dreb="0" treb="1" pf="0" tf="0" to="0" dq="0">
+      </statsbyprd>
+    </player>
+  </team>
+  <plays format="tokens">
+    <period number="1" time="20:00">
+      <special vh="V" pts_to="6" pts_ch2="6" pts_paint="8" pts_fastb="2" pts_bench="6" ties="1" leads="2" lead_time="0" large_lead="0">
+      </special>
+      <special vh="H" pts_to="7" pts_ch2="5" pts_paint="8" pts_fastb="0" pts_bench="7" ties="2" leads="2" lead_time="0" large_lead="0">
+      </special>
+      <summary vh="V" fgm="5" fga="15" fgm3="1" fga3="7" ftm="6" fta="8" blk="1" stl="3" ast="3" oreb="3" dreb="6" treb="13" pf="3" tf="0" to="8">
+      </summary>
+      <summary vh="H" fgm="8" fga="21" fgm3="4" fga3="11" ftm="0" fta="2" blk="0" stl="3" ast="5" oreb="2" dreb="7" treb="10" pf="9" tf="0" to="4">
+      </summary>
+      <play vh="V" time="19:46" uni="10" team="PSU" checkname="REED,JOSH" action="FOUL" side="left">
+      </play>
+      <play vh="V" time="19:46" uni="10" team="PSU" checkname="REED,JOSH" action="TURNOVER" side="left">
+      </play>
+      <play vh="H" time="19:29" uni="5" team="Drexel" checkname="REED,JOSH" action="MISS" type="JUMPER" side="right">
+      </play>
+      <play vh="V" time="19:25" uni="TM" team="PSU" checkname="TEAM" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="18:57" uni="45" team="PSU" checkname="BLUMS,ROBERTS" action="TURNOVER" side="left">
+      </play>
+      <play vh="H" time="18:40" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="GOOD" type="3PTR" vscore="0" hscore="3" side="right">
+      </play>
+      <play vh="H" time="18:40" uni="6" team="Drexel" checkname="EDOMWONYIN,CLEM" action="ASSIST" side="right">
+      </play>
+      <play vh="V" time="18:27" uni="10" team="PSU" checkname="REED,JOSH" action="MISS" type="3PTR" side="left">
+      </play>
+      <play vh="H" time="18:24" uni="5" team="Drexel" checkname="REED,JOSH" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="H" time="18:19" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="FOUL" side="right">
+      </play>
+      <play vh="H" time="18:19" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="TURNOVER" side="right">
+      </play>
+      <play vh="V" time="18:10" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="TURNOVER" side="left">
+      </play>
+      <play vh="H" time="18:10" uni="5" team="Drexel" checkname="REED,JOSH" action="STEAL" side="right">
+      </play>
+      <play vh="V" time="18:08" uni="45" team="PSU" checkname="BLUMS,ROBERTS" action="FOUL" side="left">
+      </play>
+      <play vh="H" time="18:08" uni="5" team="Drexel" checkname="REED,JOSH" action="MISS" type="FT" fastb="Y" side="right">
+      </play>
+      <play vh="H" time="18:08" uni="TM" team="Drexel" checkname="TEAM" action="REBOUND" type="DEADB" side="right">
+      </play>
+      <play vh="H" time="18:08" uni="5" team="Drexel" checkname="REED,JOSH" action="MISS" type="FT" fastb="Y" side="right">
+      </play>
+      <play vh="H" time="18:08" uni="TM" team="Drexel" checkname="TEAM" action="REBOUND" type="DEADB" side="right">
+      </play>
+      <play vh="H" time="17:47" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="TURNOVER" side="right">
+      </play>
+      <play vh="V" time="17:47" uni="45" team="PSU" checkname="BLUMS,ROBERTS" action="STEAL" side="left">
+      </play>
+      <play vh="H" time="17:46" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="FOUL" side="right">
+      </play>
+      <play vh="V" time="17:35" uni="45" team="PSU" checkname="BLUMS,ROBERTS" action="GOOD" type="LAYUP" vscore="2" hscore="3" side="left">
+      </play>
+      <play vh="V" time="17:35" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="ASSIST" side="left">
+      </play>
+      <play vh="H" time="17:14" uni="5" team="Drexel" checkname="REED,JOSH" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="17:10" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="17:03" uni="3" team="PSU" checkname="JURIC,IVAN" action="GOOD" type="LAYUP" vscore="4" hscore="3" side="left">
+      </play>
+      <play vh="V" time="17:03" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="ASSIST" side="left">
+      </play>
+      <play vh="H" time="16:51" uni="5" team="Drexel" checkname="REED,JOSH" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="16:48" uni="10" team="PSU" checkname="REED,JOSH" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="16:39" uni="10" team="PSU" checkname="REED,JOSH" action="GOOD" type="LAYUP" vscore="6" hscore="3" side="left">
+      </play>
+      <play vh="H" time="16:22" uni="1" team="Drexel" checkname="LORENZANO-WHITE,LATIEF" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="16:19" uni="10" team="PSU" checkname="REED,JOSH" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="16:12" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="MISS" type="JUMPER" side="left">
+      </play>
+      <play vh="H" time="16:08" uni="5" team="Drexel" checkname="REED,JOSH" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="H" time="15:42" uni="5" team="Drexel" checkname="REED,JOSH" action="GOOD" type="LAYUP" vscore="6" hscore="5" side="right">
+      </play>
+      <play vh="V" time="15:16" uni="10" team="PSU" checkname="REED,JOSH" action="MISS" type="3PTR" side="left">
+      </play>
+      <play vh="H" time="15:12" uni="5" team="Drexel" checkname="REED,JOSH" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="V" time="15:12" uni="45" team="PSU" checkname="BLUMS,ROBERTS" action="FOUL" side="left">
+      </play>
+      <play vh="V" time="15:12" uni="TM" team="PSU" checkname="TEAM" action="TIMEOUT" type="MEDIA" side="">
+      </play>
+      <play vh="H" time="15:12" uni="5" team="Drexel" checkname="REED,JOSH" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="15:12" uni="6" team="Drexel" checkname="EDOMWONYIN,CLEM" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="15:12" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="15:12" uni="3" team="Drexel" checkname="PITTMAN,LADRICUS" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="H" time="15:12" uni="23" team="Drexel" checkname="TINGLER,DILLON" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="H" time="15:12" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="15:12" uni="3" team="PSU" checkname="JURIC,IVAN" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="15:12" uni="10" team="PSU" checkname="REED,JOSH" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="15:12" uni="45" team="PSU" checkname="BLUMS,ROBERTS" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="15:12" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="V" time="15:12" uni="22" team="PSU" checkname="BYERS,BRANT" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="V" time="15:12" uni="33" team="PSU" checkname="OBOH,TIM" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="H" time="14:49" uni="1" team="Drexel" checkname="LORENZANO-WHITE,LATIEF" action="GOOD" type="3PTR" vscore="6" hscore="8" side="right">
+      </play>
+      <play vh="H" time="14:49" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="ASSIST" side="right">
+      </play>
+      <play vh="V" time="14:27" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="TURNOVER" side="left">
+      </play>
+      <play vh="H" time="14:27" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="STEAL" side="right">
+      </play>
+      <play vh="H" time="14:14" uni="1" team="Drexel" checkname="LORENZANO-WHITE,LATIEF" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="14:11" uni="22" team="PSU" checkname="BYERS,BRANT" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="H" time="14:11" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="FOUL" side="right">
+      </play>
+      <play vh="H" time="14:11" uni="1" team="Drexel" checkname="LORENZANO-WHITE,LATIEF" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="14:11" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="14:11" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="14:11" uni="1" team="PSU" checkname="RODGERS,JAY" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="V" time="13:43" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="MISS" type="3PTR" side="left">
+      </play>
+      <play vh="V" time="13:43" uni="TM" team="PSU" checkname="TEAM" action="REBOUND" type="DEADB" side="left">
+      </play>
+      <play vh="V" time="13:41" uni="TM" team="PSU" checkname="TEAM" action="TURNOVER" side="left">
+      </play>
+      <play vh="V" time="13:41" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="13:41" uni="10" team="PSU" checkname="REED,JOSH" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="H" time="13:12" uni="3" team="Drexel" checkname="PITTMAN,LADRICUS" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="13:08" uni="33" team="PSU" checkname="OBOH,TIM" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="12:50" uni="1" team="PSU" checkname="RODGERS,JAY" action="TURNOVER" side="left">
+      </play>
+      <play vh="H" time="12:50" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="STEAL" side="right">
+      </play>
+      <play vh="H" time="12:34" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="GOOD" type="LAYUP" vscore="6" hscore="10" side="right">
+      </play>
+      <play vh="H" time="12:34" uni="23" team="Drexel" checkname="TINGLER,DILLON" action="ASSIST" side="right">
+      </play>
+      <play vh="H" time="12:04" uni="3" team="Drexel" checkname="PITTMAN,LADRICUS" action="FOUL" side="right">
+      </play>
+      <play vh="V" time="12:04" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="MISS" type="FT" side="left">
+      </play>
+      <play vh="V" time="12:04" uni="TM" team="PSU" checkname="TEAM" action="REBOUND" type="DEADB" side="left">
+      </play>
+      <play vh="H" time="12:04" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="12:04" uni="6" team="Drexel" checkname="EDOMWONYIN,CLEM" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="12:04" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="GOOD" type="FT" vscore="7" hscore="10" side="left">
+      </play>
+      <play vh="H" time="11:51" uni="3" team="Drexel" checkname="PITTMAN,LADRICUS" action="TURNOVER" side="right">
+      </play>
+      <play vh="V" time="11:51" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="STEAL" side="left">
+      </play>
+      <play vh="V" time="11:46" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="MISS" type="JUMPER" side="left">
+      </play>
+      <play vh="V" time="11:42" uni="33" team="PSU" checkname="OBOH,TIM" action="REBOUND" type="OFF" side="left">
+      </play>
+      <play vh="V" time="11:42" uni="33" team="PSU" checkname="OBOH,TIM" action="GOOD" type="TIPIN" vscore="9" hscore="10" side="left">
+      </play>
+      <play vh="H" time="11:12" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="MISS" type="JUMPER" side="right">
+      </play>
+      <play vh="V" time="11:10" uni="TM" team="PSU" checkname="TEAM" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="11:10" uni="TM" team="PSU" checkname="TEAM" action="TIMEOUT" type="MEDIA" side="">
+      </play>
+      <play vh="H" time="11:10" uni="3" team="Drexel" checkname="PITTMAN,LADRICUS" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="11:10" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="11:10" uni="1" team="PSU" checkname="RODGERS,JAY" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="11:10" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="V" time="11:04" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="TURNOVER" side="left">
+      </play>
+      <play vh="H" time="10:50" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="MISS" type="LAYUP" side="right">
+      </play>
+      <play vh="H" time="10:46" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="REBOUND" type="OFF" side="right">
+      </play>
+      <play vh="H" time="10:46" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="MISS" type="TIPIN" side="right">
+      </play>
+      <play vh="H" time="10:43" uni="23" team="Drexel" checkname="TINGLER,DILLON" action="REBOUND" type="OFF" side="right">
+      </play>
+      <play vh="H" time="10:43" uni="23" team="Drexel" checkname="TINGLER,DILLON" action="GOOD" type="TIPIN" vscore="9" hscore="12" side="right">
+      </play>
+      <play vh="H" time="10:31" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="FOUL" side="right">
+      </play>
+      <play vh="V" time="10:31" uni="33" team="PSU" checkname="OBOH,TIM" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="10:31" uni="3" team="PSU" checkname="JURIC,IVAN" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="V" time="10:31" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="10:31" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="H" time="10:31" uni="15" team="Drexel" checkname="PETKOVIC,ADRIAN" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="10:31" uni="5" team="Drexel" checkname="REED,JOSH" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="10:19" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="MISS" type="3PTR" side="left">
+      </play>
+      <play vh="H" time="10:15" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="H" time="09:52" uni="23" team="Drexel" checkname="TINGLER,DILLON" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="09:50" uni="TM" team="PSU" checkname="TEAM" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="H" time="09:50" uni="5" team="Drexel" checkname="REED,JOSH" action="FOUL" side="right">
+      </play>
+      <play vh="H" time="09:50" uni="23" team="Drexel" checkname="TINGLER,DILLON" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="09:50" uni="2" team="Drexel" checkname="BROWN,BJ" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="H" time="09:50" uni="99" team="Drexel" checkname="PAGONIS,PANAGIOTIS" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="09:50" uni="13" team="Drexel" checkname="PAULDING III,RICKEY" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="09:23" uni="3" team="PSU" checkname="JURIC,IVAN" action="MISS" side="left">
+      </play>
+      <play vh="V" time="09:20" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="REBOUND" type="OFF" side="left">
+      </play>
+      <play vh="V" time="09:16" uni="22" team="PSU" checkname="BYERS,BRANT" action="GOOD" type="3PTR" vscore="12" hscore="12" side="left">
+      </play>
+      <play vh="V" time="09:16" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="ASSIST" side="left">
+      </play>
+      <play vh="H" time="08:52" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="MISS" type="3PTR" side="right">
+      </play>
+      <play vh="V" time="08:50" uni="TM" team="PSU" checkname="TEAM" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="H" time="08:49" uni="6" team="Drexel" checkname="EDOMWONYIN,CLEM" action="FOUL" side="right">
+      </play>
+      <play vh="H" time="08:49" uni="6" team="Drexel" checkname="EDOMWONYIN,CLEM" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="08:49" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="08:49" uni="3" team="PSU" checkname="JURIC,IVAN" action="GOOD" type="FT" vscore="13" hscore="12" side="left">
+      </play>
+      <play vh="V" time="08:49" uni="3" team="PSU" checkname="JURIC,IVAN" action="GOOD" type="FT" vscore="14" hscore="12" side="left">
+      </play>
+      <play vh="H" time="08:39" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="MISS" type="LAYUP" side="right">
+      </play>
+      <play vh="V" time="08:36" uni="3" team="PSU" checkname="JURIC,IVAN" action="REBOUND" type="DEF" side="left">
+      </play>
+      <play vh="V" time="08:29" uni="22" team="PSU" checkname="BYERS,BRANT" action="MISS" type="3PTR" side="left">
+      </play>
+      <play vh="V" time="08:26" uni="3" team="PSU" checkname="JURIC,IVAN" action="REBOUND" type="OFF" side="left">
+      </play>
+      <play vh="H" time="08:21" uni="5" team="Drexel" checkname="REED,JOSH" action="FOUL" side="right">
+      </play>
+      <play vh="V" time="08:21" uni="3" team="PSU" checkname="JURIC,IVAN" action="GOOD" type="FT" vscore="15" hscore="12" side="left">
+      </play>
+      <play vh="V" time="08:21" uni="3" team="PSU" checkname="JURIC,IVAN" action="MISS" type="FT" side="left">
+      </play>
+      <play vh="H" time="08:19" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="H" time="08:12" uni="TM" team="Drexel" checkname="TEAM" action="TIMEOUT" type="30SEC" side="right">
+      </play>
+      <play vh="V" time="08:12" uni="TM" team="PSU" checkname="TEAM" action="TIMEOUT" type="MEDIA" side="">
+      </play>
+      <play vh="H" time="08:05" uni="2" team="Drexel" checkname="BROWN,BJ" action="GOOD" type="3PTR" vscore="15" hscore="15" side="right">
+      </play>
+      <play vh="H" time="08:05" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="ASSIST" side="right">
+      </play>
+      <play vh="V" time="07:45" uni="10" team="PSU" checkname="REED,JOSH" action="MISS" type="LAYUP" side="left">
+      </play>
+      <play vh="H" time="07:41" uni="5" team="Drexel" checkname="REED,JOSH" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="H" time="07:37" uni="5" team="Drexel" checkname="REED,JOSH" action="TURNOVER" side="right">
+      </play>
+      <play vh="V" time="07:37" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="STEAL" side="left">
+      </play>
+      <play vh="H" time="07:29" uni="2" team="Drexel" checkname="BROWN,BJ" action="FOUL" side="right">
+      </play>
+      <play vh="V" time="07:29" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="GOOD" type="FT" fastb="Y" vscore="16" hscore="15" side="left">
+      </play>
+      <play vh="V" time="07:29" uni="10" team="PSU" checkname="REED,JOSH" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="07:29" uni="11" team="PSU" checkname="WIBAUT,FRANÇOIS" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="H" time="07:29" uni="30" team="Drexel" checkname="ABRAM,AMAREE" action="SUB" type="OUT" side="right">
+      </play>
+      <play vh="H" time="07:29" uni="1" team="Drexel" checkname="LORENZANO-WHITE,LATIEF" action="SUB" type="IN" side="right">
+      </play>
+      <play vh="V" time="07:29" uni="5" team="PSU" checkname="BOWEN,DASONTE" action="GOOD" type="FT" fastb="Y" vscore="17" hscore="15" side="left">
+      </play>
+      <play vh="H" time="06:58" uni="2" team="Drexel" checkname="BROWN,BJ" action="GOOD" type="LAYUP" vscore="17" hscore="17" side="right">
+      </play>
+      <play vh="V" time="06:46" uni="22" team="PSU" checkname="BYERS,BRANT" action="MISS" type="3PTR" side="left">
+      </play>
+      <play vh="H" time="06:44" uni="1" team="Drexel" checkname="LORENZANO-WHITE,LATIEF" action="REBOUND" type="DEF" side="right">
+      </play>
+      <play vh="H" time="06:39" uni="5" team="Drexel" checkname="REED,JOSH" action="MISS" type="LAYUP" side="right">
+      </play>
+      <play vh="V" time="06:39" uni="14" team="PSU" checkname="ALLARD,THOMAS" action="BLOCK" side="left">
+      </play>
+      <play vh="H" time="06:39" uni="TM" team="Drexel" checkname="TEAM" action="REBOUND" type="OFF" side="right">
+      </play>
+      <play vh="V" time="06:38" uni="22" team="PSU" checkname="BYERS,BRANT" action="SUB" type="OUT" side="left">
+      </play>
+      <play vh="V" time="06:38" uni="10" team="PSU" checkname="REED,JOSH" action="SUB" type="IN" side="left">
+      </play>
+      <play vh="H" time="06:29" uni="TM" team="Drexel" checkname="TEAM" action="TIMEOUT" type="30SEC" side="right">
+      </play>
+      <play vh="H" time="06:17" uni="4" team="Drexel" checkname="SIMONOVIC,DAVID" action="GOOD" type="3PTR" vscore="17" hscore="20" side="right">
+      </play>
+      <play vh="H" time="06:17" uni="13" team="Drexel" checkname="PAULDING III,RICKEY" action="ASSIST" side="right">
+      </play>
+      <play vh="H" time="05:55" uni="TM" team="Drexel" checkname="TEAM" action="HCC_SUCCESSFUL" type="OUT_OF_BOUNDS" side="right">
+      </play>
+      <play vh="V" time="05:55" uni="3" team="PSU" checkname="JURIC,IVAN" action="TURNOVER" side="left">
+      </play>
+    </period>
+  </plays>
+</bbgame>

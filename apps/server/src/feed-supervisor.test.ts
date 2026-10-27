@@ -15,7 +15,7 @@ let dir: string;
 let file: string;
 let supervisors: { stop(): Promise<unknown> }[] = [];
 
-const supervise = (mode: 'run' | 'crash' | 'stubborn', extra: { readonly killAfterMs?: number } = {}) => {
+const supervise = (mode: 'run' | 'crash' | 'stubborn' | 'events', extra: { readonly killAfterMs?: number } = {}) => {
   const supervisor: StatcrewSupervisor = createFeedSupervisor({
     inputs: ['file', 'game'],
     command: ({ file, game }) => [process.execPath, FAKE, mode, file, game],
@@ -26,7 +26,7 @@ const supervise = (mode: 'run' | 'crash' | 'stubborn', extra: { readonly killAft
   return supervisor;
 };
 
-const until = async <I>(what: string, supervisor: FeedSupervisor<I, string>, ready: (feed: Feed<I>) => boolean) => {
+const until = async <I, E>(what: string, supervisor: FeedSupervisor<I, string, E>, ready: (feed: Feed<I, E>) => boolean) => {
   const deadline = Date.now() + 8_000;
   while (!ready(supervisor.feed())) {
     if (Date.now() > deadline) throw new Error(`timed out waiting for ${what}; feed is ${JSON.stringify(supervisor.feed())}`);
@@ -78,6 +78,18 @@ describe('the feed supervisor', () => {
     await supervisor.start({ file, game: B });
     await until('the new run', supervisor, (feed) => feed.log.length > 0);
     expect(supervisor.feed()).toMatchObject({ state: 'running', game: B, log: [`started ${file} ${B}`] });
+  });
+
+  test('an events line replaces the events and stays out of the log, and a new run starts with none', async () => {
+    const supervisor = supervise('events');
+    await supervisor.start({ file, game: A });
+    await until('the last line', supervisor, (feed) => feed.log.includes('after'));
+    expect(supervisor.feed().events as readonly unknown[]).toEqual(['second', 'third']);
+    expect(supervisor.feed().log).toEqual([`started ${file} ${A}`, 'events line did not parse: @events {broken', 'after']);
+    await supervisor.stop();
+    expect(supervisor.feed().events as readonly unknown[]).toEqual(['second', 'third']);
+    await supervisor.start({ file, game: B });
+    expect(supervisor.feed().events).toEqual([]);
   });
 
   test('a process that ends on its own is exited, with its code and what it printed', async () => {

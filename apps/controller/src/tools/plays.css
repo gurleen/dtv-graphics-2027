@@ -1,0 +1,88 @@
+/* The StatCrew play list, on the Tools page and, compact, on the Show rail. */
+
+.tool-plays {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 200px;
+}
+
+.tool-plays h3 {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.tool-plays .count {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.tool-plays-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.tool-plays-scroll:focus-visible {
+  outline: 2px solid var(--focus);
+}
+
+.tool-plays table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.tool-plays th {
+  position: sticky;
+  top: 0;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: left;
+}
+
+.tool-plays td {
+  padding: var(--space-1) var(--space-4);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tool-plays :is(th, td).end {
+  text-align: right;
+}
+
+.tool-plays tr[data-scoring] td {
+  color: var(--text);
+}
+
+.tool-plays .empty {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--text-faint);
+}
+
+/* The Show rail's copy: smaller type and padding, the jersey beside the name, so it fits the rail's width. */
+.tool-plays[data-compact] {
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.tool-plays[data-compact] :is(th, td) {
+  padding-inline: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.tool-plays[data-compact] td.player {
+  max-width: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

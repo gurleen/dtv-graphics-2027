@@ -1,9 +1,10 @@
-/** The StatCrew tab: starts and stops the feed that writes a StatCrew box score into a game, and shows its log. */
+/** The StatCrew tab: starts and stops the feed that writes a StatCrew box score into a game, and shows the file's plays and the feed's log. */
 
 import { useState } from 'react';
 import { Button, Input, Label, TextField } from 'react-aria-components';
 import { useController } from '../app/context';
 import { useStream } from '../app/streams';
+import { PlayList } from './plays';
 import { FeedLog, FeedState, GameSelect, useCall, useGameChoice } from './shared';
 
 export function StatcrewTool() {
@@ -23,7 +24,7 @@ export function StatcrewTool() {
     <section className="tool" aria-label="StatCrew">
       <h2>StatCrew</h2>
       <p className="hint">
-        While it runs, StatCrew supplies the score and stats and the operator cannot edit them. Stop gives them back. The clock stays with the operator.
+        While it runs, StatCrew supplies the score, timeouts, bonus and stats and the operator cannot edit them. Stop gives them back. The clock stays with the operator.
       </p>
       <FeedState feed={feed} />
       <div className="tool-form">
@@ -58,7 +59,9 @@ export function StatcrewTool() {
           {error}
         </p>
       )}
+      <PlayList plays={feed.events} />
       <FeedLog feed={feed} label="StatCrew log" />
     </section>
   );
 }
+

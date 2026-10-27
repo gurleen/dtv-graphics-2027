@@ -1,10 +1,11 @@
 /** The feed tools the server supervises, as the router sees them, and the serial devices an AllSport feed can read. */
 
+import type { StatcrewPlay } from '@dtv/api';
 import type { GameId } from '@dtv/domain';
 import { existsSync, readdirSync } from 'node:fs';
 import type { FeedSupervisor } from './feed-supervisor';
 
-export type StatcrewSupervisor = FeedSupervisor<{ file: string; game: GameId }, 'no-game' | 'no-file'>;
+export type StatcrewSupervisor = FeedSupervisor<{ file: string; game: GameId }, 'no-game' | 'no-file', StatcrewPlay>;
 export type AllsportSupervisor = FeedSupervisor<{ port: string; game: GameId; score: boolean }, 'no-game' | 'no-port'>;
 
 export interface Feeds {
