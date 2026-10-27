@@ -235,7 +235,21 @@
       <Rectangle width="58" height="54" originX="0" originY="0" cornerRadiusTL="6"/>
       <Fill><SolidColor colorValue="FFE5322D"/></Fill>
     </Shape>
-    <Text name="Game Clock" x="0" y="88" originValue="baseline" wrapValue="noWrap" width="124" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:322" fontAssetId="30:900" fontSize="62" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Game Clock Value" styleId="30:322" text="13:59"><DataBindContext sourcePathIds="30:1000-30:1041" propertyKey="268"/></TextValueRun>
+    <!-- Zuume has no tabular figures, so scorebug_controller.luau splits the clock
+         into one run per character and pads each digit to the widest digit
+         with its style's letter spacing; the x offset puts back the first
+         digit's leading pad. -->
+    <Text name="Game Clock" x="2.1545" y="88" originValue="baseline" wrapValue="noWrap" width="124" sizingValue="fixed" alignValue="center"><DataBindContext sourcePathIds="30:1000-30:1072" propertyKey="13"/>
+      <TextStylePaint id="30:322" fontAssetId="30:900" fontSize="62" letterSpacing="4.995"><DataBindContext sourcePathIds="30:1000-30:1067" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextStylePaint id="30:324" fontAssetId="30:900" fontSize="62" letterSpacing="0.686"><DataBindContext sourcePathIds="30:1000-30:1068" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextStylePaint id="30:325" fontAssetId="30:900" fontSize="62" letterSpacing="0.624"><DataBindContext sourcePathIds="30:1000-30:1069" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextStylePaint id="30:326" fontAssetId="30:900" fontSize="62" letterSpacing="0.624"><DataBindContext sourcePathIds="30:1000-30:1070" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextStylePaint id="30:327" fontAssetId="30:900" fontSize="62" letterSpacing="0.5"><DataBindContext sourcePathIds="30:1000-30:1071" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextValueRun name="Game Clock Character 1" styleId="30:322" text="1"><DataBindContext sourcePathIds="30:1000-30:1062" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Game Clock Character 2" styleId="30:324" text="3"><DataBindContext sourcePathIds="30:1000-30:1063" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Game Clock Character 3" styleId="30:325" text=":"><DataBindContext sourcePathIds="30:1000-30:1064" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Game Clock Character 4" styleId="30:326" text="5"><DataBindContext sourcePathIds="30:1000-30:1065" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Game Clock Character 5" styleId="30:327" text="9"><DataBindContext sourcePathIds="30:1000-30:1066" propertyKey="268"/></TextValueRun>
       <TextModifierGroup name="Game Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="26">
         <TextModifierRange name="Game Clock Cascade Range" id="30:352" unitsValue="1" modifyFrom="1" falloffFrom="1.45" falloffTo="2" modifyTo="2">
           <CubicInterpolatorComponent name="Game Clock Cascade Ease" x1="0.42" y1="0" x2="0.58" y2="1"/>
@@ -836,6 +850,17 @@
 <ViewModelPropertyNumber name="_homeFlash" id="30:1057"/>
 <ViewModelPropertyNumber name="_shotAlert" id="30:1060"/>
 <ViewModelPropertyNumber name="_shotPulse" id="30:1061"/>
+<ViewModelPropertyString name="_clockChar1" id="30:1062"/>
+<ViewModelPropertyString name="_clockChar2" id="30:1063"/>
+<ViewModelPropertyString name="_clockChar3" id="30:1064"/>
+<ViewModelPropertyString name="_clockChar4" id="30:1065"/>
+<ViewModelPropertyString name="_clockChar5" id="30:1066"/>
+<ViewModelPropertyNumber name="_clockSpacing1" id="30:1067"/>
+<ViewModelPropertyNumber name="_clockSpacing2" id="30:1068"/>
+<ViewModelPropertyNumber name="_clockSpacing3" id="30:1069"/>
+<ViewModelPropertyNumber name="_clockSpacing4" id="30:1070"/>
+<ViewModelPropertyNumber name="_clockSpacing5" id="30:1071"/>
+<ViewModelPropertyNumber name="_clockX" id="30:1072"/>
 <ViewModelInstance name="Default" id="30:1001" exports="true">
 <ViewModelInstanceBoolean viewModelPropertyId="30:1002" propertyValue="false"/>
 <ViewModelInstanceString viewModelPropertyId="30:1010" propertyValue="SJU"/>
@@ -868,6 +893,17 @@
 <ViewModelInstanceNumber viewModelPropertyId="30:1057" propertyValue="0"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1060" propertyValue="0"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1061" propertyValue="1"/>
+<ViewModelInstanceString viewModelPropertyId="30:1062" propertyValue="1"/>
+<ViewModelInstanceString viewModelPropertyId="30:1063" propertyValue="3"/>
+<ViewModelInstanceString viewModelPropertyId="30:1064" propertyValue=":"/>
+<ViewModelInstanceString viewModelPropertyId="30:1065" propertyValue="5"/>
+<ViewModelInstanceString viewModelPropertyId="30:1066" propertyValue="9"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1067" propertyValue="4.995"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1068" propertyValue="0.686"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1069" propertyValue="0.624"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1070" propertyValue="0.624"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1071" propertyValue="0.5"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1072" propertyValue="2.1545"/>
 </ViewModelInstance>
 </ViewModel>
 

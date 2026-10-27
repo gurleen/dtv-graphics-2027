@@ -22,7 +22,7 @@ last one sent is skipped.
 | Group | Commands |
 |---|---|
 | `score` | `score` for each side, from the `<linescore>`; `timeouts` and `bonus` for each side, below |
-| `stats` | `teamLine` for each side, from `<totals>`; `playerLine` for each player; `starters` for a side when exactly five matched players have `gs="1"` |
+| `stats` | `teamLine` for each side, from `<totals>`; `playerLine` for each player; `starters` for a side when exactly five matched players have `gs="1"`; `shots`, below |
 
 A StatCrew player joins a roster spot by jersey: the `uni` attribute against `Player.jersey`, both strings, so `0`
 and `00` differ. Rosters come from the server's data and follow edits made while the tool runs. A player with no
@@ -46,7 +46,14 @@ These are NCAA rules. A different timeout allotment would be a change to `comman
 ## What it does not write
 
 The clock, period, phase and possession. StatCrew's clock is a snapshot taken at each play, and the
-operator keeps the game clock. Plays and last-score information do not reach the game, because the API has no place for them.
+operator keeps the game clock. The plays themselves do not reach the game, only the shots below.
+
+## Shots
+
+`shots` is every `GOOD` and `MISS` play with a side and a `m:ss` time, in the file's order: its period, its clock, its
+side, its value (`FT` is 1, `3PTR` is 3, any other type 2) and whether it went in. The made shots add up to the
+file's score. The Scorebug Slider's `insights` cue reads its runs, droughts and field goal streaks from them, against
+the game clock.
 
 ## Plays
 
@@ -70,4 +77,6 @@ bun packages/live-statcrew/scripts/prove.ts
 ```
 
 Starts a server on a scratch database at port 8996, runs the tool against a seeded game with a box score generated
-from its rosters, replaces the file, and reads `game.watch` back. It exits non-zero on any failure.
+from its rosters, replaces the file, and reads `game.watch` back. It also airs a Player Lower Third set to Game stats
+and reads its stat line from program's `output.watch`, before and after the file changes. It stops the tool with a
+`stop` line, as the server does. It exits non-zero on any failure.

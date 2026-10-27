@@ -133,6 +133,18 @@ export type FieldGroup = z.infer<typeof FieldGroup>;
 export const Phase = z.enum(['pregame', 'live', 'halftime', 'final']);
 export type Phase = z.infer<typeof Phase>;
 
+/** A field goal or free throw attempt from a feed's play by play, the run of play that insights read. */
+export const Shot = z.object({
+  period: z.number().int().min(1),
+  /** The game clock at the attempt. */
+  remainingMs: count,
+  side: Side,
+  /** 1 for a free throw, 2 or 3 for a field goal. */
+  value: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  made: z.boolean(),
+});
+export type Shot = z.infer<typeof Shot>;
+
 export const BasketballLive = z.object({
   sport: z.literal('basketball'),
   gameId: GameId,
@@ -149,6 +161,8 @@ export const BasketballLive = z.object({
   starters: sides(z.array(PlayerId).max(5)),
   team: sides(StatLine),
   players: z.record(PlayerId, StatLine),
+  /** Every attempt in the game's order. Empty without a play-by-play feed; a game stored before it existed reads as empty. */
+  shots: z.array(Shot).default([]),
   /**
    * Which source may write each field group. One writer per group, so a feed and an
    * operator never fight over the score; the operator takes a group back with `authority`.
@@ -170,6 +184,7 @@ export const BasketballCommand = z.discriminatedUnion('type', [
   z.object({ type: z.literal('starters'), side: Side, players: z.array(PlayerId).length(5) }),
   z.object({ type: z.literal('teamLine'), side: Side, line: StatLinePatch }),
   z.object({ type: z.literal('playerLine'), player: PlayerId, line: StatLinePatch }),
+  z.object({ type: z.literal('shots'), shots: z.array(Shot) }),
   z.object({ type: z.literal('authority'), group: FieldGroup, source: SourceId }),
 ]);
 export type BasketballCommand = z.infer<typeof BasketballCommand>;
@@ -188,6 +203,7 @@ const COMMAND_GROUP: Record<BasketballCommand['type'], FieldGroup | 'operator'> 
   starters: 'stats',
   teamLine: 'stats',
   playerLine: 'stats',
+  shots: 'stats',
   authority: 'operator',
 };
 
@@ -246,6 +262,8 @@ function nextLive(live: BasketballLive, command: BasketballCommand, now: EpochMs
       return { ...live, team: { ...live.team, [command.side]: { ...live.team[command.side], ...command.line } } };
     case 'playerLine':
       return { ...live, players: { ...live.players, [command.player]: { ...(live.players[command.player] ?? EMPTY_LINE), ...command.line } } };
+    case 'shots':
+      return { ...live, shots: command.shots };
     case 'authority':
       return { ...live, authority: { ...live.authority, [command.group]: command.source } };
     default: {
@@ -274,6 +292,7 @@ export const initialBasketball = (gameId: GameId, program: BasketballProgram): B
   starters: { away: [], home: [] },
   team: { away: EMPTY_LINE, home: EMPTY_LINE },
   players: {},
+  shots: [],
   authority: { clock: OPERATOR, score: OPERATOR, stats: OPERATOR },
 });
 
@@ -342,3 +361,129 @@ export const PLAYER_GAME_STATS = {
   ft: { label: 'FT', value: (l) => `${l.ftm}-${l.fta}` },
 } as const satisfies Record<string, StatDef<StatLine>>;
 export type PlayerGameStatKey = keyof typeof PLAYER_GAME_STATS;
+
+// Insights: what the run of play says about one team, from `shots` and the game clock.
+
+const OVERTIME_MS = 5 * 60_000;
+
+/** Game time played from the tip to `remainingMs` on the clock in `period`. */
+export const playedMs = (program: BasketballProgram, period: number, remainingMs: number): number => {
+  const { periods, periodMs } = BASKETBALL_FORMAT[program];
+  const length = (at: number) => (at <= periods ? periodMs : OVERTIME_MS);
+  let played = 0;
+  for (let at = 1; at < period; at++) played += length(at);
+  return played + Math.max(0, length(period) - remainingMs);
+};
+
+/** `5:11`, `0:45`: a span of game time, in whole seconds. */
+export const formatSpan = (ms: number): string => {
+  const seconds = Math.floor(ms / 1000);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+};
+
+/** A run counts from 7 points, with the opponent held to a third of them: 7-0, 11-2, 12-4. */
+const RUN_MIN_POINTS = 7;
+const RUN_MAX_SHARE = 1 / 3;
+/** Longer than this, a lead built slowly is not a run. */
+const RUN_MAX_MS = 8 * 60_000;
+const SCORING_DROUGHT_MS = 2 * 60_000;
+const FG_DROUGHT_MS = 3 * 60_000;
+/** A field goal drought is worth its own line only when free throws have broken the scoring drought by this much. */
+const FG_DROUGHT_LEAD_MS = 30_000;
+/** Streaks of 5 or more in a row, else a near-perfect or near-empty window of 6 to 12 attempts. */
+const STREAK_IN_A_ROW = 5;
+const STREAK_WINDOWS = [12, 11, 10, 9, 8, 7, 6] as const;
+
+export const INSIGHTS = {
+  run: 'Run',
+  scoringDrought: 'Scoring drought',
+  fgDrought: 'Field goal drought',
+  fgStreak: 'Field goal streak',
+} as const;
+export type InsightKind = keyof typeof INSIGHTS;
+
+export interface Insight {
+  readonly kind: InsightKind;
+  /** Natural case, such as `11-2 run over 2:31`. */
+  readonly text: string;
+}
+
+const OPPONENT = { away: 'home', home: 'away' } as const;
+
+type Timed = Shot & { readonly at: number };
+
+/**
+ * The best run `side` is on: from one of its baskets in `pinned` to now, the widest margin, the shortest span on a tie.
+ * The opponent's first basket after `pinned` ends it, and its span stops there.
+ */
+function runOf(pinned: readonly Timed[], later: readonly Timed[], side: Side, at: number): Insight | null {
+  const ender = later.find((shot) => shot.made && shot.side === OPPONENT[side]);
+  const made = [...pinned, ...later.slice(0, ender ? later.indexOf(ender) : later.length)].filter((shot) => shot.made);
+  const end = ender?.at ?? at;
+  let best: { for: number; against: number; from: number } | null = null;
+  for (let start = 0; start < made.length; start++) {
+    if (!pinned.includes(made[start]!) || made[start]!.side !== side || end - made[start]!.at > RUN_MAX_MS) continue;
+    const window = made.slice(start);
+    const points = (who: Side) => window.reduce((sum, shot) => (shot.side === who ? sum + shot.value : sum), 0);
+    const run = { for: points(side), against: points(OPPONENT[side]), from: made[start]!.at };
+    if (run.for < RUN_MIN_POINTS || run.against > run.for * RUN_MAX_SHARE) continue;
+    if (!best || run.for - run.against >= best.for - best.against) best = run;
+  }
+  return best && { kind: 'run', text: `${best.for}-${best.against} run over ${formatSpan(end - best.from)}` };
+}
+
+/**
+ * `0 of last 8` or `7 of last 8`, the newest attempts first; null when the recent shooting is unremarkable. Of a streak
+ * in a row and a window one short of it, the window only over at least two more attempts: `1 of last 8` says more
+ * than `0 of last 5`, and `0 of last 8` more than `1 of last 9`.
+ */
+function streakOf(fieldGoals: readonly Shot[]): string | null {
+  const newest = fieldGoals.toReversed();
+  const candidates: { made: number; of: number; weight: number }[] = [];
+  for (const made of [false, true]) {
+    const end = newest.findIndex((shot) => shot.made !== made);
+    const streak = end === -1 ? newest.length : end;
+    if (streak >= STREAK_IN_A_ROW) candidates.push({ made: made ? streak : 0, of: streak, weight: streak + 1 });
+  }
+  const size = STREAK_WINDOWS.find((size) => {
+    const made = newest.slice(0, size).filter((shot) => shot.made).length;
+    return newest.length >= size && (made <= 1 || made >= size - 1);
+  });
+  if (size) candidates.push({ made: newest.slice(0, size).filter((shot) => shot.made).length, of: size, weight: size });
+  const best = candidates.reduce<(typeof candidates)[number] | null>((best, candidate) => (!best || candidate.weight > best.weight ? candidate : best), null);
+  return best && `${best.made} of last ${best.of}`;
+}
+
+/**
+ * What stands out about `side`'s run of play, most telling first: its run, its scoring or field goal drought, its
+ * field goal streak. Empty without shots. Spans are game time, so they count up with the game clock and pause at
+ * halftime.
+ *
+ * `asOf` is how many shots there were when a cue was cued; it defaults to all of them. Each insight is read from those
+ * shots, and its span runs on to now until a later shot ends it: the team's next basket ends a scoring drought, its
+ * next field goal a field goal drought, the opponent's next basket a run. A drought on air therefore stops at its
+ * length instead of vanishing, and the streak stays as it was cued.
+ */
+export function insights(program: BasketballProgram, live: BasketballLive, side: Side, now: EpochMs, asOf = live.shots.length): readonly Insight[] {
+  if (live.shots.length === 0) return [];
+  const shots: Timed[] = live.shots.map((shot) => ({ ...shot, at: playedMs(program, shot.period, shot.remainingMs) }));
+  // A clock the operator has not caught up yet must not put now before the last play.
+  const at = Math.max(playedMs(program, live.period, remainingAt(live.clock, now)), ...shots.map((shot) => shot.at));
+  const pinned = shots.slice(0, asOf);
+  const later = shots.slice(asOf);
+  const own = pinned.filter((shot) => shot.side === side);
+  const fieldGoals = own.filter((shot) => shot.value > 1);
+  /** From the last pinned shot that `scores` to the first later one, or to now. */
+  const span = (scores: (shot: Timed) => boolean) =>
+    (later.find((shot) => shot.side === side && scores(shot))?.at ?? at) - (own.findLast(scores)?.at ?? 0);
+  const scoringDrought = span((shot) => shot.made);
+  const fgDrought = span((shot) => shot.made && shot.value > 1);
+  const streak = streakOf(fieldGoals);
+  const found: (Insight | null)[] = [
+    scoringDrought < SCORING_DROUGHT_MS ? runOf(pinned, later, side, at) : null,
+    scoringDrought >= SCORING_DROUGHT_MS ? { kind: 'scoringDrought', text: `Scoring drought ${formatSpan(scoringDrought)}` } : null,
+    fgDrought >= FG_DROUGHT_MS && fgDrought - scoringDrought >= FG_DROUGHT_LEAD_MS ? { kind: 'fgDrought', text: `No FGs last ${formatSpan(fgDrought)}` } : null,
+    streak ? { kind: 'fgStreak', text: `FGs: ${streak}` } : null,
+  ];
+  return found.filter((insight) => insight !== null);
+}

@@ -43,6 +43,24 @@ function inBonus(game: StatcrewGame, period: number, periods: number): Sides<boo
   return { away: fouls(OTHER.away) >= limit, home: fouls(OTHER.home) >= limit };
 }
 
+const SHOT_VALUE = { FT: 1, '3PTR': 3 } as const;
+
+/** `5:11` as milliseconds, or null for a time StatCrew left blank or garbled. */
+const clockMs = (time: string): number | null => {
+  const match = /^(\d+):(\d{2})$/.exec(time.trim());
+  return match ? (Number(match[1]) * 60 + Number(match[2])) * 1000 : null;
+};
+
+/** Every `GOOD` and `MISS` play with a side and a time, in the file's order. Any type but `FT` and `3PTR` is a 2. */
+export function shotsOf(game: StatcrewGame): basketball.Shot[] {
+  return game.plays.flatMap((play) => {
+    const remainingMs = clockMs(play.time);
+    if ((play.action !== 'GOOD' && play.action !== 'MISS') || !play.side || remainingMs === null || play.period < 1) return [];
+    const value = SHOT_VALUE[play.type as keyof typeof SHOT_VALUE] ?? 2;
+    return [{ period: play.period, remainingMs, side: play.side, value, made: play.action === 'GOOD' }];
+  });
+}
+
 /**
  * Only `score` and `stats` are written. A player off the roster is reported and skipped,
  * because the server refuses a whole batch that names one (NOT_IN_GAME). Timeouts and bonus
@@ -72,5 +90,6 @@ export function commandsFor(game: StatcrewGame, rosters: Sides<ReadonlyMap<strin
       ...(starters.length === STARTERS ? [{ type: 'starters' as const, side, players: starters }] : []),
     );
   }
+  commands.push({ type: 'shots', shots: shotsOf(game) });
   return { commands, unmatched };
 }

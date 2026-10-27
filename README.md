@@ -43,8 +43,8 @@ contract in `@dtv/api` over one WebSocket at `/rpc`.
 **The show page** has the free panel (the scorebug and Score to Break, always
 one key away), the rundown of the active game's cues, an inspector for the
 selected cue's fields, your own preview beside program, the other operators'
-previews, and the score bar, which shows the live game and has no controls
-(a live data feed will drive the game). Cue a graphic to your preview, then Take puts it on
+previews, and the score bar, which shows the live game and sets only its period
+(a live data feed drives the rest). Cue a graphic to your preview, then Take puts it on
 program for every controller and for `/renderer`. Next steps a multi-step
 graphic on, and takes a one-step graphic off.
 

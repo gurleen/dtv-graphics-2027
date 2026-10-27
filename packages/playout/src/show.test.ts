@@ -307,3 +307,28 @@ test('the state the reducer produces is what ShowState parses back from JSON', (
   send({ type: 'cue', operator: sam, ref: free('test/bug') });
   expect(ShowState.parse(JSON.parse(JSON.stringify(state())))).toEqual(state());
 });
+
+describe('pin', () => {
+  const pinning = (pin: (params: { rows: number }) => { rows: number }) =>
+    ({ ...REGISTRY, 'test/table': { ...REGISTRY['test/table']!, pin } }) as typeof REGISTRY;
+
+  test('cue, air and refresh pin the slot’s params; the rundown cue keeps them as written', () => {
+    const { send, state } = harness({ registry: pinning((params) => ({ ...params, rows: params.rows - 1 })) });
+    send({ type: 'cue', operator: alex, ref: rundown('standings') });
+    expect(state().previews[alex]?.card?.params).toEqual({ rows: 2 });
+    send({ type: 'air', operator: sam, ref: rundown('standings') });
+    expect(state().program.card?.params).toEqual({ rows: 2 });
+    expect(changed(send({ type: 'refresh', layer: 'card', slot: state().program.card!.id }))).toBe(false);
+    expect(fixtureWorld().get('show', GameId.parse('demo'))!.rundown.find((cue) => cue.id === 'standings')?.params).toEqual({ rows: 3 });
+  });
+
+  test('a pin that throws leaves the params as they are', () => {
+    const { send, state } = harness({
+      registry: pinning(() => {
+        throw new Error('no data');
+      }),
+    });
+    send({ type: 'air', operator: alex, ref: rundown('standings') });
+    expect(state().program.card?.params).toEqual({ rows: 3 });
+  });
+});

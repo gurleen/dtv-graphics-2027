@@ -1,6 +1,8 @@
 /**
  * End to end: a real server on a scratch database, the feed tool against a seeded game, and
- * `game.watch` read back as the file is replaced and the tool is stopped. Exits 1 on a failure.
+ * `game.watch` read back as the file is replaced and the tool is stopped. A Player Lower Third
+ * set to Game stats is on program throughout, and its stat line is read back from `output.watch`.
+ * Exits 1 on a failure.
  *
  *   bun packages/live-statcrew/scripts/prove.ts
  */
@@ -46,6 +48,34 @@ async function until(game: GameId, api: ReturnType<typeof connect>['api'], what:
   throw new Error(`timed out waiting for ${what}; last state authority=${JSON.stringify(last && 'authority' in last && last.authority)}`);
 }
 
+const LOWER_THIRD = 'basketball-v2/player-lower-third';
+
+/** What the lower third prints for `pts reb ast fg`, from the box score's own numbers for that jersey. */
+const tonightLine = (player: Player, bonus: number) => {
+  const jersey = Number(player.jersey);
+  const pts = jersey + 2 + bonus;
+  return [`${pts} PTS`, `${jersey % 7} REB`, `${jersey % 5} AST`, `${pts}-${pts + 3} FG`].join('  ·  ');
+};
+
+async function lowerThirdUntil(api: ReturnType<typeof connect>['api'], what: string, ok: (values: Readonly<Record<string, unknown>>) => boolean, withinMs = 10_000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), withinMs);
+  let last: unknown;
+  try {
+    for await (const frame of await api.output.watch({ bus: { kind: 'program' } }, { signal: controller.signal })) {
+      const layer = frame.layers.find((each) => each.graphic === LOWER_THIRD);
+      last = layer && (layer.error ?? layer.values);
+      if (layer && !layer.error && ok(layer.values)) return layer.values;
+    }
+  } catch {
+    // The deadline aborted the stream.
+  } finally {
+    clearTimeout(timer);
+    controller.abort();
+  }
+  throw new Error(`timed out waiting for ${what}; last lower third ${JSON.stringify(last)}`);
+}
+
 async function main() {
   const server = Bun.spawn(['bun', 'apps/server/src/main.ts', '--seed'], {
     cwd: ROOT,
@@ -83,6 +113,7 @@ async function main() {
   replaceFile(boxScore(rosters, { away: 61, home: 70 }, 0));
   const tool = Bun.spawn(['bun', 'packages/live-statcrew/src/main.ts', `--file=${file}`, `--game=${game.id}`, `--server=${URL}`], {
     cwd: ROOT,
+    stdin: 'pipe',
     stdout: 'pipe',
     stderr: 'pipe',
   });
@@ -109,18 +140,32 @@ async function main() {
   assert.equal(Object.keys(seen.players).length, rosters.away.length + rosters.home.length, 'the unknown player is not written');
   log(`first push: score ${seen.score.away}-${seen.score.home}, authority ${JSON.stringify(seen.authority)}`);
 
+  const featured = firstPlayer('home');
+  const cue = { id: 'prove-tonight', graphic: LOWER_THIRD, params: { player: featured.id, line: { kind: 'game', stats: ['pts', 'reb', 'ast', 'fg'] } }, overrides: {}, note: '' };
+  const { revision } = await first((signal) => api.data.watch(undefined, { signal }));
+  await api.data.apply({ origin: 'manual', basis: revision, edits: [{ op: 'put', kind: 'show', value: { id: game.id, crew: [], rundown: [cue] } as never }] });
+  await api.show.command({ id: 'prove-activate' as never, command: { type: 'activate', game: game.id } });
+  await api.show.command({ id: 'prove-air' as never, command: { type: 'air', operator: 'prove' as never, ref: { kind: 'rundown', cue: cue.id as never } } });
+  const aired = await lowerThirdUntil(api, 'the lower third on program', (values) => values.statLine === tonightLine(featured, 0));
+  assert.equal(String(aired.statLabel).toLowerCase(), 'tonight');
+  log(`on program: ${featured.lastName} ${aired.statLabel} ${aired.statLine}`);
+
   replaceFile(boxScore(rosters, { away: 61, home: 73 }, 3));
   const updated = await until(game.id, api, 'the replaced file', (live) => live.sport === 'basketball' && live.score.home === 73);
   assert.equal(updated.players[firstPlayer('home').id]?.pts, Number(firstPlayer('home').jersey) + 2 + 3);
   assert.equal(updated.team.home.pts, 50 + 2 + 3);
   log(`replaced file: score ${updated.score.away}-${updated.score.home}, ${firstPlayer('home').lastName} ${updated.players[firstPlayer('home').id]!.pts} pts`);
+  const onAir = await lowerThirdUntil(api, 'the lower third to follow the file', (values) => values.statLine === tonightLine(featured, 3));
+  log(`still on program: ${featured.lastName} ${onAir.statLabel} ${onAir.statLine}`);
 
-  tool.kill('SIGINT');
+  // How the server stops a feed: Windows has no SIGINT to send a child.
+  tool.stdin.write('stop\n');
+  tool.stdin.flush();
   const code = await tool.exited;
   const after = await until(game.id, api, 'authority handed back', (live) => live.sport === 'basketball' && live.authority.score === 'operator' && live.authority.stats === 'operator');
-  assert.equal(code, 0, 'the tool exits 0 on SIGINT');
+  assert.equal(code, 0, 'the tool exits 0 on stop');
   assert.equal(after.score.home, 73, 'handing back keeps the data');
-  log(`after SIGINT: authority ${JSON.stringify(after.authority)}`);
+  log(`after stop: authority ${JSON.stringify(after.authority)}`);
 
   await Bun.sleep(100);
   console.log(output.map((line) => `  tool> ${line}`).join('\n'));

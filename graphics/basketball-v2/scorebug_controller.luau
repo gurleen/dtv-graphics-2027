@@ -6,6 +6,10 @@
 --
 -- Shot clock: at 5 seconds or fewer the red alert cell fades in and pulses once
 -- per second, and the digits pulse with it.
+--
+-- Game clock: tabular figures. Zuume has no tnum feature and its digits vary in
+-- width, so the clock is split into one text run per character and each digit
+-- is padded to the widest digit's width by its run's letter spacing.
 
 local ROLL_DURATION = 0.42
 local ROLL_DISTANCE = 64
@@ -16,6 +20,13 @@ local ALERT_FADE = 0.2
 local PULSE_PERIOD = 1.0
 local PULSE_SCALE = 0.08
 
+-- Zuume Bold digit advances in font units (1000 per em), widest last.
+local DIGIT_ADVANCE = { [0] = 373, 236, 369, 369, 355, 371, 375, 316, 371, 375 }
+local DIGIT_CELL = 375
+local CLOCK_SIZE = 62
+local CLOCK_TRACKING = 0.5
+local CLOCK_SLOTS = 5
+
 type Reel = {
     input: Property<number>, shown: Property<string>, incoming: Property<string>,
     roll: Property<number>, flash: Property<number>,
@@ -25,7 +36,11 @@ type ShotClock = {
     input: Property<string>, alert: Property<number>, pulse: Property<number>,
     level: number, phase: number,
 }
-type Controller = { reels: {Reel}, shotClock: ShotClock? }
+type GameClock = {
+    input: Property<string>, chars: {Property<string>}, spacings: {Property<number>},
+    x: Property<number>, shown: string?,
+}
+type Controller = { reels: {Reel}, shotClock: ShotClock?, gameClock: GameClock? }
 
 local function wholeScore(value: number): number
     if value ~= value or math.abs(value) == math.huge then return 0 end
@@ -42,6 +57,28 @@ local function flashLevel(elapsed: number): number
     if elapsed < FLASH_RISE then return elapsed / FLASH_RISE end
     local t = math.min(1, (elapsed - FLASH_RISE) / FLASH_DECAY)
     return (1 - t) * (1 - t)
+end
+
+-- Half the space a character gives up against a digit cell, in pixels.
+local function digitPad(char: string): number
+    local digit = tonumber(char)
+    if digit == nil or #char ~= 1 then return 0 end
+    return (DIGIT_CELL - DIGIT_ADVANCE[digit]) * CLOCK_SIZE / 1000 / 2
+end
+
+-- Letter spacing follows a glyph, so each run carries its own glyph's trailing
+-- pad and the next glyph's leading pad. The first glyph's leading pad has no
+-- run before it; centred text loses half of it, so the text shifts by that.
+local function layoutGameClock(clock: GameClock, text: string)
+    local count = math.min(#text, CLOCK_SLOTS)
+    for i = 1, CLOCK_SLOTS do
+        local char = if i < CLOCK_SLOTS then string.sub(text, i, i) else string.sub(text, i)
+        clock.chars[i].value = char
+        local nextChar = if i < count then string.sub(text, i + 1, i + 1) else ''
+        clock.spacings[i].value = CLOCK_TRACKING + digitPad(char) + digitPad(nextChar)
+    end
+    clock.x.value = digitPad(string.sub(text, 1, 1)) / 2
+    clock.shown = text
 end
 
 local function init(self: Controller, context: Context): boolean
@@ -73,6 +110,20 @@ local function init(self: Controller, context: Context): boolean
         alert.value = 0
         pulse.value = 1
         self.shotClock = { input = shotInput, alert = alert, pulse = pulse, level = 0, phase = 0 }
+    end
+    local clockInput = vm:getString('clock')
+    local clockX = vm:getNumber('_clockX')
+    local chars, spacings = {}, {}
+    for i = 1, CLOCK_SLOTS do
+        local char = vm:getString('_clockChar' .. i)
+        local spacing = vm:getNumber('_clockSpacing' .. i)
+        if char and spacing then
+            table.insert(chars, char)
+            table.insert(spacings, spacing)
+        end
+    end
+    if clockInput and clockX and #chars == CLOCK_SLOTS then
+        self.gameClock = { input = clockInput, chars = chars, spacings = spacings, x = clockX, shown = nil }
     end
     return true
 end
@@ -127,9 +178,13 @@ local function advance(self: Controller, seconds: number): boolean
     if shot then
         advanceShotClock(shot, seconds)
     end
+    local clock = self.gameClock
+    if clock and clock.input.value ~= clock.shown then
+        layoutGameClock(clock, clock.input.value)
+    end
     return true
 end
 
 return function(): Node<Controller>
-    return { reels = {}, shotClock = nil, init = init, advance = advance }
+    return { reels = {}, shotClock = nil, gameClock = nil, init = init, advance = advance }
 end

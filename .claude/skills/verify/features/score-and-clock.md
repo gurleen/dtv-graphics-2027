@@ -1,6 +1,6 @@
 # Score and clock
 
-The score bar along the bottom of the show page shows the live game: the score, timeouts, team fouls, bonus, the game clock, the shot clock, the period, the phase and possession. It has no controls and the game has no keys; a live data feed, still to be built, will drive the game over `game.apply`. Until then, journeys and proofs change the game over `game.apply` themselves, with the source `operator`, the seeded game's authority for every field group. Every change reaches the bar and the scorebug on program at once, because binds read the live game.
+The score bar along the bottom of the show page shows the live game: the score, timeouts, team fouls, bonus, the game clock, the shot clock, the period, the phase and possession. Its one control is the period dropdown (`data-testid="period"`): pregame, each half or quarter, halftime at the midpoint, overtimes and final, sent as `period` and `phase` over `game.apply` with the source `operator`. It is disabled while another source writes the clock group. The game has no keys; a live data feed drives everything else over `game.apply`. Until then, journeys and proofs change the game over `game.apply` themselves, with the source `operator`, the seeded game's authority for every field group. Every change reaches the bar and the scorebug on program at once, because binds read the live game.
 
 ## Sub-features
 

@@ -68,6 +68,11 @@ export interface GraphicEntry<I extends string, F extends SceneFacts, P extends 
   readonly demo: z.input<P>;
   /** Present for free-panel graphics: their parameters, derived from the show. Null hides the button. */
   free?(context: ShowContext): z.input<P> | null;
+  /**
+   * Params a slot fixes from the show when it is cued, aired or refreshed, for a bind that must not take what changes
+   * later: the insights a Scorebug Slider shows. The rundown cue keeps the params as written.
+   */
+  pin?(params: z.output<P>, context: ShowContext): z.input<P>;
   /** The rundown and free-panel label, in natural case. */
   label(params: z.output<P>, context: BindContext): string;
   /** Pure. Throws only when a row it reads is gone; the frame then carries the error. */

@@ -832,8 +832,35 @@ View model `BasketballScorebugSliderV2`, public properties: `isPlaying`, `title`
 `subtitle`. Send text in capitals. The test data is the venue line. The registry entry's
 params are a union on `kind`: `venue` (the game's venue as `<name> · <city>, <state>`, and
 the cue's error when the game has none), `commentators` (one to three talents, joined
-`A and B` or `A, B and C`) or `custom` (a title and a subtitle). It has no free-panel
-button. To review long text, render the hold pose with a long subtitle, and pass the same
+`A and B` or `A, B and C`), `insights` or `custom` (a title and a subtitle). It has no
+free-panel button. `title` is frozen on air; `subtitle` is not, so an insight's time counts
+up on screen.
+
+`insights` takes a side and, optionally, the kinds to show. The title is the team's short
+name (`DREXEL`) and the subtitle each insight that holds, joined with ` · `:
+`11-2 RUN OVER 2:31 · SCORING DROUGHT 3:00 · FGS: 0 OF LAST 8`. They come from
+`basketball.insights` in `@dtv/domain`, which reads the live game's `shots` (written by the
+StatCrew feed) against the game clock, in game time, so a drought pauses at halftime:
+
+| Kind | Holds when | Reads |
+|---|---|---|
+| Run | From one of the team's baskets to now, within 8:00, the team has 7 or more and the opponent a third of that or less; the widest margin wins. Not while the team is in a scoring drought | `11-2 RUN OVER 2:31` |
+| Scoring drought | 2:00 or more since the team last scored | `SCORING DROUGHT 3:00` |
+| Field goal drought | 3:00 or more since the team's last field goal, and at least 0:30 longer than its scoring drought (free throws broke it) | `NO FGS LAST 5:11` |
+| Field goal streak | 5 or more made or missed in a row, or 6 to 12 attempts with one or none made, or all but one made | `FGS: 0 OF LAST 8`, `FGS: 7 OF LAST 8` |
+
+Times count up with the game clock: the server re-projects program as the clock's display
+changes, so on air the subtitle ticks every second while the clock runs and holds while it
+is stopped. When the cue is cued (or aired, or refreshed), its `pin` fixes two things in the
+slot: the kinds that held, and `asOf`, the number of shots there were. On air the line
+therefore never gains or loses an insight, and each time runs on until a later shot ends
+it, then holds: the team's next basket ends a scoring drought, its next field goal a field
+goal drought, the opponent's next basket a run (the team's own baskets meanwhile join the
+run). The streak stays as it was cued. The rundown cue keeps its params as written, so the
+next take reads the game afresh.
+
+The cue's error is `The game has no play by play yet` without shots, and `Nothing stands
+out about <team> right now` when no picked kind holds. To review long text, render the hold pose with a long subtitle, and pass the same
 `--data` to `render_frames.ts` for the wipe:
 `rive . --artboard="Basketball Scorebug Slider v2" --data=isPlaying=true --data=title=NOTE "--data=subtitle=A VERY LONG SUBTITLE THAT KEEPS GOING · WELL PAST THE ACTION SAFE MARGIN OF THE FRAME · ONE HUNDRED AND TWENTY CHARACTERS" --advance=120 --screenshot=build/scorebug_slider_long.png`.
 

@@ -40,7 +40,7 @@ export const Overrides = Cue.shape.overrides;
 export type Overrides = z.output<typeof Overrides>;
 
 /**
- * A cue on a bus, frozen when it was cued, params parsed. Binds still read the live World
+ * A cue on a bus, frozen when it was cued, params parsed and pinned. Binds still read the live World
  * and game, so a corrected name or a new score shows at once; an edited rundown cue
  * reaches air only through `refresh`.
  */
@@ -104,7 +104,7 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
   const resolved = (ref: CueRef, operator: OperatorId) => {
     const cue = resolveCue(registry, ref, env.context);
     if (!cue.ok) return cue;
-    const slot: Slot = { id: env.newSlotId(), origin: ref, graphic: cue.graphic, params: cue.params, overrides: cue.overrides, step: 0, by: operator };
+    const slot: Slot = { id: env.newSlotId(), origin: ref, graphic: cue.graphic, params: pinned(cue.entry, cue.params, env.context), overrides: cue.overrides, step: 0, by: operator };
     return { ok: true as const, slot, layer: cue.entry.layer };
   };
 
@@ -171,7 +171,7 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
       const cue = resolveCue(registry, slot.origin, env.context);
       if (!cue.ok) return rejected(cue.error);
       if (cue.graphic !== slot.graphic) return rejected(`The cue now plays ${cue.entry.name}; take it again`);
-      const refreshed = { ...slot, params: cue.params, overrides: cue.overrides };
+      const refreshed = { ...slot, params: pinned(cue.entry, cue.params, env.context), overrides: cue.overrides };
       if (sameCue(slot, refreshed)) return unchanged;
       return next({ program: { ...state.program, [command.layer]: refreshed } });
     }
@@ -187,6 +187,16 @@ export function reduceShow(state: ShowState, command: ShowCommand, env: ShowEnv)
       const exhaustive: never = command;
       return exhaustive;
     }
+  }
+}
+
+/** A slot's params after its entry's `pin`. A pin that throws leaves them as they are, and the bind reports the problem. */
+function pinned(entry: AnyGraphic, params: Record<string, unknown>, context: ShowContext): Record<string, unknown> {
+  if (!entry.pin) return params;
+  try {
+    return entry.params.parse(entry.pin(entry.params.parse(params), context)) as Record<string, unknown>;
+  } catch {
+    return params;
   }
 }
 

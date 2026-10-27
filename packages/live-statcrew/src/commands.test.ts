@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { PlayerId } from '@dtv/domain';
-import { commandsFor as commandsForProgram } from './commands';
+import { commandsFor as commandsForProgram, shotsOf } from './commands';
 import { parseStatcrew, type StatcrewGame } from './statcrew';
 
 const GAME = parseStatcrew(await Bun.file(new URL('../fixtures/bbgame.xml', import.meta.url)).text());
@@ -30,7 +30,7 @@ test('a player off the roster gets no command', () => {
 
 test('writes only score and stats groups', () => {
   const types = new Set(commandsFor(GAME, ROSTERS).commands.map((command) => command.type));
-  expect([...types].sort()).toEqual(['bonus', 'playerLine', 'score', 'starters', 'teamLine', 'timeouts']);
+  expect([...types].sort()).toEqual(['bonus', 'playerLine', 'score', 'shots', 'starters', 'teamLine', 'timeouts']);
 });
 
 test('starters are written only when exactly five starters match', () => {
@@ -101,4 +101,22 @@ test('a file with no <status> and no plays leaves timeouts and bonus alone', () 
   const types = commandsFor({ ...GAME, plays: [] }, ROSTERS).commands.map((command) => command.type);
   expect(types).not.toContain('timeouts');
   expect(types).not.toContain('bonus');
+});
+
+test('shots are the GOOD and MISS plays, valued by type', () => {
+  const shots = shotsOf(LIVESTATS);
+  expect(shots).toHaveLength(LIVESTATS.plays.filter((play) => play.action === 'GOOD' || play.action === 'MISS').length);
+  expect(shots.slice(0, 2)).toEqual([
+    { period: 1, remainingMs: 19 * 60_000 + 29_000, side: 'home', value: 2, made: false },
+    { period: 1, remainingMs: 18 * 60_000 + 40_000, side: 'home', value: 3, made: true },
+  ]);
+  const points = (side: 'away' | 'home') => shots.reduce((sum, shot) => (shot.side === side && shot.made ? sum + shot.value : sum), 0);
+  const last = LIVESTATS.plays.findLast((play) => play.score)!.score!;
+  expect({ away: points('away'), home: points('home') }).toEqual(last);
+});
+
+test('a play with no side or a blank time is not a shot', () => {
+  const play = { period: 1, time: '10:00', side: 'home' as const, team: 'DREX', uni: '5', name: 'REED,JOSH', action: 'GOOD', type: 'LAYUP', score: null };
+  const shots = shotsOf({ ...GAME, plays: [play, { ...play, side: null }, { ...play, time: '' }, { ...play, action: 'REBOUND' }] });
+  expect(shots).toEqual([{ period: 1, remainingMs: 600_000, side: 'home', value: 2, made: true }]);
 });

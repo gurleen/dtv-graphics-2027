@@ -111,6 +111,46 @@ describe('what the entries do beyond their values', async () => {
     expect(slider.label(slider.params.parse({ kind: 'commentators', talents: ['rob-brooks', 'mike-tuberosa'] }), { ...context, sponsor: undefined })).toBe('Slider · Rob Brooks and Mike Tuberosa');
   });
 
+  test('the scorebug slider reads a team’s insights off the play by play', () => {
+    const slider = BASKETBALL_V2['basketball-v2/scorebug-slider'];
+    const live = context.live?.sport === 'basketball' ? context.live : undefined;
+    if (!live) throw new Error('The demo game has no live state');
+    // The demo game is at 13:59 of the 2nd half: Drexel on a 10-0 run from 16:30, Saint Joseph's missing five straight.
+    const shot = (side: 'away' | 'home', seconds: number, value: 1 | 2 | 3, made: boolean) => ({ period: 2, remainingMs: seconds * 1000, side, value, made });
+    const shots = [
+      shot('away', 1050, 2, true),
+      shot('home', 990, 3, true),
+      ...[980, 940, 900, 880, 860].map((seconds) => shot('away', seconds, 2, false)),
+      shot('home', 970, 2, true),
+      shot('home', 930, 3, true),
+      shot('home', 870, 2, true),
+    ];
+    const at = { ...context, live: { ...live, shots } };
+    const said = (params: unknown) => {
+      const { title, subtitle } = bound(slider, params, 0, at);
+      return [title, subtitle];
+    };
+    expect(said({ kind: 'insights', side: 'home' })).toEqual(['DREXEL', '10-0 RUN OVER 2:31']);
+    expect(said({ kind: 'insights', side: 'away' })).toEqual(["SAINT JOSEPH'S", 'SCORING DROUGHT 3:31 · FGS: 0 OF LAST 5']);
+    expect(said({ kind: 'insights', side: 'away', insights: ['fgStreak'] })).toEqual(["SAINT JOSEPH'S", 'FGS: 0 OF LAST 5']);
+    expect(() => said({ kind: 'insights', side: 'home', insights: ['scoringDrought'] })).toThrow('Nothing stands out about Drexel right now');
+    expect(() => bound(slider, { kind: 'insights', side: 'home' }, 0)).toThrow('The game has no play by play yet');
+    expect(slider.label(slider.params.parse({ kind: 'insights', side: 'home' }), { ...at, sponsor: undefined })).toBe('Slider · Drexel insights');
+ 
+    // Cued, it keeps what held and the shots there were; on air the clock runs, then Drexel scores.
+    const pinned = slider.pin!(slider.params.parse({ kind: 'insights', side: 'away' }), at);
+    expect(pinned).toEqual({ kind: 'insights', side: 'away', insights: ['scoringDrought', 'fgStreak'], asOf: shots.length });
+    const clock = { running: true as const, remainingMs: 839_000, since: at.now };
+    const onAir = (seconds: number, more: typeof shots = []) => {
+      const { subtitle } = bound(slider, pinned, 0, { ...at, now: at.now + seconds * 1000, live: { ...live, clock, shots: [...shots, ...more] } });
+      return subtitle;
+    };
+    expect(onAir(9)).toBe('SCORING DROUGHT 3:40 · FGS: 0 OF LAST 5');
+    expect(onAir(9, [shot('home', 832, 2, true), shot('away', 832, 2, false)])).toBe('SCORING DROUGHT 3:40 · FGS: 0 OF LAST 5');
+    expect(onAir(30, [shot('away', 829, 3, true)])).toBe('SCORING DROUGHT 3:41 · FGS: 0 OF LAST 5');
+    expect(slider.frozenOnAir).toEqual(['title']);
+  });
+
   test('Next moves a stepped graphic: the answer, then the home team', () => {
     expect(bound(BASKETBALL_V2['basketball-v2/burning-question'], { question: 'Q', answer: 'A', team: 'drexel-mbb' }, 0).showAnswer).toBe(false);
     expect(bound(BASKETBALL_V2['basketball-v2/burning-question'], { question: 'Q', answer: 'A', team: 'drexel-mbb' }, 1).showAnswer).toBe(true);

@@ -246,3 +246,106 @@ describe('the shot clock stops when the game clock expires', () => {
     expect(applied(lastSeconds, { type: 'clock', action: 'stop' }, NOW + 8_000)).toMatchObject({ clock: stopped(0), shotClock: stopped(19_000) });
   });
 });
+
+describe('insights', () => {
+  const { insights, playedMs, formatSpan } = basketball;
+  type Shot = basketball.Shot;
+  /** A shot at `clock` (`m:ss`) in `period`. */
+  const shot = (side: Shot['side'], clock: string, value: Shot['value'], made: boolean, period = 1): Shot => {
+    const [minutes, seconds] = clock.split(':').map(Number);
+    return { period, remainingMs: (minutes! * 60 + seconds!) * 1000, side, value, made };
+  };
+  const at = (clock: string, shots: Shot[], period = 1): BasketballLive => {
+    const [minutes, seconds] = clock.split(':').map(Number);
+    return { ...BASE, period, clock: stopped((minutes! * 60 + seconds!) * 1000), shots };
+  };
+  const texts = (live: BasketballLive, side: Shot['side'] = 'home') => insights('mbb', live, side, NOW).map((insight) => insight.text);
+
+  test('game time runs on through periods and overtime', () => {
+    expect(playedMs('mbb', 1, 20 * 60_000)).toBe(0);
+    expect(playedMs('mbb', 2, 10 * 60_000)).toBe(30 * 60_000);
+    expect(playedMs('mbb', 3, 0)).toBe(45 * 60_000);
+    expect(playedMs('wbb', 3, 5 * 60_000)).toBe(25 * 60_000);
+    expect(formatSpan(311_900)).toBe('5:11');
+  });
+
+  test('nothing without shots', () => {
+    expect(insights('mbb', BASE, 'home', NOW)).toEqual([]);
+  });
+
+  test('an 11-2 run, counted from its first basket to now', () => {
+    const shots = [
+      shot('away', '15:00', 2, true),
+      shot('home', '12:31', 3, true),
+      shot('away', '12:00', 2, true),
+      shot('home', '11:40', 2, true),
+      shot('home', '11:00', 3, true),
+      shot('home', '10:30', 3, true),
+    ];
+    expect(texts(at('10:00', shots))).toEqual(['11-2 run over 2:31']);
+    expect(texts(at('10:00', shots), 'away')).toEqual(['Scoring drought 2:00']);
+  });
+
+  test('a run ends with a scoring drought, and spans at most 8:00', () => {
+    const shots = [shot('home', '19:00', 3, true), shot('home', '18:30', 3, true), shot('home', '18:00', 2, true)];
+    expect(texts(at('16:00', shots))).toEqual(['Scoring drought 2:00']);
+    const slow = [shot('home', '19:00', 3, true), shot('home', '15:00', 3, true), shot('home', '11:30', 2, true)];
+    // 8-0 from 19:00 spans 8:30; from 15:00 it is only 5-0.
+    expect(texts(at('10:30', slow))).toEqual([]);
+  });
+
+  test('a 20-12 lead is not a run', () => {
+    const shots = [...Array(10)].map((_, index) => shot(index % 5 < 3 ? 'home' : 'away', `${19 - index}:00`, 2, true));
+    expect(texts(at('10:00', shots)).filter((text) => text.includes('run'))).toEqual([]);
+  });
+
+  test('a scoring drought, and a field goal drought free throws broke', () => {
+    const shots = [shot('home', '18:00', 2, true), shot('away', '17:00', 2, false), shot('home', '15:00', 1, true), shot('home', '14:00', 2, false)];
+    expect(texts(at('12:00', shots))).toEqual(['Scoring drought 3:00', 'No FGs last 6:00']);
+    // With no free throws since the basket, the field goal drought is the scoring drought and is not repeated.
+    expect(texts(at('15:30', [shot('home', '18:00', 2, true)]))).toEqual(['Scoring drought 2:30']);
+  });
+
+  test('a drought pauses at halftime', () => {
+    expect(texts(at('19:00', [shot('home', '1:00', 2, true)], 2))).toEqual(['Scoring drought 2:00']);
+  });
+
+  test('field goal streaks: in a row, then a near-empty or near-full window', () => {
+    const misses = [...Array(8)].map((_, index) => shot('home', `${19 - index}:30`, 2, false));
+    expect(texts(at('11:30', [shot('home', '19:50', 2, true), ...misses]))).toContain('FGs: 0 of last 8');
+    const hot = [shot('home', '19:50', 2, false), ...[...Array(7)].map((_, index) => shot('home', `${19 - index}:00`, 2, true))];
+    expect(texts(at('12:59', hot))).toContain('FGs: 7 of last 7');
+    const even = [1, 0, 1, 0, 1, 1, 0, 1, 0, 1].map((made, index) => shot('home', `${19 - index}:00`, 2, made > 0));
+    expect(texts(at('10:00', even)).filter((text) => text.startsWith('FGs'))).toEqual([]);
+    const cold = [true, false, false, true, false, false, false, false, false].map((made, index) => shot('home', `${19 - index}:00`, 2, made));
+    expect(texts(at('11:00', cold))).toContain('FGs: 1 of last 8');
+  });
+
+  test('the clock behind the last play reads as the last play', () => {
+    expect(texts(at('20:00', [shot('home', '16:00', 3, true), shot('home', '15:00', 2, true), shot('home', '14:00', 2, true)]))).toEqual(['7-0 run over 2:00']);
+  });
+
+  test('spans count up with the running game clock', () => {
+    const live = { ...BASE, period: 1, clock: running(12 * 60_000), shots: [shot('home', '15:00', 2, true)] };
+    expect(insights('mbb', live, 'home', NOW).map((insight) => insight.text)).toEqual(['Scoring drought 3:00']);
+    expect(insights('mbb', live, 'home', NOW + 11_000).map((insight) => insight.text)).toEqual(['Scoring drought 3:11']);
+  });
+
+  test('after the cue, the basket that ends a span stops it instead of dropping it', () => {
+    const cued = [shot('home', '15:00', 2, true), shot('away', '14:00', 2, true)];
+    const after = [...cued, shot('home', '11:49', 3, true)];
+    // Cued with two shots: the drought ran from 15:00 to the basket at 11:49.
+    expect(insights('mbb', at('11:00', after), 'home', NOW, 2).map((insight) => insight.text)).toEqual(['Scoring drought 3:11']);
+    expect(texts(at('11:00', after))).toEqual([]);
+    const run = [shot('home', '13:00', 3, true), shot('home', '12:30', 2, true), shot('home', '12:00', 2, true)];
+    const broken = [...run, shot('home', '11:00', 2, true), shot('away', '10:15', 2, true)];
+    // The home basket after the cue joins the run; the away basket ends it at 10:15.
+    expect(insights('mbb', at('9:00', broken), 'home', NOW, 3).map((insight) => insight.text)).toEqual(['9-0 run over 2:45']);
+  });
+
+  test('shots is an absolute write in the stats group', () => {
+    const shots = [shot('home', '18:00', 2, true)];
+    expect(applied(BASE, { type: 'shots', shots }).shots).toEqual(shots);
+    expect(apply({ ...BASE, authority: { ...BASE.authority, stats: STATCREW } }, { type: 'shots', shots })).toEqual({ ok: false, reason: 'not-authority', group: 'stats' });
+  });
+});

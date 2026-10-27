@@ -128,7 +128,8 @@ build. Every game has live state. The transaction that inserts a game also inser
 deleting the game deletes it.
 
 `BasketballLive` holds the phase, period, game clock, shot clock, score, timeouts, bonus, possession, starters,
-team and player stat lines, and `authority`. Commands set absolute values (`score home 74`), never deltas, so a
+team and player stat lines, `shots` (every field goal and free throw attempt from a play-by-play feed, in the stats
+group, which the Scorebug Slider's insights read), and `authority`. Commands set absolute values (`score home 74`), never deltas, so a
 resent packet changes nothing and two operators who press +2 for one basket agree on 74.
 
 `authority` names one writer per field group (`clock`, `score`, `stats`). A feed and an operator never both write
@@ -449,8 +450,9 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
 - Keyboard first, with every action also on a click. Space takes, Up and Down
   select a rundown row and my preview follows it, Enter cues the selected row again, N is Next (it takes a one-step graphic off air), Esc clears my preview, Shift+Esc clears the program lower third, and 1 to 9 air the free panel.
   Keys do nothing while typing. Only Clear All is guarded, by a hold or a second press.
-- The controller never changes the game. Phase 5 had game keys and score-bar controls; they were removed because
-  a live data feed, still to be built, will drive the game over `game.apply`. `?` lists every key, from the same
+- The controller changes only the game's period and phase, from the score bar's period dropdown over `game.apply` as
+  `operator`, and only while the operator holds the clock group. Phase 5 had game keys and other score-bar controls;
+  they were removed because a live data feed drives the rest of the game over `game.apply`. `?` lists every key, from the same
   table the key handler reads.
 - A show command that the socket drops is sent again, under the same id, until the server
   answers or 10 s pass. Its control shows it pending meanwhile, and a plain failure after.
