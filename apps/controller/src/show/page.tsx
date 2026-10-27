@@ -1,17 +1,18 @@
 /**
  * The show page (Show A): the free panel, what is on air by layer and the selected cue's
  * inspector on the left, the rundown in the middle, my preview, Take and
- * program on the right rail with the other operators' previews, and the game along the
+ * program on the right rail with StatCrew's plays for the game, and the game along the
  * bottom.
  */
 
 import { type CueId, type GameId, resolveGame, sameJson } from '@dtv/domain';
-import { type Bus, LAYERS, type OperatorId, type Registry, type ShowCommand, type ShowView } from '@dtv/playout';
+import { type Bus, LAYERS, type Registry, type ShowCommand, type ShowView } from '@dtv/playout';
 import './show.css';
 import { useEffect, useState } from 'react';
 import { Button } from 'react-aria-components';
 import { useCommands } from '../app/commands';
 import { useController } from '../app/context';
+import { useStream } from '../app/streams';
 import { gameLabel } from '../data/rows';
 import { type ShowActions, slotLabel, stepsOf, useShowActions } from './actions';
 import { useGame } from './game';
@@ -21,6 +22,7 @@ import { type KeyAction, useKeys } from './keys';
 import { Monitor } from './monitor';
 import { Rundown } from './rundown';
 import { cueIdOf } from './rundown-edits';
+import { PlayList } from '../tools/plays';
 import { ScoreBar } from './scorebar';
 
 export function ShowPage() {
@@ -199,6 +201,14 @@ function OnAir(props: { readonly view: ShowView; readonly actions: ShowActions }
   );
 }
 
+/** StatCrew's plays, when its feed reads this show's game: a check on the box score, beside the monitors. */
+function RailPlays({ game }: { readonly game: GameId | null }) {
+  const { api } = useController();
+  const feed = useStream((signal) => api.tools.statcrew.watch(undefined, { signal }), [api]);
+  const ours = feed?.game === game;
+  return <PlayList compact plays={ours ? feed.events : []} empty={!feed?.game ? 'StatCrew is not set up. Start it on the Tools page.' : ours ? 'No plays yet.' : 'StatCrew is reading another game.'} />;
+}
+
 const busLabel = (view: ShowView, registry: Registry, bus: Bus) =>
   LAYERS.flatMap((layer) => (bus[layer] ? [slotLabel(view, registry, bus[layer])] : [])).join(' + ');
 
@@ -207,7 +217,6 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
   const { problem, dismiss, pending } = useCommands();
   const { view, actions } = props;
   const waiting = (type: ShowCommand['type']) => pending.some((command) => command.type === type);
-  const others = [...new Set<OperatorId>([...view.operators, ...(Object.keys(view.otherPreviews) as OperatorId[])])].filter((each) => each !== operator).sort();
   const previewEmpty = Object.keys(view.preview).length === 0;
   return (
     <aside className="rail" aria-label="Monitors">
@@ -242,21 +251,7 @@ function Rail(props: { readonly view: ShowView; readonly actions: ShowActions })
         <span className="caption">{busLabel(view, registry, view.program)}</span>
       </div>
       <Monitor name="program" bus={{ kind: 'program' }} className="pgm" />
-      <div className="rail-head">Others' previews</div>
-      <div className="others">
-        {others.length === 0 && <span className="muted">Nobody else is connected.</span>}
-        {others.map((other) => {
-          const bus = Object.hasOwn(view.otherPreviews, other) ? view.otherPreviews[other]! : {};
-          return (
-            <div key={other} className="other" data-operator={other}>
-              <Monitor name={`other:${other}`} bus={{ kind: 'preview', operator: other }} className="other-monitor" />
-              <span className="caption">
-                {other}: {busLabel(view, registry, bus) || 'empty'}
-              </span>
-            </div>
-          );
-        })}
-      </div>
+      <RailPlays game={view.game?.id ?? null} />
     </aside>
   );
 }

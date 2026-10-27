@@ -61,7 +61,7 @@ Use two harnesses. Both use Playwright from `apps/controller`.
 
 - `operator(id, 'show' | 'data')` opens a 1440 x 900 controller page. It sets localStorage `dtv.operator` to `id` first, so the page skips the name dialog.
 - `renderer(path)` opens a 1920 x 1080 `/renderer` page. It returns once `document.body.dataset.status === 'live'`.
-- `monitor(page, 'preview' | 'program' | 'other:<id>')` and `rendered(page)` read layer states.
+- `monitor(page, 'preview' | 'program')` and `rendered(page)` read layer states.
 - `waitMonitor` and `waitRendered` take a want such as `{ lower: '<graphic id>', bug: 'empty' }`.
 - `view(operator)` and `world()` read back the show view and the World over `@dtv/api`.
 - `command(...)` sends a show command with a fresh id.
@@ -91,7 +91,7 @@ Stable handles. These are the names the code uses, so do not guess:
 
 - `window.dtvMonitors[name]` on a controller page is a monitor. Its `.renderer.layers()` gives `{ bug, lower, card }`, each with a `phase` (`empty`, `loading`, `entering`, `on` or `leaving`) and a `frame` with `graphic`, `slot` and `step`. Its `.frame` is the newest output frame, with bound `values`.
 - `window.dtvRenderer.layers()` gives the same shape on `/renderer` and on a site page.
-- `[data-monitor="preview|program|other:<id>"]` is a monitor's element. Its canvases show what was drawn.
+- `[data-monitor="preview|program"]` is a monitor's element. Its canvases show what was drawn.
 - `[data-testid="reconnecting"]` is the top bar's badge while any stream is down.
 - `.topbar .show-name` shows the active game's matchup, or `No active game`.
 - The rundown is `getByRole('grid', { name: 'Rundown cues' })`. A rundown row is `.cue-row` with `data-pvw` and `data-pgm`. The inspector has `Cue to my preview`, `Save` and `Add cue`.

@@ -451,39 +451,9 @@
   color: var(--warn);
 }
 
-/* The others' previews take the rail's free height: each as tall as fits, two abreast, still 16:9. */
-:where(.show-page, .show-portal) .others,
-.others:where(.show-portal) {
+/* StatCrew's plays take the rail's free height. */
+:where(.show-page, .show-portal) .rail .tool-plays {
   flex: 1;
-  min-height: 0;
-  container-type: size;
-  display: flex;
-  gap: var(--space-3);
-  overflow-x: auto;
-}
-
-:where(.show-page, .show-portal) .other,
-.other:where(.show-portal) {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  width: min(calc(50cqw - var(--space-3) / 2), calc((100cqh - var(--caption) - var(--space-1)) * 16 / 9));
-  flex: none;
-}
-
-:where(.show-page, .show-portal) .other .caption {
-  height: var(--caption);
-  overflow: hidden;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* Not `.thumb`: the data page styles that class as a 64 px image. */
-:where(.show-page, .show-portal) .monitor.other-monitor,
-.monitor.other-monitor:where(.show-portal) {
-  border-width: 1px;
 }
 
 /* Score bar */

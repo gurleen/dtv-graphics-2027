@@ -198,7 +198,7 @@ async function provesTwoOperators(api: ReturnType<typeof connect>['api']) {
   await sam.page.getByRole('button', { name: 'Start' }).click();
   await rows(sam.page).first().waitFor();
   check((await sam.page.evaluate(() => localStorage.getItem('dtv.operator'))) === 'sam', 'the first visit keeps sam in localStorage');
-  await alex.page.locator('.other[data-operator="sam"]').waitFor();
+  await alex.page.locator('.operators .chip', { hasText: 'sam' }).waitFor();
   check(true, 'alex sees sam among the operators');
 
   const staff = 'basketball-v2/staff-lower-third';
@@ -206,7 +206,8 @@ async function provesTwoOperators(api: ReturnType<typeof connect>['api']) {
   await waitDrawn(sam.page, 'preview', { [layerOf(top)]: { graphic: top } }, "sam's preview opens on sam's selected row, the first");
   await rows(alex.page).filter({ hasText: 'Zach Spiker' }).click();
   await waitDrawn(alex.page, 'preview', { lower: { graphic: staff } }, "selecting a row puts it in alex's preview, with no Enter");
-  await waitDrawn(sam.page, 'other:alex', { lower: { graphic: staff } }, "alex's preview shows in sam's thumbnail of alex");
+  await sam.page.locator('.operators .chip[data-has-preview]', { hasText: 'alex' }).waitFor();
+  check(true, "sam's chip for alex marks that alex has a preview");
   await waitDrawn(sam.page, 'preview', { [layerOf(top)]: { graphic: top } }, "sam's own preview keeps sam's selection");
   await shoot(sam.page, '02-sam-sees-alex-preview');
 

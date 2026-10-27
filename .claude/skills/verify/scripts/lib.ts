@@ -125,7 +125,7 @@ export async function session(journey: string) {
       return page;
     },
 
-    /** Layers of a controller monitor: `preview`, `program`, or `other:<operator>`. Null until it mounts. */
+    /** Layers of a controller monitor: `preview` or `program`. Null until it mounts. */
     monitor: (page: Playwright.Page, name: string): Promise<Record<string, Drawn> | null> =>
       page.evaluate(`(() => {
         const handle = window.dtvMonitors && window.dtvMonitors[${JSON.stringify(name)}];
