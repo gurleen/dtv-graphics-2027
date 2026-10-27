@@ -7,7 +7,7 @@ The score bar along the bottom of the show page shows the live game: the score, 
 - `score-display` shows each side's score, timeouts left as pips, team fouls and a `Bonus` tag.
 - `clock-display` shows the game clock, ticking while it runs, the shot clock (a dash when it is off), the period and the phase.
 - `possession-display` lights the arrow of the side with possession.
-- `shot-clock-buzzer` freezes the shot clock when the game clock reaches 0:00.0, and blanks it at halftime and final.
+- `shot-clock-buzzer` freezes the shot clock when the game clock reaches 00.0, and blanks it at halftime and final.
 
 ## How to get to it (user POV)
 

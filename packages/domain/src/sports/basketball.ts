@@ -87,14 +87,14 @@ const stopClock = (clock: Clock, now: EpochMs): Clock =>
 const setClock = (remainingMs: number, running: boolean, now: EpochMs): Clock =>
   running ? { running: true, remainingMs, since: now } : { running: false, remainingMs };
 
-/** `13:59` from a minute up, `0:04.3` below it. */
+/** `13:59` from a minute up, `04.3` below it. */
 export const formatGameClock = (remainingMs: number): string => {
   if (remainingMs >= 60_000) {
     const seconds = Math.floor(remainingMs / 1000);
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   }
   const tenths = Math.floor(remainingMs / 100);
-  return `0:${String(Math.floor(tenths / 10)).padStart(2, '0')}.${tenths % 10}`;
+  return `${String(Math.floor(tenths / 10)).padStart(2, '0')}.${tenths % 10}`;
 };
 
 /** Whole seconds, rounded up, so the display reads 1 until the clock expires. */
@@ -113,7 +113,7 @@ export const nextDisplayChange = (clock: Clock, now: EpochMs, display: ClockDisp
   if (remaining <= 0) return null;
   if (display === 'shot') return now + ((remaining - 1) % 1000) + 1;
   const unit = remaining >= 60_000 ? 1000 : 100;
-  // Under a tenth the text already reads 0:00.0; what changes next is the status line at zero.
+  // Under a tenth the text already reads 00.0; what changes next is the status line at zero.
   if (remaining < unit) return now + remaining;
   return now + (remaining % unit) + 1;
 };

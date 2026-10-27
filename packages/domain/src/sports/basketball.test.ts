@@ -183,9 +183,9 @@ describe('broadcast formatting', () => {
   test.each([
     [839_000, '13:59'],
     [60_000, '1:00'],
-    [59_999, '0:59.9'],
-    [4_300, '0:04.3'],
-    [0, '0:00.0'],
+    [59_999, '59.9'],
+    [4_300, '04.3'],
+    [0, '00.0'],
   ])('game clock %p reads %p', (remaining, shown) => {
     expect(formatGameClock(remaining)).toBe(shown);
   });

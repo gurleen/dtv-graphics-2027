@@ -173,10 +173,10 @@ async function until(ok: () => boolean, what: string | (() => string), timeout =
   return false;
 }
 
-/** `13:59` or `0:04.3` to milliseconds. */
+/** `13:59` or `04.3` to milliseconds. */
 const clockMs = (text: unknown) => {
-  const match = /^(\d+):(\d{2})(?:\.(\d))?$/.exec(String(text));
-  return match ? (Number(match[1]) * 60 + Number(match[2])) * 1000 + Number(match[3] ?? 0) * 100 : Number.NaN;
+  const match = /^(?:(\d+):)?(\d{2})(?:\.(\d))?$/.exec(String(text));
+  return match ? (Number(match[1] ?? 0) * 60 + Number(match[2])) * 1000 + Number(match[3] ?? 0) * 100 : Number.NaN;
 };
 
 // The two pages: alex's controller and /renderer, each recorded.
@@ -457,8 +457,8 @@ async function endOfHalf() {
   await expectProgram({ away: 7, home: 6 }, 'a last basket: 7-6');
   await feed({ type: 'clockSet', remainingMs: 3_000, running: true });
   await until(() => live?.clock.running === true, 'the clock runs from 0:03');
-  await until(() => bug().clock === '0:00.0', () => `the clock runs out: program reads ${String(bug().clock)}`, 8_000);
-  await barText('game-clock', (text) => text === '0:00.0', 'the bar reads the expired clock');
+  await until(() => bug().clock === '00.0', () => `the clock runs out: program reads ${String(bug().clock)}`, 8_000);
+  await barText('game-clock', (text) => text === '00.0', 'the bar reads the expired clock');
   await feed({ type: 'clock', action: 'stop' });
   await until(() => live?.clock.running === false, 'the feed stops the expired clock');
   await shootRenderer('end-of-half', { bug: G('scorebug') });
@@ -566,7 +566,7 @@ async function theFinal() {
   await feed({ type: 'score', side: 'home', value: 12 });
   await expectProgram({ away: 10, home: 12 }, 'a late three: 10-12');
   await feed({ type: 'clockSet', remainingMs: 2_000, running: true });
-  await until(() => bug().clock === '0:00.0', () => `the clock runs out (program ${String(bug().clock)})`, 8_000);
+  await until(() => bug().clock === '00.0', () => `the clock runs out (program ${String(bug().clock)})`, 8_000);
   await feed({ type: 'clock', action: 'stop' }, { type: 'phase', phase: 'final' });
   await expectProgram({ bug: G('scorebug'), period: 'FINAL', away: 10, home: 12 }, 'the final phase: the scorebug reads Final, 10-12');
   await shootRenderer('final', { bug: G('scorebug') });
