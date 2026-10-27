@@ -166,7 +166,6 @@ const renderVariant = (variant: Variant) => {
 
   // Identifiers of the block-level elements.
   const namePanelsId = id(10);
-  const shadowId = id(20);
   const roleStripId = id(300);
   const roleContentId = id(310);
   const wipeMaskId = id(500);
@@ -216,7 +215,6 @@ const renderVariant = (variant: Variant) => {
       ];
     }),
     { objectId: roleContentId, propertyKey: Y, keys: [{ frame: 0, value: -ROLE_HEIGHT }, { frame: 22, value: -ROLE_HEIGHT, ease: EASE_OUT }, { frame: 46, value: 0 }] },
-    { objectId: shadowId, propertyKey: OPACITY, keys: [{ frame: 0, value: 0 }, { frame: 24, value: 0, ease: EASE_OUT }, { frame: 50, value: 0.6 }] },
     { objectId: sweepId, propertyKey: X, keys: [{ frame: 0, value: -120 }, { frame: 34, value: -120, ease: EASE_SWEEP }, { frame: 72, value: sweepEnd }] },
     {
       objectId: sweepId, propertyKey: OPACITY, keys: [
@@ -240,7 +238,6 @@ const renderVariant = (variant: Variant) => {
       ...settledText(column.roleRevealId),
     ]),
     hold(roleContentId, Y, 0),
-    hold(shadowId, OPACITY, 0.6),
     hold(sweepId, X, sweepEnd),
     hold(sweepId, OPACITY, 0),
   ];
@@ -262,7 +259,6 @@ const renderVariant = (variant: Variant) => {
       ...settledText(column.roleRevealId),
     ]),
     { objectId: roleContentId, propertyKey: Y, keys: [{ frame: 0, value: 0, ease: EASE_IN }, { frame: 18, value: -ROLE_HEIGHT }] },
-    { objectId: shadowId, propertyKey: OPACITY, keys: [{ frame: 0, value: 0.6, ease: EASE_IN }, { frame: 20, value: 0 }] },
     hold(sweepId, X, sweepEnd),
     hold(sweepId, OPACITY, 0),
   ];
@@ -272,7 +268,6 @@ const renderVariant = (variant: Variant) => {
     hold(roleStripId, OPACITY, 0),
     hold(leftEdgeId, OPACITY, 0),
     hold(rightEdgeId, OPACITY, 0),
-    hold(shadowId, OPACITY, 0),
     hold(sweepId, OPACITY, 0),
   ];
 
@@ -332,12 +327,7 @@ ${roleCells.join('\n')}
 
 </Node>
 
-<!-- Separation from bright video: a feathered dark stroke around the block. -->
 <Node name="Lower Third Backing" x="${blockX}" y="${BLOCK_Y}">
-<Shape name="Block Shadow" id="${shadowId}" x="0" y="4" opacity="0.6">
-  ${columns.map(({ x }) => `<Rectangle x="${x}" y="0" width="${columnWidth}" height="${BLOCK_HEIGHT}" originX="0" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>`).join('')}
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 <Shape name="Wipe Reveal Mask" id="${wipeMaskId}" x="${round(centre)}" y="-8"><Rectangle id="${wipeRectangleId}" width="${wipeWidth}" height="${BLOCK_HEIGHT + 16}" originX="0.5" originY="0"/></Shape>
 <Shape name="Block Silhouette" id="${silhouetteId}">${silhouette}</Shape>
 <Shape name="Role Reveal Mask" id="${roleMaskId}" x="0" y="${NAME_HEIGHT + GAP}"><Rectangle width="${blockWidth}" height="${ROLE_HEIGHT}" originX="0" originY="0"/></Shape>

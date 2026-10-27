@@ -107,7 +107,6 @@ const Y = 14;
 const SCALE_X = 16;
 const SCALE_Y = 17;
 const OPACITY = 18;
-const VERTEX_Y = 25;
 const COLOR = 37;
 const IMAGE = 206;
 const TEXT = 268;
@@ -124,8 +123,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 // --- identifiers ----------------------------------------------------------------------
 
 const ROOT = id(10);
-const SHADOW = id(20);
-const SHADOW_PATH = id(50);
 const BAND = id(300);
 const VERSUS = id(310);
 const VERSUS_STYLE = id(311);
@@ -215,12 +212,6 @@ const underlay = (name: string, width: number, height: number, radii: Radii) =>
   `<Shape name="${name}" x="0" y="0">
     ${rectangle(width, height, radii)}
     <Fill><SolidColor colorValue="59000000"/></Fill>
-  </Shape>`;
-
-const shadow = (name: string, width: number, height: number, radii: Radii) =>
-  `<Shape name="${name}" x="0" y="4" opacity="0.6">
-    ${rectangle(width, height, radii)}
-    <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
   </Shape>`;
 
 // Text reveals. Each glyph rises 14 into place as it fades in, one after another. The
@@ -386,7 +377,6 @@ const eventTitle = `<Node name="Event Title" id="${TAB}" x="0" y="0">
     ].join('\n    '),
   })}
   ${darkGlass('Event Title', TAB_WIDTH, TAB_HEIGHT, TAB_RADII)}
-  ${shadow('Event Title Shadow', TAB_WIDTH, TAB_HEIGHT, TAB_RADII)}
   </Node>
   </Node>
 </Node>`;
@@ -421,26 +411,6 @@ const strip = `<Node name="Strip" id="${STRIP}" x="0" y="${STRIP_Y}">
   ${darkGlass('Strip', BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII)}
   </Node>
 </Node>`;
-
-// --- block shadow ---------------------------------------------------------------------
-
-// The outline runs round the band and the strip; the tab casts its own shadow. The
-// bottom edge (the base) drops with the strip as it slides out.
-const outline = [
-  { local: 51, x: 0, y: BAND_Y, part: 'fixed' },
-  { local: 52, x: BLOCK_WIDTH, y: BAND_Y, part: 'fixed' },
-  { local: 53, x: BLOCK_WIDTH, y: BLOCK_HEIGHT, part: 'base' },
-  { local: 54, x: 0, y: BLOCK_HEIGHT, part: 'base' },
-] as const;
-const BASE = outline.filter((vertex) => vertex.part === 'base').map((vertex) => id(vertex.local));
-
-const blockShadow = `<Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-  <ClippingShape name="Block Shadow Reveal Clip" sourceId="${REVEAL_MASK}"/>
-  <PointsPath name="Block Outline" id="${SHADOW_PATH}" isClosed="true">
-    ${outline.map((vertex) => `<StraightVertex id="${id(vertex.local)}" x="${vertex.x}" y="${vertex.y}" radius="${OUTER_RADIUS}"/>`).join('\n    ')}
-  </PointsPath>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>`;
 
 const silhouette = [
   ...SIDES.map((s) => rectangle(PANEL_WIDTH, BAND_HEIGHT, s.panelRadii, ` x="${s.panelX}" y="${BAND_Y}"`)),
@@ -533,13 +503,11 @@ const intro: Track[] = [
     move(s.ids.marker, SCALE_Y, 0, 1, 34, 54, EASE_OUT),
   ]),
   move(STRIP_SLIDE, Y, -STRIP_DROP, 0, 16, 42, EASE_OUT),
-  ...BASE.map((vertex) => move(vertex, VERTEX_Y, BAND_BOTTOM, BLOCK_HEIGHT, 16, 42, EASE_OUT)),
   ...reveal(VENUE_REVEAL, 'forward', 26, 52),
   ...reveal(SPONSOR_LABEL_REVEAL, 'forward', 34, 54),
   move(SPONSOR_LOGO, OPACITY, 0, 1, 36, 58, EASE_OUT),
   move(TAB_RISE, Y, TAB_Y + TAB_DROP, TAB_Y, 30, 54, EASE_OUT),
   ...reveal(TITLE_REVEAL, 'forward', 36, 58),
-  move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
   ...SWEEPS.flatMap((sweepId): Track[] => [
     move(sweepId, X, SWEEP_START, SWEEP_END, SWEEP_FROM, INTRO_FRAMES, EASE_SWEEP),
     { objectId: sweepId, propertyKey: OPACITY, keys: sweepOpacity },
@@ -561,11 +529,9 @@ const settled: Track[] = [
     hold(s.ids.marker, SCALE_Y, 1),
   ]),
   hold(STRIP_SLIDE, Y, 0),
-  ...BASE.map((vertex) => hold(vertex, VERTEX_Y, BLOCK_HEIGHT)),
   hold(SPONSOR_LOGO, OPACITY, 1),
   hold(TAB_RISE, Y, TAB_Y),
   ...settledRanges,
-  hold(SHADOW, OPACITY, 0.6),
   ...SWEEPS.flatMap((sweepId) => [hold(sweepId, X, SWEEP_END), hold(sweepId, OPACITY, 0)]),
 ];
 
@@ -586,18 +552,15 @@ const outro: Track[] = [
     closing(s.ids.marker, SCALE_Y, 1, 0, 0, 12),
   ]),
   closing(STRIP_SLIDE, Y, 0, -STRIP_DROP, 0, 16),
-  ...BASE.map((vertex) => closing(vertex, VERTEX_Y, BLOCK_HEIGHT, BAND_BOTTOM, 0, 16)),
   closing(SPONSOR_LOGO, OPACITY, 1, 0, 0, 12),
   closing(TAB_RISE, Y, TAB_Y, TAB_Y + TAB_DROP, 0, 16),
   ...settledRanges,
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   ...SWEEPS.flatMap((sweepId) => [hold(sweepId, X, SWEEP_END), hold(sweepId, OPACITY, 0)]),
 ];
 
 const hidden: Track[] = [
   ...GROUPS.map((group) => hold(group, OPACITY, 0)),
   ...EDGE_LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   ...SWEEPS.map((sweepId) => hold(sweepId, OPACITY, 0)),
 ];
 
@@ -688,7 +651,7 @@ const edgeLight = (name: string, lightId: string, x: number, glowToward: 1 | -1)
     <Shape name="${name} Edge Glow" y="-${LIGHT_HEIGHT / 2}"><Rectangle width="44" height="${LIGHT_HEIGHT}" originX="${glowToward === 1 ? 0 : 1}" originY="0"/><Fill><LinearGradient startX="0" startY="0" endX="${44 * glowToward}" endY="0"><GradientStop colorValue="30FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill></Shape>
   </Node>`;
 
-// The masks reach past the block on every side so the shadows are not cut off.
+// The masks reach past the block on every side.
 const MASK_MARGIN = 60;
 
 const document = `<Rive version="1" kind="fragment">
@@ -721,9 +684,6 @@ ${band}
 
 <!-- ============================== Strip ==================================== -->
 ${strip}
-
-<!-- Separation from bright video: a feathered dark stroke around the block. -->
-${blockShadow}
 
 <!-- Unpainted shapes: the clip sources. -->
 <Shape name="Reveal Mask" id="${REVEAL_MASK}" x="${SEAM}" y="${-MASK_MARGIN}"><Rectangle width="${BLOCK_WIDTH + 2 * REVEAL_OVERHANG}" height="${BLOCK_HEIGHT + 2 * MASK_MARGIN}" originX="0.5" originY="0"/></Shape>

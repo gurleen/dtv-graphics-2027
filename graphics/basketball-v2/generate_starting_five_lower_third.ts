@@ -9,7 +9,7 @@
  * air. Its state machine has two layers:
  *
  *   Display  Hidden -> Intro -> Hold -> Outro, gated on `isPlaying`, as in every v2 scene.
- *            It animates the shell: wipes, edge lights, drifts, strips, shadow and sheen,
+ *            It animates the shell: wipes, edge lights, drifts, strips and sheen,
  *            and the letter-by-letter rise of both teams' text.
  *   Team     Away Shown <-> Home Shown, gated on `step` (0 = away, 1 = home). On air it
  *            plays a change animation; off air it switches instantly. It animates only
@@ -123,7 +123,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 // --- identifiers ----------------------------------------------------------------------
 
 const ROOT = id(10);
-const SHADOW = id(20);
 const HEADER_PANEL = id(100);
 const HEADER_CONTENT = id(101);
 const LOGO_GROUP = id(102);
@@ -456,7 +455,6 @@ const intro: Track[] = [
   }),
   move(HEADER_STRIP_CONTENT, Y, -STRIP_HEIGHT, 0, 22, 46, EASE_OUT),
   move(PLAYER_STRIPS_CONTENT, Y, -STRIP_HEIGHT, 0, 22, 46, EASE_OUT),
-  move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
   move(INTRO_SWEEP, X, SWEEP_START, SWEEP_END, 34, INTRO_FRAMES, EASE_SWEEP),
   {
     objectId: INTRO_SWEEP, propertyKey: OPACITY, keys: [
@@ -481,7 +479,6 @@ const settled: Track[] = [
   ...settledRanges,
   hold(HEADER_STRIP_CONTENT, Y, 0),
   hold(PLAYER_STRIPS_CONTENT, Y, 0),
-  hold(SHADOW, OPACITY, 0.6),
   hold(INTRO_SWEEP, X, SWEEP_END),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -505,7 +502,6 @@ const outro: Track[] = [
   ...settledRanges,
   closing(HEADER_STRIP_CONTENT, Y, 0, -STRIP_HEIGHT, 0, 18),
   closing(PLAYER_STRIPS_CONTENT, Y, 0, -STRIP_HEIGHT, 0, 18),
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   hold(INTRO_SWEEP, X, SWEEP_END),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -513,7 +509,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   ...GROUPS.map((group) => hold(group, OPACITY, 0)),
   ...EDGE_LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
 
@@ -755,11 +750,6 @@ ${COLUMNS.map(playerStrip).join('\n')}
 </Node>
 </Node>
 
-<!-- Separation from bright video: a feathered dark stroke around the block. -->
-<Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-  <Rectangle width="${BLOCK_WIDTH}" height="${BLOCK_HEIGHT}" originX="0" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
 <Shape name="Strip Reveal Mask" id="${STRIP_MASK}" x="0" y="${STRIP_Y}"><Rectangle width="${BLOCK_WIDTH}" height="${STRIP_HEIGHT}" originX="0" originY="0"/></Shape>
 </Node>

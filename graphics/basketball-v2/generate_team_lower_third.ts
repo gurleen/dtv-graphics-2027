@@ -95,7 +95,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 // --- identifiers ----------------------------------------------------------------------
 
 const ROOT = id(10);
-const SHADOW = id(20);
 const LOGO_PANEL = id(100);
 const MARKER = id(101);
 const LOGO_TINT = id(130);
@@ -323,7 +322,6 @@ const intro: Track[] = [
   ...reveal(NAME_REVEAL, 20, 44),
   ...reveal(COPY_REVEAL, 28, 46),
   ...CELLS.flatMap((c) => reveal(c.reveal, 28 + c.index * 3, 46 + c.index * 3)),
-  move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
   move(INTRO_SWEEP, X, SWEEP_START, SWEEP_END, 34, INTRO_FRAMES, EASE_SWEEP),
   {
     objectId: INTRO_SWEEP, propertyKey: OPACITY, keys: [
@@ -346,7 +344,6 @@ const settled: Track[] = [
   hold(NAME_CONTENT, X, 0),
   hold(BODY_SLIDE, Y, 0),
   ...settledRanges,
-  hold(SHADOW, OPACITY, 0.6),
   hold(INTRO_SWEEP, X, SWEEP_END),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -365,7 +362,6 @@ const outro: Track[] = [
   closing(NAME_CONTENT, X, 0, -18, 0, OUTRO_FRAMES),
   closing(BODY_SLIDE, Y, 0, -BODY_HEIGHT, 0, 18),
   ...settledRanges,
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   hold(INTRO_SWEEP, X, SWEEP_END),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -373,7 +369,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   ...GROUPS.map((group) => hold(group, OPACITY, 0)),
   ...EDGE_LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
 
@@ -501,11 +496,6 @@ ${namePanel}
 <!-- ============================== Body strip ============================== -->
 ${body}
 
-<!-- Separation from bright video: a feathered dark stroke around the block. -->
-<Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-  <Rectangle width="${BLOCK_WIDTH}" height="${BLOCK_HEIGHT}" originX="0" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
 <Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X}" y="${BODY_Y}"><Rectangle width="${COLUMN_WIDTH}" height="${BODY_HEIGHT}" originX="0" originY="0"/></Shape>
 </Node>

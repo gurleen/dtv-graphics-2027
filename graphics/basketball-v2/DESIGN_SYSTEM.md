@@ -35,7 +35,7 @@ Colours are written `AARRGGBB` in RML.
 | Dark glass, dense | `E00E1116` (88%) | Talent role strips |
 | Glaze fill | linear `00000000` → `4D000000`, top to bottom | Over every panel |
 | Hairline stroke | linear `73FFFFFF` at 0 → `0FFFFFFF` at 0.6, thickness 1 | The glaze's stroke; light from above |
-| Block shadow | stroke `99000000`, thickness 10, feather 18, shape opacity 0.6, offset y 4 | Behind the whole block |
+| No block shadow | none | Never stroke or feather round the block: it reads as a grey ring over bright video, though it barely shows on a dark preview |
 | Marker | team secondary, 8 wide (6 on neutral graphics, white) | Left edge of the first panel; the outer (right) edge on a bottom-right block |
 | Edge light | line `E6FFFFFF`, 2 wide; glow `30FFFFFF` → clear, 44 wide, trailing the edge | The ignition and leading edges (the scorebug's: `F2FFFFFF`, glow `38FFFFFF`, 32 wide). The Burning Question alone burns ember (`F2FFB066`, glow `4DFF7A1F`) |
 | Alert | `FFE5322D` | Shot clock at 5 or fewer |
@@ -165,7 +165,7 @@ width it does not know. The Scorebug Slider does it this way:
 - The glass is an absolute child box of the panel with `widthUnitsValue="percent"` and its
   fills, stroke and corner radii on the box itself. The Intro keys its width
   (`LayoutComponent` width, key 7) from 0 to 100, which wipes it open with its rounded
-  edge leading. The shadow, the sheen and the edge light sit on percentage boxes keyed
+  edge leading. The sheen and the edge light sit on percentage boxes keyed
   the same way, each pinned to its box's right end. Keep them out of the glass box: a
   box's opacity reaches its children, so hiding the glass would hide the light too.
 - A percent width resolves against the parent's content box, padding excluded. Put the
@@ -173,7 +173,7 @@ width it does not know. The Scorebug Slider does it this way:
 - A box's own fill and stroke ignore an ancestor's `ClippingShape`. `Text` and `Shape`
   obey it. Clip text and sweeps with a `Shape` inside the glass that fills it (a `fill`
   participant and an unpainted `Rectangle`). Make anything that must show outside the
-  glass, such as the shadow or a light in the seam gap before the glass opens, a box.
+  glass, such as a light in the seam gap before the glass opens, a box.
 - A `fill` participant stretches its shape's path, corner radii included, so that mask is
   square. A box's `clip` is square too. A glow that must keep the glass's rounded corners
   is a box pinned to the glass's edge with the same radii and a `maxWidth`.
@@ -240,7 +240,6 @@ Every lower third builds the same way; a new one should reuse these frames.
 | 6 → 36/40 | The leading edges (clip masks) leave the seam and wipe each panel open outward |
 | 8–44 | Panel content drifts in behind the edge (x −22 → 0) |
 | 8–48 | Logos settle from 112% |
-| 12–42 | Block shadow fades in (0 → 0.6) |
 | 18–38 | Marker draws (scaleY 0 → 1) |
 | 18–40 | Edge light fades out |
 | 18–46 | Text rises in letter by letter (text modifier range; 20–44 on the name) |
@@ -271,7 +270,7 @@ this on the away side, so both teams' text rises from the seam outward.
 
 24 frames, ease-in: the strip retracts by frame 18, the marker retracts, logos
 enlarge slightly and fade, the edges close toward the seam, the edge lights
-flash to 0.45 during frames 6–22, and the shadow is gone by frame 20. The last
+flash to 0.45 during frames 6–22. The last
 frame is fully transparent.
 
 ### State machine
@@ -296,7 +295,7 @@ These keep a second take identical to the first:
 1. Hold keys every property the Intro animates, at its resting value.
 2. Outro keys the same properties at frame 0, so it starts from the rest pose
    even when it interrupts an Intro.
-3. Hidden sets the panels, edge lights, shadow and sheen to opacity 0.
+3. Hidden sets the panels, edge lights and sheen to opacity 0.
 4. A new Intro key therefore needs a matching Hold key and Outro key.
 5. The Intro and Outro lengths are the timelines' own (72 frames = 1200 ms,
    24 = 400 ms). `bun run codegen` reads them into `scenes.gen.ts`, and the
@@ -314,7 +313,7 @@ for the same roles.
 | `NN:5` | `LayoutComponentStyle` |
 | `NN:7` | State machine |
 | `NN:10` | The block's root node |
-| `NN:20` | Block shadow |
+| `NN:20` | Unused (was the block shadow) |
 | `NN:30` / `31` / `32` / `33` | Hold / Intro / Outro / Hidden animations |
 | `NN:40` / `41` / `42` / `43` | Hold / Intro / Outro / Hidden states |
 | `NN:100`, `200`, `300` | First, second, third panel (children numbered within the hundred) |
@@ -382,7 +381,7 @@ other with `rive schema <Type>`.
 | 634 | Bindable boolean (state machine conditions) |
 | 327 / 317 | `TextModifierRange` modifyFrom / falloffFrom |
 | 336 / 318 | `TextModifierRange` modifyTo / falloffTo (a backward reveal) |
-| 25 | `StraightVertex` y (a shadow outline that follows moving panels) |
+| 25 | `StraightVertex` y (a path vertex that follows moving panels) |
 | 7 | `LayoutComponent` width (a percentage-width wipe, as on the Scorebug Slider) |
 
 ## Building a new graphic

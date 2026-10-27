@@ -14,14 +14,14 @@
  * comes from layout: a hug `Panel` box holds the padded text, and the glass is an absolute
  * child box of the panel whose width is a percentage of it. Keying that percentage from 0
  * to 100 wipes the glass open from the seam, rounded edge leading, at any text length. The
- * shadow and the runs that carry the sheen and the edge light are percentage boxes beside
- * it. Two findings decide which parts are boxes and which are shapes:
+ * runs that carry the sheen and the edge light are percentage boxes beside it. Two findings
+ * decide which parts are boxes and which are shapes:
  *
  *   - A percent width resolves against the parent's content box, so the padding is on the
  *     text's own box, not on the panel.
  *   - A box's own fill and stroke ignore an ancestor's ClippingShape; Text and Shape obey
  *     it. So the glass clips the text and the sheen (a shape), while the edge light (lit in
- *     the seam gap before any glass shows) and the shadow (outside the glass) are boxes.
+ *     the seam gap before any glass shows) is a box.
  *
  * Text longer than the frame allows shrinks: the line's layout participant is capped at the
  * width left inside the action-safe margin, and `overflowValue="fit"` scales the line into
@@ -69,7 +69,6 @@ const SHEEN_WIDTH = 110;
 // The sheen's centre travels from SHEEN_REACH before the run's end to SHEEN_REACH past it,
 // so it starts and ends wholly off the glass (its slanted footprint is about ±70).
 const SHEEN_REACH = 90;
-const SHADOW_OPACITY = 0.6;
 
 // Timeline lengths in frames at 60 fps.
 const INTRO_FRAMES = 72;
@@ -100,7 +99,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 // --- identifiers ----------------------------------------------------------------------
 
 const ROOT = id(10);
-const SHADOW = id(20);
 const PANEL = id(100);
 const CONTENT = id(110);
 const LINE = id(120);
@@ -200,13 +198,6 @@ const edge = `<LayoutComponent name="Edge Run" id="${EDGE_RUN}" clip="false" wid
         </LayoutComponent>
       </LayoutComponent>`;
 
-// Separation from bright video. It follows the glass's width, and as a box it is not
-// clipped to the glass.
-const shadow = `<LayoutComponent name="Block Shadow" id="${SHADOW}" clip="false" y="4" width="0" height="100" opacity="0" styleId="${id(21)}">
-        ${runStyle('Block Shadow', id(21), ` ${RADII}`)}
-        <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-      </LayoutComponent>`;
-
 // --- timelines ------------------------------------------------------------------------
 
 type Key = { frame: number; value: number; ease?: string; linear?: boolean };
@@ -231,8 +222,8 @@ const move = (objectId: string, propertyKey: number, from: number, to: number, s
 const closing = (objectId: string, propertyKey: number, from: number, to: number, start: number, end: number) =>
   move(objectId, propertyKey, from, to, start, end, EASE_IN);
 
-// The glass, its shadow and the edge light's run open and close together.
-const WIPED = [GLASS, SHADOW, EDGE_RUN];
+// The glass and the edge light's run open and close together.
+const WIPED = [GLASS, EDGE_RUN];
 
 const edgeFlare: Key[] = [
   { frame: 0, value: 0, linear: true }, { frame: 2, value: 1, linear: true },
@@ -260,7 +251,6 @@ const intro: Track[] = [
   move(CONTENT, X, -CONTENT_DRIFT, 0, 8, 44, EASE_OUT),
   move(RISE, MODIFY_FROM, -0.4, 1, 18, 46, EASE_OUT),
   move(RISE, FALLOFF_FROM, 0, 1.4, 18, 46, EASE_OUT),
-  move(SHADOW, OPACITY, 0, SHADOW_OPACITY, 12, 42, EASE_OUT),
   move(SHEEN_RUN, BOX_WIDTH, 0, 100, SWEEP_FROM, INTRO_FRAMES, EASE_SWEEP),
   move(SHEEN, X, -SHEEN_REACH, SHEEN_REACH, SWEEP_FROM, INTRO_FRAMES, EASE_SWEEP),
   { objectId: SHEEN, propertyKey: OPACITY, keys: sheenFade },
@@ -277,7 +267,6 @@ const settled: Track[] = [
   hold(EDGE_LIGHT, OPACITY, 0),
   hold(CONTENT, X, 0),
   ...settledText,
-  hold(SHADOW, OPACITY, SHADOW_OPACITY),
   hold(SHEEN_RUN, BOX_WIDTH, 100),
   hold(SHEEN, X, SHEEN_REACH),
   hold(SHEEN, OPACITY, 0),
@@ -294,7 +283,6 @@ const outro: Track[] = [
   { objectId: EDGE_LIGHT, propertyKey: OPACITY, keys: edgeClosing },
   closing(CONTENT, X, 0, -OUTRO_DRIFT, 0, OUTRO_FRAMES),
   ...settledText,
-  closing(SHADOW, OPACITY, SHADOW_OPACITY, 0, 0, 20),
   hold(SHEEN_RUN, BOX_WIDTH, 100),
   hold(SHEEN, X, SHEEN_REACH),
   hold(SHEEN, OPACITY, 0),
@@ -304,7 +292,6 @@ const hidden: Track[] = [
   hold(GLASS, OPACITY, 0),
   hold(CONTENT, OPACITY, 0),
   hold(EDGE_LIGHT, OPACITY, 0),
-  hold(SHADOW, OPACITY, 0),
   hold(SHEEN, OPACITY, 0),
 ];
 
@@ -354,7 +341,6 @@ const document = `<Rive version="1" kind="fragment">
       ${sheen}
       ${edge}
       ${glass}
-      ${shadow}
   </LayoutComponent>
 </Node>
 

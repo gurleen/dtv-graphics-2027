@@ -168,7 +168,6 @@ const renderVariant = (variant: Variant) => {
   // --- identifiers ----------------------------------------------------------------------
 
   const ROOT = id(10);
-  const SHADOW = id(20);
   const MARKER = id(100);
   const HEADSHOT_PANEL = id(101);
   const HEADSHOT_RISE_NODE = id(102);
@@ -515,7 +514,6 @@ const renderVariant = (variant: Variant) => {
         ...reveal(t.labelReveal, start + 12, start + 30),
       ];
     }),
-    move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
     move(INTRO_SWEEP, X, SWEEP_START, SWEEP_END, 40, INTRO_FRAMES, EASE_SWEEP),
     {
       objectId: INTRO_SWEEP, propertyKey: OPACITY, keys: [
@@ -540,7 +538,6 @@ const renderVariant = (variant: Variant) => {
     hold(HEADER_CONTENT, Y, 0),
     ...SLIDES.map((slide) => hold(slide, Y, 0)),
     ...settledRanges,
-    hold(SHADOW, OPACITY, 0.6),
     hold(INTRO_SWEEP, X, SWEEP_END),
     hold(INTRO_SWEEP, OPACITY, 0),
   ];
@@ -559,7 +556,6 @@ const renderVariant = (variant: Variant) => {
     closing(HEADER_CONTENT, Y, 0, HEADER_HEIGHT, 0, 18),
     ...SLIDES.map((slide) => closing(slide, Y, 0, -BODY_HEIGHT, 0, 18)),
     ...settledRanges,
-    closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
     hold(INTRO_SWEEP, X, SWEEP_END),
     hold(INTRO_SWEEP, OPACITY, 0),
   ];
@@ -567,7 +563,6 @@ const renderVariant = (variant: Variant) => {
   const hidden: Track[] = [
     ...GROUPS.map((group) => hold(group, OPACITY, 0)),
     ...EDGE_LIGHTS.map((light) => hold(light, OPACITY, 0)),
-    hold(SHADOW, OPACITY, 0),
     hold(INTRO_SWEEP, OPACITY, 0),
   ];
 
@@ -712,11 +707,6 @@ const renderVariant = (variant: Variant) => {
   ${sponsorChip}
   ${body}
 
-  <!-- Separation from bright video: a feathered dark stroke around the block. -->
-  <Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-    <Rectangle width="${BLOCK_WIDTH}" height="${BLOCK_HEIGHT}" originX="0" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-    <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-  </Shape>
   <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
   <Shape name="Header Slide Mask" id="${HEADER_MASK}" x="${COLUMN_X}" y="0"><Rectangle width="${COLUMN_WIDTH}" height="${HEADER_HEIGHT}" originX="0" originY="0"/></Shape>
   <Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X}" y="${BODY_Y}">${rectangle(BODY_WIDTH, BODY_HEIGHT, BODY_RADII)}</Shape>

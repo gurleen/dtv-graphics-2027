@@ -105,7 +105,7 @@ const STATUS_BASELINE = 37;
 // The strip starts wholly behind its slide mask, under the home row.
 const STRIP_DROP = STRIP_HEIGHT + GAP;
 // The leading edge rests REVEAL_OVERHANG past the outer edge; the masks reach MASK_MARGIN
-// past the block so the shadow is not cut off.
+// past the block.
 const REVEAL_OVERHANG = 24;
 const MASK_MARGIN = 60;
 const EDGE_REST = -REVEAL_OVERHANG;
@@ -130,7 +130,6 @@ const Y = 14;
 const SCALE_X = 16;
 const SCALE_Y = 17;
 const OPACITY = 18;
-const VERTEX_Y = 25;
 const COLOR = 37;
 const IMAGE = 206;
 const TEXT = 268;
@@ -150,8 +149,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 const ROOT = id(10);
 const SIDE = id(11);
 const PRESENCE = id(12);
-const SHADOW = id(20);
-const SHADOW_PATH = id(50);
 const EDGE = id(500);
 const REVEAL_MASK = id(501);
 const EDGE_LIGHT = id(502);
@@ -353,7 +350,7 @@ const strip = `<Node name="Strip" id="${STRIP.panel}" x="0" y="${STRIP_Y}">
   </Node>
 </Node>`;
 
-// --- leading edge, sweep, shadow, silhouette ------------------------------------------
+// --- leading edge, sweep, silhouette --------------------------------------------------
 
 // One edge: its mask reaches toward the inner end, so the glass shows between the edge and
 // the inner end. The light spans the rows only (the strip arrives after the wipe), ignites
@@ -375,23 +372,6 @@ const sweep = `<Shape name="Glass Specular Sweep" id="${SWEEP}" x="${SWEEP_END}"
   <Fill><LinearGradient startX="-55" startY="0" endX="55" endY="0"><GradientStop colorValue="00FFFFFF" position="0"/><GradientStop colorValue="20FFFFFF" position="0.5"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill>
   <ClippingShape name="Sweep Silhouette Clip" sourceId="${SILHOUETTE}"/>
   ${wipeClip('Sweep')}
-</Shape>`;
-
-// The outline runs round the rows and the strip. Its base drops with the strip.
-const outline = [
-  { local: 51, x: 0, y: 0, base: false },
-  { local: 52, x: BLOCK_WIDTH, y: 0, base: false },
-  { local: 53, x: BLOCK_WIDTH, y: BLOCK_HEIGHT, base: true },
-  { local: 54, x: 0, y: BLOCK_HEIGHT, base: true },
-] as const;
-const BASE = outline.filter((vertex) => vertex.base).map((vertex) => id(vertex.local));
-
-const blockShadow = `<Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-  ${wipeClip('Block Shadow')}
-  <PointsPath name="Block Outline" id="${SHADOW_PATH}" isClosed="true">
-    ${outline.map((vertex) => `<StraightVertex id="${id(vertex.local)}" x="${vertex.x}" y="${vertex.y}" radius="${OUTER_RADIUS}"/>`).join('\n    ')}
-  </PointsPath>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
 </Shape>`;
 
 const silhouette = `<Shape name="Block Silhouette" id="${SILHOUETTE}">
@@ -477,11 +457,9 @@ const intro: Track[] = [
     move(own.marker, SCALE_Y, 0, 1, 30, 50, EASE_OUT),
   ]),
   move(STRIP.slide, Y, -STRIP_DROP, 0, 22, 46, EASE_OUT),
-  ...BASE.map((vertex) => move(vertex, VERTEX_Y, ROWS_HEIGHT, BLOCK_HEIGHT, 22, 46, EASE_OUT)),
   ...STRIP.statuses.flatMap((twin) => reveal(twin, 28, 52)),
   move(STRIP.sponsorRise, Y, SPONSOR_Y + SPONSOR_DROP, SPONSOR_Y, 32, 56, EASE_OUT),
   move(STRIP.sponsorRise, OPACITY, 0, 1, 32, 50, EASE_OUT),
-  move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
   move(SWEEP, X, SWEEP_START, SWEEP_END, SWEEP_FROM, INTRO_FRAMES, EASE_SWEEP),
   { objectId: SWEEP, propertyKey: OPACITY, keys: sheen },
 ];
@@ -498,11 +476,9 @@ const settled: Track[] = [
     hold(own.marker, SCALE_Y, 1),
   ]),
   hold(STRIP.slide, Y, 0),
-  ...BASE.map((vertex) => hold(vertex, VERTEX_Y, BLOCK_HEIGHT)),
   ...settledRanges,
   hold(STRIP.sponsorRise, Y, SPONSOR_Y),
   hold(STRIP.sponsorRise, OPACITY, 1),
-  hold(SHADOW, OPACITY, 0.6),
   hold(SWEEP, X, SWEEP_END),
   hold(SWEEP, OPACITY, 0),
 ];
@@ -523,11 +499,9 @@ const outro: Track[] = [
     closing(own.marker, SCALE_Y, 1, 0, 0, 12),
   ]),
   closing(STRIP.slide, Y, 0, -STRIP_DROP, 0, 16),
-  ...BASE.map((vertex) => closing(vertex, VERTEX_Y, BLOCK_HEIGHT, ROWS_HEIGHT, 0, 16)),
   ...settledRanges,
   hold(STRIP.sponsorRise, Y, SPONSOR_Y),
   closing(STRIP.sponsorRise, OPACITY, 1, 0, 0, 12),
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   hold(SWEEP, X, SWEEP_END),
   hold(SWEEP, OPACITY, 0),
 ];
@@ -535,7 +509,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   ...GROUPS.map((group) => hold(group, OPACITY, 0)),
   hold(EDGE_LIGHT, OPACITY, 0),
-  hold(SHADOW, OPACITY, 0),
   hold(SWEEP, OPACITY, 0),
 ];
 
@@ -651,8 +624,6 @@ ${TEAM_INDICES.map(teamRow).join('\n')}
 <!-- ============================== Strip ==================================== -->
 ${strip}
 
-<!-- Separation from bright video: a feathered dark stroke around the block. -->
-${blockShadow}
 
 <!-- Unpainted shapes: the clip sources. -->
 ${stripMask}

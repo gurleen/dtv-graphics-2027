@@ -59,10 +59,6 @@
           <Rectangle width="100" height="64" originX="0" originY="0"/>
         </Shape>
       </LayoutComponent>
-      <LayoutComponent name="Block Shadow" id="47:20" clip="false" y="4" width="0" height="100" opacity="0" styleId="47:21">
-        <LayoutComponentStyle name="Block Shadow Style" id="47:21" positionTypeValue="absolute" positionLeft="0" positionLeftUnitsValue="points" positionTop="0" positionTopUnitsValue="points" widthUnitsValue="percent" heightUnitsValue="percent" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="12"/>
-        <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-      </LayoutComponent>
   </LayoutComponent>
 </Node>
 
@@ -81,11 +77,6 @@
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:500"><KeyedProperty propertyKey="7">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-    <KeyFrameDouble frame="6" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="40" value="100" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
     <KeyFrameDouble frame="6" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
     <KeyFrameDouble frame="40" value="100" interpolationType="hold"/>
@@ -120,11 +111,6 @@
     <KeyFrameDouble frame="18" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
     <KeyFrameDouble frame="46" value="1.4" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-    <KeyFrameDouble frame="12" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="42" value="0.6" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:600"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
     <KeyFrameDouble frame="34" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.4" y1="0" x2="0.6" y2="1"/></KeyFrameDouble>
@@ -157,9 +143,6 @@
   <KeyedObject objectId="47:500"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="7">
-    <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:530"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -177,9 +160,6 @@
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:123"><KeyedProperty propertyKey="317">
     <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:600"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
@@ -211,11 +191,6 @@
     <KeyFrameDouble frame="2" value="100" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
     <KeyFrameDouble frame="22" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="7">
-    <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
-    <KeyFrameDouble frame="2" value="100" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
-    <KeyFrameDouble frame="22" value="0" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:530"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
     <KeyFrameDouble frame="2" value="100" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
@@ -241,10 +216,6 @@
   <KeyedObject objectId="47:123"><KeyedProperty propertyKey="317">
     <KeyFrameDouble frame="0" value="1.4" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0.6" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
-    <KeyFrameDouble frame="20" value="0" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:600"><KeyedProperty propertyKey="7">
     <KeyFrameDouble frame="0" value="100" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -264,9 +235,6 @@
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:520"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="47:20"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="47:604"><KeyedProperty propertyKey="18">

@@ -163,8 +163,6 @@ const playing = (name: string) =>
 
 const ROOT = id(10);
 const CONTENT = id(11);
-const SHADOW = id(20);
-const SHADOW_RECTANGLE = id(21);
 const TITLE_PANEL = id(100);
 const TITLE_CONTENT = id(101);
 const WORDMARK = id(102);
@@ -425,8 +423,6 @@ const intro: Track[] = [
     move(light, SCALE_Y, 0, 1, 0, 16, EASE_OUT),
     { objectId: light, propertyKey: OPACITY, keys: edgeFlare(18, 42) },
   ]),
-  move(SHADOW_RECTANGLE, PATH_WIDTH, 0, CARD_WIDTH, WIPE_START, WIPE_END, EASE_WIPE),
-  move(SHADOW, OPACITY, 0, 0.6, WIPE_START, 36, EASE_OUT),
   ...scale(WORDMARK_GROUP, 1.12, 1, 16, 56, EASE_OUT),
   move(WORDMARK_GROUP, OPACITY, 0, 1, 16, 36, EASE_OUT),
   ...reveal(TITLE_REVEAL, 16, 40),
@@ -464,8 +460,6 @@ const settled: Track[] = [
   hold(LEFT_EDGE, X, -8),
   hold(RIGHT_EDGE, X, CARD_WIDTH + 8),
   ...EDGE_LIGHTS.flatMap((light) => [hold(light, SCALE_Y, 1), hold(light, OPACITY, 0)]),
-  hold(SHADOW_RECTANGLE, PATH_WIDTH, CARD_WIDTH),
-  hold(SHADOW, OPACITY, 0.6),
   ...MARKS.flatMap((mark) => [hold(mark, SCALE_X, 1), hold(mark, SCALE_Y, 1), hold(mark, OPACITY, 1)]),
   ...settledGates,
   ...settledRanges,
@@ -478,8 +472,6 @@ const outro: Track[] = [
   closing(LEFT_EDGE, X, -8, SEAM_X, 2, OUTRO_FRAMES),
   closing(RIGHT_EDGE, X, CARD_WIDTH + 8, SEAM_X, 2, OUTRO_FRAMES),
   ...EDGE_LIGHTS.flatMap((light): Track[] => [hold(light, SCALE_Y, 1), { objectId: light, propertyKey: OPACITY, keys: edgeClosing }]),
-  hold(SHADOW_RECTANGLE, PATH_WIDTH, CARD_WIDTH),
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   ...MARKS.flatMap((mark): Track[] => [
     closing(mark, SCALE_X, 1, 1.06, 0, 16), closing(mark, SCALE_Y, 1, 1.06, 0, 16),
     closing(mark, OPACITY, 1, 0, 0, 16),
@@ -492,7 +484,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   hold(CONTENT, OPACITY, 0),
   ...EDGE_LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
 
@@ -644,12 +635,6 @@ ${titlePanel}
 ${tablePanel}
 </Node>
 
-<!-- Separation from bright video: a feathered dark stroke around the card. Its origin
-     is the top centre, so the intro grows it with the revealed area. -->
-<Shape name="Card Shadow" id="${SHADOW}" x="${SEAM_X}" y="4" opacity="0.6">
-  <Rectangle id="${SHADOW_RECTANGLE}" width="${CARD_WIDTH}" height="${CARD_HEIGHT}" originX="0.5" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 
 <!-- ============================= Clip sources ============================= -->
 <!-- Unpainted, so they contribute geometry and draw nothing. The reveal mask is centred

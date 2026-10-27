@@ -22,8 +22,8 @@ A summary; `DESIGN_SYSTEM.md` has the values.
   clear at the top to about 30% black at the foot, and a hairline edge is lit
   from above (white at about 45% along the top, fading to a trace by 60% of
   the height). No white wash over the colour. Neutral panels use dark glass
-  (`#0E1116` at about 82%). A feathered dark stroke behind the block gives it
-  separation from bright video.
+  (`#0E1116` at about 82%). There is no drop shadow or outer ring round the
+  block.
 - **Typeface: Zuume.** `assets/fonts/Zuume-Bold.ttf` for acronyms, scores and
   the game clock; `assets/fonts/Zuume-Regular.ttf` for labels (period, `SHOT`,
   `BONUS`) and the shot clock digits.
@@ -66,7 +66,7 @@ action-safe margin (block origin 96, 890; size 430 x 132).
   reads by about 0.67 s.
 - **Outro (0.4 s):** the markers retract and text sinks away while illuminated
   edges close both sides of the glass toward the seam. The logos gently enlarge
-  and fade, the sponsor lowers away, and the shadow contracts with the panels.
+  and fade, and the sponsor lowers away.
   The joined seam light contracts to the centre and extinguishes last.
 - **Motion maintenance:** Hold keys every animated property at its resting
   value. Intro and Outro explicitly key the same properties so replay resets
@@ -109,7 +109,7 @@ scorebug's baseline and height so the two can be on air together (block origin
   Everything reads by about 0.77 s. The 0.4 s outro retracts the stat strip
   and closes the panels toward the seam with a brief edge light.
 - **Motion maintenance:** Hold and Outro key every intro property at its
-  resting value. Hidden turns off the panels, shadow, edge lights and sheen.
+  resting value. Hidden turns off the panels, edge lights and sheen.
 - **On air:** `isPlaying`, as on the scorebug.
 
 Text is shown as entered; Rive has no case transform, so send names in capitals.
@@ -144,7 +144,7 @@ origin 610, 890; size 700 x 132; 84 units clear of the scorebug).
   The 0.4 s outro retracts the strip and marker, enlarges and fades the logo,
   and closes the panels toward the seam with a brief edge light.
 - **Motion maintenance:** Hold and Outro key every intro property at its
-  resting value. Hidden turns off the panels, shadow, edge lights and sheen.
+  resting value. Hidden turns off the panels, edge lights and sheen.
 - **On air:** `isPlaying`, as on the scorebug.
 
 View model `BasketballStaffLowerThirdV2`, public properties: `isPlaying`,
@@ -281,9 +281,8 @@ scorebug, so it is for pre-game only; never put the two on air together.**
   retract, the strip and tab withdraw behind the band, and the edges close the
   glass toward the seam with a brief edge light.
 - **Motion maintenance:** Hold and Outro key every property the intro animates
-  at its resting value; Hidden turns off the panel groups, edge lights, shadow
-  and sweeps. The block shadow is one outline round the band and the strip,
-  its bottom edge keyed to follow the strip; the tab casts its own.
+  at its resting value; Hidden turns off the panel groups, edge lights
+  and sweeps.
 - **On air:** `isPlaying`, as on the scorebug.
 
 View model `BasketballMatchupLocatorLowerThirdV2`, public properties:
@@ -325,13 +324,12 @@ and are meant for shots without it (pregame, halftime, the desk).
   two leading edges that wipe all the blocks open outward. Each block's name
   drifts outward behind the edges, the markers draw in, the role strip slides
   down from under the name panels, and text rises in letter by letter from the
-  centre column out. The shadow fades in once the wipe is mostly open, and one
-  sheen finishes the glass. Everything reads by about 0.87 s.
+  centre column out. One sheen finishes the glass. Everything reads by about 0.87 s.
 - **Outro (0.4 s):** the role strip retracts, the markers retract, and the edges
   close the blocks toward the centre with a brief edge light.
 - **Motion maintenance:** the generator keys Hold and Outro from the same
   property list as the Intro; Hidden turns off both panel groups, the edge
-  lights, shadow and sheen.
+  lights and sheen.
 - **On air:** `isPlaying`, as on the scorebug.
 
 View models `BasketballTalentLowerThirdSingleV2`, `…DoubleV2` and
@@ -687,7 +685,7 @@ thirds: the text is right-aligned, and the sponsor chip and the marker sit on th
 - **State machine:** two layers. Display (Hidden → Intro → Hold → Outro) follows
   `isPlaying`. Answer (Answer Hidden, Answer Shown, the reveal and the conceal)
   follows `showAnswer` and animates only while `isPlaying` is true. It keys the lift
-  and everything that follows it (the question's lower corners, the shadow outline,
+  and everything that follows it (the question's lower corners,
   the sweeps' silhouette and the edge-light spans), the answer's fade and its own
   sweep. The layers share only the answer's reveal range, which the Answer layer, the
   later one, wins during the reveal. Hold and Outro key every property the intro
@@ -736,7 +734,7 @@ edge on the action-safe margin, x 96) or, mirrored, bottom-right (right edge on 
   it and rise in letter by letter from the inner end. As the edge reaches the outer
   end, each logo settles from 112% while drifting 16 units outward, and the markers
   draw away from the gap between the rows. The strip slides down from under the home
-  row, the status rises in, and the sponsor fades up. The shadow fades in and one
+  row, the status rises in, and the sponsor fades up. One
   sheen crosses the glass. Everything reads by about 0.9 s (frame 52). The edge light is clipped
   to the block, so it never burns outside the glass.
 - **Outro (0.4 s):** the logos fade as they swell to 106%, the markers retract, the
@@ -790,8 +788,8 @@ layer, so it replaces a lower third on air and a lower third replaces it.
 - **Generated.** `generate_scorebug_slider.ts` writes the `.rml`. Edit the generator, then
   run `bun graphics/basketball-v2/generate_scorebug_slider.ts`. Never edit the `.rml`
   output by hand.
-- **Glass:** neutral dark glass (`D10E1116`) with the glaze fill, the hairline stroke and
-  the block shadow. There is no team colour and no marker: the left edge is the seam with
+- **Glass:** neutral dark glass (`D10E1116`) with the glaze fill and the hairline
+  stroke. There is no team colour and no marker: the left edge is the seam with
   the scorebug. The corners are 3 on the left (the seam) and 12 on the right.
 - **Width:** the glass is as wide as its text plus 24 on the left and 28 on the right, up
   to 1294, so its right edge never passes the action-safe margin (x 1824). The venue line
@@ -806,26 +804,26 @@ layer, so it replaces a lower third on air and a lower third replaces it.
   a `Content` box, which holds the line and its padding. The glass is an absolute child
   box of the panel whose width is a percentage of the panel, and the Intro keys that
   percentage from 0 to 100 (`LayoutComponent` width, key 7). The glass therefore wipes
-  open from the seam with its rounded edge leading, at any text length. The shadow and the
+  open from the seam with its rounded edge leading, at any text length. The
   runs that carry the sheen and the edge light are percentage boxes keyed the same way,
   and the light is pinned to its run's right end. Two layout rules set the structure. A
   percentage resolves against the parent's content box, so the padding is on `Content`,
   not on the panel. A box's own fill and stroke ignore an ancestor's `ClippingShape`,
   while `Text` and `Shape` obey it. So a square mask inside the glass clips the text and
-  the sheen, and the edge light and the shadow are boxes: the light shows in the seam gap
-  before any glass opens, and the shadow falls outside the glass.
+  the sheen, and the edge light is a box: it shows in the seam gap
+  before any glass opens.
 - **Intro (1.2 s):** a white edge light ignites in the gap at the seam (frames 0 to 12).
   The glass wipes open left to right with the ignition-split ease (frames 6 to 40), with
   the light on its leading edge and the glow trailing over the glass. The text drifts in
-  22 behind the edge and rises in letter by letter (frames 18 to 46). The shadow fades in,
-  the light fades out (frames 24 to 44), and one sheen crosses the glass (frames 34 to
+  22 behind the edge and rises in letter by letter (frames 18 to 46). The
+  light fades out (frames 24 to 44), and one sheen crosses the glass (frames 34 to
   72). The whole line reads by about 0.6 s (frame 36).
 - **Outro (0.4 s):** the text sinks 10 and fades as it drifts toward the seam (gone by
   frame 16). The glass closes right to left back into the scorebug with a brief edge
-  light (frames 2 to 22). The shadow is gone by frame 20, and the last frame is empty.
+  light (frames 2 to 22). The last frame is empty.
 - **Motion maintenance:** Hold and Outro key every property the Intro animates at its
   resting value, so a second take matches the first. Hidden sets the glass, text, edge
-  light, shadow and sheen to opacity 0. The glass shows from frame 6: at zero width its
+  light and sheen to opacity 0. The glass shows from frame 6: at zero width its
   stroke would draw a hairline at the seam.
 - **State machine:** one layer, Display (Hidden → Intro → Hold → Outro), gated on
   `isPlaying`.

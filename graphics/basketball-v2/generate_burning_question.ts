@@ -11,14 +11,14 @@
  * and the team marker sit on its outer (right) edge. Its state machine has two layers:
  *
  *   Display  Hidden -> Intro -> Hold -> Outro, gated on `isPlaying`, as in every v2 scene.
- *            It animates the shell: wipes, edge lights, drifts, the logos, shadow and
+ *            It animates the shell: wipes, edge lights, drifts, the logos and
  *            sheen, and the rise of all three texts.
  *   Answer   Answer Hidden <-> Answer Shown, gated on `showAnswer`. On air it plays the
  *            reveal, in which the title and question lift to uncover the answer strip
  *            beneath them, so the block's foot stays on the scorebug's baseline, or the
  *            conceal; off air it switches instantly, so the intro builds whichever is set.
  *            It keys the lift and everything that follows it (the question's lower
- *            corners, the shadow, the silhouette and the edge-light spans), the answer's
+ *            corners, the silhouette and the edge-light spans), the answer's
  *            fade and its own sweep, so the layers never key the same property, except
  *            the answer's reveal range, which the reveal keys and the later layer wins.
  */
@@ -129,8 +129,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 
 const ROOT = id(10);
 const LIFT_NODE = id(11);
-const SHADOW = id(20);
-const SHADOW_OUTLINE = id(21);
 const TITLE_PANEL = id(100);
 const TITLE_CONTENT = id(101);
 const TITLE_REVEAL = id(102);
@@ -432,7 +430,6 @@ const intro: Track[] = [
   ...reveal(TITLE_REVEAL, 'backward', 14, 40),
   ...reveal(QUESTION_REVEAL, 'forward', 18, 50),
   ...reveal(ANSWER_REVEAL, 'backward', 22, 46),
-  move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
   move(INTRO_SWEEP, X, SWEEP_RIGHT, SWEEP_LEFT, 34, INTRO_FRAMES, EASE_SWEEP),
   { objectId: INTRO_SWEEP, propertyKey: OPACITY, keys: sheen(34, INTRO_FRAMES, 0.65) },
 ];
@@ -447,7 +444,6 @@ const settled: Track[] = [
   ...CONTENTS.map((content) => hold(content, X, 0)),
   hold(CHIP_LOGO, SCALE_X, 1), hold(CHIP_LOGO, SCALE_Y, 1), hold(CHIP_LOGO, OPACITY, 1),
   ...settledRanges,
-  hold(SHADOW, OPACITY, 0.6),
   hold(INTRO_SWEEP, X, SWEEP_LEFT),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -468,7 +464,6 @@ const outro: Track[] = [
   // until the edge reaches it rather than leaving an empty plate.
   closing(CHIP_LOGO, OPACITY, 1, 0, 12, OUTRO_FRAMES),
   ...settledRanges,
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   hold(INTRO_SWEEP, X, SWEEP_LEFT),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -476,7 +471,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   ...GROUPS.map((group) => hold(group, OPACITY, 0)),
   ...LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
 
@@ -490,8 +484,6 @@ const LIFTED: Lifted[] = [
   { objectId: SILHOUETTE_TITLE, propertyKey: Y, hidden: 0, shown: -LIFT },
   { objectId: SILHOUETTE_CHIP, propertyKey: Y, hidden: 0, shown: -LIFT },
   { objectId: SILHOUETTE_QUESTION, propertyKey: Y, hidden: QUESTION_Y, shown: QUESTION_Y - LIFT },
-  { objectId: SHADOW_OUTLINE, propertyKey: Y, hidden: 0, shown: -LIFT },
-  { objectId: SHADOW_OUTLINE, propertyKey: HEIGHT, hidden: HIDDEN_HEIGHT, shown: SHOWN_HEIGHT },
   ...[LEFT_SPAN, RIGHT_SPAN].flatMap((span): Lifted[] => [
     { objectId: span, propertyKey: Y, hidden: HIDDEN_HEIGHT / 2, shown: (HIDDEN_HEIGHT - LIFT) / 2 },
     { objectId: span, propertyKey: SCALE_Y, hidden: 1, shown: SHOWN_HEIGHT / HIDDEN_HEIGHT },
@@ -648,12 +640,6 @@ ${questionPanel}
 <!-- ============================== Answer =================================== -->
 ${answerStrip}
 
-<!-- Separation from bright video: a feathered dark stroke around the block, its top
-     following the lift. -->
-<Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-  <Rectangle id="${SHADOW_OUTLINE}" width="${BLOCK_WIDTH}" height="${HIDDEN_HEIGHT}" originX="0" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 ${silhouette}
 </Node>
 

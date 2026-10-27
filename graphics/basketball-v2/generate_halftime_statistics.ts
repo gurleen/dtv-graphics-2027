@@ -177,8 +177,6 @@ const SCORE_LEADER = leaderOf({
 
 const ROOT = id(10);
 const CONTENT = id(11);
-const SHADOW = id(20);
-const SHADOW_RECTANGLE = id(21);
 const COLUMN = id(300);
 const TITLE_STRIP = id(301);
 const TITLE_STYLE = id(302);
@@ -552,8 +550,6 @@ const intro: Track[] = [
     move(light, SCALE_Y, 0, 1, 0, 16, EASE_OUT),
     { objectId: light, propertyKey: OPACITY, keys: edgeFlare(18, 42) },
   ]),
-  move(SHADOW_RECTANGLE, PATH_WIDTH, 0, CARD_WIDTH, WIPE_START, WIPE_END, EASE_WIPE),
-  move(SHADOW, OPACITY, 0, 0.6, WIPE_START, 36, EASE_OUT),
   ...reveal(TITLE_REVEAL, 14, 40),
   ...reveal(SCORE_LABEL_REVEAL, 16, 36),
   ...TEAMS.flatMap((t): Track[] => [
@@ -602,8 +598,6 @@ const settled: Track[] = [
   hold(AWAY_EDGE, X, -8),
   hold(HOME_EDGE, X, CARD_WIDTH + 8),
   ...EDGE_LIGHTS.flatMap((light) => [hold(light, SCALE_Y, 1), hold(light, OPACITY, 0)]),
-  hold(SHADOW_RECTANGLE, PATH_WIDTH, CARD_WIDTH),
-  hold(SHADOW, OPACITY, 0.6),
   ...TEAMS.flatMap((t) => [
     hold(t.content, X, 0),
     hold(t.bloom, SCALE_X, 1), hold(t.bloom, SCALE_Y, 1), hold(t.bloom, OPACITY, 1),
@@ -623,8 +617,6 @@ const outro: Track[] = [
   closing(AWAY_EDGE, X, -8, SEAM_X, 2, OUTRO_FRAMES),
   closing(HOME_EDGE, X, CARD_WIDTH + 8, SEAM_X, 2, OUTRO_FRAMES),
   ...EDGE_LIGHTS.flatMap((light): Track[] => [hold(light, SCALE_Y, 1), { objectId: light, propertyKey: OPACITY, keys: edgeClosing }]),
-  hold(SHADOW_RECTANGLE, PATH_WIDTH, CARD_WIDTH),
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   ...TEAMS.flatMap((t): Track[] => [
     closing(t.content, X, 0, t.towardSeam * 24, 0, OUTRO_FRAMES),
     hold(t.bloom, SCALE_X, 1), hold(t.bloom, SCALE_Y, 1),
@@ -643,7 +635,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   hold(CONTENT, OPACITY, 0),
   ...EDGE_LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
 
@@ -800,12 +791,6 @@ ${column}
 ${teamPanel(TEAMS[1])}
 </Node>
 
-<!-- Separation from bright video: a feathered dark stroke around the card. Its origin
-     is the top centre, so the intro grows it with the revealed area. -->
-<Shape name="Card Shadow" id="${SHADOW}" x="${SEAM_X}" y="4" opacity="0.6">
-  <Rectangle id="${SHADOW_RECTANGLE}" width="${CARD_WIDTH}" height="${CARD_HEIGHT}" originX="0.5" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 
 <!-- ============================= Clip sources ============================= -->
 <!-- Unpainted, so they contribute geometry and draw nothing. The reveal mask is centred

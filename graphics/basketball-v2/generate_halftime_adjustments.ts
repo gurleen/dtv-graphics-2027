@@ -12,7 +12,7 @@
  * the team marker on the panel's outer (left) edge. Its state machine has two layers:
  *
  *   Display  Hidden -> Intro -> Hold -> Outro, gated on `isPlaying`, as in every v2 scene.
- *            It animates the shell: wipes, edge lights, drifts, the logos, shadow and
+ *            It animates the shell: wipes, edge lights, drifts, the logos and
  *            sheen, and the rise of both teams' text.
  *   Team     Away Shown <-> Home Shown, gated on `step` (0 = away, 1 = home). On air it
  *            plays a change animation; off air it switches instantly. It animates only
@@ -135,7 +135,6 @@ const pathTo = (property: number) => `${id(1000)}-${id(property)}`;
 // --- identifiers ----------------------------------------------------------------------
 
 const ROOT = id(10);
-const SHADOW = id(20);
 const TITLE_PANEL = id(100);
 const TITLE_CONTENT = id(101);
 const TITLE_REVEAL = id(102);
@@ -439,7 +438,6 @@ const intro: Track[] = [
     ...reveal(teamPanel(team).line(0).reveal, 22, 48),
     ...reveal(teamPanel(team).line(1).reveal, 26, 52),
   ]),
-  move(SHADOW, OPACITY, 0, 0.6, 12, 42, EASE_OUT),
   move(INTRO_SWEEP, X, SWEEP_LEFT, SWEEP_RIGHT, 34, INTRO_FRAMES, EASE_SWEEP),
   { objectId: INTRO_SWEEP, propertyKey: OPACITY, keys: sheen(34, INTRO_FRAMES, 0.65) },
 ];
@@ -454,7 +452,6 @@ const settled: Track[] = [
   ...CONTENTS.map((content) => hold(content, X, 0)),
   hold(CHIP_LOGO, SCALE_X, 1), hold(CHIP_LOGO, SCALE_Y, 1), hold(CHIP_LOGO, OPACITY, 1),
   ...settledRanges,
-  hold(SHADOW, OPACITY, 0.6),
   hold(INTRO_SWEEP, X, SWEEP_RIGHT),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -475,7 +472,6 @@ const outro: Track[] = [
   // until the edge reaches it rather than leaving an empty plate.
   closing(CHIP_LOGO, OPACITY, 1, 0, 12, OUTRO_FRAMES),
   ...settledRanges,
-  closing(SHADOW, OPACITY, 0.6, 0, 0, 20),
   hold(INTRO_SWEEP, X, SWEEP_RIGHT),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
@@ -483,7 +479,6 @@ const outro: Track[] = [
 const hidden: Track[] = [
   ...GROUPS.map((group) => hold(group, OPACITY, 0)),
   ...LIGHTS.map((light) => hold(light, OPACITY, 0)),
-  hold(SHADOW, OPACITY, 0),
   hold(INTRO_SWEEP, OPACITY, 0),
 ];
 
@@ -661,11 +656,6 @@ ${titlePanel}
 <!-- ============================== Team panel =============================== -->
 ${panel}
 
-<!-- Separation from bright video: a feathered dark stroke around the block. -->
-<Shape name="Block Shadow" id="${SHADOW}" x="0" y="4" opacity="0.6">
-  <Rectangle width="${BLOCK_WIDTH}" height="${BLOCK_HEIGHT}" originX="0" originY="0" cornerRadiusTL="${OUTER_RADIUS}"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 ${silhouette}
 </Node>
 

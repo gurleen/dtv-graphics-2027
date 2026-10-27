@@ -373,12 +373,6 @@
 </Node>
 </Node>
 
-<!-- Separation from bright video: a feathered dark stroke around the card. Its origin
-     is the top centre, so the intro grows it with the revealed area. -->
-<Shape name="Card Shadow" id="41:20" x="550" y="4" opacity="0.6">
-  <Rectangle id="41:21" width="1100" height="788" originX="0.5" originY="0" cornerRadiusTL="24"/>
-  <Stroke thickness="10"><SolidColor colorValue="99000000"/><Feather strength="18"/></Stroke>
-</Shape>
 
 <!-- ============================= Clip sources ============================= -->
 <!-- Unpainted, so they contribute geometry and draw nothing. The reveal mask is centred
@@ -433,16 +427,6 @@
     <KeyFrameDouble frame="2" value="1" interpolationType="linear"/>
     <KeyFrameDouble frame="18" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
     <KeyFrameDouble frame="42" value="0" interpolationType="linear"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:21"><KeyedProperty propertyKey="20">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-    <KeyFrameDouble frame="8" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.1" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="46" value="1100" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:20"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-    <KeyFrameDouble frame="8" value="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.16" y1="1" x2="0.3" y2="1"/></KeyFrameDouble>
-    <KeyFrameDouble frame="36" value="0.6" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="41:107"><KeyedProperty propertyKey="16">
     <KeyFrameDouble frame="0" value="1.12" interpolationType="hold"/>
@@ -1468,12 +1452,6 @@
   <KeyedObject objectId="41:503"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:21"><KeyedProperty propertyKey="20">
-    <KeyFrameDouble frame="0" value="1100" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:20"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0.6" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="41:107"><KeyedProperty propertyKey="16">
     <KeyFrameDouble frame="0" value="1" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -2112,13 +2090,6 @@
     <KeyFrameDouble frame="10" value="0.45" interpolationType="linear"/>
     <KeyFrameDouble frame="22" value="0.45" interpolationType="linear"/>
     <KeyFrameDouble frame="24" value="0" interpolationType="linear"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:21"><KeyedProperty propertyKey="20">
-    <KeyFrameDouble frame="0" value="1100" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:20"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0.6" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
-    <KeyFrameDouble frame="20" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="41:107"><KeyedProperty propertyKey="16">
     <KeyFrameDouble frame="0" value="1" interpolationType="cubic"><CubicEaseInterpolator x1="0.7" y1="0" x2="0.84" y2="0"/></KeyFrameDouble>
@@ -2769,9 +2740,6 @@
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="41:503"><KeyedProperty propertyKey="18">
-    <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="41:20"><KeyedProperty propertyKey="18">
     <KeyFrameDouble frame="0" value="0" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="41:600"><KeyedProperty propertyKey="18">
