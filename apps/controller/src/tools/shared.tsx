@@ -70,6 +70,31 @@ export function useGameChoice(feed: (FeedStatus & { readonly game: string | null
   return { games, game, choose: setChosen };
 }
 
+/**
+ * A text field of a feed form, kept in this browser's localStorage under `key` as it changes: a running feed's own value
+ * first, so a reload shows what is running; then the value last entered here; then the feed's last start.
+ */
+export function useCachedInput(key: string, feed: (FeedStatus & { readonly value: string | null }) | null | undefined) {
+  const [chosen, setChosen] = useState<string | null>(null);
+  const [cached] = useState(() => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  });
+  const value = chosen ?? (feed?.state === 'running' ? feed.value : (cached ?? feed?.value)) ?? '';
+  const choose = (next: string) => {
+    setChosen(next);
+    try {
+      localStorage.setItem(key, next);
+    } catch {
+      // Private mode or a full store: the field still works, it just is not remembered.
+    }
+  };
+  return { value, choose };
+}
+
 export function GameSelect({ games, game, onChange }: { readonly games: readonly { id: string; label: string }[]; readonly game: string | null; readonly onChange: (id: string | null) => void }) {
   return (
     <Select className="field tool-game" placeholder="Choose a game" selectedKey={game} onSelectionChange={(key) => onChange(key === null ? null : String(key))}>

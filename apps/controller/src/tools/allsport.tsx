@@ -4,12 +4,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button, Checkbox, ComboBox, Input, Label, ListBox, ListBoxItem, Popover } from 'react-aria-components';
 import { useController } from '../app/context';
 import { useStream } from '../app/streams';
-import { FeedLog, FeedState, GameSelect, useCall, useGameChoice } from './shared';
+import { FeedLog, FeedState, GameSelect, useCachedInput, useCall, useGameChoice } from './shared';
 
 export function AllsportTool() {
   const { api } = useController();
   const feed = useStream((signal) => api.tools.allsport.watch(undefined, { signal }), [api]);
-  const [chosenPort, setChosenPort] = useState<string | null>(null);
+  const { value: port, choose: rememberPort } = useCachedInput('dtv.tools.allsport.port', feed && { ...feed, value: feed.port });
   const [chosenScore, setChosenScore] = useState<boolean | null>(null);
   const [ports, setPorts] = useState<readonly string[]>([]);
   const { games, game, choose } = useGameChoice(feed);
@@ -18,7 +18,6 @@ export function AllsportTool() {
   const refresh = useCallback(() => api.tools.allsport.ports().then(setPorts, () => setPorts([])), [api]);
   useEffect(() => void refresh(), [refresh]);
 
-  const port = chosenPort ?? feed?.port ?? '';
   const score = chosenScore ?? feed?.score ?? true;
   const running = feed?.state === 'running';
   const sameAsRunning = running && port === feed.port && game === feed.game && score === feed.score;
@@ -26,7 +25,7 @@ export function AllsportTool() {
   if (!feed) return <p className="loading">Loading…</p>;
 
   const choosePort = (value: string) => {
-    setChosenPort(value);
+    rememberPort(value);
     setError(null);
   };
 

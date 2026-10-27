@@ -1,6 +1,6 @@
 # Tools page
 
-The Tools page (`#/tools`) has a tab list down the left, one tab per tool. Its StatCrew and AllSport tabs start and stop the live-statcrew and live-allsport feeds, which the server runs as child processes. Each tab shows Stopped, Running since hh:mm:ss or Exited (code N), the File and Game fields, Start (Restart when the values differ from the running ones) and Stop, an inline error, and the feed's last 200 log lines. The StatCrew tab also has a Plays table above the log: the file's play by play, newest first, with the score on scoring plays. It stays after Stop and empties on the next Start.
+The Tools page (`#/tools`) has a tab list down the left, one tab per tool. Its StatCrew and AllSport tabs start and stop the live-statcrew and live-allsport feeds, which the server runs as child processes. Each tab shows Stopped, Running since hh:mm:ss or Exited (code N), the File and Game fields, Start (Restart when the values differ from the running ones) and Stop, an inline error, and the feed's last 200 log lines. The StatCrew tab also has a Plays table above the log: the file's play by play, newest first, with the score on scoring plays. It stays after Stop and empties on the next Start. The StatCrew File and AllSport Port are kept in localStorage (`dtv.tools.statcrew.file`, `dtv.tools.allsport.port`) as they are typed, so a reload keeps them; a running feed shows its own.
 
 ## Sub-features
 

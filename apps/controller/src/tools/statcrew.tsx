@@ -1,20 +1,18 @@
 /** The StatCrew tab: starts and stops the feed that writes a StatCrew box score into a game, and shows the file's plays and the feed's log. */
 
-import { useState } from 'react';
 import { Button, Input, Label, TextField } from 'react-aria-components';
 import { useController } from '../app/context';
 import { useStream } from '../app/streams';
 import { PlayList } from './plays';
-import { FeedLog, FeedState, GameSelect, useCall, useGameChoice } from './shared';
+import { FeedLog, FeedState, GameSelect, useCachedInput, useCall, useGameChoice } from './shared';
 
 export function StatcrewTool() {
   const { api } = useController();
   const feed = useStream((signal) => api.tools.statcrew.watch(undefined, { signal }), [api]);
-  const [chosenFile, setChosenFile] = useState<string | null>(null);
+  const { value: file, choose: chooseFile } = useCachedInput('dtv.tools.statcrew.file', feed && { ...feed, value: feed.file });
   const { games, game, choose } = useGameChoice(feed);
   const { call, busy, error, setError } = useCall();
 
-  const file = chosenFile ?? feed?.file ?? '';
   const running = feed?.state === 'running';
   const sameAsRunning = running && file === feed.file && game === feed.game;
 
@@ -32,7 +30,7 @@ export function StatcrewTool() {
           className="field tool-file"
           value={file}
           onChange={(value) => {
-            setChosenFile(value);
+            chooseFile(value);
             setError(null);
           }}
         >
