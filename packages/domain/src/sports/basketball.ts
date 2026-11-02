@@ -145,6 +145,10 @@ export const Shot = z.object({
 });
 export type Shot = z.infer<typeof Shot>;
 
+/** Where the game stands: a phase and its period. */
+export const Stage = z.object({ period: z.number().int().min(1), phase: Phase });
+export type Stage = z.infer<typeof Stage>;
+
 export const BasketballLive = z.object({
   sport: z.literal('basketball'),
   gameId: GameId,
@@ -164,6 +168,11 @@ export const BasketballLive = z.object({
   /** Every attempt in the game's order. Empty without a play-by-play feed; a game stored before it existed reads as empty. */
   shots: z.array(Shot).default([]),
   /**
+   * The period and phase the clock's writer gave, set aside while the operator overrides them: `period` and `phase`
+   * then hold the operator's choice, and the writer's later writes land here until the override is cleared.
+   */
+  overridden: Stage.nullable().default(null),
+  /**
    * Which source may write each field group. One writer per group, so a feed and an
    * operator never fight over the score; the operator takes a group back with `authority`.
    */
@@ -178,6 +187,8 @@ export const BasketballCommand = z.discriminatedUnion('type', [
   z.object({ type: z.literal('shotClock'), remainingMs: count.nullable(), running: z.boolean().optional() }),
   z.object({ type: z.literal('period'), period: z.number().int().min(1) }),
   z.object({ type: z.literal('phase'), phase: Phase }),
+  /** The operator's period and phase over the clock writer's, whoever holds the clock; null clears it. */
+  z.object({ type: z.literal('stageOverride'), stage: Stage.nullable() }),
   z.object({ type: z.literal('timeouts'), side: Side, remaining: count }),
   z.object({ type: z.literal('bonus'), side: Side, value: z.boolean() }),
   z.object({ type: z.literal('possession'), side: Side.nullable() }),
@@ -200,6 +211,7 @@ const COMMAND_GROUP: Record<BasketballCommand['type'], FieldGroup | 'operator'> 
   shotClock: 'clock',
   period: 'clock',
   phase: 'clock',
+  stageOverride: 'operator',
   starters: 'stats',
   teamLine: 'stats',
   playerLine: 'stats',
@@ -247,9 +259,12 @@ function nextLive(live: BasketballLive, command: BasketballCommand, now: EpochMs
         shotClock: command.remainingMs === null ? null : setClock(command.remainingMs, command.running ?? live.clock.running, now),
       };
     case 'period':
-      return { ...live, period: command.period };
+      return live.overridden ? { ...live, overridden: { ...live.overridden, period: command.period } } : { ...live, period: command.period };
     case 'phase':
-      return { ...live, phase: command.phase };
+      return live.overridden ? { ...live, overridden: { ...live.overridden, phase: command.phase } } : { ...live, phase: command.phase };
+    case 'stageOverride':
+      if (command.stage) return { ...live, ...command.stage, overridden: live.overridden ?? { period: live.period, phase: live.phase } };
+      return live.overridden ? { ...live, ...live.overridden, overridden: null } : live;
     case 'timeouts':
       return { ...live, timeouts: { ...live.timeouts, [command.side]: command.remaining } };
     case 'bonus':
@@ -293,6 +308,7 @@ export const initialBasketball = (gameId: GameId, program: BasketballProgram): B
   team: { away: EMPTY_LINE, home: EMPTY_LINE },
   players: {},
   shots: [],
+  overridden: null,
   authority: { clock: OPERATOR, score: OPERATOR, stats: OPERATOR },
 });
 

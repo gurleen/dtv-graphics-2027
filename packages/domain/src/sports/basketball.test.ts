@@ -115,6 +115,40 @@ describe('applyBasketball: each command is an absolute write', () => {
   });
 });
 
+describe('applyBasketball: stage override', () => {
+  const ALLSPORT = SourceId.parse('allsport');
+  const fed = applied(BASE, { type: 'authority', group: 'clock', source: ALLSPORT });
+  const write = (live: BasketballLive, command: BasketballCommand, source: SourceId) => {
+    const result = apply(live, command, source);
+    if (!result.ok) throw new Error(`refused: ${result.group}`);
+    return result.live;
+  };
+  const halftime = write(fed, { type: 'stageOverride', stage: { period: 2, phase: 'halftime' } }, OPERATOR);
+
+  test('the operator overrides the period of a game a feed clocks', () => {
+    expect(halftime).toMatchObject({ phase: 'halftime', period: 2, overridden: { phase: 'live', period: 2 } });
+  });
+
+  test("the feed's writes wait under the override, and clearing it restores them", () => {
+    const moved = write(write(halftime, { type: 'period', period: 3 }, ALLSPORT), { type: 'phase', phase: 'live' }, ALLSPORT);
+    expect(moved).toMatchObject({ phase: 'halftime', period: 2, overridden: { phase: 'live', period: 3 } });
+    expect(write(moved, { type: 'stageOverride', stage: null }, OPERATOR)).toMatchObject({ phase: 'live', period: 3, overridden: null });
+  });
+
+  test("a second override keeps the feed's values, not the first override", () => {
+    const final = write(halftime, { type: 'stageOverride', stage: { period: 2, phase: 'final' } }, OPERATOR);
+    expect(final).toMatchObject({ phase: 'final', overridden: { phase: 'live', period: 2 } });
+  });
+
+  test('clearing with nothing overridden changes nothing', () => {
+    expect(write(fed, { type: 'stageOverride', stage: null }, OPERATOR)).toEqual(fed);
+  });
+
+  test('only the operator overrides', () => {
+    expect(apply(fed, { type: 'stageOverride', stage: null }, ALLSPORT)).toEqual({ ok: false, reason: 'not-authority', group: 'operator' });
+  });
+});
+
 describe('applyBasketball: authority', () => {
   const fed = applied(BASE, { type: 'authority', group: 'score', source: STATCREW });
 

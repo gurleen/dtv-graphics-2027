@@ -63,7 +63,8 @@
   background: var(--pvw);
 }
 
-:where(.show-page, .show-portal) .tag.bonus {
+:where(.show-page, .show-portal) .tag.bonus,
+:where(.show-page, .show-portal) .tag.overridden {
   background: var(--warn);
 }
 

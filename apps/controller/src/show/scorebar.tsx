@@ -1,7 +1,8 @@
 /**
  * The game along the bottom, to read: score, clocks, period, phase, possession, timeouts,
- * fouls and bonus. The period is the one thing an operator sets here, for a game no feed
- * writes the clock of; everything else a live data feed changes.
+ * fouls and bonus. The period is the one thing an operator sets here. With no feed on the
+ * clock it is written outright; over a feed it is an override, shown until cleared, when the
+ * feed's own period returns. Everything else a live data feed changes.
  */
 
 import { basketball, type GameView, type Side } from '@dtv/domain';
@@ -44,14 +45,23 @@ function stages(program: Program, live: basketball.BasketballLive) {
   return options;
 }
 
-/** The commands that move the game to a stage. Halftime leaves the first half's last period current. */
-function commandsTo(program: Program, live: basketball.BasketballLive, stage: string): basketball.BasketballCommand[] {
+/** The period and phase a menu choice stands for. Halftime leaves the first half's last period current. */
+function stageFor(program: Program, live: basketball.BasketballLive, id: string): basketball.Stage {
   const { periods } = basketball.BASKETBALL_FORMAT[program];
-  const phase: basketball.Phase = stage.startsWith('period-') ? 'live' : (stage as basketball.Phase);
-  const period = stage.startsWith('period-') ? Number(stage.slice('period-'.length)) : stage === 'halftime' ? periods / 2 : stage === 'pregame' ? 1 : live.period;
+  if (id.startsWith('period-')) return { phase: 'live', period: Number(id.slice('period-'.length)) };
+  const phase = id as basketball.Phase;
+  return { phase, period: phase === 'halftime' ? periods / 2 : phase === 'pregame' ? 1 : live.period };
+}
+
+/** The commands that move the game to a stage: an override while a feed holds the clock or one already stands. */
+function commandsTo(program: Program, live: basketball.BasketballLive, id: string): basketball.BasketballCommand[] {
+  const stage = stageFor(program, live, id);
+  if (live.authority.clock !== basketball.OPERATOR || live.overridden) {
+    return stage.period === live.period && stage.phase === live.phase ? [] : [{ type: 'stageOverride', stage }];
+  }
   return [
-    ...(period !== live.period ? [{ type: 'period', period } as const] : []),
-    ...(phase !== live.phase ? [{ type: 'phase', phase } as const] : []),
+    ...(stage.period !== live.period ? [{ type: 'period', period: stage.period } as const] : []),
+    ...(stage.phase !== live.phase ? [{ type: 'phase', phase: stage.phase } as const] : []),
   ];
 }
 
@@ -63,36 +73,50 @@ function PeriodSelect(props: { readonly game: GameView; readonly live: basketbal
   const writer = live.authority.clock;
   const fed = writer !== basketball.OPERATOR;
   const [sending, setSending] = useState(false);
-  const choose = async (stage: string) => {
-    const commands = commandsTo(program, live, stage);
+  const send = async (commands: basketball.BasketballCommand[], failure: string) => {
     if (commands.length === 0) return;
     setSending(true);
     try {
       await api.game.apply({ sport: 'basketball', gameId: live.gameId, source: basketball.OPERATOR, commands });
     } catch (error) {
-      fail(`Period not set: ${reasonOf(error)}`);
+      fail(`${failure}: ${reasonOf(error)}`);
     } finally {
       setSending(false);
     }
   };
   return (
-    <Select
-      className="period-select"
-      aria-label={fed ? `Period, written by ${writer}` : 'Period'}
-      selectedKey={stageOf(live)}
-      isDisabled={fed || sending}
-      onSelectionChange={(key) => key !== null && void choose(String(key))}
-    >
-      <Button className="select-button" data-testid="period">
-        <SelectValue />
-        <span aria-hidden>▾</span>
-      </Button>
-      <Popover className="popover show-portal">
-        <ListBox className="listbox" items={stages(program, live)}>
-          {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
-        </ListBox>
-      </Popover>
-    </Select>
+    <>
+      <Select
+        className="period-select"
+        aria-label={live.overridden ? 'Period, overridden' : fed ? `Period, written by ${writer}` : 'Period'}
+        selectedKey={stageOf(live)}
+        isDisabled={sending}
+        onSelectionChange={(key) => key !== null && void send(commandsTo(program, live, String(key)), 'Period not set')}
+      >
+        <Button className="select-button" data-testid="period">
+          <SelectValue />
+          <span aria-hidden>▾</span>
+        </Button>
+        <Popover className="popover show-portal">
+          <ListBox className="listbox" items={stages(program, live)}>
+            {(option) => <ListBoxItem className="option">{option.label}</ListBoxItem>}
+          </ListBox>
+        </Popover>
+      </Select>
+      {live.overridden && (
+        <>
+          <span className="tag overridden" data-testid="period-overridden">overridden</span>
+          <Button
+            className="button small"
+            aria-label="Clear the period override"
+            isDisabled={sending}
+            onPress={() => void send([{ type: 'stageOverride', stage: null }], 'Override not cleared')}
+          >
+            Clear
+          </Button>
+        </>
+      )}
+    </>
   );
 }
 
