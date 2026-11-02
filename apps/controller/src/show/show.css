@@ -2,16 +2,45 @@
 
 .show-page {
   display: grid;
-  grid-template-columns: 1fr 1fr var(--rail);
+  grid-template-columns: var(--left, minmax(0, 1fr)) var(--space-4) minmax(0, 1fr) var(--space-4) var(--rail);
   grid-template-rows: auto auto minmax(0, 1fr) var(--scorebar);
   grid-template-areas:
-    'free rundown rail'
-    'onair rundown rail'
-    'inspector rundown rail'
-    'score score score';
-  gap: var(--space-4);
+    'free split-left rundown split-rail rail'
+    'onair split-left rundown split-rail rail'
+    'inspector split-left rundown split-rail rail'
+    'score score score score score';
+  gap: var(--space-4) 0;
   height: 100%;
   padding: var(--space-4) var(--space-4) 0;
+}
+
+/* A splitter fills the gap between two columns and shows a line while hovered, focused or dragged. */
+.show-page .splitter {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+
+.show-page .splitter-left {
+  grid-area: split-left;
+}
+
+.show-page .splitter-rail {
+  grid-area: split-rail;
+}
+
+.show-page .splitter::after {
+  content: '';
+  position: absolute;
+  inset: 0 calc(50% - 1px);
+  border-radius: 1px;
+}
+
+.show-page .splitter:hover::after,
+.show-page .splitter:focus-visible::after,
+.show-page .splitter[data-dragging]::after {
+  background: var(--focus);
 }
 
 :where(.show-page, .show-portal) .panel,

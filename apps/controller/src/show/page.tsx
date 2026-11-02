@@ -8,9 +8,10 @@
 import { type CueId, type GameId, resolveGame, sameJson } from '@dtv/domain';
 import { type Bus, LAYERS, type Registry, type ShowCommand, type ShowView } from '@dtv/playout';
 import './show.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from 'react-aria-components';
 import { useCommands } from '../app/commands';
+import { Splitter, useColumns } from './columns';
 import { useController } from '../app/context';
 import { useStream } from '../app/streams';
 import { gameLabel } from '../data/rows';
@@ -103,14 +104,18 @@ function Console(props: { readonly view: ShowView; readonly game: GameId }) {
     }
   };
   useKeys({ run, clearAllUp: clearAll.up, paused: adding || dragging || listingKeys });
+  const page = useRef<HTMLDivElement>(null);
+  const columns = useColumns(page);
 
   return (
-    <div className="show-page">
+    <div className="show-page" ref={page} style={columns.style}>
       <FreePanel view={view} actions={actions} onKeys={() => setListingKeys(true)} />
       <OnAir view={view} actions={actions} />
       <Rundown view={view} selected={selectedId} onSelect={setChosen} onCue={actions.cue} onAdd={() => setAdding(true)} onDragging={setDragging} />
       <Inspector cue={selected} live={live} onCue={actions.cue} />
       <Rail view={view} actions={actions} />
+      <Splitter {...columns.left} />
+      <Splitter {...columns.rail} />
       <ScoreBar game={game} live={live} />
       {listingKeys && <KeyList onClose={() => setListingKeys(false)} />}
       {adding && (
