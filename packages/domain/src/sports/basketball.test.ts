@@ -365,6 +365,17 @@ describe('insights', () => {
     expect(insights('mbb', live, 'home', NOW + 11_000).map((insight) => insight.text)).toEqual(['Scoring drought 3:11']);
   });
 
+  test('spans tick with the displayed game clock, not a beat after it', () => {
+    const live = { ...BASE, period: 1, clock: running(12 * 60_000), shots: [shot('home', '15:00', 2, true)] };
+    const read = (after: number) => [
+      basketball.formatGameClock(basketball.remainingAt(live.clock, NOW + after)),
+      ...insights('mbb', live, 'home', NOW + after).map((insight) => insight.text),
+    ];
+    expect(read(1)).toEqual(['11:59', 'Scoring drought 3:01']);
+    expect(read(999)).toEqual(['11:59', 'Scoring drought 3:01']);
+    expect(read(1_001)).toEqual(['11:58', 'Scoring drought 3:02']);
+  });
+
   test('after the cue, the basket that ends a span stops it instead of dropping it', () => {
     const cued = [shot('home', '15:00', 2, true), shot('away', '14:00', 2, true)];
     const after = [...cued, shot('home', '11:49', 3, true)];

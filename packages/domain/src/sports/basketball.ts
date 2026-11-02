@@ -483,8 +483,10 @@ function streakOf(fieldGoals: readonly Shot[]): string | null {
 export function insights(program: BasketballProgram, live: BasketballLive, side: Side, now: EpochMs, asOf = live.shots.length): readonly Insight[] {
   if (live.shots.length === 0) return [];
   const shots: Timed[] = live.shots.map((shot) => ({ ...shot, at: playedMs(program, shot.period, shot.remainingMs) }));
-  // A clock the operator has not caught up yet must not put now before the last play.
-  const at = Math.max(playedMs(program, live.period, remainingAt(live.clock, now)), ...shots.map((shot) => shot.at));
+  // Now is the clock's whole second, as the scorebug shows it, so a span ticks with the clock's digits. A clock the
+  // operator has not caught up yet must not put now before the last play.
+  const shown = Math.floor(remainingAt(live.clock, now) / 1000) * 1000;
+  const at = Math.max(playedMs(program, live.period, shown), ...shots.map((shot) => shot.at));
   const pinned = shots.slice(0, asOf);
   const later = shots.slice(asOf);
   const own = pinned.filter((shot) => shot.side === side);
