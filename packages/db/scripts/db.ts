@@ -34,6 +34,7 @@ const KEY = 'dtv.sqlite';
  * connection holds no lock, and macOS keeps the WAL file after the last close. Empty without lsof.
  */
 function holders(file: string): string[] {
+  if (!Bun.which('lsof')) return [];
   const lsof = Bun.spawnSync(['lsof', '-t', file], { stdout: 'pipe', stderr: 'ignore' });
   return lsof.stdout.toString().split('\n').filter((pid) => pid && pid !== String(process.pid));
 }
