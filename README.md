@@ -82,7 +82,17 @@ browser. `@dtv/db` (`packages/db/`) owns the SQLite file, `data/db/dtv.sqlite`.
 bun run db:seed              # migrate, then fill the file from data/seed/
 bun run db:migrate           # bring the file to the schema the code expects
 bun run db:backup            # copy the file to data/db/backups/; the newest 30 stay, and the newest of each reason
+bun run db:push              # upload a snapshot to the dtv-db R2 bucket; needs `wrangler login`
+bun run db:pull              # replace the file with the bucket's copy, over its public URL; no login
 ```
+
+`db:push` takes the snapshot with `VACUUM INTO`, so it is safe while the server
+runs. `db:pull` reads https://pub-80c21300152e43be9c3d1b41cf8aba59.r2.dev, and
+`DTV_DB_ORIGIN` names another public URL. It refuses while
+another process has the file open, checks the download with `PRAGMA
+quick_check`, and backs up the local file with the reason `pre-pull` before it
+replaces it. `DTV_DB_BUCKET` names another bucket for `db:push`. The bucket is public, so
+anyone with the URL can download the database.
 
 `DTV_DB` names another database file, as it does for the server, and its backups
 go in `backups/` beside it. Run `db:seed` with the server stopped, because the

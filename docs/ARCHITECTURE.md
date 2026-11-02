@@ -248,7 +248,8 @@ rewrites `show_state`'s `showId` to the old show's `gameId`. Old journal rows of
 are; they only feed the command-id memory. Later migrations take version 3 on.
 
 `VACUUM INTO` writes a backup without blocking readers. The server takes one before every migration, at every game
-activation, and on shutdown, and `bun run db:backup` takes one on demand. The newest 30 are kept, and the newest of
+activation, and on shutdown, and `bun run db:backup` takes one on demand. `bun run db:push` uploads one to R2, and
+`bun run db:pull` replaces the file with it over the bucket's public URL, after a `pre-pull` backup. The newest 30 are kept, and the newest of
 each reason, so a run of activations never evicts the only backup taken before a migration.
 
 After a data commit the server reloads the World from SQLite instead of patching memory, so a cascaded delete can
