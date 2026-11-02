@@ -29,16 +29,22 @@ type Program = keyof typeof basketball.BASKETBALL_FORMAT;
 /** Overtimes the menu always offers; a game already past them offers its own too. */
 const OVERTIMES = 4;
 
-/** Where the game stands, as one menu choice: a phase, or a period of live play. */
-const stageOf = (live: basketball.BasketballLive): string => (live.phase === 'live' ? `period-${live.period}` : live.phase);
+/** The phases each period offers, in the order they come. */
+const PERIOD_PHASES = ['start', 'live', 'end'] as const;
 
-/** Regulation periods, halftime at the midpoint, overtimes, then pregame and final. */
+/** Where the game stands, as one menu choice: `pregame`, `halftime`, `final`, or a period's phase as `live-2`. */
+const stageOf = (live: basketball.BasketballLive): string =>
+  (PERIOD_PHASES as readonly string[]).includes(live.phase) ? `${live.phase}-${live.period}` : live.phase;
+
+/** Each period's start, play and end, halftime at the midpoint, overtimes, then pregame and final. */
 function stages(program: Program, live: basketball.BasketballLive) {
   const { periods } = basketball.BASKETBALL_FORMAT[program];
   const last = Math.max(periods + OVERTIMES, live.period);
   const options: { id: string; label: string }[] = [{ id: 'pregame', label: 'Pregame' }];
   for (let period = 1; period <= last; period++) {
-    options.push({ id: `period-${period}`, label: basketball.periodLabel(program, period) });
+    for (const phase of PERIOD_PHASES) {
+      options.push({ id: `${phase}-${period}`, label: basketball.breakLabel(program, { phase, period }) ?? basketball.periodLabel(program, period) });
+    }
     if (period === periods / 2) options.push({ id: 'halftime', label: 'Halftime' });
   }
   options.push({ id: 'final', label: 'Final' });
@@ -48,8 +54,8 @@ function stages(program: Program, live: basketball.BasketballLive) {
 /** The period and phase a menu choice stands for. Halftime leaves the first half's last period current. */
 function stageFor(program: Program, live: basketball.BasketballLive, id: string): basketball.Stage {
   const { periods } = basketball.BASKETBALL_FORMAT[program];
-  if (id.startsWith('period-')) return { phase: 'live', period: Number(id.slice('period-'.length)) };
-  const phase = id as basketball.Phase;
+  const [phase, period] = id.split('-') as [basketball.Phase, string | undefined];
+  if (period) return { phase, period: Number(period) };
   return { phase, period: phase === 'halftime' ? periods / 2 : phase === 'pregame' ? 1 : live.period };
 }
 

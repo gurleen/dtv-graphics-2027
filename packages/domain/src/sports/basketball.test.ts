@@ -244,6 +244,15 @@ describe('broadcast formatting', () => {
     expect(statusLine('mbb', { ...BASE, period: 1, clock: running(1_000, NOW - 1_000) }, NOW)).toBe('End of 1st Half');
     expect(statusLine('mbb', { ...BASE, phase: 'halftime' }, NOW)).toBe('Halftime');
     expect(statusLine('wbb', { ...BASE, phase: 'final' }, NOW)).toBe('Final');
+    expect(statusLine('mbb', { ...BASE, phase: 'start', clock: stopped(1_200_000) }, NOW)).toBe('Start of 2nd Half');
+    expect(statusLine('wbb', { ...BASE, phase: 'end', period: 3, clock: stopped(4_000) }, NOW)).toBe('End of 3rd Qtr');
+  });
+
+  test('the scorebug period is short between periods', () => {
+    expect(basketball.bugPeriod('mbb', { phase: 'start', period: 2 })).toBe('2nd Half');
+    expect(basketball.bugPeriod('mbb', { phase: 'end', period: 1 })).toBe('End 1st');
+    expect(basketball.bugPeriod('wbb', { phase: 'end', period: 6 })).toBe('End 2OT');
+    expect(basketball.bugPeriod('mbb', { phase: 'halftime', period: 1 })).toBe('Half');
   });
 
   test('positions and stat catalogues', () => {
@@ -268,6 +277,8 @@ describe('the shot clock stops when the game clock expires', () => {
   test('it shows nothing at halftime or after the final', () => {
     expect(basketball.shotClockAt({ ...lastSeconds, phase: 'halftime' }, NOW)).toBeNull();
     expect(basketball.shotClockAt({ ...lastSeconds, phase: 'final' }, NOW)).toBeNull();
+    expect(basketball.shotClockAt({ ...lastSeconds, phase: 'start' }, NOW)).toBeNull();
+    expect(basketball.shotClockAt({ ...lastSeconds, phase: 'end' }, NOW)).toBeNull();
   });
 
   test('the server stops re-projecting it at the buzzer', () => {

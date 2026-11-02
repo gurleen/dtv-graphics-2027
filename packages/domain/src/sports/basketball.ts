@@ -74,9 +74,9 @@ const expiresAt = (clock: Clock): EpochMs | null => (clock.running ? clock.since
 /** The shot clock as of `now`, frozen at the instant the game clock expired. */
 const shotAt = (live: Pick<BasketballLive, 'clock'>, now: EpochMs): EpochMs => Math.min(now, expiresAt(live.clock) ?? now);
 
-/** The shot clock's remaining time as displayed: it stops when the game clock does, and shows nothing outside live play. */
+/** The shot clock's remaining time as displayed: it stops when the game clock does, and shows nothing between periods. */
 export const shotClockAt = (live: BasketballLive, now: EpochMs): number | null =>
-  live.shotClock && live.phase !== 'halftime' && live.phase !== 'final' ? remainingAt(live.shotClock, shotAt(live, now)) : null;
+  live.shotClock && (live.phase === 'pregame' || live.phase === 'live') ? remainingAt(live.shotClock, shotAt(live, now)) : null;
 
 const startClock = (clock: Clock, now: EpochMs): Clock =>
   clock.running ? clock : { running: true, remainingMs: clock.remainingMs, since: now };
@@ -130,7 +130,8 @@ export const FIELD_GROUPS = ['clock', 'score', 'stats'] as const;
 export const FieldGroup = z.enum(FIELD_GROUPS);
 export type FieldGroup = z.infer<typeof FieldGroup>;
 
-export const Phase = z.enum(['pregame', 'live', 'halftime', 'final']);
+/** `start` is a period before its tip and `end` one whose clock has run out; halftime is the break at the midpoint. */
+export const Phase = z.enum(['pregame', 'start', 'live', 'end', 'halftime', 'final']);
 export type Phase = z.infer<typeof Phase>;
 
 /** A field goal or free throw attempt from a feed's play by play, the run of play that insights read. */
@@ -328,10 +329,27 @@ export const periodLabel = (program: BasketballProgram, period: number): string 
   return overtime === 1 ? 'OT' : `${overtime}OT`;
 };
 
-/** The Score to Break's one-line status: `8:42 2nd Half`, `Halftime`, `End of 1st Half`, `Final`. */
-export const statusLine = (program: BasketballProgram, live: BasketballLive, now: EpochMs): string => {
+/** `Start of 2nd Half`, `End of 1st Qtr`, `Halftime`: a phase between periods, or null in play. */
+export const breakLabel = (program: BasketballProgram, live: Pick<BasketballLive, 'phase' | 'period'>): string | null => {
   if (live.phase === 'final') return 'Final';
   if (live.phase === 'halftime') return 'Halftime';
+  if (live.phase === 'start') return `Start of ${periodLabel(program, live.period)}`;
+  if (live.phase === 'end') return `End of ${periodLabel(program, live.period)}`;
+  return null;
+};
+
+/** The scorebug's period, short to fit it: `2nd Half`, `End 1st`, `End OT`, `Half`, `Final`. */
+export const bugPeriod = (program: BasketballProgram, live: Pick<BasketballLive, 'phase' | 'period'>): string => {
+  if (live.phase === 'final') return 'Final';
+  if (live.phase === 'halftime') return 'Half';
+  if (live.phase === 'end') return live.period <= BASKETBALL_FORMAT[program].periods ? `End ${ordinal(live.period)}` : `End ${periodLabel(program, live.period)}`;
+  return periodLabel(program, live.period);
+};
+
+/** The Score to Break's one-line status: `8:42 2nd Half`, `Halftime`, `End of 1st Half`, `Final`. */
+export const statusLine = (program: BasketballProgram, live: BasketballLive, now: EpochMs): string => {
+  const between = breakLabel(program, live);
+  if (between) return between;
   const remaining = remainingAt(live.clock, now);
   if (remaining === 0) return `End of ${periodLabel(program, live.period)}`;
   return `${formatGameClock(remaining)} ${periodLabel(program, live.period)}`;

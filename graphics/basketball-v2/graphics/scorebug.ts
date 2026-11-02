@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
 import { requireBasketball, requireGame } from './shared';
 
-const { formatGameClock, formatShotClock, periodLabel, remainingAt, shotClockAt } = basketball;
+const { bugPeriod, formatGameClock, formatShotClock, remainingAt, shotClockAt } = basketball;
 
 export const scorebug = defineGraphic({
   id: 'basketball-v2/scorebug',
@@ -40,7 +40,7 @@ export const scorebug = defineGraphic({
       homeBonus: live.bonus.home,
       awayPossession: live.possession === 'away',
       homePossession: live.possession === 'home',
-      period: live.phase === 'halftime' ? 'Half' : live.phase === 'final' ? 'Final' : periodLabel(program, live.period),
+      period: bugPeriod(program, live),
       clock: formatGameClock(remainingAt(live.clock, context.now)),
       shotClock: shot === null ? '' : formatShotClock(shot),
       sponsorLogo: context.sponsor?.logoOnDark ?? null,
