@@ -55,9 +55,28 @@ async function profileCards(html: string, site: string): Promise<Found[]> {
   );
 }
 
+/** The classic Sidearm list (Marist): each row lazy-loads a resized thumbnail; the path without its query is the original. */
+function listRows(html: string, site: string): Found[] {
+  return html
+    .split('<li class="sidearm-roster-player')
+    .slice(1)
+    .flatMap((row) => {
+      const jersey = /sidearm-roster-player-jersey-number">\s*(\d+)/.exec(row)?.[1];
+      const name = /aria-label="([^"]+?) - View Full Bio"/.exec(row)?.[1];
+      if (!jersey || !name) return [];
+      const thumbnail = /data-src="([^"?]+)/.exec(row)?.[1];
+      const image = thumbnail && !thumbnail.includes('default') ? new URL(decode(thumbnail), site).href : null;
+      return [{ name: decode(name), jersey, image }];
+    });
+}
+
 async function fetchRoster(espnId: string, program: string, rosterUrl: string) {
   const html = await (await page(rosterUrl)).text();
-  const found = html.includes('s-person-card-list__root') ? listCards(html) : await profileCards(html, rosterUrl);
+  const found = html.includes('s-person-card-list__root')
+    ? listCards(html)
+    : html.includes('<li class="sidearm-roster-player')
+      ? listRows(html, rosterUrl)
+      : await profileCards(html, rosterUrl);
   const dir = join(DIR, espnId, program);
   await Bun.$`mkdir -p ${dir}`;
   for (const { name, jersey, image } of found) {
