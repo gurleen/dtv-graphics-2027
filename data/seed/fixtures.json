@@ -63,7 +63,20 @@
       { "id": "penn-state-mbb@2026-27/little-sam", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Sam", "lastName": "Little", "title": "Video Coordinator / Player Development", "detail": "" },
       { "id": "penn-state-mbb@2026-27/grumer-alex", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Alex", "lastName": "Grumer", "title": "Assistant Director of Operations", "detail": "" },
       { "id": "penn-state-mbb@2026-27/dawry-peter", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Peter", "lastName": "Dawry", "title": "Athletic Trainer", "detail": "" },
-      { "id": "penn-state-mbb@2026-27/janota-tyler", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Tyler", "lastName": "Janota", "title": "Director of Athletic Performance", "detail": "" }
+      { "id": "penn-state-mbb@2026-27/janota-tyler", "teamId": "penn-state-mbb", "seasonId": "2026-27", "firstName": "Tyler", "lastName": "Janota", "title": "Director of Athletic Performance", "detail": "" },
+      { "id": "drexel-wbb@2026-27/mallon-amy", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Amy", "lastName": "Mallon", "title": "Head Coach", "detail": "7th season" },
+      { "id": "drexel-wbb@2026-27/weiss-stacy", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Stacy", "lastName": "Weiss", "title": "Associate Head Coach", "detail": "" },
+      { "id": "drexel-wbb@2026-27/bacon-kayla", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Kayla", "lastName": "Bacon", "title": "Assistant Coach", "detail": "" },
+      { "id": "drexel-wbb@2026-27/perretta-stephen", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Stephen", "lastName": "Perretta", "title": "Assistant Coach", "detail": "" },
+      { "id": "drexel-wbb@2026-27/perretta-mike", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Mike", "lastName": "Perretta", "title": "Assistant Coach / Video and Player Development", "detail": "" },
+      { "id": "drexel-wbb@2026-27/como-regan", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Regan", "lastName": "Como", "title": "Director of Basketball Operations", "detail": "" },
+      { "id": "drexel-wbb@2026-27/moyer-erika", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Erika", "lastName": "Moyer", "title": "Head Strength and Conditioning Coach", "detail": "" },
+      { "id": "drexel-wbb@2026-27/shutack-ashley", "teamId": "drexel-wbb", "seasonId": "2026-27", "firstName": "Ashley", "lastName": "Shutack", "title": "Assistant Athletic Trainer", "detail": "" },
+      { "id": "marist-wbb@2026-27/doughty-erin", "teamId": "marist-wbb", "seasonId": "2026-27", "firstName": "Erin", "lastName": "Doughty", "title": "Head Coach", "detail": "4th season" },
+      { "id": "marist-wbb@2026-27/jones-tiana", "teamId": "marist-wbb", "seasonId": "2026-27", "firstName": "Tiana", "lastName": "Jones", "title": "Assistant Coach", "detail": "" },
+      { "id": "marist-wbb@2026-27/gillespie-kiah", "teamId": "marist-wbb", "seasonId": "2026-27", "firstName": "Kiah", "lastName": "Gillespie", "title": "Assistant Coach", "detail": "" },
+      { "id": "marist-wbb@2026-27/saunders-zakiya", "teamId": "marist-wbb", "seasonId": "2026-27", "firstName": "Zakiya", "lastName": "Saunders", "title": "Assistant Coach", "detail": "" },
+      { "id": "marist-wbb@2026-27/mendonca-gabi", "teamId": "marist-wbb", "seasonId": "2026-27", "firstName": "Gabi", "lastName": "Mendonca", "title": "Assistant Coach", "detail": "" }
     ],
     "talent": [
       { "id": "rob-brooks", "firstName": "Rob", "lastName": "Brooks", "role": "Play-by-Play" },
