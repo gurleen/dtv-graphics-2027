@@ -12,6 +12,7 @@ import { matchupLocator } from './graphics/matchup-locator';
 import { matchupLocatorLowerThird } from './graphics/matchup-locator-lower-third';
 import { playerLowerThird } from './graphics/player-lower-third';
 import { scorebug } from './graphics/scorebug';
+import { pressConference } from './graphics/press-conference';
 import { playerOfTheGame } from './graphics/player-of-the-game';
 import { playerToWatch } from './graphics/player-to-watch';
 import { scoreToBreak } from './graphics/score-to-break';
@@ -23,7 +24,7 @@ import { talentLowerThirdSingle } from './graphics/talent-lower-third-single';
 import { talentLowerThirdTriple } from './graphics/talent-lower-third-triple';
 import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings, pressConference] as const;
 
 type Entry = (typeof ENTRIES)[number];
 

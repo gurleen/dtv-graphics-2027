@@ -45,6 +45,7 @@ test('every graphic’s params fit the generic form, with a picker for each id',
     'basketball-v2/player-lower-third': ['player: player'],
     'basketball-v2/player-of-the-game': ['player: player'],
     'basketball-v2/player-to-watch': ['player: player'],
+    'basketball-v2/press-conference': ['players: player x0'],
     'basketball-v2/score-to-break': [],
     // The insights cue's shot count, which its pin writes; the form leaves it out.
     'basketball-v2/scorebug-slider': ['talents: talent x1', 'asOf: fixed'],

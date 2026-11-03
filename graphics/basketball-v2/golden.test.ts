@@ -8,7 +8,7 @@
 import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
 import { loadLive, loadSnapshot, migrate, openDb, seed } from '@dtv/db';
-import { GameId, GraphicId, indexWorld, PlayerId, Url } from '@dtv/domain';
+import { basketball, Game, GameId, GraphicId, indexWorld, PlayerId, Url } from '@dtv/domain';
 import { type AnyGraphic, bindValues, EMPTY_SHOW, OperatorId, showContext, viewShow } from '@dtv/playout';
 import { BASKETBALL_V2, SCENES } from './index';
 
@@ -38,6 +38,7 @@ const KNOWN_DRIFT: Readonly<Record<string, string>> = Object.fromEntries([
     ['awayScore', 'homeScore', 'status', 'awayPrimaryColor', 'awaySecondaryColor'],
     'The scene’s placeholder game is Campbell at Drexel, 58-61 with 8:42 left; the demo game is Saint Joseph’s at Drexel, 68-72 with 13:59 left.',
   ),
+  ...drift('press-conference', ['nextGameLabel', 'nextGameOpponent', 'nextGameDate'], 'The scene shows a sample next game so the design previews full; the seed holds only the demo game, so the bind blanks all three.'),
   ...drift('team-lower-third', ['stat1Value', 'stat2Value'], 'The scene’s placeholder record (14-3, 8-1) is not the 14-6, 6-3 the matchup scenes and the seed agree on.'),
   ...drift('team-lower-third', ['bodyText'], 'Placeholder copy; the bind blanks it in stats mode.'),
 ]);
@@ -149,6 +150,45 @@ describe('what the entries do beyond their values', async () => {
     expect(onAir(9, [shot('home', 832, 2, true), shot('away', 832, 2, false)])).toBe('SCORING DROUGHT 3:40 · FGS: 0 OF LAST 5');
     expect(onAir(30, [shot('away', 829, 3, true)])).toBe('SCORING DROUGHT 3:41 · FGS: 0 OF LAST 5');
     expect(slider.frozenOnAir).toEqual(['title']);
+  });
+
+  test('the press conference lists the featured side’s top two scorers, or the players named', () => {
+    const live = context.live?.sport === 'basketball' ? context.live : undefined;
+    if (!live) throw new Error('The demo game has no live state');
+    const line = (pts: number, fgm: number) => basketball.StatLine.parse({ pts, fgm, fga: fgm + 2, ftm: 1, fta: 2 });
+    const players = {
+      [REED]: line(18, 6),
+      ['drexel-mbb@2026-27/hipps' as PlayerId]: line(18, 7),
+      ['drexel-mbb@2026-27/tingler' as PlayerId]: line(9, 3),
+      ['saint-josephs-mbb@2026-27/carey' as PlayerId]: line(30, 10),
+    };
+    const at = { ...context, live: { ...live, players } };
+    const pc = BASKETBALL_V2['basketball-v2/press-conference'];
+    const lines = (params: unknown) => {
+      const values = bound(pc, params, 0, at);
+      return [values.playerLine1, values.playerLine2, values.playerLine3];
+    };
+    expect(lines({})).toEqual(['HIPPS 18 PTS, 7-9 FG, 1-2 FT', 'J. REED 18 PTS, 6-8 FG, 1-2 FT', '']);
+    expect(lines({ side: 'away' })[0]).toBe('CAREY 30 PTS, 10-12 FG, 1-2 FT');
+    expect(lines({ players: ['drexel-mbb@2026-27/tingler'] })).toEqual(['TINGLER 9 PTS, 3-5 FG, 1-2 FT', '', '']);
+  });
+
+  test('the press conference shows the date with its ordinal and the featured team’s next game', () => {
+    const pc = BASKETBALL_V2['basketball-v2/press-conference'];
+    expect(bound(pc, {}, 0).date).toBe('NOVEMBER 8TH 2026');
+    expect(bound(pc, {}, 0).nextGameLabel).toBe('');
+    expect([bound(pc, {}, 0).nextGameOpponent, bound(pc, {}, 0).nextGameDate]).toEqual(['', '']);
+    const game = (id: string, startsAt: string, away: string, home: string) =>
+      Game.parse({ id: `2026-27/${id}`, seasonId: '2026-27', program: 'mbb', awayTeamId: away, homeTeamId: home, startsAt });
+    const later = [
+      game('2026-12-02/drexel-mbb.at.saint-josephs-mbb', '2026-12-02T19:00:00-05:00', 'drexel-mbb', 'saint-josephs-mbb'),
+      game('2026-11-14/saint-josephs-mbb.at.drexel-mbb', '2026-11-14T19:00:00-05:00', 'saint-josephs-mbb', 'drexel-mbb'),
+    ];
+    const world = indexWorld({ ...context.world.snapshot, entities: { ...context.world.snapshot.entities, game: [...context.world.snapshot.entities.game, ...later] } });
+    const values = (params: unknown) => bound(pc, params, 0, { ...context, world });
+    expect([values({}).nextGameLabel, values({}).nextGameOpponent, values({}).nextGameDate]).toEqual(['NEXT GAME', "VS SAINT JOSEPH'S", '11/14/26']);
+    expect(values({ side: 'away' }).nextGameOpponent).toBe('AT DREXEL');
+    expect(values({ side: 'away' }).nextGameDate).toBe('11/14/26');
   });
 
   test('Next moves a stepped graphic: the answer, then the home team', () => {

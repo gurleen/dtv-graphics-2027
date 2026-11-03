@@ -315,7 +315,8 @@ export const initialBasketball = (gameId: GameId, program: BasketballProgram): B
 
 // Natural case, like the stored data: the projector applies broadcast capitals once.
 
-const ordinal = (n: number) => {
+/** `1st`, `2nd`, `3rd`, `11th`. */
+export const ordinal = (n: number) => {
   const tens = n % 100;
   const suffix = tens >= 11 && tens <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th';
   return `${n}${suffix}`;
