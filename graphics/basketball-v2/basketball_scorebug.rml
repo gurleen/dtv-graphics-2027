@@ -221,8 +221,14 @@
       <Rectangle width="66" height="62" originX="0.5" originY="0.5" cornerRadiusTL="10"/>
       <Stroke thickness="1.5" cap="round"><SolidColor colorValue="E6FFFFFF"/><TrimPath name="Shot Clock Trace Trim" id="30:361" start="0" end="1"/></Stroke>
     </Shape>
-    <Node name="Shot Clock Value" x="157" y="65"><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="16"/><DataBindContext sourcePathIds="30:1000-30:1061" propertyKey="17"/>
-    <Text name="Shot Clock" x="-29" y="23" originValue="baseline" wrapValue="noWrap" width="58" sizingValue="fixed" alignValue="center"><TextStylePaint id="30:320" fontAssetId="30:901" fontSize="62" letterSpacing="0"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Shot Clock Value" styleId="30:320" text="24"><DataBindContext sourcePathIds="30:1000-30:1042" propertyKey="268"/></TextValueRun>
+    <!-- Tabular like the game clock below: one run per digit, padded by the
+         controller to the widest digit. -->
+    <Node name="Shot Clock Value" x="128" y="65">
+    <Text name="Shot Clock" x="0.093" y="23" originValue="baseline" wrapValue="noWrap" width="58" sizingValue="fixed" alignValue="center"><DataBindContext sourcePathIds="30:1000-30:1077" propertyKey="13"/>
+      <TextStylePaint id="30:320" fontAssetId="30:900" fontSize="62" letterSpacing="1.306"><DataBindContext sourcePathIds="30:1000-30:1075" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextStylePaint id="30:321" fontAssetId="30:900" fontSize="62" letterSpacing="1.12"><DataBindContext sourcePathIds="30:1000-30:1076" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextValueRun name="Shot Clock Character 1" styleId="30:320" text="2"><DataBindContext sourcePathIds="30:1000-30:1073" propertyKey="268"/></TextValueRun>
+      <TextValueRun name="Shot Clock Character 2" styleId="30:321" text="4"><DataBindContext sourcePathIds="30:1000-30:1074" propertyKey="268"/></TextValueRun>
       <!-- The clock panel cascades run the other way: from the start of the text
            to its end, and at rest the range lies past the last glyph. -->
       <TextModifierGroup name="Shot Clock Cascade" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="26">
@@ -849,7 +855,6 @@
 <ViewModelPropertyNumber name="_homeRoll" id="30:1056"/>
 <ViewModelPropertyNumber name="_homeFlash" id="30:1057"/>
 <ViewModelPropertyNumber name="_shotAlert" id="30:1060"/>
-<ViewModelPropertyNumber name="_shotPulse" id="30:1061"/>
 <ViewModelPropertyString name="_clockChar1" id="30:1062"/>
 <ViewModelPropertyString name="_clockChar2" id="30:1063"/>
 <ViewModelPropertyString name="_clockChar3" id="30:1064"/>
@@ -861,6 +866,11 @@
 <ViewModelPropertyNumber name="_clockSpacing4" id="30:1070"/>
 <ViewModelPropertyNumber name="_clockSpacing5" id="30:1071"/>
 <ViewModelPropertyNumber name="_clockX" id="30:1072"/>
+<ViewModelPropertyString name="_shotChar1" id="30:1073"/>
+<ViewModelPropertyString name="_shotChar2" id="30:1074"/>
+<ViewModelPropertyNumber name="_shotSpacing1" id="30:1075"/>
+<ViewModelPropertyNumber name="_shotSpacing2" id="30:1076"/>
+<ViewModelPropertyNumber name="_shotX" id="30:1077"/>
 <ViewModelInstance name="Default" id="30:1001" exports="true">
 <ViewModelInstanceBoolean viewModelPropertyId="30:1002" propertyValue="false"/>
 <ViewModelInstanceString viewModelPropertyId="30:1010" propertyValue="SJU"/>
@@ -892,7 +902,6 @@
 <ViewModelInstanceNumber viewModelPropertyId="30:1056" propertyValue="0"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1057" propertyValue="0"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1060" propertyValue="0"/>
-<ViewModelInstanceNumber viewModelPropertyId="30:1061" propertyValue="1"/>
 <ViewModelInstanceString viewModelPropertyId="30:1062" propertyValue="1"/>
 <ViewModelInstanceString viewModelPropertyId="30:1063" propertyValue="3"/>
 <ViewModelInstanceString viewModelPropertyId="30:1064" propertyValue=":"/>
@@ -904,6 +913,11 @@
 <ViewModelInstanceNumber viewModelPropertyId="30:1070" propertyValue="0.624"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1071" propertyValue="0.5"/>
 <ViewModelInstanceNumber viewModelPropertyId="30:1072" propertyValue="2.1545"/>
+<ViewModelInstanceString viewModelPropertyId="30:1073" propertyValue="2"/>
+<ViewModelInstanceString viewModelPropertyId="30:1074" propertyValue="4"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1075" propertyValue="1.306"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1076" propertyValue="1.12"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1077" propertyValue="0.093"/>
 </ViewModelInstance>
 </ViewModel>
 
