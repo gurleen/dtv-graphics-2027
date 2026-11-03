@@ -87,14 +87,14 @@ const stopClock = (clock: Clock, now: EpochMs): Clock =>
 const setClock = (remainingMs: number, running: boolean, now: EpochMs): Clock =>
   running ? { running: true, remainingMs, since: now } : { running: false, remainingMs };
 
-/** `13:59` from a minute up, `04.3` below it. */
+/** `13:59` from a minute up, `4.3` below it. */
 export const formatGameClock = (remainingMs: number): string => {
   if (remainingMs >= 60_000) {
     const seconds = Math.floor(remainingMs / 1000);
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   }
   const tenths = Math.floor(remainingMs / 100);
-  return `${String(Math.floor(tenths / 10)).padStart(2, '0')}.${tenths % 10}`;
+  return `${Math.floor(tenths / 10)}.${tenths % 10}`;
 };
 
 /** Whole seconds, rounded up, so the display reads 1 until the clock expires. */

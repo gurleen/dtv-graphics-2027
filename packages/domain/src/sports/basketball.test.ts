@@ -218,8 +218,8 @@ describe('broadcast formatting', () => {
     [839_000, '13:59'],
     [60_000, '1:00'],
     [59_999, '59.9'],
-    [4_300, '04.3'],
-    [0, '00.0'],
+    [4_300, '4.3'],
+    [0, '0.0'],
   ])('game clock %p reads %p', (remaining, shown) => {
     expect(formatGameClock(remaining)).toBe(shown);
   });
