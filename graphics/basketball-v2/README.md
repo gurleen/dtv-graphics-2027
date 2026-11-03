@@ -7,7 +7,7 @@ follows the design language below. The earlier ports (`graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 48), naming, and a five-step checklist
+the id namespace registry (next free: 49), naming, and a five-step checklist
 from scene to registry entry. This README describes the finished graphics.
 Intro and outro lengths are not kept by hand: `bun run codegen` reads every
 timeline's length from the scene into `scenes.gen.ts`, and the renderer waits
@@ -863,6 +863,56 @@ The cue's error is `The game has no play by play yet` without shots, and `Nothin
 out about <team> right now` when no picked kind holds. To review long text, render the hold pose with a long subtitle, and pass the same
 `--data` to `render_frames.ts` for the wipe:
 `rive . --artboard="Basketball Scorebug Slider v2" --data=isPlaying=true --data=title=NOTE "--data=subtitle=A VERY LONG SUBTITLE THAT KEEPS GOING · WELL PAST THE ACTION SAFE MARGIN OF THE FRAME · ONE HUNDRED AND TWENTY CHARACTERS" --advance=120 --screenshot=build/scorebug_slider_long.png`.
+
+## Press Conference (`press_conference.rml`)
+
+A full-frame wrapper for the live press-conference video, on the card layer. It
+clears the scorebug (`clears: ['bug']`), so a coach's staff lower third can still
+go over the video. A 1424 x 801 window (16:9, origin 24, 140) is transparent: the
+video shows through it. Everything else is marble, with a team-coloured sidebar
+(origin 1482, 134; 372 x 813) on the right.
+
+- **Generated.** `generate_press_conference.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_press_conference.ts`;
+  never edit the `.rml` output by hand.
+- **Marble and the window.** `assets/images/press_conference/marble.jpg` is a
+  1920 x 1080 colour grade of ambientCG Marble012 (CC0, no attribution required).
+  A `ClippingShape` with `fillRule="evenOdd"` clips it by one shape holding two
+  rectangles, the full frame and the window, so the marble is absent inside the
+  window. The marble is an embedded asset, not bound.
+- **Borders.** A 6-unit stroke in the team's secondary colour rings the window
+  (outer 1436 x 813) and the sidebar, with the same top and bottom. The sidebar
+  fills with the team's primary colour. Both bind to `primaryColor` and
+  `secondaryColor`.
+- **Sidebar, top to bottom.** The date (Zuume Bold 44, centred). A white band for
+  the home team, then one for the away team, each 75 high with the logo larger
+  than the band on its left and the score (Bold 84, black) right-aligned. Up to
+  three player lines (Bold 30, left, white). A white 6-unit divider. Then
+  `Next Game` in the secondary colour (Bold 44), the opponent (`at Penn`,
+  `vs Penn`) and the date (`11/6/26`) in white (Bold 36). Home is always on
+  top. Every text takes a fixed width and `fitFontSize`, so a long line shrinks.
+  Zuume sets lower case as capitals, and the projector uppercases strings.
+- **Motion.** A fade and nothing else: only the root node's opacity is keyed.
+  The intro is 20 frames with the ease-out, the outro 24 frames with the
+  ease-in, and the last outro frame is empty. Hold keys opacity 1 and Hidden 0.
+- **On air:** `isPlaying`, as on the scorebug.
+
+View model `BasketballPressConferenceV2`, public properties: `isPlaying`, `date`,
+`homeLogo`/`awayLogo`, `homeScore`/`awayScore`, `playerLine1` to `playerLine3`
+(blank hides a line), `nextGameLabel`, `nextGameOpponent`, `nextGameDate` (all
+three blank when there is no next game), `primaryColor`, `secondaryColor`.
+
+The registry entry takes `side` (`home` by default), the team holding the
+press conference. It picks the colours, whose players are listed, and whose next game
+shows. `players` (up to three) names the player lines; without it the lines are
+the side's top two scorers in the live game (ties by field goals made, then
+name). The next game is the earliest game after this one with the team in it.
+The date is the game's calendar date as written in `startsAt`, so the offset's
+own day wins. The test data shows a sample next game the seed lacks, so the
+golden test lists those three properties in `KNOWN_DRIFT`. To review the hold
+pose: `rive . --artboard="Basketball Press Conference v2" --data=isPlaying=true --advance=120 --screenshot=build/press_conference.png`.
+`rive --screenshot` composites over a dark backdrop (29, 29, 29), so the window
+reads as that colour, the same as an empty scene.
 
 ## Test data
 

@@ -346,7 +346,8 @@ Namespaces in use:
 | 45 | Burning Question | 20600 |
 | 46 | Score to Break | 21800 |
 | 47 | Scorebug Slider | 23000 |
-| **48** | **Next free** | **24200** |
+| 48 | Press Conference | 24200 |
+| **49** | **Next free** | **25400** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

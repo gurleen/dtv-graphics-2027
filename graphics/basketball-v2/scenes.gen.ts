@@ -814,6 +814,55 @@ export const SCENES = {
       "stat4Label": "FG%"
     }
   },
+  "press_conference": {
+    "file": "press_conference.rml",
+    "artboard": "Basketball Press Conference v2",
+    "stateMachine": "Press Conference",
+    "viewModel": "BasketballPressConferenceV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 333,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17
+    },
+    "props": {
+      "date": "string",
+      "homeScore": "string",
+      "awayScore": "string",
+      "playerLine1": "string",
+      "playerLine2": "string",
+      "playerLine3": "string",
+      "nextGameLabel": "string",
+      "nextGameOpponent": "string",
+      "nextGameDate": "string",
+      "isPlaying": "boolean",
+      "primaryColor": "color",
+      "secondaryColor": "color",
+      "homeLogo": "image",
+      "awayLogo": "image"
+    },
+    "groups": {},
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "date": "NOVEMBER 8TH 2026",
+      "homeLogo": "asset:Press Conference v2 Drexel",
+      "awayLogo": "asset:Press Conference v2 Saint Joseph's",
+      "homeScore": "72",
+      "awayScore": "68",
+      "playerLine1": "J. REED 18 PTS, 0-0 FG, 0-0 FT",
+      "playerLine2": "",
+      "playerLine3": "",
+      "nextGameLabel": "NEXT GAME",
+      "nextGameOpponent": "AT PENN",
+      "nextGameDate": "11/14/26",
+      "primaryColor": "#07294d",
+      "secondaryColor": "#ffc600"
+    }
+  },
   "score_to_break": {
     "file": "score_to_break.rml",
     "artboard": "Basketball Score to Break v2",
