@@ -197,7 +197,8 @@ export const BasketballCommand = z.discriminatedUnion('type', [
   z.object({ type: z.literal('teamLine'), side: Side, line: StatLinePatch }),
   z.object({ type: z.literal('playerLine'), player: PlayerId, line: StatLinePatch }),
   z.object({ type: z.literal('shots'), shots: z.array(Shot) }),
-  z.object({ type: z.literal('authority'), group: FieldGroup, source: SourceId }),
+  /** With `from`, the group moves only while `from` holds it: a feed hands back what it still writes, never what another feed took. */
+  z.object({ type: z.literal('authority'), group: FieldGroup, source: SourceId, from: SourceId.optional() }),
 ]);
 export type BasketballCommand = z.infer<typeof BasketballCommand>;
 
@@ -281,6 +282,7 @@ function nextLive(live: BasketballLive, command: BasketballCommand, now: EpochMs
     case 'shots':
       return { ...live, shots: command.shots };
     case 'authority':
+      if (command.from !== undefined && live.authority[command.group] !== command.from) return live;
       return { ...live, authority: { ...live.authority, [command.group]: command.source } };
     default: {
       const exhaustive: never = command;

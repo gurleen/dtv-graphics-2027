@@ -65,7 +65,7 @@ export function createRouter(store: Store, feeds: Feeds) {
         start: os.tools.statcrew.start.handler(async ({ input, errors }) => {
           const result = await feeds.statcrew.start(input);
           if (result.ok) return result.feed;
-          throw result.reason === 'no-game' ? errors.NO_GAME() : errors.NO_FILE();
+          throw { 'no-game': errors.NO_GAME, 'no-file': errors.NO_FILE, 'score-held': errors.SCORE_HELD }[result.reason]();
         }),
         stop: os.tools.statcrew.stop.handler(() => feeds.statcrew.stop()),
       },
@@ -74,7 +74,7 @@ export function createRouter(store: Store, feeds: Feeds) {
         start: os.tools.allsport.start.handler(async ({ input, errors }) => {
           const result = await feeds.allsport.start(input);
           if (result.ok) return result.feed;
-          throw result.reason === 'no-game' ? errors.NO_GAME() : errors.NO_PORT();
+          throw { 'no-game': errors.NO_GAME, 'no-port': errors.NO_PORT, 'score-held': errors.SCORE_HELD }[result.reason]();
         }),
         stop: os.tools.allsport.stop.handler(() => feeds.allsport.stop()),
         ports: os.tools.allsport.ports.handler(() => feeds.ports()),

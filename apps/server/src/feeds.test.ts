@@ -2,7 +2,8 @@ import { afterEach, beforeEach, expect, test } from 'bun:test';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseSerialComm, serialPorts } from './feeds';
+import { GameId } from '@dtv/domain';
+import { parseSerialComm, serialPorts, writesScore } from './feeds';
 
 let dev: string;
 const touch = (...names: string[]) => names.forEach((name) => writeFileSync(join(dev, name), ''));
@@ -34,4 +35,15 @@ test('Windows offers the registry COM ports in number order, except Bluetooth li
   ].join('\r\n');
   expect(parseSerialComm(output)).toEqual(['COM1', 'COM3', 'COM10']);
   expect(parseSerialComm('')).toEqual([]);
+});
+
+test('a feed writes the score only while it runs on that game, and AllSport not with Score off', () => {
+  const game = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
+  const other = GameId.parse('2026-27/2026-11-12/drexel-mbb.at.hofstra-mbb');
+  expect(writesScore({ state: 'running', game }, game)).toBe(true);
+  expect(writesScore({ state: 'running', game, score: true }, game)).toBe(true);
+  expect(writesScore({ state: 'running', game, score: false }, game)).toBe(false);
+  expect(writesScore({ state: 'running', game }, other)).toBe(false);
+  expect(writesScore({ state: 'exited', game }, game)).toBe(false);
+  expect(writesScore({ state: 'stopped', game: null, score: null }, game)).toBe(false);
 });

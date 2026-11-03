@@ -113,8 +113,9 @@ export const contract = {
         .errors({
           NO_GAME: { message: 'No such basketball game' },
           NO_FILE: { message: 'No file at that path on the server' },
+          SCORE_HELD: { message: 'AllSport is writing this game’s score. Stop it, or restart it with Score off, first' },
         }),
-      /** Interrupts the feed so it hands score and stats back to the operator, then waits for it to end. Idempotent. */
+      /** Interrupts the feed so it hands back whichever of score and stats it still holds, then waits for it to end. Idempotent. */
       stop: oc.output(type<StatcrewFeed>()),
     },
     allsport: {
@@ -126,8 +127,9 @@ export const contract = {
         .errors({
           NO_GAME: { message: 'No such basketball game' },
           NO_PORT: { message: 'No device at that path on the server' },
+          SCORE_HELD: { message: 'StatCrew is writing this game’s score. Turn Score off, or stop StatCrew, first' },
         }),
-      /** Interrupts the feed so it hands the clock and score back to the operator, then waits for it to end. Idempotent. */
+      /** Interrupts the feed so it hands back whichever of the clock and score it still holds, then waits for it to end. Idempotent. */
       stop: oc.output(type<AllsportFeed>()),
       /** The serial devices on the server that could be a console: `/dev/cu.*` on macOS, `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux, the registry's non-Bluetooth COM ports on Windows. */
       ports: oc.output(type<readonly string[]>()),

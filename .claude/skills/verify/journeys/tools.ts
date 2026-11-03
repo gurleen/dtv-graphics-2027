@@ -74,6 +74,23 @@ await s.run(async () => {
   s.check((await start.isDisabled()), 'Start is disabled while running the same values');
   await shoot('running');
 
+  // Two feeds writing one score refuse each other's batches; the server refuses the second one before it starts.
+  await alex.getByRole('tab', { name: 'AllSport' }).click();
+  await alex.getByRole('combobox', { name: 'Port' }).fill(join(dir, 'no-such-port'));
+  await alex.getByRole('button', { name: /Game/ }).click();
+  await alex.getByRole('option', { name: /Saint Joseph's at Drexel/ }).click();
+  await alex.getByRole('button', { name: /^(Start|Restart)$/ }).click();
+  await alex.getByRole('alert').filter({ hasText: 'StatCrew is writing this game’s score' }).waitFor();
+  s.check(true, 'AllSport with Score on is refused with SCORE_HELD while StatCrew runs the game');
+  await shoot('error-score-held');
+  await alex.getByText('Score, timeouts, bonus, possession').click();
+  await alex.getByRole('button', { name: /^(Start|Restart)$/ }).click();
+  await alex.getByRole('alert').filter({ hasText: 'No device at that path' }).waitFor();
+  s.check(true, 'with Score off the score check passes and only the missing port is refused');
+  s.check((await authority())?.authority.score === 'statcrew', 'StatCrew still holds the score');
+  await tab.click();
+  await alex.getByRole('status').filter({ hasText: /Running since/ }).waitFor();
+
   const rows = () => alex.getByRole('region', { name: 'StatCrew plays' }).locator('tbody tr').allInnerTexts();
   await s.until("the plays table shows the file's three plays", rows, (texts) => texts.length === 3);
   const first = await rows();
@@ -93,7 +110,7 @@ await s.run(async () => {
   await alex.getByRole('status').filter({ hasText: 'Stopped' }).waitFor();
   await s.until('authority is back with the operator', authority, (live) => live?.authority.score === 'operator' && live.authority.stats === 'operator');
   s.check((await authority())?.score.home === 70, 'handing back keeps the score');
-  await s.until('the log shows the handback', () => alex.getByRole('log', { name: 'StatCrew log' }).innerText(), (text) => /handed score and stats to operator/.test(text));
+  await s.until('the log shows the handback', () => alex.getByRole('log', { name: 'StatCrew log' }).innerText(), (text) => /handed back whichever of score and stats it still held/.test(text));
   s.check((await rows()).length === 4, 'the plays stay after Stop');
   await shoot('stopped');
   rmSync(dir, { recursive: true, force: true });

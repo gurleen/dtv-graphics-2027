@@ -101,7 +101,7 @@ await s.run(async () => {
   await alex.getByRole('status').filter({ hasText: 'Stopped' }).waitFor();
   await s.until('authority is back with the operator', live, (state) => state?.authority.clock === 'operator' && state.authority.score === 'operator');
   s.check((await live())?.clock.remainingMs === 780_000, 'handing back keeps the clock');
-  await s.until('the log shows the handback', log, (text) => /handed clock to operator/.test(text));
+  await s.until('the log shows the handback', log, (text) => /handed back whichever of clock it still held/.test(text));
   await shoot('allsport-stopped-after');
   fake.close();
 });

@@ -22,6 +22,9 @@ const SEND_WITHIN_MS = 10_000;
 const MIN_PUSH_GAP_MS = 100;
 const RETRY_MS = 1_000;
 const DROPPED_REPORT_MS = 10_000;
+/** A console sends all the time (the CG output repeats the whole board every second), so this much quiet means the port is stuck. */
+const SILENCE_MS = 3_000;
+const SILENCE_CHECK_MS = 500;
 /** How often a Windows COM port is read. At 19200 baud 20 ms is under 400 bytes, well inside the driver's buffer. */
 const POLL_MS = 20;
 
@@ -68,15 +71,16 @@ const view = resolveGame(world!, gameId);
 if (!view) fail(`game ${gameId} is not in the server's data`);
 if (PROGRAMS[view.program].sport !== 'basketball') fail(`game ${gameId} is ${PROGRAMS[view.program].sport}, not basketball`);
 
-const hand = (to: SourceId) =>
+/** Hands the groups to `to`; with `from`, only the groups `from` still holds. */
+const hand = (to: SourceId, from?: SourceId) =>
   untilAnswered(
     (signal) =>
       api.game.apply(
-        { sport: 'basketball', gameId, source: basketball.OPERATOR, commands: groups.map((group) => ({ type: 'authority', group, source: to })) },
+        { sport: 'basketball', gameId, source: basketball.OPERATOR, commands: groups.map((group) => ({ type: 'authority', group, source: to, from })) },
         { signal },
       ),
     { withinMs: SEND_WITHIN_MS },
-  ).then(() => log(`handed ${groups.join(' and ')} to ${to}`));
+  ).then(() => log(from ? `handed back whichever of ${groups.join(' and ')} it still held` : `handed ${groups.join(' and ')} to ${to}`));
 
 const decoder = createDecoder(format);
 let sent = NOTHING_SENT;
@@ -89,6 +93,9 @@ let queue: Promise<void> = Promise.resolve();
 let reading: { destroy(): void } | undefined;
 /** The last reason the device could not be read, so a missing device is reported once and not every second. */
 let reported = '';
+let heardAt = 0;
+/** Whether the device has stayed silent since it was last reopened, so a console that is off is reported once. */
+let quiet = false;
 
 /** Pushes soon, from the newest screen. The queue keeps one push in flight; the gap keeps it to about ten a second. */
 function schedule(delayMs = Math.max(0, lastPushAt + MIN_PUSH_GAP_MS - Date.now())) {
@@ -130,6 +137,8 @@ function describe(commands: readonly basketball.BasketballCommand[], wasRunning:
 
 /** Decodes what the console sent and schedules a push. */
 function take(chunk: Buffer) {
+  heardAt = Date.now();
+  quiet = false;
   dropped += decoder.push(chunk, Date.now());
   schedule();
 }
@@ -145,7 +154,7 @@ function readDevice(): Promise<void> {
     closeSync(fd);
     throw new Error(`stty failed: ${configured.error?.message ?? configured.stderr.toString().trim()}`);
   }
-  log(`reading ${port} at ${baud} baud, ${format} format`);
+  if (!quiet) log(`reading ${port} at ${baud} baud, ${format} format`);
   reported = '';
   const stream = createReadStream('', { fd });
   reading = stream;
@@ -159,7 +168,7 @@ function readDevice(): Promise<void> {
 /** The Windows path: a COM port has no stream to listen to, so poll it; each read returns at once. */
 function readComPort(): Promise<void> {
   const device = openComPort(port, baud);
-  log(`reading ${port} at ${baud} baud, ${format} format`);
+  if (!quiet) log(`reading ${port} at ${baud} baud, ${format} format`);
   reported = '';
   return new Promise((resolve, reject) => {
     const poll = setInterval(() => {
@@ -182,12 +191,31 @@ function readComPort(): Promise<void> {
   });
 }
 
-/** Keeps the device open: when it is missing or fails, say so once and try again every second. */
+/**
+ * Reads the device until it ends, fails, or goes silent. A port can stop delivering bytes without an error, as a USB
+ * adapter does after a glitch, so silence closes it to be opened again.
+ */
+async function readUntilSilent(): Promise<'closed' | 'silent'> {
+  const read = readDevice();
+  heardAt = Date.now();
+  const silent = Promise.withResolvers<'silent'>();
+  const check = setInterval(() => Date.now() - heardAt >= SILENCE_MS && silent.resolve('silent'), SILENCE_CHECK_MS);
+  try {
+    return await Promise.race([read.then(() => 'closed' as const), silent.promise]);
+  } finally {
+    clearInterval(check);
+    reading?.destroy();
+  }
+}
+
+/** Keeps the device open: when it is missing, fails or goes silent, say so once and try again every second. */
 async function readForever() {
   while (running) {
     try {
-      await readDevice();
-      if (running) log(`${port} closed, reopening`);
+      const ended = await readUntilSilent();
+      if (running && ended === 'closed') log(`${port} closed, reopening`);
+      if (running && ended === 'silent' && !quiet) log(`no data from ${port} for ${SILENCE_MS / 1000} s; reopening it until data arrives`);
+      if (ended === 'silent') quiet = true;
     } catch (error) {
       const text = (error as Error).message;
       if (running && text !== reported) log(`cannot read ${port}: ${text}; retrying every ${RETRY_MS / 1000} s`);
@@ -209,7 +237,7 @@ async function shutdown() {
   clearTimeout(timer);
   reading?.destroy();
   await queue;
-  await hand(basketball.OPERATOR).catch((error) => log(`could not hand back: ${refusal(error).message}`));
+  await hand(basketball.OPERATOR, source).catch((error) => log(`could not hand back: ${refusal(error).message}`));
   stop.abort();
   close();
   // A destroyed stream on a terminal can leave its read pending, which would keep the process alive.

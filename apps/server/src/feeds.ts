@@ -1,18 +1,26 @@
 /** The feed tools the server supervises, as the router sees them, and the serial devices an AllSport feed can read. */
 
-import type { StatcrewPlay } from '@dtv/api';
+import type { FeedStatus, StatcrewPlay } from '@dtv/api';
 import type { GameId } from '@dtv/domain';
 import { existsSync, readdirSync } from 'node:fs';
 import type { FeedSupervisor } from './feed-supervisor';
 
-export type StatcrewSupervisor = FeedSupervisor<{ file: string; game: GameId }, 'no-game' | 'no-file', StatcrewPlay>;
-export type AllsportSupervisor = FeedSupervisor<{ port: string; game: GameId; score: boolean }, 'no-game' | 'no-port'>;
+export type StatcrewSupervisor = FeedSupervisor<{ file: string; game: GameId }, 'no-game' | 'no-file' | 'score-held', StatcrewPlay>;
+export type AllsportSupervisor = FeedSupervisor<{ port: string; game: GameId; score: boolean }, 'no-game' | 'no-port' | 'score-held'>;
 
 export interface Feeds {
   readonly statcrew: StatcrewSupervisor;
   readonly allsport: AllsportSupervisor;
   /** The serial devices that could be a console. */
   readonly ports: () => readonly string[];
+}
+
+/**
+ * Whether `feed` is running on `game` and writing its score. A second feed on that game would take the score away,
+ * and the first feed's pushes, which carry the score with its clock or stats, would then be refused whole.
+ */
+export function writesScore(feed: { readonly state: FeedStatus['state']; readonly game: GameId | null; readonly score?: boolean | null }, game: GameId): boolean {
+  return feed.state === 'running' && feed.game === game && feed.score !== false;
 }
 
 /** `/dev/cu.*` on macOS, except the two that are not serial ports; `/dev/ttyUSB*` and `/dev/ttyACM*` on Linux. */

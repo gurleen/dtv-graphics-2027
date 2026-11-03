@@ -13,6 +13,7 @@ type Clock = basketball.Clock;
 const NOW = 1_700_000_000_000;
 const GAME = GameId.parse('2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb');
 const STATCREW = SourceId.parse('statcrew');
+const ALLSPORT = SourceId.parse('allsport');
 const REED = PlayerId.parse('drexel-mbb@2026-27/reed-josh');
 const five = (team: string) => ['a', 'b', 'c', 'd', 'e'].map((name) => PlayerId.parse(`${team}@2026-27/${name}`));
 
@@ -116,7 +117,6 @@ describe('applyBasketball: each command is an absolute write', () => {
 });
 
 describe('applyBasketball: stage override', () => {
-  const ALLSPORT = SourceId.parse('allsport');
   const fed = applied(BASE, { type: 'authority', group: 'clock', source: ALLSPORT });
   const write = (live: BasketballLive, command: BasketballCommand, source: SourceId) => {
     const result = apply(live, command, source);
@@ -169,6 +169,12 @@ describe('applyBasketball: authority', () => {
   test('only the operator hands a group over or takes it back', () => {
     expect(apply(fed, { type: 'authority', group: 'stats', source: STATCREW }, STATCREW)).toEqual({ ok: false, reason: 'not-authority', group: 'operator' });
     expect(applied(fed, { type: 'authority', group: 'score', source: OPERATOR }).authority.score).toBe(OPERATOR);
+  });
+
+  test('a hand-back from a feed moves the group only while that feed still holds it', () => {
+    expect(applied(fed, { type: 'authority', group: 'score', source: OPERATOR, from: STATCREW }).authority.score).toBe(OPERATOR);
+    const taken = applied(fed, { type: 'authority', group: 'score', source: ALLSPORT });
+    expect(applied(taken, { type: 'authority', group: 'score', source: OPERATOR, from: STATCREW }).authority.score).toBe(ALLSPORT);
   });
 });
 
