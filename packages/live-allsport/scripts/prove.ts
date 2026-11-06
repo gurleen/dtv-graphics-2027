@@ -71,7 +71,7 @@ async function main() {
 
   const fake = await openConsole();
   consoles.push(fake);
-  const tool = Bun.spawn(['bun', 'packages/live-allsport/src/main.ts', `--port=${fake.path}`, `--game=${game.id}`, `--server=${URL}`], {
+  const tool = Bun.spawn(['bun', 'packages/live-allsport/src/main.ts', `--port=${fake.path}`, `--game=${game.id}`, '--format=rtd', `--server=${URL}`], {
     cwd: ROOT,
     stdout: 'pipe',
     stderr: 'pipe',

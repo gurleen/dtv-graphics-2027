@@ -3,7 +3,7 @@
  *
  *   bun packages/live-allsport/src/main.ts --port=<path> --game=<GameId> [--score=true|false] [--format=rtd|cg] [--baud=<rate>] [--server=ws://localhost:8975/rpc] [--source=allsport]
  *
- * `--format` is `cg` on Windows and `rtd` elsewhere; `--baud` follows it, 9600 for `cg` and 19200 for `rtd`.
+ * `--format` defaults to `cg`, what our console sends; `--baud` follows it, 9600 for `cg` and 19200 for `rtd`.
  */
 
 import { connect, untilAnswered, watch } from '@dtv/api';
@@ -32,7 +32,7 @@ const Args = z.object({
   port: z.string().min(1),
   game: GameId,
   score: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
-  format: z.enum(FORMATS).default(process.platform === 'win32' ? 'cg' : 'rtd'),
+  format: z.enum(FORMATS).default('cg'),
   baud: z.coerce.number().int().positive().optional(),
   server: z.string().default('ws://localhost:8975/rpc'),
   source: SourceId.default(SourceId.parse('allsport')),

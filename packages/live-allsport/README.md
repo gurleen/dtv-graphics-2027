@@ -16,7 +16,8 @@ game id from the data page, such as `2026-27/2026-11-08/saint-josephs-mbb.at.dre
 message if the game is not in the server's data or is not basketball. Bad arguments print the usage and exit 2.
 `--score=false` leaves score, timeouts, bonus and possession alone, for when StatCrew writes the score.
 
-`--format` is `cg` on Windows and `rtd` elsewhere, and `--baud` follows it: 9600 for `cg`, 19200 for `rtd`.
+`--format` defaults to `cg` on every platform, since that is what our console sends, and `--baud` follows it: 9600 for
+`cg`, 19200 for `rtd`.
 
 The port opens 8N1 through `stty` on macOS and Linux. On Windows `src/windows.ts` opens the COM port
 through kernel32 with `bun:ffi`: it sets the same 8N1 with `SetCommState`, makes reads return at once with
