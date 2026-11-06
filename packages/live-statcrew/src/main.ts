@@ -1,5 +1,5 @@
 /**
- * Pushes a StatCrew basketball XML file's box score into the running show server.
+ * Pushes a StatCrew basketball XML file's box score (the `stats` group, never the score) into the running show server.
  *
  *   bun packages/live-statcrew/src/main.ts --file=<path> --game=<GameId> [--server=ws://localhost:8975/rpc] [--source=statcrew]
  */
@@ -19,7 +19,8 @@ const POLL_MS = 500;
 const READ_RETRY_MS = 250;
 const PUSH_RETRY_MS = 1_000;
 const SEND_WITHIN_MS = 10_000;
-const GROUPS = ['score', 'stats'] as const;
+/** Only the box score: the score, timeouts, bonus and clock belong to AllSport or the operator. */
+const GROUPS = ['stats'] as const;
 
 const Args = z.object({
   file: z.string().min(1),
@@ -117,7 +118,7 @@ async function pushOnce() {
     away: new Map(world.roster(game.awayTeamId, game.seasonId).map((player) => [player.jersey, player.id])),
     home: new Map(world.roster(game.homeTeamId, game.seasonId).map((player) => [player.jersey, player.id])),
   };
-  const { commands, unmatched } = commandsFor(parsed, rosters, view!.program);
+  const { commands, unmatched } = commandsFor(parsed, rosters);
   for (const player of unmatched.filter((name) => !reported.has(name))) {
     reported.add(player);
     log(`not on the roster, skipped: ${player}`);

@@ -126,11 +126,10 @@ async function main() {
   }
 
   const firstPlayer = (side: Side) => rosters[side][0]!;
-  const seen = await until(game.id, api, 'the first push', (live) => live.sport === 'basketball' && live.score.home === 70);
-  assert.deepEqual(seen.score, { away: 61, home: 70 });
-  assert.equal(seen.authority.score, 'statcrew');
+  const seen = await until(game.id, api, 'the first push', (live) => live.sport === 'basketball' && live.team.home.pts === 50 + 2);
   assert.equal(seen.authority.stats, 'statcrew');
-  assert.equal(seen.authority.clock, 'operator', 'the clock stays with the operator');
+  assert.deepEqual({ clock: seen.authority.clock, score: seen.authority.score }, { clock: 'operator', score: 'operator' }, 'the clock and score stay with the operator');
+  assert.deepEqual(seen.score, before.score, 'the file\'s 61-70 does not reach the score');
   assert.equal(seen.team.home.pts, 50 + 2);
   for (const side of SIDES) {
     const player = firstPlayer(side);
@@ -151,9 +150,9 @@ async function main() {
   log(`on program: ${featured.lastName} ${aired.statLabel} ${aired.statLine}`);
 
   replaceFile(boxScore(rosters, { away: 61, home: 73 }, 3));
-  const updated = await until(game.id, api, 'the replaced file', (live) => live.sport === 'basketball' && live.score.home === 73);
+  const updated = await until(game.id, api, 'the replaced file', (live) => live.sport === 'basketball' && live.team.home.pts === 50 + 2 + 3);
+  assert.deepEqual(updated.score, before.score, 'the score is still untouched');
   assert.equal(updated.players[firstPlayer('home').id]?.pts, Number(firstPlayer('home').jersey) + 2 + 3);
-  assert.equal(updated.team.home.pts, 50 + 2 + 3);
   log(`replaced file: score ${updated.score.away}-${updated.score.home}, ${firstPlayer('home').lastName} ${updated.players[firstPlayer('home').id]!.pts} pts`);
   const onAir = await lowerThirdUntil(api, 'the lower third to follow the file', (values) => values.statLine === tonightLine(featured, 3));
   log(`still on program: ${featured.lastName} ${onAir.statLabel} ${onAir.statLine}`);
@@ -162,9 +161,9 @@ async function main() {
   tool.stdin.write('stop\n');
   tool.stdin.flush();
   const code = await tool.exited;
-  const after = await until(game.id, api, 'authority handed back', (live) => live.sport === 'basketball' && live.authority.score === 'operator' && live.authority.stats === 'operator');
+  const after = await until(game.id, api, 'authority handed back', (live) => live.sport === 'basketball' && live.authority.stats === 'operator');
   assert.equal(code, 0, 'the tool exits 0 on stop');
-  assert.equal(after.score.home, 73, 'handing back keeps the data');
+  assert.equal(after.team.home.pts, 50 + 2 + 3, 'handing back keeps the data');
   log(`after stop: authority ${JSON.stringify(after.authority)}`);
 
   await Bun.sleep(100);

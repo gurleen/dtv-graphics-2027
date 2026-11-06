@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
  * The Tools page's StatCrew tab: alex opens #/tools, points the feed at a generated box score for the seeded
- * game, starts it, and sees Running, the log, and the score on the game over the API with statcrew as the
- * authority. The file's plays show newest first in their own table, not in the log, and a play added to the file joins them. A missing file shows NO_FILE inline. Stop shows Stopped and hands authority back to the operator.
+ * game, starts it, and sees Running, the log, and statcrew holding only the stats over the API: the file's
+ * score never reaches the game. AllSport with Score on starts beside it. The file's plays show newest first in their own table, not in the log, and a play added to the file joins them. A missing file shows NO_FILE inline. Stop shows Stopped and hands authority back to the operator.
  * Screenshots go to build/controller/tools/ as well as the evidence folder.
  *
  *   .claude/skills/verify/scripts/dtv.sh up --port=8998
@@ -41,6 +41,7 @@ await s.run(async () => {
     const live = await s.live(GAME);
     return live.sport === 'basketball' ? { score: live.score, authority: live.authority } : null;
   };
+  const scoreBefore = (await authority())!.score;
 
   await alex.getByRole('link', { name: 'Tools' }).click();
   await alex.waitForURL(/#\/tools$/);
@@ -67,27 +68,25 @@ await s.run(async () => {
   s.check((await alex.getByRole('alert').count()) === 0, 'editing the file clears the error');
   await start.click();
   await alex.getByRole('status').filter({ hasText: /Running since \d\d:\d\d:\d\d/ }).waitFor();
-  await s.until('the log shows the first push', () => alex.getByRole('log', { name: 'StatCrew log' }).innerText(), (text) => /handed score and stats to statcrew/.test(text));
-  await s.until('the game has the file score and statcrew authority', authority, (live) => live?.score.home === 70 && live.authority.score === 'statcrew' && live.authority.stats === 'statcrew');
-  s.check((await authority())?.authority.clock === 'operator', 'the clock stays with the operator');
+  await s.until('the log shows the first push', () => alex.getByRole('log', { name: 'StatCrew log' }).innerText(), (text) => /handed stats to statcrew/.test(text));
+  await s.until('statcrew holds the stats', authority, (live) => live?.authority.stats === 'statcrew');
+  s.check((await authority())?.authority.clock === 'operator' && (await authority())?.authority.score === 'operator', 'the clock and score stay with the operator');
+  s.check(JSON.stringify((await authority())?.score) === JSON.stringify(scoreBefore), "the file's 61-70 does not reach the game's score");
   s.check(await stop.isEnabled(), 'Stop is enabled while running');
   s.check((await start.isDisabled()), 'Start is disabled while running the same values');
   await shoot('running');
 
-  // Two feeds writing one score refuse each other's batches; the server refuses the second one before it starts.
+  // StatCrew writes nothing AllSport does, so AllSport with Score on is not refused for StatCrew; only the missing port is.
   await alex.getByRole('tab', { name: 'AllSport' }).click();
   await alex.getByRole('combobox', { name: 'Port' }).fill(join(dir, 'no-such-port'));
+  await alex.keyboard.press('Tab');
   await alex.getByRole('button', { name: /Game/ }).click();
   await alex.getByRole('option', { name: /Saint Joseph's at Drexel/ }).click();
-  await alex.getByRole('button', { name: /^(Start|Restart)$/ }).click();
-  await alex.getByRole('alert').filter({ hasText: 'StatCrew is writing this game’s score' }).waitFor();
-  s.check(true, 'AllSport with Score on is refused with SCORE_HELD while StatCrew runs the game');
-  await shoot('error-score-held');
-  await alex.getByText('Score, timeouts, bonus, possession').click();
+  s.check(await alex.getByRole('checkbox', { name: /Score, timeouts, bonus, possession/ }).isChecked(), 'Score is on');
   await alex.getByRole('button', { name: /^(Start|Restart)$/ }).click();
   await alex.getByRole('alert').filter({ hasText: 'No device at that path' }).waitFor();
-  s.check(true, 'with Score off the score check passes and only the missing port is refused');
-  s.check((await authority())?.authority.score === 'statcrew', 'StatCrew still holds the score');
+  s.check(true, 'AllSport with Score on beside StatCrew is refused only for the missing port');
+  await shoot('error-no-port-beside-statcrew');
   await tab.click();
   await alex.getByRole('status').filter({ hasText: /Running since/ }).waitFor();
 
@@ -108,9 +107,9 @@ await s.run(async () => {
 
   await stop.click();
   await alex.getByRole('status').filter({ hasText: 'Stopped' }).waitFor();
-  await s.until('authority is back with the operator', authority, (live) => live?.authority.score === 'operator' && live.authority.stats === 'operator');
-  s.check((await authority())?.score.home === 70, 'handing back keeps the score');
-  await s.until('the log shows the handback', () => alex.getByRole('log', { name: 'StatCrew log' }).innerText(), (text) => /handed back whichever of score and stats it still held/.test(text));
+  await s.until('the stats are back with the operator', authority, (live) => live?.authority.stats === 'operator');
+  s.check(JSON.stringify((await authority())?.score) === JSON.stringify(scoreBefore), 'the score is still untouched');
+  await s.until('the log shows the handback', () => alex.getByRole('log', { name: 'StatCrew log' }).innerText(), (text) => /handed back whichever of stats it still held/.test(text));
   s.check((await rows()).length === 4, 'the plays stay after Stop');
   await shoot('stopped');
   rmSync(dir, { recursive: true, force: true });

@@ -21,7 +21,6 @@ last one sent is skipped.
 
 | Group | Commands |
 |---|---|
-| `score` | `score` for each side, from the `<linescore>`; `timeouts` and `bonus` for each side, below |
 | `stats` | `teamLine` for each side, from `<totals>`; `playerLine` for each player; `starters` for a side when exactly five matched players have `gs="1"`; `shots`, below |
 
 A StatCrew player joins a roster spot by jersey: the `uni` attribute against `Player.jersey`, both strings, so `0`
@@ -29,24 +28,12 @@ and `00` differ. Rosters come from the server's data and follow edits made while
 roster spot is logged once as `home #23 SMITH,JOHN` and gets no command. The server refuses a whole batch that
 names a player who is not in the game, so one unknown player would otherwise stop every update.
 
-## Timeouts and bonus
-
-The file has no count of either, so the tool works them out for the current period, `<status period>` (or the last
-play's period on a file without one). Regulation is `<rules prds>`: 2 is halves, 4 quarters, and a file without it
-goes by the game's program. With neither a status nor a play, the tool leaves both alone.
-
-- **Timeouts left**: four a game, less each `TIMEOUT` play charged to the side. Media timeouts (`type="MEDIA"`) are charged
-  to a team in the file but do not count. Halves carry at most three into the second half; each overtime adds one.
-- **Bonus**: a side is in the bonus when the other side has 7 team fouls in the half (halves) or 5 in the quarter
-  (quarters), from `<totals><statsbyprd pf>`. Overtime counts with the last regulation period. `<rules fouls>` is the
-  foul-out limit, not the bonus.
-
-These are NCAA rules. A different timeout allotment would be a change to `commands.ts`.
-
 ## What it does not write
 
-The clock, period, phase and possession. StatCrew's clock is a snapshot taken at each play, and the
-operator keeps the game clock. The plays themselves do not reach the game, only the shots below.
+Anything AllSport writes: the score, timeouts, bonus and possession (the `score` group) and the clock, shot clock,
+period and phase (the `clock` group). Those come from the AllSport console or the operator, never from StatCrew, so
+the two feeds can run on one game at once without contending. The plays themselves do not reach the game, only the
+shots below.
 
 ## Shots
 
@@ -64,11 +51,11 @@ own screen. Run by hand, the line goes to the terminal.
 
 ## Authority
 
-Every game starts with its operator as the writer of `score` and `stats`, and the controller has no control to hand
-a group to a feed. On start the tool sends `authority` commands as source `operator` that give both groups to
-`--source`, and logs the handover. On SIGINT, SIGTERM or a `stop` line on stdin (how the server stops it, since Windows cannot send a child SIGINT) it hands both groups back to `operator`. If the operator
-takes a group back while the tool runs, the next push logs `the operator took <group> back` and the tool keeps
-watching.
+Every game starts with its operator as the writer of every group, and the controller has no control to hand a group
+to a feed. On start the tool sends an `authority` command as source `operator` that gives `stats` to `--source`, and
+logs the handover. On SIGINT, SIGTERM or a `stop` line on stdin (how the server stops it, since Windows cannot send a
+child SIGINT) it hands `stats` back to `operator`. If the operator takes it back while the tool runs, the next push
+logs `the operator took stats back` and the tool keeps watching.
 
 ## Prove it
 

@@ -22,7 +22,7 @@ export function StatcrewTool() {
     <section className="tool" aria-label="StatCrew">
       <h2>StatCrew</h2>
       <p className="hint">
-        While it runs, StatCrew supplies the score, timeouts, bonus and stats and the operator cannot edit them. Stop gives them back. The clock stays with the operator.
+        While it runs, StatCrew supplies the box score (team and player stats, starters and shots) and the operator cannot edit it. Stop gives it back. It never writes the score, timeouts, bonus or clock: those come from AllSport or the operator.
       </p>
       <FeedState feed={feed} />
       <div className="tool-form">

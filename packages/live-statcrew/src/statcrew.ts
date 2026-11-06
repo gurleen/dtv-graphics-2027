@@ -1,5 +1,5 @@
 /**
- * Reads a StatCrew basketball XML file's box score, play by play, period and team fouls. Pure: the shell reads the file.
+ * Reads a StatCrew basketball XML file's box score and play by play. Pure: the shell reads the file.
  * The game clock is left out; StatCrew's clock is a per-play snapshot and the operator keeps it.
  */
 
@@ -20,17 +20,11 @@ export interface StatcrewTeam {
   readonly name: string;
   readonly score: number;
   readonly line: basketball.StatLine;
-  /** Team fouls by period number, from `<statsbyprd>`; a period with none recorded is absent. */
-  readonly fouls: ReadonlyMap<number, number>;
   readonly players: readonly StatcrewPlayer[];
 }
 
 export interface StatcrewGame {
   readonly teams: Sides<StatcrewTeam>;
-  /** The current period, from `<status>`; null on a file without one. */
-  readonly period: number | null;
-  /** Regulation periods, from `<rules prds>`: 2 for halves, 4 for quarters. Null on a file without them. */
-  readonly periods: number | null;
   /** In the file's order, which is the game's. */
   readonly plays: readonly StatcrewPlay[];
 }
@@ -89,7 +83,7 @@ const RawTeam = z.object({
   id: z.string().default(''),
   name: z.string().default(''),
   linescore: z.object({ score: z.string().optional() }).optional(),
-  totals: z.object({ stats: RawStats, statsbyprd: z.array(z.object({ prd: z.coerce.number().int().positive(), pf: count })).catch([]).default([]) }).optional(),
+  totals: z.object({ stats: RawStats }).optional(),
   player: z.array(RawPlayer).default([]),
 });
 
@@ -104,12 +98,8 @@ const RawPlays = z.preprocess(
   z.object({ period: z.array(RawPeriod).default([]) }),
 );
 
-const positive = z.coerce.number().int().positive();
-
 const RawGame = z.object({
   bbgame: z.object({
-    venue: z.object({ rules: z.object({ prds: positive }).optional().catch(undefined) }).optional().catch(undefined),
-    status: z.object({ period: positive }).optional().catch(undefined),
     team: z.array(RawTeam),
     plays: RawPlays,
   }),
@@ -121,7 +111,7 @@ const parser = new XMLParser({
   parseAttributeValue: false,
   parseTagValue: false,
   // A play's `team` is an attribute, not the <team> element.
-  isArray: (name, _path, _leaf, isAttribute) => !isAttribute && ['team', 'player', 'statsbyprd', 'period', 'play'].includes(name),
+  isArray: (name, _path, _leaf, isAttribute) => !isAttribute && ['team', 'player', 'period', 'play'].includes(name),
 });
 
 const lineOf = (stats: RawStats): basketball.StatLine =>
@@ -135,7 +125,6 @@ const teamOf = (raw: z.infer<typeof RawTeam>): StatcrewTeam => {
     name: raw.name,
     score: raw.linescore?.score && Number.isInteger(linescore) && linescore >= 0 ? linescore : line.pts,
     line,
-    fouls: new Map(raw.totals?.statsbyprd.map((period) => [period.prd, period.pf])),
     players: raw.player
       .filter((player) => player.uni !== 'TM')
       .map((player) => ({
@@ -184,10 +173,10 @@ export function parseStatcrew(xml: string): StatcrewGame {
   }
   const parsed = RawGame.safeParse(tree);
   if (!parsed.success) throw new Error(`StatCrew XML has no <bbgame> box score: ${z.prettifyError(parsed.error)}`);
-  const { venue, status, team, plays } = parsed.data.bbgame;
+  const { team, plays } = parsed.data.bbgame;
   const away = team.find((candidate) => candidate.vh === 'V');
   const home = team.find((candidate) => candidate.vh === 'H');
   if (!away || !home) throw new Error('StatCrew XML needs a <team vh="V"> and a <team vh="H">');
   const teams = { away: teamOf(away), home: teamOf(home) };
-  return { teams, period: status?.period ?? null, periods: venue?.rules?.prds ?? null, plays: playsOf(plays, teams) };
+  return { teams, plays: playsOf(plays, teams) };
 }

@@ -33,8 +33,8 @@ export function AllsportTool() {
     <section className="tool" aria-label="AllSport">
       <h2>AllSport</h2>
       <p className="hint">
-        While it runs, the AllSport console supplies the clock, shot clock and period, and the operator cannot edit them. With Score on, it also supplies score, timeouts, bonus and possession. StatCrew also writes the score, so turn
-        Score off if StatCrew owns it. Stop gives everything back, and is the way to set halftime or final.
+        While it runs, the AllSport console supplies the clock, shot clock and period, and the operator cannot edit them. With Score on, it also supplies score, timeouts, bonus and possession; with it off, the operator keeps those.
+        Stop gives everything back, and is the way to set halftime or final.
       </p>
       <FeedState feed={feed} />
       <div className="tool-form">

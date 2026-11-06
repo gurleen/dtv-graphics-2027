@@ -28,7 +28,7 @@ import rendererPage from '@dtv/renderer-page';
 import { rpcWebSocket } from './router';
 import { headshotHandler } from './headshots';
 import { createFeedSupervisor } from './feed-supervisor';
-import { type Feeds, portExists, serialPorts, writesScore } from './feeds';
+import { type Feeds, portExists, serialPorts } from './feeds';
 import { createStore, systemClock } from './store';
 
 const ROOT = resolve(import.meta.dir, '../../..');
@@ -61,16 +61,14 @@ const feeds: Feeds = {
     command: ({ file, game }) => [process.execPath, join(ROOT, 'packages/live-statcrew/src/main.ts'), `--file=${file}`, `--game=${game}`, serverUrl],
     validate: async ({ file, game }) => {
       if (!isBasketball(game)) return 'no-game';
-      if (writesScore(feeds.allsport.feed(), game)) return 'score-held';
       return (await Bun.file(file).exists()) ? null : 'no-file';
     },
   }),
   allsport: createFeedSupervisor({
     inputs: ['port', 'game', 'score'],
     command: ({ port, game, score }) => [process.execPath, join(ROOT, 'packages/live-allsport/src/main.ts'), `--port=${port}`, `--game=${game}`, `--score=${score}`, serverUrl],
-    validate: ({ port, game, score }) => {
+    validate: ({ port, game }) => {
       if (!isBasketball(game)) return 'no-game';
-      if (score && writesScore(feeds.statcrew.feed(), game)) return 'score-held';
       return portExists(port) ? null : 'no-port';
     },
   }),
