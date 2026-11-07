@@ -26,6 +26,7 @@ export const halftimeAdjustments = defineGraphic({
     const [homeLine1 = '', homeLine2 = ''] = params.adjustments.home;
     return {
       step: 0,
+      singleLine: params.adjustments.away.length <= 1 && params.adjustments.home.length <= 1,
       awaySchool: away.school.name,
       awayMascot: away.school.mascot,
       awayLine1,

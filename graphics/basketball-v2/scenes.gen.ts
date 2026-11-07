@@ -323,7 +323,8 @@ export const SCENES = {
     "viewModel": "BasketballHalftimeAdjustmentsV2",
     "layers": [
       "Display",
-      "Team"
+      "Team",
+      "Size"
     ],
     "animations": {
       "Intro": 1200,
@@ -333,7 +334,9 @@ export const SCENES = {
       "Away Shown": 17,
       "Home Shown": 17,
       "Away To Home": 800,
-      "Home To Away": 800
+      "Home To Away": 800,
+      "Two Lines": 17,
+      "One Line": 17
     },
     "props": {
       "awaySchool": "string",
@@ -346,6 +349,7 @@ export const SCENES = {
       "homeLine2": "string",
       "step": "number",
       "isPlaying": "boolean",
+      "singleLine": "boolean",
       "awayPrimaryColor": "color",
       "awaySecondaryColor": "color",
       "homePrimaryColor": "color",
@@ -359,6 +363,7 @@ export const SCENES = {
     "defaults": {
       "isPlaying": false,
       "step": 0,
+      "singleLine": false,
       "awaySchool": "SAINT JOSEPH'S",
       "awayMascot": "HAWKS",
       "awayLogo": "asset:Halftime Adjustments v2 Saint Joseph's",

@@ -5,7 +5,7 @@
  *
  * writes halftime_adjustments.rml beside this file. Edit this file, not the output.
  *
- * The graphic shows one team's two halftime adjustments at a time and changes team without
+ * The graphic shows one team's two halftime adjustments (or one, when `singleLine` is set) at a time and changes team without
  * leaving air, as the starting five lower third does. It takes the Burning Question's form,
  * mirrored onto the left action-safe margin: a title row (the sponsor chip on the outer
  * edge, the fixed title on dark glass) over a team-tinted panel, its text left-aligned and
@@ -19,6 +19,10 @@
  *            the per-team nodes (team name, lines, tint, marker, logo), so the layers never
  *            key the same property, except the text reveal ranges, which the change
  *            animations key and the later layer wins.
+ *   Size     Two Lines <-> One Line, gated on `singleLine`, switches instantly. It holds the
+ *            geometry the other layers never key: the panel and edge heights, the block's
+ *            top (its foot stays put), the edge lights' and sweeps' centres, and the
+ *            second lines' group.
  */
 
 import { join } from 'node:path';
@@ -67,6 +71,9 @@ const PANEL_HEIGHT = 172;
 const PANEL_Y = TITLE_HEIGHT + GAP;
 const BLOCK_HEIGHT = PANEL_Y + PANEL_HEIGHT;
 const BLOCK_Y = FOOT_Y - BLOCK_HEIGHT;
+// With one adjustment per team the panel drops its second line and the block keeps its foot.
+const LINE_STEP = 48;
+const COMPACT_PANEL_HEIGHT = PANEL_HEIGHT - LINE_STEP;
 const CHIP_WIDTH = 112;
 const TITLE_X = CHIP_WIDTH + GAP;
 const TITLE_WIDTH = BLOCK_WIDTH - TITLE_X;
@@ -119,6 +126,8 @@ const Y = 14;
 const SCALE_X = 16;
 const SCALE_Y = 17;
 const OPACITY = 18;
+const HEIGHT = 21;
+const END_Y = 35;
 const COLOR = 37;
 const IMAGE = 206;
 const TEXT = 268;
@@ -157,6 +166,15 @@ const RIGHT_LIGHT = id(507);
 const INTRO_SWEEP = id(600);
 const CHANGE_SWEEP = id(601);
 const SILHOUETTE = id(610);
+const SECOND_LINES = id(250);
+// Every shape sized to the panel or the block, which the Size layer shortens.
+const PANEL_RECTS = {
+  glaze: id(251), underlay: id(252), silhouette: id(253),
+  tint: (team: number) => id(254 + team), marker: (team: number) => id(256 + team),
+};
+const GLAZE_GRADIENTS = [id(258), id(259)];
+const EDGE_SHAPES = [id(260), id(261), id(262), id(263)];
+const EDGE_RECTS = [id(264), id(265), id(266), id(267)];
 const FONT_BOLD = id(900);
 const FONT_REGULAR = id(901);
 const SPONSOR_ASSET = id(913);
@@ -185,6 +203,7 @@ const teamProperty = (team: number) => {
 };
 const IS_PLAYING = 1002;
 const STEP = 1003;
+const SINGLE_LINE = 1004;
 const SPONSOR_LOGO = 1100;
 const logoAsset = (team: number) => id(911 + team);
 const LINE_INDICES = Array.from({ length: LINE_COUNT }, (_, index) => index);
@@ -202,9 +221,9 @@ const bound = (property: number, key: number) => `<DataBindContext sourcePathIds
 const xml = (text: string) => text.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 const glaze = (name: string, width: number, height: number, radii: Radii) => `<Shape name="${name} Glaze" x="0" y="0">
-    ${rectangle(width, height, radii)}
-    <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
-    <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
+    ${rectangle(width, height, radii, ` id="${PANEL_RECTS.glaze}"`)}
+    <Fill><LinearGradient id="${GLAZE_GRADIENTS[0]}" startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
+    <Stroke thickness="1"><LinearGradient id="${GLAZE_GRADIENTS[1]}" startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>`;
 
 const darkGlass = (name: string, width: number, height: number, radii: Radii) => `<Shape name="${name} Glaze" x="0" y="0">
@@ -305,13 +324,17 @@ const panel = `<Node name="Team Panel" id="${TEAM_PANEL}" x="0" y="${PANEL_Y}">
   <Node name="Markers" id="${MARKERS}" x="0" y="0">
     <ClippingShape name="Markers Clip" sourceId="${PANEL_UNDERLAY}"/>
 ${TEAM_ORDER.map((team) => `    <Shape name="${TEAMS[team]!.title} Marker" id="${teamPanel(team).marker}" x="0" y="0" scaleY="${teamOpacity(team)}">
-      <Rectangle width="${MARKER_WIDTH}" height="${PANEL_HEIGHT}" originX="0" originY="0"/>
+      <Rectangle id="${PANEL_RECTS.marker(team)}" width="${MARKER_WIDTH}" height="${PANEL_HEIGHT}" originX="0" originY="0"/>
       <Fill><SolidColor colorValue="${TEAMS[team]!.secondary}">${bound(teamProperty(team).secondary, COLOR)}</SolidColor></Fill>
     </Shape>`).join('\n')}
   </Node>
   <Node name="Panel Content" id="${PANEL_CONTENT}" x="0" y="0">
 ${TEAM_ORDER.map(teamName).join('\n')}
-${TEAM_ORDER.flatMap((team) => LINE_INDICES.map((index) => lineNode(team, index))).join('\n')}
+${TEAM_ORDER.map((team) => lineNode(team, 0)).join('\n')}
+  <!-- Hidden by the Size layer when each team has one adjustment. -->
+  <Node name="Second Lines" id="${SECOND_LINES}" x="0" y="0">
+${TEAM_ORDER.flatMap((team) => LINE_INDICES.slice(1).map((index) => lineNode(team, index))).join('\n')}
+  </Node>
   </Node>
   ${glaze('Panel', BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII)}
   <!-- The team logo as a large faded mark at the inner end, cropped by the panel. -->
@@ -320,11 +343,11 @@ ${TEAM_ORDER.flatMap((team) => LINE_INDICES.map((index) => lineNode(team, index)
 ${TEAM_ORDER.map((team) => `    <Image name="${TEAMS[team]!.title} Logo" id="${teamPanel(team).logo}" x="0" y="0" opacity="${team === 0 ? LOGO_OPACITY : 0}" scaleX="${LOGO_SCALE}" scaleY="${LOGO_SCALE}" assetId="${logoAsset(team)}">${bound(teamProperty(team).logo, IMAGE)}</Image>`).join('\n')}
   </Node>
 ${TEAM_ORDER.map((team) => `  <Shape name="${TEAMS[team]!.title} Tint" id="${teamPanel(team).tint}" x="0" y="0" opacity="${team === 0 ? TINT_OPACITY : 0}">
-    ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII)}
+    ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII, ` id="${PANEL_RECTS.tint(team)}"`)}
     <Fill><SolidColor colorValue="${TEAMS[team]!.primary}">${bound(teamProperty(team).primary, COLOR)}</SolidColor></Fill>
   </Shape>`).join('\n')}
   <Shape name="Panel Underlay" id="${PANEL_UNDERLAY}" x="0" y="0">
-    ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII)}
+    ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII, ` id="${PANEL_RECTS.underlay}"`)}
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
 </Node>`;
@@ -336,12 +359,13 @@ ${TEAM_ORDER.map((team) => `  <Shape name="${TEAMS[team]!.title} Tint" id="${tea
 // and fades.
 const edge = (side: 'Left' | 'Right', edgeId: string, maskId: string, lightId: string) => {
   const left = side === 'Left';
+  const [line, glow] = left ? [0, 1] : [2, 3];
   const glowToward = left ? 1 : -1;
   return `<Node name="${side} Leading Edge" id="${edgeId}" x="${left ? -8 : BLOCK_WIDTH + 8}">
   <Shape name="${side} Reveal Mask" id="${maskId}" y="-8"><Rectangle width="2400" height="${BLOCK_HEIGHT + 16}" originX="${left ? 0 : 1}" originY="0"/></Shape>
   <Node name="${side} Edge Light" id="${lightId}" y="${BLOCK_HEIGHT / 2}" opacity="0">
-    <Shape name="${side} Edge Line" y="${-BLOCK_HEIGHT / 2}"><Rectangle width="2" height="${BLOCK_HEIGHT}" originX="0.5" originY="0"/><Fill><SolidColor colorValue="E6FFFFFF"/></Fill></Shape>
-    <Shape name="${side} Edge Glow" y="${-BLOCK_HEIGHT / 2}"><Rectangle width="44" height="${BLOCK_HEIGHT}" originX="${left ? 0 : 1}" originY="0"/><Fill><LinearGradient startX="0" startY="0" endX="${44 * glowToward}" endY="0"><GradientStop colorValue="30FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill></Shape>
+    <Shape name="${side} Edge Line" id="${EDGE_SHAPES[line]}" y="${-BLOCK_HEIGHT / 2}"><Rectangle id="${EDGE_RECTS[line]}" width="2" height="${BLOCK_HEIGHT}" originX="0.5" originY="0"/><Fill><SolidColor colorValue="E6FFFFFF"/></Fill></Shape>
+    <Shape name="${side} Edge Glow" id="${EDGE_SHAPES[glow]}" y="${-BLOCK_HEIGHT / 2}"><Rectangle id="${EDGE_RECTS[glow]}" width="44" height="${BLOCK_HEIGHT}" originX="${left ? 0 : 1}" originY="0"/><Fill><LinearGradient startX="0" startY="0" endX="${44 * glowToward}" endY="0"><GradientStop colorValue="30FFFFFF" position="0"/><GradientStop colorValue="00FFFFFF" position="1"/></LinearGradient></Fill></Shape>
   </Node>
 </Node>`;
 };
@@ -357,7 +381,7 @@ const sweep = (name: string, sweepId: string, peak: string) => `<Shape name="${n
 const silhouette = `<Shape name="Block Silhouette" id="${SILHOUETTE}">
   ${rectangle(CHIP_WIDTH, TITLE_HEIGHT, CHIP_RADII, ' x="0" y="0"')}
   ${rectangle(TITLE_WIDTH, TITLE_HEIGHT, TITLE_RADII, ` x="${TITLE_X}" y="0"`)}
-  ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII, ` x="0" y="${PANEL_Y}"`)}
+  ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII, ` id="${PANEL_RECTS.silhouette}" x="0" y="${PANEL_Y}"`)}
 </Shape>`;
 
 // --- timelines ------------------------------------------------------------------------
@@ -538,22 +562,46 @@ const change = (from: number, to: number): Track[] => {
   ];
 };
 
+// --- size layer -----------------------------------------------------------------------
+
+/** The resting geometry for two lines a team or one: the panel, and the block it ends. */
+const sized = (singleLine: boolean): Track[] => {
+  const panelHeight = singleLine ? COMPACT_PANEL_HEIGHT : PANEL_HEIGHT;
+  const blockHeight = PANEL_Y + panelHeight;
+  const panelRects = [PANEL_RECTS.glaze, PANEL_RECTS.underlay, PANEL_RECTS.silhouette, ...[0, 1].flatMap((team) => [PANEL_RECTS.tint(team), PANEL_RECTS.marker(team)])];
+  return [
+    hold(ROOT, Y, FOOT_Y - blockHeight),
+    ...panelRects.map((rect) => hold(rect, HEIGHT, panelHeight)),
+    ...GLAZE_GRADIENTS.map((gradient) => hold(gradient, END_Y, panelHeight)),
+    hold(LOGO_GROUP, Y, panelHeight / 2),
+    ...LIGHTS.map((light) => hold(light, Y, blockHeight / 2)),
+    ...EDGE_SHAPES.map((shape) => hold(shape, Y, -blockHeight / 2)),
+    ...EDGE_RECTS.map((rect) => hold(rect, HEIGHT, blockHeight)),
+    ...[INTRO_SWEEP, CHANGE_SWEEP].map((sweep) => hold(sweep, Y, blockHeight / 2)),
+    hold(SECOND_LINES, OPACITY, singleLine ? 0 : 1),
+  ];
+};
+
 const animation = (name: string, local: number, duration: number, loop: 'oneShot' | 'loop', tracks: Track[]) =>
   `<LinearAnimation name="${name}" id="${id(local)}" fps="60" duration="${duration}" loopValue="${loop}">\n${tracks.map(renderTrack).join('\n')}\n</LinearAnimation>`;
 
 // --- state machine --------------------------------------------------------------------
 
-const onAir = (value: 'equal' | 'notEqual') =>
-  `<TransitionViewModelCondition opValue="${value}"><TransitionPropertyViewModelComparator><BindablePropertyBoolean>${bound(IS_PLAYING, BOOLEAN)}</BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition>`;
+const isTrue = (property: number) => (value: 'equal' | 'notEqual') =>
+  `<TransitionViewModelCondition opValue="${value}"><TransitionPropertyViewModelComparator><BindablePropertyBoolean>${bound(property, BOOLEAN)}</BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition>`;
+const onAir = isTrue(IS_PLAYING);
+const singleLine = isTrue(SINGLE_LINE);
 // Step 1 is the home team; any other value shows the away team.
 const showsHome = (value: 'equal' | 'notEqual') =>
   `<TransitionViewModelCondition opValue="${value}"><TransitionPropertyViewModelComparator><BindablePropertyNumber>${bound(STEP, NUMBER)}</BindablePropertyNumber></TransitionPropertyViewModelComparator><TransitionValueNumberComparator value="1"/></TransitionViewModelCondition>`;
 
 const ID = {
   hold: 30, intro: 31, outro: 32, hidden: 33, awayShown: 34, homeShown: 35, awayToHome: 36, homeToAway: 37,
+  twoLines: 38, oneLine: 39,
 } as const;
 const STATE = {
   hold: 40, intro: 41, outro: 42, hidden: 43, awayShown: 44, homeShown: 45, awayToHome: 46, homeToAway: 47,
+  twoLines: 48, oneLine: 49,
 } as const;
 
 const stateMachine = `<StateMachine name="Halftime Adjustments" id="${id(7)}">
@@ -588,6 +636,12 @@ const stateMachine = `<StateMachine name="Halftime Adjustments" id="${id(7)}">
     <StateTransition stateToId="${id(STATE.awayToHome)}" duration="0">${showsHome('equal')}</StateTransition>
   </AnimationState>
 </StateMachineLayer>
+<StateMachineLayer name="Size">
+  <AnyState x="820" y="-120"/><ExitState x="940" y="-120"/>
+  <EntryState x="0" y="0"><StateTransition stateToId="${id(STATE.twoLines)}"/></EntryState>
+  <AnimationState x="180" y="0" id="${id(STATE.twoLines)}" animationId="${id(ID.twoLines)}"><StateTransition stateToId="${id(STATE.oneLine)}" duration="0">${singleLine('equal')}</StateTransition></AnimationState>
+  <AnimationState x="420" y="0" id="${id(STATE.oneLine)}" animationId="${id(ID.oneLine)}"><StateTransition stateToId="${id(STATE.twoLines)}" duration="0">${singleLine('notEqual')}</StateTransition></AnimationState>
+</StateMachineLayer>
 </StateMachine>`;
 
 // --- view model -----------------------------------------------------------------------
@@ -595,6 +649,7 @@ const stateMachine = `<StateMachine name="Halftime Adjustments" id="${id(7)}">
 const viewModelProperties = [
   `<ViewModelPropertyBoolean name="isPlaying" id="${id(IS_PLAYING)}" componentProps="1"/>`,
   `<ViewModelPropertyNumber name="step" id="${id(STEP)}" componentProps="1"/>`,
+  `<ViewModelPropertyBoolean name="singleLine" id="${id(SINGLE_LINE)}" componentProps="1"/>`,
   ...TEAMS.flatMap((team, index) => {
     const property = teamProperty(index);
     return [
@@ -612,6 +667,7 @@ const viewModelProperties = [
 const viewModelDefaults = [
   `<ViewModelInstanceBoolean viewModelPropertyId="${id(IS_PLAYING)}" propertyValue="false"/>`,
   `<ViewModelInstanceNumber viewModelPropertyId="${id(STEP)}" propertyValue="0"/>`,
+  `<ViewModelInstanceBoolean viewModelPropertyId="${id(SINGLE_LINE)}" propertyValue="false"/>`,
   ...TEAMS.flatMap((team, index) => {
     const property = teamProperty(index);
     return [
@@ -678,9 +734,15 @@ ${animation('Away To Home', ID.awayToHome, CHANGE_FRAMES, 'oneShot', change(0, 1
 
 ${animation('Home To Away', ID.homeToAway, CHANGE_FRAMES, 'oneShot', change(1, 0))}
 
+<!-- Size layer: two lines a team, or one, with the block's foot in place. -->
+${animation('Two Lines', ID.twoLines, 1, 'loop', sized(false))}
+
+${animation('One Line', ID.oneLine, 1, 'loop', sized(true))}
+
 <!-- Display: isPlaying true takes the graphic on air (Intro then Hold), false dismisses
      it (Outro then Hidden). Team: step 1 shows the home team, anything else the away
-     team; on air the change animates, off air it is immediate. Both default off/away. -->
+     team; on air the change animates, off air it is immediate. Size: singleLine true drops
+     each team's second line and shortens the panel. All default off/away/two lines. -->
 ${stateMachine}
 </Artboard>
 
