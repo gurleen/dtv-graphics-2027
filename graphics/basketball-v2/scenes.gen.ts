@@ -381,6 +381,142 @@ export const SCENES = {
       "sponsorLogo": "asset:Halftime Adjustments v2 Rothman Orthopaedics"
     }
   },
+  "halftime_slate": {
+    "file": "halftime_slate.rml",
+    "artboard": "Basketball Halftime Slate v2",
+    "stateMachine": "Halftime Slate",
+    "viewModel": "BasketballHalftimeSlateV2",
+    "layers": [
+      "Display",
+      "Pages",
+      "Window"
+    ],
+    "animations": {
+      "Intro": 1400,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17,
+      "Pages Idle": 17,
+      "Page 1": 8000,
+      "Page 2": 8000,
+      "Page 3": 8000,
+      "Window Closed": 17,
+      "Window Open": 17,
+      "Window Opening": 333,
+      "Window Closing": 333
+    },
+    "props": {
+      "title": "string",
+      "clock": "string",
+      "awaySchool": "string",
+      "awayMascot": "string",
+      "awayScore": "string",
+      "homeSchool": "string",
+      "homeMascot": "string",
+      "homeScore": "string",
+      "isPlaying": "boolean",
+      "showWindow": "boolean",
+      "awayPrimaryColor": "color",
+      "awaySecondaryColor": "color",
+      "homePrimaryColor": "color",
+      "homeSecondaryColor": "color",
+      "awayLogo": "image",
+      "homeLogo": "image"
+    },
+    "groups": {
+      "row": {
+        "count": 6,
+        "fields": {
+          "label": "string",
+          "awayValue": "string",
+          "homeValue": "string"
+        }
+      },
+      "awayLeader": {
+        "count": 3,
+        "fields": {
+          "label": "string",
+          "name": "string",
+          "value": "string"
+        }
+      },
+      "homeLeader": {
+        "count": 3,
+        "fields": {
+          "label": "string",
+          "name": "string",
+          "value": "string"
+        }
+      }
+    },
+    "internal": {
+      "_clockChar1": "string",
+      "_clockChar2": "string",
+      "_clockChar3": "string",
+      "_clockChar4": "string",
+      "_clockChar5": "string",
+      "_clockSpacing1": "number",
+      "_clockSpacing2": "number",
+      "_clockSpacing3": "number",
+      "_clockSpacing4": "number",
+      "_clockSpacing5": "number",
+      "_clockX": "number"
+    },
+    "defaults": {
+      "isPlaying": false,
+      "showWindow": false,
+      "title": "HALFTIME",
+      "clock": "13:59",
+      "awaySchool": "SAINT JOSEPH'S",
+      "awayMascot": "HAWKS",
+      "awayScore": "68",
+      "awayLogo": "asset:Halftime Slate v2 Saint Joseph's",
+      "awayPrimaryColor": "#c2071b",
+      "awaySecondaryColor": "#101010",
+      "homeSchool": "DREXEL",
+      "homeMascot": "DRAGONS",
+      "homeScore": "72",
+      "homeLogo": "asset:Halftime Slate v2 Drexel",
+      "homePrimaryColor": "#07294d",
+      "homeSecondaryColor": "#ffc600",
+      "row1Label": "FG",
+      "row1AwayValue": "12-28",
+      "row1HomeValue": "13-27",
+      "row2Label": "3PT",
+      "row2AwayValue": "4-11",
+      "row2HomeValue": "5-12",
+      "row3Label": "FT",
+      "row3AwayValue": "3-4",
+      "row3HomeValue": "3-5",
+      "row4Label": "REB",
+      "row4AwayValue": "17",
+      "row4HomeValue": "15",
+      "row5Label": "AST",
+      "row5AwayValue": "8",
+      "row5HomeValue": "10",
+      "row6Label": "TO",
+      "row6AwayValue": "5",
+      "row6HomeValue": "7",
+      "awayLeader1Label": "POINTS",
+      "awayLeader1Name": "CAREY",
+      "awayLeader1Value": "16",
+      "awayLeader2Label": "REBOUNDS",
+      "awayLeader2Name": "MARRS",
+      "awayLeader2Value": "6",
+      "awayLeader3Label": "ASSISTS",
+      "awayLeader3Name": "JOHNSON",
+      "awayLeader3Value": "4",
+      "homeLeader1Label": "POINTS",
+      "homeLeader1Name": "J. REED",
+      "homeLeader1Value": "18",
+      "homeLeader2Label": "REBOUNDS",
+      "homeLeader2Name": "EDOMWONYIN",
+      "homeLeader2Value": "8",
+      "homeLeader3Label": "ASSISTS",
+      "homeLeader3Name": "HIPPS",
+      "homeLeader3Value": "5"
+    }
+  },
   "halftime_statistics": {
     "file": "halftime_statistics.rml",
     "artboard": "Basketball Halftime Statistics v2",

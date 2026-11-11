@@ -161,7 +161,8 @@
           },
           { "id": "conference-standings", "graphic": "basketball-v2/conference-standings", "params": { "season": "2025-26" } },
           { "id": "player-of-the-game", "graphic": "basketball-v2/player-of-the-game", "params": { "player": "drexel-mbb@2026-27/reed-josh" } },
-          { "id": "press-conference", "graphic": "basketball-v2/press-conference", "params": { "side": "home" } }
+          { "id": "press-conference", "graphic": "basketball-v2/press-conference", "params": { "side": "home" } },
+          { "id": "halftime-slate", "graphic": "basketball-v2/halftime-slate", "params": {} }
         ]
       }
     ]

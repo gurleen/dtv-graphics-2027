@@ -39,6 +39,11 @@ const KNOWN_DRIFT: Readonly<Record<string, string>> = Object.fromEntries([
     'The scene’s placeholder game is Campbell at Drexel, 58-61 with 8:42 left; the demo game is Saint Joseph’s at Drexel, 68-72 with 13:59 left.',
   ),
   ...drift('press-conference', ['nextGameLabel', 'nextGameOpponent', 'nextGameDate'], 'The scene shows a sample next game so the design previews full; the seed holds only the demo game, so the bind blanks all three.'),
+  ...drift(
+    'halftime-slate',
+    [...[1, 2, 3].flatMap((n) => ['Label', 'Name', 'Value'].map((field) => `awayLeader${n}${field}`)), 'homeLeader2Name', 'homeLeader2Value', 'homeLeader3Name', 'homeLeader3Value'],
+    'The seed has a box score line only for Josh Reed (18 PTS, 7 REB, 4 AST), so the bind leaves Saint Joseph’s rows blank and names Reed for every Drexel row; the scene shows full leader rows for both teams.',
+  ),
   ...drift('team-lower-third', ['stat1Value', 'stat2Value'], 'The scene’s placeholder record (14-3, 8-1) is not the 14-6, 6-3 the matchup scenes and the seed agree on.'),
   ...drift('team-lower-third', ['bodyText'], 'Placeholder copy; the bind blanks it in stats mode.'),
 ]);
@@ -171,6 +176,29 @@ describe('what the entries do beyond their values', async () => {
     expect(lines({})).toEqual(['HIPPS 18 PTS, 7-9 FG, 1-2 FT', 'J. REED 18 PTS, 6-8 FG, 1-2 FT', '']);
     expect(lines({ side: 'away' })[0]).toBe('CAREY 30 PTS, 10-12 FG, 1-2 FT');
     expect(lines({ players: ['drexel-mbb@2026-27/tingler'] })).toEqual(['TINGLER 9 PTS, 3-5 FG, 1-2 FT', '', '']);
+  });
+
+  test('the halftime slate names each team’s leaders tonight and opens the window on request', () => {
+    const live = context.live?.sport === 'basketball' ? context.live : undefined;
+    if (!live) throw new Error('The demo game has no live state');
+    const line = (pts: number, reb: number, ast: number) => basketball.StatLine.parse({ pts, reb, ast });
+    const players = {
+      [REED]: line(18, 7, 4),
+      ['drexel-mbb@2026-27/hipps' as PlayerId]: line(18, 3, 0),
+      ['drexel-mbb@2026-27/tingler' as PlayerId]: line(9, 9, 0),
+      ['saint-josephs-mbb@2026-27/carey' as PlayerId]: line(30, 0, 0),
+    };
+    const slate = BASKETBALL_V2['basketball-v2/halftime-slate'];
+    const values = (params: unknown) => bound(slate, params, 0, { ...context, live: { ...live, players } });
+    const rows = (side: 'away' | 'home', params: unknown = {}) => {
+      const v = values(params) as Record<string, unknown>;
+      return [1, 2, 3].map((n) => [v[`${side}Leader${n}Label`], v[`${side}Leader${n}Name`], v[`${side}Leader${n}Value`]]);
+    };
+    // Hipps ties Reed on points and wins by name; nobody has a Saint Joseph’s rebound or assist.
+    expect(rows('home')).toEqual([['POINTS', 'HIPPS', '18'], ['REBOUNDS', 'TINGLER', '9'], ['ASSISTS', 'J. REED', '4']]);
+    expect(rows('away')).toEqual([['POINTS', 'CAREY', '30'], ['', '', ''], ['', '', '']]);
+    expect([values({}).showWindow, values({ window: 'open' }).showWindow]).toEqual([false, true]);
+    expect(values({ title: 'Second half next' }).title).toBe('SECOND HALF NEXT');
   });
 
   test('the press conference shows the date with its ordinal and the featured team’s next game', () => {

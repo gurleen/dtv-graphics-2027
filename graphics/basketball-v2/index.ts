@@ -7,6 +7,7 @@ import type { Registry } from '@dtv/playout';
 import { burningQuestion } from './graphics/burning-question';
 import { conferenceStandings } from './graphics/conference-standings';
 import { halftimeAdjustments } from './graphics/halftime-adjustments';
+import { halftimeSlate } from './graphics/halftime-slate';
 import { halftimeStatistics } from './graphics/halftime-statistics';
 import { matchupLocator } from './graphics/matchup-locator';
 import { matchupLocatorLowerThird } from './graphics/matchup-locator-lower-third';
@@ -24,7 +25,7 @@ import { talentLowerThirdSingle } from './graphics/talent-lower-third-single';
 import { talentLowerThirdTriple } from './graphics/talent-lower-third-triple';
 import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings, pressConference] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings, pressConference, halftimeSlate] as const;
 
 type Entry = (typeof ENTRIES)[number];
 
