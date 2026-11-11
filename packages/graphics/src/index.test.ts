@@ -36,6 +36,7 @@ test('every graphic’s params fit the generic form, with a picker for each id',
   const fieldsOf = (form: ParamsNode) => (form.kind === 'group' ? form.fields : form.variants.flatMap((variant) => variant.fields));
   const found = Object.fromEntries(Object.values(GRAPHICS).map((entry) => [entry.id, refs(fieldsOf(paramForm(entry.params)))]));
   expect(found).toEqual({
+    'basketball-v2/bars-slate': [],
     'basketball-v2/burning-question': ['team: team'],
     'basketball-v2/conference-standings': ['season: season'],
     'basketball-v2/halftime-adjustments': [],

@@ -2,6 +2,53 @@
 import type { SceneFacts } from '@dtv/playout';
 
 export const SCENES = {
+  "bars_slate": {
+    "file": "bars_slate.rml",
+    "artboard": "Basketball Bars Slate v2",
+    "stateMachine": "Bars Slate",
+    "viewModel": "BasketballBarsSlateV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 200,
+      "Hold": 17,
+      "Outro": 200,
+      "Hidden": 17
+    },
+    "props": {
+      "clock": "string",
+      "period": "string",
+      "message": "string",
+      "isPlaying": "boolean"
+    },
+    "groups": {},
+    "internal": {
+      "_clockChar1": "string",
+      "_clockChar2": "string",
+      "_clockChar3": "string",
+      "_clockChar4": "string",
+      "_clockChar5": "string",
+      "_clockChar6": "string",
+      "_clockChar7": "string",
+      "_clockChar8": "string",
+      "_clockSpacing1": "number",
+      "_clockSpacing2": "number",
+      "_clockSpacing3": "number",
+      "_clockSpacing4": "number",
+      "_clockSpacing5": "number",
+      "_clockSpacing6": "number",
+      "_clockSpacing7": "number",
+      "_clockSpacing8": "number",
+      "_clockX": "number"
+    },
+    "defaults": {
+      "isPlaying": false,
+      "clock": "04:00:00",
+      "period": "PM ET",
+      "message": "GOOD AFTERNOON FROM PHILADELPHIA"
+    }
+  },
   "basketball_scorebug": {
     "file": "basketball_scorebug.rml",
     "artboard": "Basketball Scorebug v2",

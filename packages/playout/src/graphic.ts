@@ -89,6 +89,8 @@ export interface GraphicEntry<I extends string, F extends SceneFacts, P extends 
   /** A number the scene sets to 0 once its outro has really ended; the renderer waits for it. */
   readonly exitSignal?: InternalNumberProp<F>;
   readonly overlay?: MotionMediaOverlay<InternalNumberProp<F>, P>;
+  /** Set for a graphic that shows the time of day: while one is on air or in a preview, outputs re-project at every whole second. */
+  readonly ticks?: 'second';
   /** Where the stakeholder site shows it. */
   readonly site: 'scorebug' | 'with-scorebug' | 'full-frame';
 }
