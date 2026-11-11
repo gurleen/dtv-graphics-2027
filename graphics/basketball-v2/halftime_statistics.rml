@@ -81,6 +81,10 @@
     <Rectangle width="340" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="6"/>
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  <Shape name="Away Backing" x="0" y="0">
+    <Rectangle width="342" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="0" cornerRadiusBL="24" cornerRadiusBR="0"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
 </Node>
 
 <!-- ============================== Column ==================================== -->
@@ -370,8 +374,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="636"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="636"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Column Body" x="0" y="0">
-    <Rectangle width="668" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
+  <Shape name="Column Backing" x="-2" y="0">
+    <Rectangle width="672" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -421,6 +425,10 @@
     <Rectangle width="340" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="24"/>
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  <Shape name="Home Backing" x="-2" y="0">
+    <Rectangle width="342" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="24" cornerRadiusBL="0" cornerRadiusBR="24"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
 </Node>
 </Node>
 
@@ -430,9 +438,7 @@
      on the seam and opens both ways at once; at rest it covers the card. -->
 <Shape name="Card Reveal Mask" id="39:505" x="678" y="-8"><Rectangle id="39:506" width="1372" height="652" originX="0.5" originY="0"/></Shape>
 <Shape name="Card Silhouette" id="39:610">
-  <Rectangle x="0" y="0" width="340" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="6"/>
-  <Rectangle x="344" y="0" width="668" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="1016" y="0" width="340" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="24"/>
+  <Rectangle x="0" y="0" width="1356" height="636" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="24" cornerRadiusBL="24" cornerRadiusBR="24"/>
 </Shape>
 <Shape name="Sponsor Slide Mask" id="39:620" x="344" y="552"><Rectangle width="668" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/></Shape>
 </Node>

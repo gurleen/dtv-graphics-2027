@@ -254,15 +254,17 @@ const glaze = (name: string, width: number, height: number, radii: Radii, stroke
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="${strokeTop}" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>`;
 
-const glassBody = (name: string, width: number, height: number, radii: Radii) => `<Shape name="${name} Body" x="0" y="0">
-    ${rectangle(width, height, radii)}
+// The card's dark backing, one piece per panel and each panel's body, so the gap between
+// the panels reads as glass rather than video. The two pieces meet mid-gap.
+const backing = (name: string, y: number, height: number, radii: Radii) => `<Shape name="${name} Backing" x="0" y="${y}">
+    ${rectangle(CARD_WIDTH, height, radii)}
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
 
-/** Dark glass: a glaze over a near-black body, as on every v2 strip. */
-const darkGlass = (name: string, width: number, height: number, radii: Radii) =>
-  `${glaze(name, width, height, radii, '59FFFFFF')}
-  ${glassBody(name, width, height, radii)}`;
+/** Dark glass: a glaze over its backing piece. */
+const darkGlass = (name: string, height: number, radii: Radii, backingY: number, backingHeight: number, backingRadii: Radii) =>
+  `${glaze(name, CARD_WIDTH, height, radii, '59FFFFFF')}
+  ${backing(name, backingY, backingHeight, backingRadii)}`;
 
 const rise = (name: string, rangeId: string) =>
   `<TextModifierGroup name="${name} Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="${name} Reveal" id="${rangeId}" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup>`;
@@ -285,7 +287,7 @@ const titlePanel = `<Node name="Title Panel" id="${TITLE_PANEL}" x="0" y="0">
     ${text({ name: 'Title', x: TITLE_X, y: 52, width: SPORT_X - TITLE_X, height: 58, font: FONT_BOLD, size: 50, spacing: 1.25, color: 'FFFFFFFF', styleId: TITLE_STYLE, value: 'STANDINGS', reveal: TITLE_REVEAL })}
     ${text({ name: 'Sport', x: SPORT_X, y: 46, width: CARD_WIDTH - TEXT_INSET - SPORT_X, height: 38, font: FONT_REGULAR, size: 32, spacing: 2.5, color: 'B3FFFFFF', styleId: SPORT_STYLE, value: SPORT, property: P.sport, reveal: SPORT_REVEAL, align: 'right' })}
   </Node>
-  ${darkGlass('Title', CARD_WIDTH, TITLE_HEIGHT, TITLE_RADII)}
+  ${darkGlass('Title', TITLE_HEIGHT, TITLE_RADII, 0, TITLE_HEIGHT + GAP / 2, [OUTER_RADIUS, OUTER_RADIUS, 0, 0])}
 </Node>`;
 
 // --- table panel ----------------------------------------------------------------------
@@ -354,7 +356,7 @@ const tablePanel = `<Node name="Table Panel" id="${TABLE_PANEL}" x="0" y="${TABL
 ${ROWS.map(standingRow).join('\n')}
     ${rankBand}
   </Node>
-  ${darkGlass('Table', CARD_WIDTH, TABLE_HEIGHT, TABLE_RADII)}
+  ${darkGlass('Table', TABLE_HEIGHT, TABLE_RADII, -GAP / 2, TABLE_HEIGHT + GAP / 2, [0, 0, OUTER_RADIUS, OUTER_RADIUS])}
 </Node>`;
 
 // --- timelines ------------------------------------------------------------------------
@@ -641,8 +643,7 @@ ${tablePanel}
      on the seam and opens both ways at once; at rest it covers the card. -->
 <Shape name="Card Reveal Mask" id="${REVEAL_MASK}" x="${SEAM_X}" y="-8"><Rectangle id="${REVEAL_MASK_RECTANGLE}" width="${MASK_WIDTH}" height="${CARD_HEIGHT + 16}" originX="0.5" originY="0"/></Shape>
 <Shape name="Card Silhouette" id="${CARD_SILHOUETTE}">
-  ${rectangle(CARD_WIDTH, TITLE_HEIGHT, TITLE_RADII, ' x="0" y="0"')}
-  ${rectangle(CARD_WIDTH, TABLE_HEIGHT, TABLE_RADII, ` x="0" y="${TABLE_Y}"`)}
+  ${rectangle(CARD_WIDTH, CARD_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ' x="0" y="0"')}
 </Shape>
 <Shape name="Table Silhouette" id="${TABLE_SILHOUETTE}" x="0" y="${TABLE_Y}">${rectangle(CARD_WIDTH, TABLE_HEIGHT, TABLE_RADII)}</Shape>
 </Node>

@@ -90,6 +90,10 @@
     <Rectangle width="304" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  <Shape name="Header Backing" x="0" y="0">
+    <Rectangle width="306" height="88" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
 </Node>
 <Node name="Header Strip" id="37:150" x="0" y="88">
   <ClippingShape name="Header Strip Reveal Clip" sourceId="37:620"/>
@@ -102,8 +106,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Header Strip Body" x="0" y="0">
-    <Rectangle width="304" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/>
+  <Shape name="Header Strip Backing" x="0" y="0">
+    <Rectangle width="306" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="12" cornerRadiusBR="0"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   </Node>
@@ -387,6 +391,10 @@
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
 </Node>
+<Shape name="Player Panels Backing" x="-2" y="0">
+    <Rectangle width="968" height="88" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="12" cornerRadiusBL="0" cornerRadiusBR="0"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
 </Node>
 <Node name="Player Strips" id="37:700" x="308" y="88">
 <ClippingShape name="Player Strips Reveal Clip" sourceId="37:620"/>
@@ -405,10 +413,6 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Player 1 Strip Body" x="0" y="0">
-    <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
   <Node name="Home Player 2 Strip Content" id="37:2131" opacity="0">
   <Text name="Home Player 2 Last Name" x="208" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2138" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 2 Last Name Value" styleId="37:2138" text="HIPPS"><DataBindContext sourcePathIds="37:1000-37:1075" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 2 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 2 Last Name Reveal" id="37:2134" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Home Player 2 Position" x="336" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2139" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 2 Position Value" styleId="37:2139" text="G"><DataBindContext sourcePathIds="37:1000-37:1076" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 2 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 2 Position Reveal" id="37:2135" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
@@ -421,10 +425,6 @@
     <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Player 2 Strip Body" x="194" y="0">
-    <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Node name="Home Player 3 Strip Content" id="37:2231" opacity="0">
   <Text name="Home Player 3 Last Name" x="402" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2238" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 3 Last Name Value" styleId="37:2238" text="TINGLER"><DataBindContext sourcePathIds="37:1000-37:1079" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 3 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 3 Last Name Reveal" id="37:2234" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
@@ -439,10 +439,6 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Player 3 Strip Body" x="388" y="0">
-    <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
   <Node name="Home Player 4 Strip Content" id="37:2331" opacity="0">
   <Text name="Home Player 4 Last Name" x="596" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2338" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 4 Last Name Value" styleId="37:2338" text="EDOMWONYIN"><DataBindContext sourcePathIds="37:1000-37:1083" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 4 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 4 Last Name Reveal" id="37:2334" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Text name="Home Player 4 Position" x="724" y="31" originValue="baseline" wrapValue="noWrap" width="34" height="30" sizingValue="fixed" overflowValue="fitFontSize" alignValue="right"><TextStylePaint id="37:2339" fontAssetId="37:901" fontSize="24" letterSpacing="1"><Fill><SolidColor colorValue="B3FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 4 Position Value" styleId="37:2339" text="F"><DataBindContext sourcePathIds="37:1000-37:1084" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 4 Position Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 4 Position Reveal" id="37:2335" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
@@ -455,10 +451,6 @@
     <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="Player 4 Strip Body" x="582" y="0">
-    <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Node name="Home Player 5 Strip Content" id="37:2431" opacity="0">
   <Text name="Home Player 5 Last Name" x="790" y="31" originValue="baseline" wrapValue="noWrap" width="122" height="32" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="37:2438" fontAssetId="37:900" fontSize="28" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Home Player 5 Last Name Value" styleId="37:2438" text="DE LAPORTERIE"><DataBindContext sourcePathIds="37:1000-37:1087" propertyKey="268"/></TextValueRun><TextModifierGroup name="Home Player 5 Last Name Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Home Player 5 Last Name Reveal" id="37:2434" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
@@ -473,14 +465,14 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Player 5 Strip Body" x="776" y="0">
-    <Rectangle width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
+<Shape name="Player Strips Backing" x="-2" y="0">
+    <Rectangle width="968" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="12"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
 </Node>
 
-<Shape name="Block Silhouette" id="37:610"><Rectangle x="0" y="0" width="304" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="0" y="88" width="304" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/><Rectangle x="308" y="0" width="190" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="308" y="88" width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="502" y="0" width="190" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="502" y="88" width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="696" y="0" width="190" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="696" y="88" width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="890" y="0" width="190" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="890" y="88" width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="1084" y="0" width="190" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="1084" y="88" width="190" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/></Shape>
+<Shape name="Block Silhouette" id="37:610"><Rectangle x="0" y="0" width="1274" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"/></Shape>
 <Shape name="Strip Reveal Mask" id="37:620" x="0" y="88"><Rectangle width="1274" height="44" originX="0" originY="0"/></Shape>
 </Node>
 

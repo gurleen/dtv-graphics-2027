@@ -155,6 +155,7 @@ const TEXT = 268;
 const TEXT_WIDTH = 285;
 const MODIFY_FROM = 327;
 const FALLOFF_FROM = 317;
+const FORMULA_VALUE = 777;
 
 const TINT_OPACITY = 0.78;
 
@@ -206,6 +207,8 @@ const renderVariant = (variant: Variant) => {
   const LOGO_ASSET = id(911);
   const SPONSOR_ASSET = id(913);
   const CONTROLLER_ASSET = id(950);
+  const TILE_BACKING_WIDTH = id(960);
+  const BODY_SHOWN = id(961);
 
   const NAME_REVEAL = {
     number: id(240), fullName: id(241), position: id(243), classYear: id(244),
@@ -244,7 +247,8 @@ const renderVariant = (variant: Variant) => {
   const rectangle = (width: number, height: number, radii: Radii, position = '', children = '') =>
     `<Rectangle${position} width="${width}" height="${height}" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="${radii[0]}" cornerRadiusTR="${radii[1]}" cornerRadiusBL="${radii[2]}" cornerRadiusBR="${radii[3]}"${children ? `>${children}</Rectangle>` : '/>'}`;
 
-  const bound = (property: number, key: number) => `<DataBindContext sourcePathIds="${pathTo(property)}" propertyKey="${key}"/>`;
+  const bound = (property: number, key: number, converterId = '') =>
+    `<DataBindContext sourcePathIds="${pathTo(property)}" propertyKey="${key}"${converterId ? ` converterId="${converterId}"` : ''}/>`;
 
   const glaze = (name: string, width: number, height: number, radii: Radii, strokeTop = '73FFFFFF', widthBind = '') => `<Shape name="${name} Glaze" x="0" y="0">
       ${rectangle(width, height, radii, '', widthBind)}
@@ -252,9 +256,19 @@ const renderVariant = (variant: Variant) => {
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="${strokeTop}" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>`;
 
-  /** Dark glass: a glaze over a near-black body, as on every v2 strip. */
-  const darkGlass = (name: string, width: number, height: number, radii: Radii, widthBind = '') => `${glaze(name, width, height, radii, '59FFFFFF', widthBind)}
-    <Shape name="${name} Body" x="0" y="0">
+  /** The glaze of a dark-glass panel, whose body is its backing piece. */
+  const darkGlaze = (name: string, width: number, height: number, radii: Radii, widthBind = '') =>
+    glaze(name, width, height, radii, '59FFFFFF', widthBind);
+
+  // The block's dark backing, one piece per moving part, so the 4-unit seams read as
+  // glass rather than video. A piece is its panel's last child, so it moves, reveals
+  // and fades with that panel. Static neighbours meet mid-gap; a gap beside a sliding
+  // part belongs wholly to the static neighbour. A stat tile's piece spans half of each
+  // gap beside it, and the body mask trims the halves at the row's ends. The gaps above
+  // and right of the body row fade with whatever the row shows, so an empty row leaves none.
+  const bodySeamOpacity = bound(P.statsOpacity, OPACITY, BODY_SHOWN);
+  const backing = (name: string, x: number, y: number, width: number, height: number, radii: Radii, widthBind = '', opacityBind = '') =>
+    `<Shape name="${name} Backing" x="${x}" y="${y}">${opacityBind}
       ${rectangle(width, height, radii, '', widthBind)}
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>`;
@@ -322,6 +336,7 @@ const renderVariant = (variant: Variant) => {
     ${teamTint('Headshot Tint', id(107), HEADSHOT_WIDTH, BLOCK_HEIGHT, HEADSHOT_RADII)}
     ${underlay('Headshot Underlay', HEADSHOT_WIDTH, BLOCK_HEIGHT, HEADSHOT_RADII)}
     <Shape name="Headshot Clip Shape" id="${HEADSHOT_CLIP}" x="${HEADSHOT_FRAME_X}" y="${-HEADSHOT_BREAKOUT}">${rectangle(HEADSHOT_FRAME_WIDTH, HEADSHOT_FRAME_HEIGHT, [0, 0, 0, INNER_RADIUS])}</Shape>
+    ${backing('Headshot', 0, 0, SEAM, BLOCK_HEIGHT, [OUTER_RADIUS, 0, OUTER_RADIUS, 0])}
   </Node>`;
 
   // --- header ---------------------------------------------------------------------------
@@ -341,7 +356,8 @@ const renderVariant = (variant: Variant) => {
     ${rise('Title', TITLE_REVEAL)}</Text>
     <!-- Centred over the sponsor chip in the name row below. -->
     <Text name="Sponsor Label" x="${CHIP_X}" y="29" originValue="baseline" wrapValue="noWrap" width="${CHIP_WIDTH}" height="24" sizingValue="fixed" alignValue="center"><TextStylePaint id="${id(163)}" fontAssetId="${FONT_REGULAR}" fontSize="18" letterSpacing="2"><Fill><SolidColor colorValue="A6FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Sponsor Label Value" styleId="${id(163)}" text="PRESENTED BY"></TextValueRun>${rise('Sponsor Label', SPONSOR_LABEL_REVEAL)}</Text>
-    ${darkGlass('Header', COLUMN_WIDTH, HEADER_HEIGHT, HEADER_RADII)}
+    ${darkGlaze('Header', COLUMN_WIDTH, HEADER_HEIGHT, HEADER_RADII)}
+    ${backing('Header', -GAP / 2, 0, COLUMN_WIDTH + GAP / 2, HEADER_HEIGHT, [0, OUTER_RADIUS, 0, 0])}
     </Node>
   </Node>`;
 
@@ -375,6 +391,8 @@ const renderVariant = (variant: Variant) => {
     <Image name="Team Logo" id="${TEAM_LOGO}" x="${NAME_WIDTH - 116}" y="${NAME_HEIGHT / 2}" opacity="0.18" scaleX="${LOGO_SCALE}" scaleY="${LOGO_SCALE}" assetId="${LOGO_ASSET}">${bound(P.teamLogo, IMAGE)}<ClippingShape name="Team Logo Clip" sourceId="${NAME_TINT}"/></Image>
     ${teamTint('Name Tint', NAME_TINT, NAME_WIDTH, NAME_HEIGHT, NAME_RADII)}
     ${underlay('Name Underlay', NAME_WIDTH, NAME_HEIGHT, NAME_RADII)}
+    ${backing('Name', -GAP / 2, -GAP, NAME_WIDTH + GAP / 2, NAME_HEIGHT + GAP, [0, 0, 0, 0])}
+    ${backing('Name Body Seam', -GAP / 2, NAME_HEIGHT, NAME_WIDTH + GAP / 2, GAP, [0, 0, 0, 0], '', bodySeamOpacity)}
   </Node>`;
 
   // --- sponsor chip ---------------------------------------------------------------------
@@ -387,6 +405,9 @@ const renderVariant = (variant: Variant) => {
       ${rectangle(CHIP_WIDTH, CHIP_HEIGHT, CHIP_RADII)}
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${CHIP_HEIGHT}"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
     </Shape>
+    ${backing('Sponsor Chip', 0, -GAP, CHIP_WIDTH, CHIP_HEIGHT + GAP, [0, 0, 0, OUTER_RADIUS])}
+    ${backing('Sponsor Chip Name Seam', -GAP, -GAP, GAP, NAME_HEIGHT + 2 * GAP, [0, 0, 0, 0])}
+    ${backing('Sponsor Chip Body Seam', -GAP, NAME_HEIGHT + GAP, GAP, BODY_HEIGHT, [0, 0, 0, 0], '', bodySeamOpacity)}
   </Node>`;
 
   // --- body -----------------------------------------------------------------------------
@@ -398,6 +419,7 @@ const renderVariant = (variant: Variant) => {
     const label = `Stat ${t.index + 1}`;
     const widthBind = bound(P.statWidth(t.index), PATH_WIDTH);
     const textWidth = bound(P.statWidth(t.index), TEXT_WIDTH);
+    const backingWidth = bound(P.statWidth(t.index), PATH_WIDTH, TILE_BACKING_WIDTH);
     const stat = stats[t.index]!;
     return `<Node name="${label} Tile" id="${t.node}" x="${t.index * (TILE_WIDTH + GAP)}" y="0">${bound(P.statX(t.index), X)}${bound(P.statOpacity(t.index), OPACITY)}
     <Node name="${label} Slide" id="${t.slide}" x="0" y="0">
@@ -408,7 +430,8 @@ const renderVariant = (variant: Variant) => {
       <TextValueRun name="${label} Gap" styleId="${t.labelStyle}" text=" "></TextValueRun>
       <TextValueRun name="${label} Label" id="${t.labelRun}" styleId="${t.labelStyle}" text="${stat.label}">${bound(P.statLabel(t.index), TEXT)}</TextValueRun>
     ${rise(`${label} Value`, t.valueReveal, t.valueRun)}${rise(`${label} Label`, t.labelReveal, t.labelRun)}</Text>
-    ${darkGlass(label, TILE_WIDTH, BODY_HEIGHT, BODY_RADII, widthBind)}
+    ${darkGlaze(label, TILE_WIDTH, BODY_HEIGHT, BODY_RADII, widthBind)}
+    ${backing(label, -GAP / 2, 0, TILE_WIDTH + GAP, BODY_HEIGHT, [0, 0, 0, 0], backingWidth)}
     </Node>
   </Node>`;
   };
@@ -424,18 +447,14 @@ const renderVariant = (variant: Variant) => {
     <Node name="Copy Slide" id="${TEXT_SLIDE}" x="0" y="0">
     <!-- Up to two lines; longer copy shrinks to fit the box, centred on the panel. -->
     <Text name="Body Copy" x="${TEXT_INSET}" y="${(BODY_HEIGHT - BODY_TEXT_HEIGHT) / 2}" originValue="top" wrapValue="wrap" width="${BODY_WIDTH - 2 * TEXT_INSET}" height="${BODY_TEXT_HEIGHT}" sizingValue="fixed" overflowValue="fitFontSize" verticalAlignValue="middle"><TextStylePaint id="${id(305)}" fontAssetId="${FONT_BOLD}" fontSize="32" letterSpacing="0.5"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Body Copy Value" styleId="${id(305)}" text="${player.text}">${bound(P.bodyText, TEXT)}</TextValueRun>${rise('Body Copy', BODY_TEXT_REVEAL)}</Text>
-    ${darkGlass('Copy', BODY_WIDTH, BODY_HEIGHT, BODY_RADII)}
+    ${darkGlaze('Copy', BODY_WIDTH, BODY_HEIGHT, BODY_RADII)}
+    ${backing('Copy', -GAP / 2, 0, BODY_WIDTH + GAP / 2, BODY_HEIGHT, [0, 0, 0, 0])}
     </Node>
     </Node>
   </Node>`;
 
-  const silhouette = [
-    rectangle(HEADSHOT_WIDTH, BLOCK_HEIGHT, HEADSHOT_RADII, ' x="0" y="0"'),
-    rectangle(COLUMN_WIDTH, HEADER_HEIGHT, HEADER_RADII, ` x="${COLUMN_X}" y="0"`),
-    rectangle(NAME_WIDTH, NAME_HEIGHT, NAME_RADII, ` x="${COLUMN_X}" y="${NAME_Y}"`),
-    rectangle(CHIP_WIDTH, CHIP_HEIGHT, CHIP_RADII, ` x="${COLUMN_X + CHIP_X}" y="${NAME_Y}"`),
-    rectangle(BODY_WIDTH, BODY_HEIGHT, BODY_RADII, ` x="${COLUMN_X}" y="${BODY_Y}"`),
-  ].join('');
+  const OUTER_RADII: Radii = [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS];
+  const silhouette = rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, OUTER_RADII, ' x="0" y="0"');
 
   // --- timelines ------------------------------------------------------------------------
 
@@ -708,8 +727,8 @@ const renderVariant = (variant: Variant) => {
   ${body}
 
   <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
-  <Shape name="Header Slide Mask" id="${HEADER_MASK}" x="${COLUMN_X}" y="0"><Rectangle width="${COLUMN_WIDTH}" height="${HEADER_HEIGHT}" originX="0" originY="0"/></Shape>
-  <Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X}" y="${BODY_Y}">${rectangle(BODY_WIDTH, BODY_HEIGHT, BODY_RADII)}</Shape>
+  <Shape name="Header Slide Mask" id="${HEADER_MASK}" x="${COLUMN_X - GAP / 2}" y="0"><Rectangle width="${COLUMN_WIDTH + GAP / 2}" height="${HEADER_HEIGHT}" originX="0" originY="0"/></Shape>
+  <Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X - GAP / 2}" y="${BODY_Y}"><Rectangle width="${BODY_WIDTH + GAP / 2}" height="${BODY_HEIGHT}" originX="0" originY="0"/></Shape>
   </Node>
 
   <!-- Intro: seam ignition, outward glass wipes, a rising headshot, rows sliding out from
@@ -741,6 +760,18 @@ const renderVariant = (variant: Variant) => {
   ${viewModelDefaults.join('\n')}
   </ViewModelInstance>
   </ViewModel>
+
+  <DataConverterOperationValue name="Tile Backing Width" id="${TILE_BACKING_WIDTH}" operationValue="${GAP}"/>
+  <!-- _statsOpacity x the most opaque tile + _textOpacity: 1 while the body row shows anything. -->
+  <DataConverterFormula name="Body Shown" id="${BODY_SHOWN}">
+    <FormulaTokenInput/>
+    <FormulaTokenOperation operationType="2"/>
+    <FormulaTokenFunction functionType="1"/>
+    ${TILES.map((t) => `<FormulaTokenValue operationValue="0">${bound(P.statOpacity(t.index), FORMULA_VALUE)}</FormulaTokenValue>`).join('\n    <FormulaTokenArgumentSeparator/>\n    ')}
+    <FormulaTokenParenthesisClose/>
+    <FormulaTokenOperation operationType="0"/>
+    <FormulaTokenValue operationValue="0">${bound(P.textOpacity, FORMULA_VALUE)}</FormulaTokenValue>
+  </DataConverterFormula>
   </Rive>
   `;
 

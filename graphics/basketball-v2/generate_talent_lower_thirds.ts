@@ -81,7 +81,9 @@ const renderTrack = ({ objectId, propertyKey, keys }: Track) => {
   return `  <KeyedObject objectId="${objectId}"><KeyedProperty propertyKey="${propertyKey}">\n${frames.join('\n')}\n  </KeyedProperty></KeyedObject>`;
 };
 
-const rectangle = (width: number, height: number, radii: [number, number, number, number], position = '') =>
+type Radii = [number, number, number, number];
+
+const rectangle = (width: number, height: number, radii: Radii, position = '') =>
   `<Rectangle${position} width="${width}" height="${height}" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="${radii[0]}" cornerRadiusTR="${radii[1]}" cornerRadiusBL="${radii[2]}" cornerRadiusBR="${radii[3]}"/>`;
 
 const round = (value: number) => Math.round(value * 1000) / 1000;
@@ -122,6 +124,11 @@ const renderVariant = (variant: Variant) => {
     };
   });
 
+  // Each block's dark backing is two pieces, so the seam reads as glass rather than video.
+  // Each opens with its own panel; the name's also takes the whole gap above the role
+  // strip, which slides.
+  const nameBackingRadii: Radii = [OUTER_RADIUS, OUTER_RADIUS, 0, 0];
+  const roleBackingRadii: Radii = [0, 0, OUTER_RADIUS, OUTER_RADIUS];
   const namePanels = columns.map((column) => {
     const { talent, label, x, nameRadii, markerRadii } = column;
     return `<Node name="${label} Name Panel" id="${column.panelId}" x="${x}" y="0">
@@ -137,8 +144,8 @@ const renderVariant = (variant: Variant) => {
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${NAME_HEIGHT}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${NAME_HEIGHT}"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="${label} Name Body" x="0" y="0">
-    ${rectangle(columnWidth, NAME_HEIGHT, nameRadii)}
+  <Shape name="${label} Name Backing" x="0" y="0">
+    ${rectangle(columnWidth, NAME_HEIGHT + GAP, nameBackingRadii)}
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>`;
@@ -152,16 +159,14 @@ const renderVariant = (variant: Variant) => {
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${ROLE_HEIGHT}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${ROLE_HEIGHT}"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="${label} Role Body" x="${x}" y="0">
-    ${rectangle(columnWidth, ROLE_HEIGHT, roleRadii)}
-    <Fill><SolidColor colorValue="E00E1116"/></Fill>
+  <Shape name="${label} Role Backing" x="${x}" y="0">
+    ${rectangle(columnWidth, ROLE_HEIGHT, roleBackingRadii)}
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
   });
 
   const silhouette = columns
-    .map(({ x, nameRadii, roleRadii }) =>
-      rectangle(columnWidth, NAME_HEIGHT, nameRadii, ` x="${x}" y="0"`) +
-      rectangle(columnWidth, ROLE_HEIGHT, roleRadii, ` x="${x}" y="${NAME_HEIGHT + GAP}"`))
+    .map(({ x }) => rectangle(columnWidth, BLOCK_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ` x="${x}" y="0"`))
     .join('');
 
   // Identifiers of the block-level elements.

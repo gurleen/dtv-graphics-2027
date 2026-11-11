@@ -184,6 +184,19 @@ const LOGO_RADII: Radii = [OUTER_RADIUS, INNER_RADIUS, OUTER_RADIUS, INNER_RADIU
 const NAME_RADII: Radii = [INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS];
 const BODY_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS];
 
+// The block's dark backing, in three pieces, so the seams read as glass rather than video.
+// Each opens with its own panel and the logo and name pieces meet mid-gap; the name's also
+// takes the whole gap above the body strip, which slides.
+const HALF_GAP = GAP / 2;
+const backing = (name: string, x: number, width: number, height: number, radii: Radii) =>
+  `<Shape name="${name}" x="${x}" y="0">
+    ${rectangle(width, height, radii)}
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>`;
+const LOGO_BACKING_RADII: Radii = [OUTER_RADIUS, 0, OUTER_RADIUS, 0];
+const NAME_BACKING_RADII: Radii = [0, OUTER_RADIUS, 0, 0];
+const BODY_BACKING_RADII: Radii = [0, 0, 0, OUTER_RADIUS];
+
 // --- logo panel -----------------------------------------------------------------------
 
 // The logo box is 118 units square (the 1024 source at 0.115), so a logo draws at about
@@ -206,6 +219,7 @@ const logoPanel = `<Node name="Logo Panel" id="${LOGO_PANEL}" x="0" y="0">
   </Shape>
   ${teamTint('Logo Tint', LOGO_TINT, LOGO_SIZE, LOGO_SIZE, LOGO_RADII)}
   ${underlay('Logo Underlay', LOGO_SIZE, LOGO_SIZE, LOGO_RADII)}
+  ${backing('Logo Backing', 0, LOGO_SIZE + HALF_GAP, LOGO_SIZE, LOGO_BACKING_RADII)}
 </Node>`;
 
 // --- name panel -----------------------------------------------------------------------
@@ -219,6 +233,7 @@ const namePanel = `<Node name="Name Panel" id="${NAME_PANEL}" x="${COLUMN_X}" y=
   ${glaze('Name', COLUMN_WIDTH, NAME_HEIGHT, NAME_RADII)}
   ${teamTint('Name Tint', NAME_TINT, COLUMN_WIDTH, NAME_HEIGHT, NAME_RADII)}
   ${underlay('Name Underlay', COLUMN_WIDTH, NAME_HEIGHT, NAME_RADII)}
+  ${backing('Name Backing', -HALF_GAP, COLUMN_WIDTH + HALF_GAP, NAME_HEIGHT + GAP, NAME_BACKING_RADII)}
 </Node>`;
 
 // --- body strip -----------------------------------------------------------------------
@@ -248,18 +263,11 @@ ${CELLS.map(statCell).join('\n')}
   <Text name="Body Copy" x="${TEXT_INSET}" y="32" originValue="baseline" wrapValue="noWrap" width="${COLUMN_WIDTH - 2 * TEXT_INSET}" height="34" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="${id(305)}" fontAssetId="${FONT_BOLD}" fontSize="28" letterSpacing="1"><Fill><SolidColor colorValue="FFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Body Copy Value" styleId="${id(305)}" text="${TEAM.text}">${bound(P.bodyText, TEXT)}</TextValueRun>${rise('Body Copy', COPY_REVEAL)}</Text>
   </Node>
   ${glaze('Body', COLUMN_WIDTH, BODY_HEIGHT, BODY_RADII, '59FFFFFF', '40000000')}
-  <Shape name="Body Panel" x="0" y="0">
-    ${rectangle(COLUMN_WIDTH, BODY_HEIGHT, BODY_RADII)}
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
-  </Shape>
+  ${backing('Body Backing', -HALF_GAP, COLUMN_WIDTH + HALF_GAP, BODY_HEIGHT, BODY_BACKING_RADII)}
   </Node>
 </Node>`;
 
-const silhouette = [
-  rectangle(LOGO_SIZE, LOGO_SIZE, LOGO_RADII, ' x="0" y="0"'),
-  rectangle(COLUMN_WIDTH, NAME_HEIGHT, NAME_RADII, ` x="${COLUMN_X}" y="0"`),
-  rectangle(COLUMN_WIDTH, BODY_HEIGHT, BODY_RADII, ` x="${COLUMN_X}" y="${BODY_Y}"`),
-].join('');
+const silhouette = rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ' x="0" y="0"');
 
 // --- timelines ------------------------------------------------------------------------
 
@@ -497,7 +505,7 @@ ${namePanel}
 ${body}
 
 <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
-<Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X}" y="${BODY_Y}"><Rectangle width="${COLUMN_WIDTH}" height="${BODY_HEIGHT}" originX="0" originY="0"/></Shape>
+<Shape name="Body Slide Mask" id="${BODY_MASK}" x="${COLUMN_X - HALF_GAP}" y="${BODY_Y}"><Rectangle width="${COLUMN_WIDTH + HALF_GAP}" height="${BODY_HEIGHT}" originX="0" originY="0"/></Shape>
 </Node>
 
 <!-- Intro: seam ignition, outward glass wipes, a body strip sliding out from under the name

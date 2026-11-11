@@ -147,6 +147,7 @@ const TEAM_LOGO = id(206);
 const QUESTION_GLAZE_PATH = id(207);
 const QUESTION_TINT_PATH = id(208);
 const QUESTION_UNDERLAY_PATH = id(209);
+const QUESTION_BACKING_PATH = id(210);
 const ANSWER_STRIP = id(300);
 const ANSWER_CONTENT = id(301);
 const ANSWER_FADE = id(302);
@@ -154,6 +155,8 @@ const ANSWER_REVEAL = id(303);
 const ANSWER_LABEL_STYLE = id(304);
 const ANSWER_STYLE = id(305);
 const ANSWER_MASK = id(306);
+const ANSWER_GAP_MASK = id(307);
+const ANSWER_GAP = id(308);
 const LEFT_EDGE = id(500);
 const LEFT_MASK = id(501);
 const LEFT_SPAN = id(502);
@@ -165,9 +168,7 @@ const RIGHT_LIGHT = id(508);
 const INTRO_SWEEP = id(600);
 const ANSWER_SWEEP = id(601);
 const SILHOUETTE = id(610);
-const SILHOUETTE_TITLE = id(611);
-const SILHOUETTE_CHIP = id(612);
-const SILHOUETTE_QUESTION = id(613);
+const SILHOUETTE_LIFTED = id(611);
 const FONT_BOLD = id(900);
 const FONT_REGULAR = id(901);
 const LOGO_ASSET = id(911);
@@ -202,9 +203,11 @@ const darkGlass = (name: string, width: number, height: number, radii: Radii) =>
     ${rectangle(width, height, radii)}
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="${name} Body" x="0" y="0">
-    ${rectangle(width, height, radii)}
+  </Shape>`;
+
+/** A piece of the block's dark backing, drawn last in its panel so it opens and moves with it. */
+const backing = (name: string, x: number, y: number, width: number, height: number, radii: Radii, pathAttributes = '') => `<Shape name="${name} Backing" x="${x}" y="${y}">
+    ${rectangle(width, height, radii, pathAttributes)}
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
 
@@ -230,6 +233,11 @@ const CHIP_RADII: Radii = [INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS, INNER_RADIU
 const QUESTION_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS, OUTER_RADIUS];
 const ANSWER_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS, OUTER_RADIUS];
 
+// One dark backing lies behind the block so its 4-unit gaps read as glass, not video. The
+// title and chip split their seam and the gap above the question; the question owns the gap
+// above the answer, which comes and goes with the lift; the answer's piece is its own strip.
+const HALF_GAP = GAP / 2;
+
 /** Both leading edges' masks: a panel shows only between the two edges. */
 const wipeClips = (name: string) =>
   `<ClippingShape name="${name} Left Wipe Clip" sourceId="${LEFT_MASK}"/><ClippingShape name="${name} Right Wipe Clip" sourceId="${RIGHT_MASK}"/>`;
@@ -246,6 +254,7 @@ const titlePanel = `<Node name="Title Panel" id="${TITLE_PANEL}" x="0" y="0">
   ${rise('Title', TITLE_REVEAL, 'backward')}</Text>
   </Node>
   ${darkGlass('Title', TITLE_WIDTH, TITLE_HEIGHT, TITLE_RADII)}
+  ${backing('Title', 0, 0, TITLE_WIDTH + HALF_GAP, TITLE_HEIGHT + HALF_GAP, [OUTER_RADIUS, 0, 0, 0])}
 </Node>`;
 
 const chipPanel = `<Node name="Sponsor Chip" id="${CHIP_PANEL}" x="${CHIP_X}" y="0">
@@ -264,6 +273,7 @@ const chipPanel = `<Node name="Sponsor Chip" id="${CHIP_PANEL}" x="${CHIP_X}" y=
     ${rectangle(CHIP_WIDTH, TITLE_HEIGHT, CHIP_RADII)}
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${TITLE_HEIGHT}"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
   </Shape>
+  ${backing('Sponsor Chip', -HALF_GAP, 0, CHIP_WIDTH + HALF_GAP, TITLE_HEIGHT + HALF_GAP, [0, OUTER_RADIUS, 0, 0])}
 </Node>`;
 
 // --- question panel -------------------------------------------------------------------
@@ -292,6 +302,15 @@ const questionPanel = `<Node name="Question Panel" id="${QUESTION_PANEL}" x="0" 
     ${rectangle(BLOCK_WIDTH, QUESTION_HEIGHT, QUESTION_RADII, ` id="${QUESTION_UNDERLAY_PATH}"`)}
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  ${backing('Question', 0, -HALF_GAP, BLOCK_WIDTH, QUESTION_HEIGHT + HALF_GAP, [0, 0, OUTER_RADIUS, OUTER_RADIUS], ` id="${QUESTION_BACKING_PATH}"`)}
+</Node>`;
+
+// The question's piece of the gap above the answer rides with the lift but shows only where
+// the lift has raised it above the block's foot, so it never hangs below the foot.
+const answerGap = `<Node name="Answer Gap" id="${ANSWER_GAP}" x="0" y="${QUESTION_Y + QUESTION_HEIGHT}">
+  ${wipeClips('Answer Gap')}
+  <ClippingShape name="Answer Gap Foot Clip" sourceId="${ANSWER_GAP_MASK}"/>
+  ${backing('Answer Gap', 0, 0, BLOCK_WIDTH, GAP, [0, 0, 0, 0])}
 </Node>`;
 
 // --- answer strip ---------------------------------------------------------------------
@@ -315,7 +334,9 @@ const answerStrip = `<Node name="Answer Strip" id="${ANSWER_STRIP}" x="0" y="${A
   </Node>
   </Node>
   ${darkGlass('Answer', BLOCK_WIDTH, ANSWER_HEIGHT, ANSWER_RADII)}
-</Node>`;
+  ${backing('Answer', 0, 0, BLOCK_WIDTH, ANSWER_HEIGHT, [0, 0, OUTER_RADIUS, OUTER_RADIUS])}
+</Node>
+<Shape name="Answer Gap Mask" id="${ANSWER_GAP_MASK}" x="0" y="${ANSWER_Y - GAP}"><Rectangle width="${BLOCK_WIDTH}" height="${ANSWER_HEIGHT + GAP}" originX="0" originY="0"/></Shape>`;
 
 // --- leading edges, sweeps, silhouette ------------------------------------------------
 
@@ -347,13 +368,13 @@ const sweep = (name: string, sweepId: string, peak: string) => `<Shape name="${n
   ${wipeClips(name)}
 </Shape>`;
 
-// The panels' outline for the sweeps. The title, chip and question rectangles follow the
-// lift; the answer strip's stands still and lies inside the question's while it is hidden.
+// The block's outline for the sweeps, gaps included. The upper rectangle follows the lift;
+// the lower one stands still from a corner's depth above the answer gap to the foot, so
+// it covers the upper one's lower corners at every point of the lift.
+const LOWER_SILHOUETTE_Y = ANSWER_Y - GAP - OUTER_RADIUS;
 const silhouette = `<Shape name="Block Silhouette" id="${SILHOUETTE}">
-  ${rectangle(TITLE_WIDTH, TITLE_HEIGHT, TITLE_RADII, ` id="${SILHOUETTE_TITLE}" x="0" y="0"`)}
-  ${rectangle(CHIP_WIDTH, TITLE_HEIGHT, CHIP_RADII, ` id="${SILHOUETTE_CHIP}" x="${CHIP_X}" y="0"`)}
-  ${rectangle(BLOCK_WIDTH, QUESTION_HEIGHT, QUESTION_RADII, ` id="${SILHOUETTE_QUESTION}" x="0" y="${QUESTION_Y}"`)}
-  ${rectangle(BLOCK_WIDTH, ANSWER_HEIGHT, ANSWER_RADII, ` x="0" y="${ANSWER_Y}"`)}
+  ${rectangle(BLOCK_WIDTH, HIDDEN_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ` id="${SILHOUETTE_LIFTED}" x="0" y="0"`)}
+  ${rectangle(BLOCK_WIDTH, HIDDEN_HEIGHT - LOWER_SILHOUETTE_Y, [0, 0, OUTER_RADIUS, OUTER_RADIUS], ` x="0" y="${LOWER_SILHOUETTE_Y}"`)}
 </Shape>`;
 
 // --- timelines ------------------------------------------------------------------------
@@ -392,7 +413,7 @@ const revealed = (rangeId: string, direction: Direction): Track[] => direction =
   ? [hold(rangeId, MODIFY_FROM, 1), hold(rangeId, FALLOFF_FROM, 1.4)]
   : [hold(rangeId, MODIFY_TO, 0), hold(rangeId, FALLOFF_TO, -0.4)];
 
-const GROUPS = [TITLE_PANEL, CHIP_PANEL, QUESTION_PANEL, ANSWER_STRIP];
+const GROUPS = [TITLE_PANEL, CHIP_PANEL, QUESTION_PANEL, ANSWER_GAP, ANSWER_STRIP];
 const LIGHTS = [LEFT_LIGHT, RIGHT_LIGHT];
 const CONTENTS = [TITLE_CONTENT, QUESTION_CONTENT, ANSWER_CONTENT];
 const RANGES: [string, Direction][] = [[TITLE_REVEAL, 'backward'], [QUESTION_REVEAL, 'forward'], [ANSWER_REVEAL, 'backward']];
@@ -481,9 +502,7 @@ type Lifted = { objectId: string; propertyKey: number; hidden: number; shown: nu
 
 const LIFTED: Lifted[] = [
   { objectId: LIFT_NODE, propertyKey: Y, hidden: 0, shown: -LIFT },
-  { objectId: SILHOUETTE_TITLE, propertyKey: Y, hidden: 0, shown: -LIFT },
-  { objectId: SILHOUETTE_CHIP, propertyKey: Y, hidden: 0, shown: -LIFT },
-  { objectId: SILHOUETTE_QUESTION, propertyKey: Y, hidden: QUESTION_Y, shown: QUESTION_Y - LIFT },
+  { objectId: SILHOUETTE_LIFTED, propertyKey: Y, hidden: 0, shown: -LIFT },
   ...[LEFT_SPAN, RIGHT_SPAN].flatMap((span): Lifted[] => [
     { objectId: span, propertyKey: Y, hidden: HIDDEN_HEIGHT / 2, shown: (HIDDEN_HEIGHT - LIFT) / 2 },
     { objectId: span, propertyKey: SCALE_Y, hidden: 1, shown: SHOWN_HEIGHT / HIDDEN_HEIGHT },
@@ -491,9 +510,11 @@ const LIFTED: Lifted[] = [
 ];
 
 // The question panel's lower corners: the block's outer corners while the answer is
-// hidden, seams once the strip opens beneath them.
-const CORNERS: Lifted[] = [QUESTION_GLAZE_PATH, QUESTION_TINT_PATH, QUESTION_UNDERLAY_PATH, SILHOUETTE_QUESTION].flatMap((path) =>
-  [CORNER_BL, CORNER_BR].map((propertyKey) => ({ objectId: path, propertyKey, hidden: OUTER_RADIUS, shown: INNER_RADIUS })));
+// hidden, seams once the strip opens beneath them (square on the backing, inside the block).
+const CORNERS: Lifted[] = [
+  ...[QUESTION_GLAZE_PATH, QUESTION_TINT_PATH, QUESTION_UNDERLAY_PATH].map((path) => ({ path, shown: INNER_RADIUS })),
+  { path: QUESTION_BACKING_PATH, shown: 0 },
+].flatMap(({ path, shown }) => [CORNER_BL, CORNER_BR].map((propertyKey) => ({ objectId: path, propertyKey, hidden: OUTER_RADIUS, shown })));
 
 const answerPose = (shown: boolean): Track[] => [
   ...[...LIFTED, ...CORNERS].map((p) => hold(p.objectId, p.propertyKey, shown ? p.shown : p.hidden)),
@@ -634,6 +655,7 @@ ${sweep('Answer Sweep', ANSWER_SWEEP, '2EFFFFFF')}
 ${titlePanel}
 ${chipPanel}
 ${questionPanel}
+${answerGap}
 <Shape name="Answer Reveal Mask" id="${ANSWER_MASK}" x="-40" y="${HIDDEN_HEIGHT + GAP}"><Rectangle width="${BLOCK_WIDTH + 80}" height="400" originX="0" originY="0"/></Shape>
 </Node>
 

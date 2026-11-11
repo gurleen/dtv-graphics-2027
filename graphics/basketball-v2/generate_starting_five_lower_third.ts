@@ -215,11 +215,18 @@ const stripGlass = (name: string, width: number, radii: Radii, x = 0) => `<Shape
     ${rectangle(width, STRIP_HEIGHT, radii)}
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${STRIP_HEIGHT}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${STRIP_HEIGHT}"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="${name} Body" x="${x}" y="0">
-    ${rectangle(width, STRIP_HEIGHT, radii)}
+  </Shape>`;
+
+// The block's dark backing, one piece per moving part, so the 4-unit seams read as glass
+// rather than video. A piece is the last child of the node it backs, so it reveals, slides
+// and fades with it. The header and players meet mid-seam; the gap above the strips, which
+// slide, belongs to the panels.
+const backing = (name: string, x: number, y: number, width: number, height: number, radii: Radii) =>
+  `<Shape name="${name} Backing" x="${x}" y="${y}">
+    ${rectangle(width, height, radii)}
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
+const PLAYERS_WIDTH = BLOCK_WIDTH - PLAYERS_X;
 
 const teamTint = (name: string, tintId: string, width: number, height: number, radii: Radii, team: number, opacity: number) =>
   `<Shape name="${name}" id="${tintId}" x="0" y="0" opacity="${opacity}">
@@ -286,6 +293,7 @@ ${TEAM_ORDER.map((team) => `    <Node name="${TEAMS[team]!.title} Logo" id="${te
   ${panelGlaze('Header', HEADER_WIDTH, PANEL_HEIGHT, HEADER_PANEL_RADII)}
 ${TEAM_ORDER.map((team) => `  ${teamTint(`${TEAMS[team]!.title} Header Tint`, teamHeader(team).tint, HEADER_WIDTH, PANEL_HEIGHT, HEADER_PANEL_RADII, team, team === 0 ? TINT_OPACITY : 0)}`).join('\n')}
   ${underlay('Header Underlay', HEADER_UNDERLAY, HEADER_WIDTH, PANEL_HEIGHT, HEADER_PANEL_RADII)}
+  ${backing('Header', 0, 0, SEAM, PANEL_HEIGHT + GAP, [OUTER_RADIUS, 0, 0, 0])}
 </Node>`;
 
 const sponsorLogoWidth = 1600 * SPONSOR_SCALE;
@@ -296,6 +304,7 @@ const headerStrip = `<Node name="Header Strip" id="${HEADER_STRIP}" x="0" y="${S
   <Text name="Sponsor Label" x="22" y="29" originValue="baseline" wrapValue="noWrap" sizingValue="autoWidth"><TextStylePaint id="${id(153)}" fontAssetId="${FONT_REGULAR}" fontSize="18" letterSpacing="2"><Fill><SolidColor colorValue="A6FFFFFF"/></Fill></TextStylePaint><TextValueRun name="Sponsor Label Value" styleId="${id(153)}" text="PRESENTED BY"></TextValueRun>${rise('Sponsor Label', SPONSOR_LABEL_REVEAL)}</Text>
   <Image name="Sponsor Logo" id="${id(154)}" x="${HEADER_WIDTH - 16 - sponsorLogoWidth / 2}" y="${STRIP_HEIGHT / 2}" scaleX="${SPONSOR_SCALE}" scaleY="${SPONSOR_SCALE}" assetId="${SPONSOR_ASSET}">${bound(SPONSOR_LOGO, 206)}</Image>
   ${stripGlass('Header Strip', HEADER_WIDTH, HEADER_STRIP_RADII)}
+  ${backing('Header Strip', 0, 0, SEAM, STRIP_HEIGHT, [0, 0, OUTER_RADIUS, 0])}
   </Node>
 </Node>`;
 
@@ -356,14 +365,7 @@ const playerStrip = (col: (typeof COLUMNS)[number]) => {
   ${stripGlass(label + ' Strip', COLUMN_WIDTH, stripRadii(col.index), col.x)}`;
 };
 
-const silhouette = [
-  rectangle(HEADER_WIDTH, PANEL_HEIGHT, HEADER_PANEL_RADII, ' x="0" y="0"'),
-  rectangle(HEADER_WIDTH, STRIP_HEIGHT, HEADER_STRIP_RADII, ` x="0" y="${STRIP_Y}"`),
-  ...COLUMNS.flatMap((col) => [
-    rectangle(COLUMN_WIDTH, PANEL_HEIGHT, panelRadii(col.index), ` x="${PLAYERS_X + col.x}" y="0"`),
-    rectangle(COLUMN_WIDTH, STRIP_HEIGHT, stripRadii(col.index), ` x="${PLAYERS_X + col.x}" y="${STRIP_Y}"`),
-  ]),
-].join('');
+const silhouette = rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ' x="0" y="0"');
 
 // --- timelines ------------------------------------------------------------------------
 
@@ -741,12 +743,14 @@ ${headerStrip}
 <Node name="Player Panels" id="${PLAYER_PANELS}" x="${PLAYERS_X}" y="0">
 <ClippingShape name="Player Panels Reveal Clip" sourceId="${PLAYERS_MASK}"/>
 ${COLUMNS.map(playerPanel).join('\n')}
+${backing('Player Panels', -GAP / 2, 0, PLAYERS_WIDTH + GAP / 2, PANEL_HEIGHT + GAP, [0, OUTER_RADIUS, 0, 0])}
 </Node>
 <Node name="Player Strips" id="${PLAYER_STRIPS}" x="${PLAYERS_X}" y="${STRIP_Y}">
 <ClippingShape name="Player Strips Reveal Clip" sourceId="${STRIP_MASK}"/>
 <ClippingShape name="Player Strips Wipe Clip" sourceId="${PLAYERS_MASK}"/>
 <Node name="Player Strips Sliding Content" id="${PLAYER_STRIPS_CONTENT}">
 ${COLUMNS.map(playerStrip).join('\n')}
+${backing('Player Strips', -GAP / 2, 0, PLAYERS_WIDTH + GAP / 2, STRIP_HEIGHT, [0, 0, 0, OUTER_RADIUS])}
 </Node>
 </Node>
 

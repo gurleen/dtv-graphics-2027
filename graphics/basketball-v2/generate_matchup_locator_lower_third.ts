@@ -195,12 +195,20 @@ const glaze = (name: string, width: number, height: number, radii: Radii, stroke
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="${strokeTop}" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>`;
 
-/** Dark glass: a glaze over a near-black body, as on every v2 strip. */
-const darkGlass = (name: string, width: number, height: number, radii: Radii, bodyColor = 'D10E1116') => `${glaze(name, width, height, radii, '59FFFFFF')}
-  <Shape name="${name} Body" x="0" y="0">
+// The block's dark backing: one piece per moving part, laid out so the pieces tile the
+// block's outline once and the 4-unit seams read as glass, not video. A piece is the last
+// child of its panel, so it opens, moves and fades with it.
+type Piece = { x: number; y: number; width: number; height: number; radii: Radii };
+
+const backing = (name: string, { x, y, width, height, radii }: Piece) => `<Shape name="${name} Backing" x="${x}" y="${y}">
     ${rectangle(width, height, radii)}
-    <Fill><SolidColor colorValue="${bodyColor}"/></Fill>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
+
+/** Dark glass: a glaze over its backing piece, which is the panel's body. */
+const darkGlass = (name: string, width: number, height: number, radii: Radii, piece: Piece) =>
+  `${glaze(name, width, height, radii, '59FFFFFF')}
+  ${backing(name, piece)}`;
 
 const tint = (name: string, tintId: string, width: number, height: number, radii: Radii, color: string, property: number) =>
   `<Shape name="${name}" id="${tintId}" x="0" y="0" opacity="${TINT_OPACITY}">
@@ -243,6 +251,7 @@ const textBox = (o: { name: string; x: number; y: number; width: number; height:
 const PANEL_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS];
 const TAB_RADII: Radii = [OUTER_RADIUS, OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS];
 const STRIP_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS, OUTER_RADIUS];
+const SQUARE: Radii = [0, 0, 0, 0];
 
 // --- sides ----------------------------------------------------------------------------
 
@@ -256,6 +265,12 @@ const side = (o: { label: 'Away' | 'Home'; key: 'away' | 'home'; team: typeof AW
   return {
     ...o, p,
     panelX: away ? AWAY_PANEL_X : HOME_PANEL_X,
+    // The seam takes 2 units each side of the gap to the VS panel; the gap under the
+    // band, above the sliding strip, is the band's.
+    backing: {
+      x: away ? 0 : -GAP / 2, y: 0, width: PANEL_WIDTH + GAP / 2, height: BAND_HEIGHT + GAP,
+      radii: (away ? [OUTER_RADIUS, 0, 0, 0] : [0, OUTER_RADIUS, 0, 0]) as Radii,
+    },
     panelRadii: (away ? [OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS] : [INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS]) as Radii,
     // The marker runs down the panel's outer edge, over the logo cropped there.
     markerX: away ? 0 : PANEL_WIDTH - MARKER_WIDTH,
@@ -332,6 +347,7 @@ const panel = (s: Side) => `<Node name="${s.label} Panel" id="${s.ids.panel}" x=
   ${glaze(`${s.label} Panel`, PANEL_WIDTH, BAND_HEIGHT, s.panelRadii)}
   ${tint(`${s.label} Panel Tint`, s.ids.panelTint, PANEL_WIDTH, BAND_HEIGHT, s.panelRadii, s.team.primary, s.p.primary)}
   ${underlay(`${s.label} Panel Underlay`, PANEL_WIDTH, BAND_HEIGHT, s.panelRadii)}
+  ${backing(`${s.label} Panel`, s.backing)}
 </Node>`;
 
 const versus = `<Node name="Versus Panel" id="${VERSUS}" x="${VERSUS_X}" y="${BAND_Y}">
@@ -343,7 +359,7 @@ const versus = `<Node name="Versus Panel" id="${VERSUS}" x="${VERSUS_X}" y="${BA
       rise('Versus', VERSUS_REVEAL, 'forward'),
     ].join('\n    '),
   })}
-  ${darkGlass('Versus', VERSUS_WIDTH, BAND_HEIGHT, PANEL_RADII, 'E00E1116')}
+  ${darkGlass('Versus', VERSUS_WIDTH, BAND_HEIGHT, PANEL_RADII, { x: -GAP / 2, y: 0, width: VERSUS_WIDTH + GAP, height: BAND_HEIGHT + GAP, radii: SQUARE })}
 </Node>`;
 
 const band = `<Node name="Band" id="${BAND}" x="0" y="0">
@@ -360,7 +376,7 @@ const sweep = (name: string, sweepId: string, clipId: string) => `<Shape name="$
   <ClippingShape name="${name} Clip" sourceId="${clipId}"/>
 </Shape>`;
 
-// The tab rises out from behind the band; its mask ends at the tab's bottom edge.
+// The tab rises out from behind the band; its mask ends at the band's top edge, so its backing rises with it.
 const eventTitle = `<Node name="Event Title" id="${TAB}" x="0" y="0">
   <ClippingShape name="Event Title Reveal Clip" sourceId="${REVEAL_MASK}"/>
   <ClippingShape name="Event Title Rise Clip" sourceId="${TAB_MASK}"/>
@@ -376,7 +392,7 @@ const eventTitle = `<Node name="Event Title" id="${TAB}" x="0" y="0">
       rise('Event Title', TITLE_REVEAL, 'forward'),
     ].join('\n    '),
   })}
-  ${darkGlass('Event Title', TAB_WIDTH, TAB_HEIGHT, TAB_RADII)}
+  ${darkGlass('Event Title', TAB_WIDTH, TAB_HEIGHT, TAB_RADII, { x: 0, y: 0, width: TAB_WIDTH, height: TAB_HEIGHT + GAP, radii: [OUTER_RADIUS, OUTER_RADIUS, 0, 0] })}
   </Node>
   </Node>
 </Node>`;
@@ -408,15 +424,12 @@ const strip = `<Node name="Strip" id="${STRIP}" x="0" y="${STRIP_Y}">
     ].join('\n    '),
   })}
   <Image name="Sponsor Logo" id="${SPONSOR_LOGO}" x="${SPONSOR_X}" y="${STRIP_HEIGHT / 2}" scaleX="${SPONSOR_SCALE}" scaleY="${SPONSOR_SCALE}" assetId="${SPONSOR_ASSET}">${bound(P.sponsorLogo, IMAGE)}</Image>
-  ${darkGlass('Strip', BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII)}
+  ${darkGlass('Strip', BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII, { x: 0, y: 0, width: BLOCK_WIDTH, height: STRIP_HEIGHT, radii: [0, 0, OUTER_RADIUS, OUTER_RADIUS] })}
   </Node>
 </Node>`;
 
-const silhouette = [
-  ...SIDES.map((s) => rectangle(PANEL_WIDTH, BAND_HEIGHT, s.panelRadii, ` x="${s.panelX}" y="${BAND_Y}"`)),
-  rectangle(VERSUS_WIDTH, BAND_HEIGHT, PANEL_RADII, ` x="${VERSUS_X}" y="${BAND_Y}"`),
-  rectangle(BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII, ` x="0" y="${STRIP_Y}"`),
-].join('');
+// The block's outer outline, band and strip with the seams between them; the tab has its own.
+const silhouette = rectangle(BLOCK_WIDTH, BLOCK_HEIGHT - BAND_Y, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ` x="0" y="${BAND_Y}"`);
 
 // --- timelines ------------------------------------------------------------------------
 
@@ -687,7 +700,7 @@ ${strip}
 
 <!-- Unpainted shapes: the clip sources. -->
 <Shape name="Reveal Mask" id="${REVEAL_MASK}" x="${SEAM}" y="${-MASK_MARGIN}"><Rectangle width="${BLOCK_WIDTH + 2 * REVEAL_OVERHANG}" height="${BLOCK_HEIGHT + 2 * MASK_MARGIN}" originX="0.5" originY="0"/></Shape>
-<Shape name="Event Title Rise Mask" id="${TAB_MASK}" x="${TAB_X - TEXT_INSET}" y="${TAB_Y - TEXT_INSET}"><Rectangle width="${TAB_WIDTH + 2 * TEXT_INSET}" height="${TAB_HEIGHT + TEXT_INSET}" originX="0" originY="0"/></Shape>
+<Shape name="Event Title Rise Mask" id="${TAB_MASK}" x="${TAB_X - TEXT_INSET}" y="${TAB_Y - TEXT_INSET}"><Rectangle width="${TAB_WIDTH + 2 * TEXT_INSET}" height="${TAB_HEIGHT + GAP + TEXT_INSET}" originX="0" originY="0"/></Shape>
 <Shape name="Strip Slide Mask" id="${STRIP_MASK}" x="${-MASK_MARGIN}" y="${STRIP_Y - GAP / 2}"><Rectangle width="${BLOCK_WIDTH + 2 * MASK_MARGIN}" height="${STRIP_HEIGHT + GAP / 2 + MASK_MARGIN}" originX="0" originY="0"/></Shape>
 <Shape name="Block Silhouette" id="${SILHOUETTE}">${silhouette}</Shape>
 <Shape name="Event Title Silhouette" id="${TAB_SILHOUETTE}">${rectangle(TAB_WIDTH, TAB_HEIGHT, TAB_RADII, ` x="${TAB_X}" y="${TAB_Y}"`)}</Shape>

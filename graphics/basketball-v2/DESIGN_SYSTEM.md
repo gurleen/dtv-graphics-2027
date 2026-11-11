@@ -89,6 +89,42 @@ full-colour logo larger than its panel, cropped at the panel's outer edge (the
 matchup locator lower third), takes its own node between the content and the
 glaze, also clipped by the tint shape, so it moves independently of the text.
 
+### The block backing
+
+The panels of a block sit 4 apart, and video must not show through those gaps.
+Dark glass (`D10E1116`) lies behind the whole block, so a seam reads as glass.
+Every scene with more than one panel has it; the scorebug was the first.
+
+- **Shape.** At rest the backing pieces tile the block's outer outline exactly
+  once. Two overlapping pieces show as a darker band, and a hole shows video.
+  Outer corners take the block's outer radius; corners inside the block are
+  square.
+- **One piece per moving part.** A piece is the last child of the panel node it
+  backs, so it takes that panel's reveal clip, motion and opacity keys, and
+  Hidden hides it. Panels that share one mask from separate nodes take a
+  `Block Backing` node clipped by that mask and keyed for opacity in all four
+  animations (the scorebug).
+- **Who owns a gap.** Two static neighbours that wipe from a shared seam meet at
+  the gap's midpoint, 2 each. A gap beside a part that slides, toggles or can
+  be blank belongs wholly to the static neighbour, and the moving part's piece
+  is its own rectangle. Split that gap and a sliver of the strip shows before
+  it slides.
+- **A gap beside a part that can be absent** comes and goes with that part. The
+  Burning Question's answer gap is a node of its own, clipped at the block's
+  foot. The player features bind their stat-row seams' opacity to the row's.
+- **Neutral panels** drop their own dark fill: the backing piece is the body.
+  Team panels keep tint and underlay and sit on the backing. An opaque plate
+  keeps everything.
+- **The sheen's clip**, `Block Silhouette`, is the block's outer outline, so the
+  sheen crosses the gaps.
+- Blocks 24 apart (the talent double and triple) each take their own backing.
+  A part that overhangs the block (a headshot, a title tab) is backed only
+  across its own 4-unit gap.
+
+A `ClippingShape` on a `Shape` inside a node that is already clipped can make
+the renderer drop that whole node, with no error. Give the piece a node of its
+own and put the clips on the node.
+
 ### Tables
 
 A table's cells share one panel. Glass on every cell reads as a grid of
@@ -146,7 +182,7 @@ can be on air together.
 | Lower-third block origin y | 890 |
 | Lower-third block height | 132 = 84 panel + 4 gap + 44 strip |
 | Centred origin x | 960 − width / 2 |
-| Gap between panels | 4 (no rules or dividers; a table's rows take hairlines, see [Tables](#tables)) |
+| Gap between panels | 4, filled by [the block backing](#the-block-backing) (no rules or dividers; a table's rows take hairlines, see [Tables](#tables)) |
 | Gap between blocks | 24 (talent blocks; also the minimum clearance from the scorebug, whose right edge is x 526) |
 | Outer corner radius | 12 (24 on the locator and halftime cards) |
 | Inner seam radius | 3 (6 on the locator and halftime cards) |

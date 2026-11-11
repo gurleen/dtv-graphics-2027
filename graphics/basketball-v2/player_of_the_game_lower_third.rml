@@ -69,6 +69,10 @@
       <Fill><SolidColor colorValue="59000000"/></Fill>
     </Shape>
     <Shape name="Headshot Clip Shape" id="43:106" x="8" y="-84"><Rectangle width="212" height="304" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="3"/></Shape>
+    <Shape name="Headshot Backing" x="0" y="0">
+      <Rectangle width="222" height="220" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="0" cornerRadiusBL="12" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
   </Node>
 
   <!-- ============================== Column =================================== -->
@@ -92,8 +96,8 @@
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
-    <Shape name="Header Body" x="0" y="0">
-      <Rectangle width="1176" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+    <Shape name="Header Backing" x="-2" y="0">
+      <Rectangle width="1178" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="12" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -132,6 +136,14 @@
       <Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
       <Fill><SolidColor colorValue="59000000"/></Fill>
     </Shape>
+    <Shape name="Name Backing" x="-2" y="-4">
+      <Rectangle width="974" height="88" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
+    <Shape name="Name Body Seam Backing" x="-2" y="84"><DataBindContext sourcePathIds="43:1000-43:1072" propertyKey="18" converterId="43:961"/>
+      <Rectangle width="974" height="4" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
   </Node>
   <Node name="Sponsor Chip" id="43:170" x="1200" y="48">
     <ClippingShape name="Sponsor Reveal Clip" sourceId="43:506"/>
@@ -139,6 +151,18 @@
     <Shape name="Sponsor Chip Body" x="0" y="0">
       <Rectangle width="200" height="172" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/>
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="172"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
+    </Shape>
+    <Shape name="Sponsor Chip Backing" x="0" y="-4">
+      <Rectangle width="200" height="176" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="12"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
+    <Shape name="Sponsor Chip Name Seam Backing" x="-4" y="-4">
+      <Rectangle width="4" height="92" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
+    <Shape name="Sponsor Chip Body Seam Backing" x="-4" y="88"><DataBindContext sourcePathIds="43:1000-43:1072" propertyKey="18" converterId="43:961"/>
+      <Rectangle width="4" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
   </Node>
   <Node name="Body" id="43:300" x="224" y="136">
@@ -159,8 +183,8 @@
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
-    <Shape name="Stat 1 Body" x="0" y="0">
-      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="43:1000-43:1051" propertyKey="20"/></Rectangle>
+    <Shape name="Stat 1 Backing" x="-2" y="0">
+      <Rectangle width="244" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"><DataBindContext sourcePathIds="43:1000-43:1051" propertyKey="20" converterId="43:960"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -179,8 +203,8 @@
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
-    <Shape name="Stat 2 Body" x="0" y="0">
-      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="43:1000-43:1055" propertyKey="20"/></Rectangle>
+    <Shape name="Stat 2 Backing" x="-2" y="0">
+      <Rectangle width="244" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"><DataBindContext sourcePathIds="43:1000-43:1055" propertyKey="20" converterId="43:960"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -199,8 +223,8 @@
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
-    <Shape name="Stat 3 Body" x="0" y="0">
-      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="43:1000-43:1059" propertyKey="20"/></Rectangle>
+    <Shape name="Stat 3 Backing" x="-2" y="0">
+      <Rectangle width="244" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"><DataBindContext sourcePathIds="43:1000-43:1059" propertyKey="20" converterId="43:960"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -219,8 +243,8 @@
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
-    <Shape name="Stat 4 Body" x="0" y="0">
-      <Rectangle width="240" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"><DataBindContext sourcePathIds="43:1000-43:1063" propertyKey="20"/></Rectangle>
+    <Shape name="Stat 4 Backing" x="-2" y="0">
+      <Rectangle width="244" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"><DataBindContext sourcePathIds="43:1000-43:1063" propertyKey="20" converterId="43:960"/></Rectangle>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
@@ -235,17 +259,17 @@
       <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
       <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
     </Shape>
-    <Shape name="Copy Body" x="0" y="0">
-      <Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
+    <Shape name="Copy Backing" x="-2" y="0">
+      <Rectangle width="974" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
       <Fill><SolidColor colorValue="D10E1116"/></Fill>
     </Shape>
     </Node>
     </Node>
   </Node>
 
-  <Shape name="Block Silhouette" id="43:610"><Rectangle x="0" y="0" width="220" height="220" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="3"/><Rectangle x="224" y="0" width="1176" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="224" y="48" width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="1200" y="48" width="200" height="172" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="12"/><Rectangle x="224" y="136" width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/></Shape>
-  <Shape name="Header Slide Mask" id="43:620" x="224" y="0"><Rectangle width="1176" height="44" originX="0" originY="0"/></Shape>
-  <Shape name="Body Slide Mask" id="43:621" x="224" y="136"><Rectangle width="972" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/></Shape>
+  <Shape name="Block Silhouette" id="43:610"><Rectangle x="0" y="0" width="1400" height="220" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"/></Shape>
+  <Shape name="Header Slide Mask" id="43:620" x="222" y="0"><Rectangle width="1178" height="44" originX="0" originY="0"/></Shape>
+  <Shape name="Body Slide Mask" id="43:621" x="222" y="136"><Rectangle width="974" height="84" originX="0" originY="0"/></Shape>
   </Node>
 
   <!-- Intro: seam ignition, outward glass wipes, a rising headshot, rows sliding out from
@@ -1019,5 +1043,23 @@
 <ViewModelInstanceNumber viewModelPropertyId="43:1073" propertyValue="0"/>
   </ViewModelInstance>
   </ViewModel>
+
+  <DataConverterOperationValue name="Tile Backing Width" id="43:960" operationValue="4"/>
+  <!-- _statsOpacity x the most opaque tile + _textOpacity: 1 while the body row shows anything. -->
+  <DataConverterFormula name="Body Shown" id="43:961">
+    <FormulaTokenInput/>
+    <FormulaTokenOperation operationType="2"/>
+    <FormulaTokenFunction functionType="1"/>
+    <FormulaTokenValue operationValue="0"><DataBindContext sourcePathIds="43:1000-43:1052" propertyKey="777"/></FormulaTokenValue>
+    <FormulaTokenArgumentSeparator/>
+    <FormulaTokenValue operationValue="0"><DataBindContext sourcePathIds="43:1000-43:1056" propertyKey="777"/></FormulaTokenValue>
+    <FormulaTokenArgumentSeparator/>
+    <FormulaTokenValue operationValue="0"><DataBindContext sourcePathIds="43:1000-43:1060" propertyKey="777"/></FormulaTokenValue>
+    <FormulaTokenArgumentSeparator/>
+    <FormulaTokenValue operationValue="0"><DataBindContext sourcePathIds="43:1000-43:1064" propertyKey="777"/></FormulaTokenValue>
+    <FormulaTokenParenthesisClose/>
+    <FormulaTokenOperation operationType="0"/>
+    <FormulaTokenValue operationValue="0"><DataBindContext sourcePathIds="43:1000-43:1073" propertyKey="777"/></FormulaTokenValue>
+  </DataConverterFormula>
   </Rive>
   

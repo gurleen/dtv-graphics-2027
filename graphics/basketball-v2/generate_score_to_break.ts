@@ -234,10 +234,10 @@ const glaze = (name: string, width: number, height: number, radii: Radii, stroke
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="${strokeTop}" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>`;
 
-const darkGlass = (name: string, width: number, height: number, radii: Radii) => `${glaze(name, width, height, radii, '59FFFFFF', '40000000')}
-  <Shape name="${name} Body" x="0" y="0">
+const BACKING_COLOR = 'D10E1116';
+const backing = (name: string, y: number, width: number, height: number, radii: Radii) => `<Shape name="${name} Backing" x="0" y="${y}">
     ${rectangle(width, height, radii)}
-    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    <Fill><SolidColor colorValue="${BACKING_COLOR}"/></Fill>
   </Shape>`;
 
 // Text reveals. Each glyph rises 14 into place as it fades in, one after another. The
@@ -274,6 +274,15 @@ const ROW_RADII: readonly Radii[] = [
 ];
 const STRIP_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS, OUTER_RADIUS];
 const rowY = (team: number) => team * (ROW_HEIGHT + GAP);
+
+// The block's dark backing, one piece per panel, so the gaps read as glass rather than
+// video. The rows meet mid-gap; the home row takes the whole gap above the strip, which
+// slides, and the strip's piece is its body.
+const ROW_BACKINGS: readonly { y: number; height: number; radii: Radii }[] = [
+  { y: 0, height: ROW_HEIGHT + GAP / 2, radii: [OUTER_RADIUS, OUTER_RADIUS, 0, 0] },
+  { y: -GAP / 2, height: ROW_HEIGHT + GAP / 2 + GAP, radii: [0, 0, 0, 0] },
+];
+const STRIP_BACKING_RADII: Radii = [0, 0, OUTER_RADIUS, OUTER_RADIUS];
 
 const wipeClip = (name: string) => `<ClippingShape name="${name} Wipe Clip" sourceId="${REVEAL_MASK}"/>`;
 
@@ -324,6 +333,7 @@ const teamRow = (team: number) => {
     ${rectangle(BLOCK_WIDTH, ROW_HEIGHT, radii)}
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  ${backing(title, ROW_BACKINGS[team]!.y, BLOCK_WIDTH, ROW_BACKINGS[team]!.height, ROW_BACKINGS[team]!.radii)}
 </Node>`;
 };
 
@@ -346,7 +356,8 @@ const strip = `<Node name="Strip" id="${STRIP.panel}" x="0" y="${STRIP_Y}">
           `<Image name="Sponsor Logo" fit="contain" assetId="${SPONSOR_ASSET}">${bound(SPONSOR_LOGO, IMAGE)}</Image>`)}
       </Node>
     </Node>
-    ${darkGlass('Strip', BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII)}
+    ${glaze('Strip', BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII, '59FFFFFF', '40000000')}
+    ${backing('Strip', 0, BLOCK_WIDTH, STRIP_HEIGHT, STRIP_BACKING_RADII)}
   </Node>
 </Node>`;
 
@@ -375,8 +386,7 @@ const sweep = `<Shape name="Glass Specular Sweep" id="${SWEEP}" x="${SWEEP_END}"
 </Shape>`;
 
 const silhouette = `<Shape name="Block Silhouette" id="${SILHOUETTE}">
-  ${TEAM_INDICES.map((team) => rectangle(BLOCK_WIDTH, ROW_HEIGHT, ROW_RADII[team]!, ` x="0" y="${rowY(team)}"`)).join('\n  ')}
-  ${rectangle(BLOCK_WIDTH, STRIP_HEIGHT, STRIP_RADII, ` x="0" y="${STRIP_Y}"`)}
+  ${rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ' x="0" y="0"')}
 </Shape>`;
 
 const stripMask = `<Shape name="Strip Slide Mask" id="${STRIP_MASK}" x="${-MASK_MARGIN}" y="${STRIP_Y - GAP / 2}"><Rectangle width="${BLOCK_WIDTH + 2 * MASK_MARGIN}" height="${STRIP_HEIGHT + GAP / 2 + MASK_MARGIN}" originX="0" originY="0"/></Shape>`;

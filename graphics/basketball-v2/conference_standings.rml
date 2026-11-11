@@ -51,8 +51,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="70"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="70"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Title Body" x="0" y="0">
-    <Rectangle width="1100" height="70" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="6"/>
+  <Shape name="Title Backing" x="0" y="0">
+    <Rectangle width="1100" height="72" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="24" cornerRadiusBL="0" cornerRadiusBR="0"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -366,8 +366,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="714"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="714"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Table Body" x="0" y="0">
-    <Rectangle width="1100" height="714" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="24"/>
+  <Shape name="Table Backing" x="0" y="-2">
+    <Rectangle width="1100" height="716" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="24" cornerRadiusBR="24"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -379,8 +379,7 @@
      on the seam and opens both ways at once; at rest it covers the card. -->
 <Shape name="Card Reveal Mask" id="41:505" x="550" y="-8"><Rectangle id="41:506" width="1116" height="804" originX="0.5" originY="0"/></Shape>
 <Shape name="Card Silhouette" id="41:611">
-  <Rectangle x="0" y="0" width="1100" height="70" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="0" y="74" width="1100" height="714" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="24"/>
+  <Rectangle x="0" y="0" width="1100" height="788" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="24" cornerRadiusBL="24" cornerRadiusBR="24"/>
 </Shape>
 <Shape name="Table Silhouette" id="41:610" x="0" y="74"><Rectangle width="1100" height="714" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="24"/></Shape>
 </Node>

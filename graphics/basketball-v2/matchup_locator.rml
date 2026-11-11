@@ -157,6 +157,13 @@
       <Rectangle width="598" height="466" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
       <Fill><SolidColor colorValue="59000000"/></Fill>
     </Shape>
+    <!-- The card's dark backing, in three pieces, so the seams read as glass
+         rather than video. Each piece opens with its own half. The halves meet
+         mid-seam, and the gap above the venue strip, which slides, is theirs. -->
+    <Shape name="Away Backing" x="0" y="0">
+      <Rectangle width="600" height="470" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
   </Node>
 </Node>
 
@@ -220,6 +227,10 @@
       <Rectangle width="598" height="466" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="6"/>
       <Fill><SolidColor colorValue="59000000"/></Fill>
     </Shape>
+    <Shape name="Home Backing" x="-2" y="0">
+      <Rectangle width="600" height="470" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="24" cornerRadiusBL="0" cornerRadiusBR="0"/>
+      <Fill><SolidColor colorValue="D10E1116"/></Fill>
+    </Shape>
   </Node>
 </Node>
 
@@ -244,8 +255,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="90"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="90"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Venue Body" x="0" y="0">
-    <Rectangle width="1200" height="90" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="24"/>
+  <Shape name="Venue Backing" x="0" y="0">
+    <Rectangle width="1200" height="90" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="24" cornerRadiusBR="24"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -254,10 +265,7 @@
 <!-- ============================= Clip sources ============================= -->
 <!-- Unpainted, so they contribute geometry and draw nothing. -->
 <Shape name="Card Silhouette" id="32:610" x="0" y="0">
-  <Rectangle x="0" y="0" width="598" height="466" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="24" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="602" y="0" width="598" height="466" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="24" cornerRadiusBL="6" cornerRadiusBR="6"/>
-  <Rectangle x="0" y="470" width="1200" height="90" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="24" cornerRadiusBR="24"/>
-  <Ellipse x="600" y="186" width="124" height="124"/>
+  <Rectangle x="0" y="0" width="1200" height="560" originX="0" originY="0" cornerRadiusTL="24"/>
 </Shape>
 <!-- Starts in the gap under the halves and runs well below the card, so the
      outro can still lower the strip inside it. -->

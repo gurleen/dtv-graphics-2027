@@ -297,15 +297,14 @@ const glaze = (name: string, width: number, height: number, radii: Radii, stroke
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="${strokeTop}" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>`;
 
-const glassBody = (name: string, width: number, height: number, radii: Radii) => `<Shape name="${name} Body" x="0" y="0">
-    ${rectangle(width, height, radii)}
+// The card's dark backing, one piece per panel, so the gaps between the panels read as
+// glass rather than video. The panels meet mid-gap; the column's piece is its body.
+const backing = (name: string, x: number, width: number, radii: Radii) => `<Shape name="${name} Backing" x="${x}" y="0">
+    ${rectangle(width, CARD_HEIGHT, radii)}
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
-
-/** Dark glass: a glaze over a near-black body, as on every v2 strip. */
-const darkGlass = (name: string, width: number, height: number, radii: Radii) =>
-  `${glaze(name, width, height, radii, '59FFFFFF')}
-  ${glassBody(name, width, height, radii)}`;
+const AWAY_BACKING_RADII: Radii = [OUTER_RADIUS, 0, OUTER_RADIUS, 0];
+const HOME_BACKING_RADII: Radii = [0, OUTER_RADIUS, 0, OUTER_RADIUS];
 
 const underlay = (name: string, width: number, height: number, radii: Radii) =>
   `<Shape name="${name}" x="0" y="0">
@@ -365,6 +364,9 @@ const teamPanel = (t: Team) => {
     <Fill><SolidColor colorValue="${t.data.primary}">${bound(t.property.primary, COLOR)}</SolidColor></Fill>
   </Shape>
   ${underlay(`${t.name} Underlay`, TEAM_WIDTH, CARD_HEIGHT, t.radii)}
+  ${t.side === 'away'
+    ? backing(t.name, 0, TEAM_WIDTH + GAP / 2, AWAY_BACKING_RADII)
+    : backing(t.name, -GAP / 2, TEAM_WIDTH + GAP / 2, HOME_BACKING_RADII)}
 </Node>`;
 };
 
@@ -482,14 +484,11 @@ const column = `<Node name="Statistics Column" id="${COLUMN}" x="${COLUMN_X}" y=
 ${ROWS.map(statisticRow).join('\n')}
   ${sponsorStrip}
   ${labelBand}
-  ${darkGlass('Column', COLUMN_WIDTH, CARD_HEIGHT, INNER_RADII)}
+  ${glaze('Column', COLUMN_WIDTH, CARD_HEIGHT, INNER_RADII, '59FFFFFF')}
+  ${backing('Column', -GAP / 2, COLUMN_WIDTH + GAP, SQUARE_RADII)}
 </Node>`;
 
-const silhouette = [
-  rectangle(TEAM_WIDTH, CARD_HEIGHT, AWAY_RADII, ' x="0" y="0"'),
-  rectangle(COLUMN_WIDTH, CARD_HEIGHT, INNER_RADII, ` x="${COLUMN_X}" y="0"`),
-  rectangle(TEAM_WIDTH, CARD_HEIGHT, HOME_RADII, ` x="${HOME_X}" y="0"`),
-].join('\n  ');
+const silhouette = rectangle(CARD_WIDTH, CARD_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ' x="0" y="0"');
 
 // --- timelines ------------------------------------------------------------------------
 

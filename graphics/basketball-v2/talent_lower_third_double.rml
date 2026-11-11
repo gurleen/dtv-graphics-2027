@@ -43,8 +43,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Talent 1 Name Body" x="0" y="0">
-    <Rectangle width="460" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+  <Shape name="Talent 1 Name Backing" x="0" y="0">
+    <Rectangle width="460" height="88" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="0" cornerRadiusBR="0"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -61,8 +61,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="4D000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="73FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Talent 2 Name Body" x="0" y="0">
-    <Rectangle width="460" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+  <Shape name="Talent 2 Name Backing" x="0" y="0">
+    <Rectangle width="460" height="88" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="0" cornerRadiusBR="0"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -79,9 +79,9 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Talent 1 Role Body" x="0" y="0">
-    <Rectangle width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/>
-    <Fill><SolidColor colorValue="E00E1116"/></Fill>
+  <Shape name="Talent 1 Role Backing" x="0" y="0">
+    <Rectangle width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="12" cornerRadiusBR="12"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
   <Text name="Talent 2 Role" x="510" y="31" originValue="baseline" wrapValue="noWrap" width="408" height="30" sizingValue="fixed" overflowValue="fitFontSize"><TextStylePaint id="34:126" fontAssetId="34:901" fontSize="24" letterSpacing="2"><Fill><SolidColor colorValue="BFFFFFFF"/></Fill></TextStylePaint><TextValueRun name="Talent 2 Role Value" styleId="34:126" text="COLOR ANALYST"><DataBindContext sourcePathIds="34:1000-34:1021" propertyKey="268"/></TextValueRun><TextModifierGroup name="Talent 2 Role Rise" modifyOpacity="true" modifyTranslation="true" invertOpacity="true" opacity="0" y="14"><TextModifierRange name="Talent 2 Role Reveal" id="34:124" unitsValue="1" modifyFrom="1" modifyTo="2" falloffFrom="1.4" falloffTo="2"/></TextModifierGroup></Text>
   <Shape name="Talent 2 Role Glaze" x="484" y="0">
@@ -89,9 +89,9 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="44"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Talent 2 Role Body" x="484" y="0">
-    <Rectangle width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/>
-    <Fill><SolidColor colorValue="E00E1116"/></Fill>
+  <Shape name="Talent 2 Role Backing" x="484" y="0">
+    <Rectangle width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="12" cornerRadiusBR="12"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
 </Node>
@@ -100,7 +100,7 @@
 
 <Node name="Lower Third Backing" x="488" y="890">
 <Shape name="Wipe Reveal Mask" id="34:500" x="472" y="-8"><Rectangle id="34:501" width="960" height="148" originX="0.5" originY="0"/></Shape>
-<Shape name="Block Silhouette" id="34:610"><Rectangle x="0" y="0" width="460" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="0" y="88" width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/><Rectangle x="484" y="0" width="460" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/><Rectangle x="484" y="88" width="460" height="44" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/></Shape>
+<Shape name="Block Silhouette" id="34:610"><Rectangle x="0" y="0" width="460" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"/><Rectangle x="484" y="0" width="460" height="132" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"/></Shape>
 <Shape name="Role Reveal Mask" id="34:620" x="0" y="88"><Rectangle width="944" height="44" originX="0" originY="0"/></Shape>
 </Node>
 

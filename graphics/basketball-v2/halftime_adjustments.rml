@@ -58,6 +58,10 @@
     <Rectangle width="112" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
   </Shape>
+  <Shape name="Sponsor Chip Backing" x="0" y="0">
+    <Rectangle width="114" height="86" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="0" cornerRadiusBL="0" cornerRadiusBR="0"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
 </Node>
 <Node name="Title Panel" id="44:100" x="116" y="0">
   <ClippingShape name="Title Left Wipe Clip" sourceId="44:501"/><ClippingShape name="Title Right Wipe Clip" sourceId="44:506"/>
@@ -73,8 +77,8 @@
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="84"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
   </Shape>
-  <Shape name="Title Body" x="0" y="0">
-    <Rectangle width="644" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
+  <Shape name="Title Backing" x="-2" y="0">
+    <Rectangle width="646" height="86" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="12" cornerRadiusBL="0" cornerRadiusBR="0"/>
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>
 </Node>
@@ -174,12 +178,14 @@
     <Rectangle id="44:252" width="760" height="172" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/>
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  <Shape name="Panel Backing" x="0" y="-2">
+    <Rectangle id="44:268" width="760" height="174" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="0" cornerRadiusTR="0" cornerRadiusBL="12" cornerRadiusBR="12"/>
+    <Fill><SolidColor colorValue="D10E1116"/></Fill>
+  </Shape>
 </Node>
 
 <Shape name="Block Silhouette" id="44:610">
-  <Rectangle x="0" y="0" width="112" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="3" cornerRadiusBL="3" cornerRadiusBR="3"/>
-  <Rectangle x="116" y="0" width="644" height="84" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="12" cornerRadiusBL="3" cornerRadiusBR="3"/>
-  <Rectangle id="44:253" x="0" y="88" width="760" height="172" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="3" cornerRadiusTR="3" cornerRadiusBL="12" cornerRadiusBR="12"/>
+  <Rectangle id="44:253" x="0" y="0" width="760" height="260" originX="0" originY="0" linkCornerRadius="false" cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"/>
 </Shape>
 </Node>
 
@@ -1105,9 +1111,6 @@
   <KeyedObject objectId="44:252"><KeyedProperty propertyKey="21">
     <KeyFrameDouble frame="0" value="172" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="44:253"><KeyedProperty propertyKey="21">
-    <KeyFrameDouble frame="0" value="172" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="44:254"><KeyedProperty propertyKey="21">
     <KeyFrameDouble frame="0" value="172" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -1119,6 +1122,12 @@
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="44:257"><KeyedProperty propertyKey="21">
     <KeyFrameDouble frame="0" value="172" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="44:268"><KeyedProperty propertyKey="21">
+    <KeyFrameDouble frame="0" value="174" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="44:253"><KeyedProperty propertyKey="21">
+    <KeyFrameDouble frame="0" value="260" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="44:258"><KeyedProperty propertyKey="35">
     <KeyFrameDouble frame="0" value="172" interpolationType="hold"/>
@@ -1180,9 +1189,6 @@
   <KeyedObject objectId="44:252"><KeyedProperty propertyKey="21">
     <KeyFrameDouble frame="0" value="124" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
-  <KeyedObject objectId="44:253"><KeyedProperty propertyKey="21">
-    <KeyFrameDouble frame="0" value="124" interpolationType="hold"/>
-  </KeyedProperty></KeyedObject>
   <KeyedObject objectId="44:254"><KeyedProperty propertyKey="21">
     <KeyFrameDouble frame="0" value="124" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
@@ -1194,6 +1200,12 @@
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="44:257"><KeyedProperty propertyKey="21">
     <KeyFrameDouble frame="0" value="124" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="44:268"><KeyedProperty propertyKey="21">
+    <KeyFrameDouble frame="0" value="126" interpolationType="hold"/>
+  </KeyedProperty></KeyedObject>
+  <KeyedObject objectId="44:253"><KeyedProperty propertyKey="21">
+    <KeyFrameDouble frame="0" value="212" interpolationType="hold"/>
   </KeyedProperty></KeyedObject>
   <KeyedObject objectId="44:258"><KeyedProperty propertyKey="35">
     <KeyFrameDouble frame="0" value="124" interpolationType="hold"/>

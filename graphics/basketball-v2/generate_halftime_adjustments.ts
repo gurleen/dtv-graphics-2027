@@ -169,7 +169,7 @@ const SILHOUETTE = id(610);
 const SECOND_LINES = id(250);
 // Every shape sized to the panel or the block, which the Size layer shortens.
 const PANEL_RECTS = {
-  glaze: id(251), underlay: id(252), silhouette: id(253),
+  glaze: id(251), underlay: id(252), silhouette: id(253), backing: id(268),
   tint: (team: number) => id(254 + team), marker: (team: number) => id(256 + team),
 };
 const GLAZE_GRADIENTS = [id(258), id(259)];
@@ -230,9 +230,11 @@ const darkGlass = (name: string, width: number, height: number, radii: Radii) =>
     ${rectangle(width, height, radii)}
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="00000000" position="0"/><GradientStop colorValue="40000000" position="1"/></LinearGradient></Fill>
     <Stroke thickness="1"><LinearGradient startX="0" startY="0" endX="0" endY="${height}"><GradientStop colorValue="59FFFFFF" position="0"/><GradientStop colorValue="0FFFFFFF" position="0.6"/></LinearGradient></Stroke>
-  </Shape>
-  <Shape name="${name} Body" x="0" y="0">
-    ${rectangle(width, height, radii)}
+  </Shape>`;
+
+/** A piece of the block's dark backing, drawn last in its panel so it opens and moves with it. */
+const backing = (name: string, x: number, y: number, width: number, height: number, radii: Radii, pathAttributes = '') => `<Shape name="${name} Backing" x="${x}" y="${y}">
+    ${rectangle(width, height, radii, pathAttributes)}
     <Fill><SolidColor colorValue="D10E1116"/></Fill>
   </Shape>`;
 
@@ -245,6 +247,10 @@ const rise = (name: string, rangeId: string) =>
 const CHIP_RADII: Radii = [OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS, INNER_RADIUS];
 const TITLE_RADII: Radii = [INNER_RADIUS, OUTER_RADIUS, INNER_RADIUS, INNER_RADIUS];
 const PANEL_RADII: Radii = [INNER_RADIUS, INNER_RADIUS, OUTER_RADIUS, OUTER_RADIUS];
+
+// One dark backing lies behind the block so its 4-unit gaps read as glass, not video. The
+// three panels never leave one another, so each takes half of every gap it borders.
+const HALF_GAP = GAP / 2;
 
 /** Both leading edges' masks: a panel shows only between the two edges. */
 const wipeClips = (name: string) =>
@@ -273,6 +279,7 @@ const chipPanel = `<Node name="Sponsor Chip" id="${CHIP_PANEL}" x="0" y="0">
     ${rectangle(CHIP_WIDTH, TITLE_HEIGHT, CHIP_RADII)}
     <Fill><LinearGradient startX="0" startY="0" endX="0" endY="${TITLE_HEIGHT}"><GradientStop colorValue="FFFFFFFF" position="0"/><GradientStop colorValue="FFE9ECF0" position="1"/></LinearGradient></Fill>
   </Shape>
+  ${backing('Sponsor Chip', 0, 0, CHIP_WIDTH + HALF_GAP, TITLE_HEIGHT + HALF_GAP, [OUTER_RADIUS, 0, 0, 0])}
 </Node>`;
 
 const titlePanel = `<Node name="Title Panel" id="${TITLE_PANEL}" x="${TITLE_X}" y="0">
@@ -285,6 +292,7 @@ const titlePanel = `<Node name="Title Panel" id="${TITLE_PANEL}" x="${TITLE_X}" 
   ${rise('Title', TITLE_REVEAL)}</Text>
   </Node>
   ${darkGlass('Title', TITLE_WIDTH, TITLE_HEIGHT, TITLE_RADII)}
+  ${backing('Title', -HALF_GAP, 0, TITLE_WIDTH + HALF_GAP, TITLE_HEIGHT + HALF_GAP, [0, OUTER_RADIUS, 0, 0])}
 </Node>`;
 
 // --- team panel -----------------------------------------------------------------------
@@ -350,6 +358,7 @@ ${TEAM_ORDER.map((team) => `  <Shape name="${TEAMS[team]!.title} Tint" id="${tea
     ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII, ` id="${PANEL_RECTS.underlay}"`)}
     <Fill><SolidColor colorValue="59000000"/></Fill>
   </Shape>
+  ${backing('Panel', 0, -HALF_GAP, BLOCK_WIDTH, PANEL_HEIGHT + HALF_GAP, [0, 0, OUTER_RADIUS, OUTER_RADIUS], ` id="${PANEL_RECTS.backing}"`)}
 </Node>`;
 
 // --- leading edges, sweeps, silhouette ------------------------------------------------
@@ -378,10 +387,9 @@ const sweep = (name: string, sweepId: string, peak: string) => `<Shape name="${n
   ${wipeClips(name)}
 </Shape>`;
 
+// The block's outline, gaps included, so the sweeps cross the seams too.
 const silhouette = `<Shape name="Block Silhouette" id="${SILHOUETTE}">
-  ${rectangle(CHIP_WIDTH, TITLE_HEIGHT, CHIP_RADII, ' x="0" y="0"')}
-  ${rectangle(TITLE_WIDTH, TITLE_HEIGHT, TITLE_RADII, ` x="${TITLE_X}" y="0"`)}
-  ${rectangle(BLOCK_WIDTH, PANEL_HEIGHT, PANEL_RADII, ` id="${PANEL_RECTS.silhouette}" x="0" y="${PANEL_Y}"`)}
+  ${rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, [OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS, OUTER_RADIUS], ` id="${PANEL_RECTS.silhouette}" x="0" y="0"`)}
 </Shape>`;
 
 // --- timelines ------------------------------------------------------------------------
@@ -568,10 +576,12 @@ const change = (from: number, to: number): Track[] => {
 const sized = (singleLine: boolean): Track[] => {
   const panelHeight = singleLine ? COMPACT_PANEL_HEIGHT : PANEL_HEIGHT;
   const blockHeight = PANEL_Y + panelHeight;
-  const panelRects = [PANEL_RECTS.glaze, PANEL_RECTS.underlay, PANEL_RECTS.silhouette, ...[0, 1].flatMap((team) => [PANEL_RECTS.tint(team), PANEL_RECTS.marker(team)])];
+  const panelRects = [PANEL_RECTS.glaze, PANEL_RECTS.underlay, ...[0, 1].flatMap((team) => [PANEL_RECTS.tint(team), PANEL_RECTS.marker(team)])];
   return [
     hold(ROOT, Y, FOOT_Y - blockHeight),
     ...panelRects.map((rect) => hold(rect, HEIGHT, panelHeight)),
+    hold(PANEL_RECTS.backing, HEIGHT, panelHeight + HALF_GAP),
+    hold(PANEL_RECTS.silhouette, HEIGHT, blockHeight),
     ...GLAZE_GRADIENTS.map((gradient) => hold(gradient, END_Y, panelHeight)),
     hold(LOGO_GROUP, Y, panelHeight / 2),
     ...LIGHTS.map((light) => hold(light, Y, blockHeight / 2)),
