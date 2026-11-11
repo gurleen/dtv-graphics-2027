@@ -1,8 +1,8 @@
-import { basketball, type GameView, type Player, PlayerId, resolveTeam, Side, type World } from '@dtv/domain';
+import { basketball, type GameView, type Player, PlayerId, resolveTeam, Side, type TeamId, type World } from '@dtv/domain';
 import { defineGraphic } from '@dtv/playout';
 import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
-import { fail, fullName, requireBasketball, requireGame } from './shared';
+import { fail, fullName, initialedName, requireBasketball, requireGame, teamLinesTonight } from './shared';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as const;
 
@@ -25,24 +25,17 @@ const shortDate = (iso: string) => {
 };
 
 /** `A. Baker 25 PTS, 8-20 FG, 9-11 FT`. */
-const playerLine = (player: Player, line: basketball.StatLine) => {
-  const initial = player.firstName.trim().slice(0, 1);
-  const name = initial ? `${initial}. ${player.lastName}` : player.lastName;
-  return `${name} ${line.pts} PTS, ${line.fgm}-${line.fga} FG, ${line.ftm}-${line.fta} FT`;
-};
+const playerLine = (player: Player, line: basketball.StatLine) =>
+  `${initialedName(player)} ${line.pts} PTS, ${line.fgm}-${line.fga} FG, ${line.ftm}-${line.fta} FT`;
 
 const LINES = 3;
 const TOP_SCORERS = 2;
 
 /** The listed players in order, else the team's top scorers tonight: ties by field goals made, then name. */
-const playerLines = (params: { players?: readonly PlayerId[] | undefined }, world: World, live: basketball.BasketballLive, teamId: string) => {
+const playerLines = (params: { players?: readonly PlayerId[] | undefined }, world: World, live: basketball.BasketballLive, teamId: TeamId) => {
   const line = (id: PlayerId) => live.players[id] ?? basketball.StatLine.parse({});
   const listed = params.players?.map((id) => ({ player: world.get('player', id) ?? fail(`Player ${id} is gone`), line: line(id) }));
-  const scorers = Object.entries(live.players)
-    .flatMap(([id, stats]) => {
-      const player = world.get('player', PlayerId.parse(id));
-      return player?.teamId === teamId ? [{ player, line: stats }] : [];
-    })
+  const scorers = teamLinesTonight(world, live, teamId)
     .sort((a, b) => b.line.pts - a.line.pts || b.line.fgm - a.line.fgm || fullName(a.player).localeCompare(fullName(b.player)))
     .slice(0, TOP_SCORERS);
   const shown = (listed ?? scorers).map(({ player, line }) => playerLine(player, line));

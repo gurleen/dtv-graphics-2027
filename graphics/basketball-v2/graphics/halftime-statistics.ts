@@ -1,25 +1,7 @@
-import { basketball } from '@dtv/domain';
 import { defineGraphic } from '@dtv/playout';
 import { z } from 'zod';
 import { SCENES } from '../scenes.gen';
-import { requireBasketball, requireGame } from './shared';
-
-const { pct } = basketball;
-
-/** One row of the card. `leading` is which figure marks the leader, so turnovers lead when lower. */
-const ROWS: readonly {
-  readonly label: string;
-  readonly leading: 'HIGHER' | 'LOWER';
-  readonly value: (line: basketball.StatLine) => string;
-  readonly detail?: (line: basketball.StatLine) => string;
-}[] = [
-  { label: 'FG', leading: 'HIGHER', value: (l) => `${l.fgm}-${l.fga}`, detail: (l) => pct(l.fgm, l.fga) },
-  { label: '3PT', leading: 'HIGHER', value: (l) => `${l.tpm}-${l.tpa}`, detail: (l) => pct(l.tpm, l.tpa) },
-  { label: 'FT', leading: 'HIGHER', value: (l) => `${l.ftm}-${l.fta}`, detail: (l) => pct(l.ftm, l.fta) },
-  { label: 'REB', leading: 'HIGHER', value: (l) => String(l.reb) },
-  { label: 'AST', leading: 'HIGHER', value: (l) => String(l.ast) },
-  { label: 'TO', leading: 'LOWER', value: (l) => String(l.to) },
-];
+import { requireBasketball, requireGame, TEAM_STAT_ROWS } from './shared';
 
 export const halftimeStatistics = defineGraphic({
   id: 'basketball-v2/halftime-statistics',
@@ -43,7 +25,7 @@ export const halftimeStatistics = defineGraphic({
       homeMascot: home.school.mascot,
       awayScore: String(live.score.away),
       homeScore: String(live.score.home),
-      row: ROWS.map((row) => ({
+      row: TEAM_STAT_ROWS.map((row) => ({
         label: row.label,
         awayValue: row.value(live.team.away),
         awayDetail: row.detail?.(live.team.away) ?? '',

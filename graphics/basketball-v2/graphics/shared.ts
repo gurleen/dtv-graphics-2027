@@ -1,8 +1,10 @@
 /** What several basketball binds read the same way. Each throws a message an operator can act on. */
 
-import { type basketball, type GameView, headshotUrl, type Player, type PlayerId, resolveTeam, type Staff, type StaffId, type TeamId, type TeamView, type WinLoss, type World } from '@dtv/domain';
+import { basketball, type GameView, headshotUrl, type Player, PlayerId, resolveTeam, type Staff, type StaffId, type TeamId, type TeamView, type WinLoss, type World } from '@dtv/domain';
 import { FALLBACK_IMAGES, type ShowContext } from '@dtv/playout';
 import { z } from 'zod';
+
+const { pct } = basketball;
 
 export const fail = (message: string): never => {
   throw new Error(message);
@@ -30,6 +32,34 @@ export const staffOf = (world: World, id: StaffId): { staff: Staff; team: TeamVi
 };
 
 export const fullName = (person: { readonly firstName: string; readonly lastName: string }) => `${person.firstName} ${person.lastName}`.trim();
+
+/** `J. Reed`, or the last name alone when the roster has no first name. */
+export const initialedName = (player: Player) => {
+  const initial = player.firstName.trim().slice(0, 1);
+  return initial ? `${initial}. ${player.lastName}` : player.lastName;
+};
+
+/** The team's players with a line in tonight's game. `live.players` has no team key, so each id resolves through the world. */
+export const teamLinesTonight = (world: World, live: basketball.BasketballLive, teamId: TeamId) =>
+  Object.entries(live.players).flatMap(([id, line]) => {
+    const player = world.get('player', PlayerId.parse(id));
+    return player?.teamId === teamId ? [{ player, line }] : [];
+  });
+
+/** The team rows both halftime graphics show, in order; `value` formats a team's line. Turnovers lead when lower. */
+export const TEAM_STAT_ROWS: readonly {
+  readonly label: string;
+  readonly leading: 'HIGHER' | 'LOWER';
+  readonly value: (line: basketball.StatLine) => string;
+  readonly detail?: (line: basketball.StatLine) => string;
+}[] = [
+  { label: 'FG', leading: 'HIGHER', value: (l) => `${l.fgm}-${l.fga}`, detail: (l) => pct(l.fgm, l.fga) },
+  { label: '3PT', leading: 'HIGHER', value: (l) => `${l.tpm}-${l.tpa}`, detail: (l) => pct(l.tpm, l.tpa) },
+  { label: 'FT', leading: 'HIGHER', value: (l) => `${l.ftm}-${l.fta}`, detail: (l) => pct(l.ftm, l.fta) },
+  { label: 'REB', leading: 'HIGHER', value: (l) => String(l.reb) },
+  { label: 'AST', leading: 'HIGHER', value: (l) => String(l.ast) },
+  { label: 'TO', leading: 'LOWER', value: (l) => String(l.to) },
+];
 
 const CLASS_NAMES = { FR: 'Freshman', SO: 'Sophomore', JR: 'Junior', SR: 'Senior', GR: 'Graduate' } as const;
 
