@@ -17,8 +17,9 @@ const { PNG } = createRequire(join(ROOT, 'apps/renderer/package.json'))('pngjs')
 
 const SLATE = 'basketball-v2/halftime-slate';
 const SCOREBUG = 'basketball-v2/scorebug';
-const COLUMN = { x: 1352, y: 312, width: 520, height: 720 };
-const WINDOW = { x: 48, y: 312, width: 1280, height: 720 };
+const COLUMN = { x: 1352, y: 280, width: 520, height: 720 };
+const WINDOW = { x: 48, y: 280, width: 1280, height: 720 };
+const TICKER = { x: 0, y: 1024, width: 1920, height: 56 };
 const PAGE_MS = 8000;
 
 const s = await session('halftime-slate');
@@ -77,6 +78,7 @@ await s.run(async () => {
   const changed = differing(pageOne, pageTwo, COLUMN);
   s.check(changed > 0.02, `8 s later the stat column shows another page (${(changed * 100).toFixed(1)}% of its pixels differ)`);
   s.check(differing(pageOne, pageTwo, WINDOW) < 0.001, 'while the hero beside it does not change');
+  s.check(alphaAt(pageTwo, 960, 1052) === 255 && differing(pageOne, pageTwo, TICKER) > 0.02, 'and the ticker along the foot has moved');
 
   await clearCard.click();
   await s.waitRendered(program, { card: 'empty' }, 'Clear takes the slate off program /renderer');
@@ -115,6 +117,6 @@ await s.run(async () => {
     [WINDOW.x + WINDOW.width - 40, WINDOW.y + WINDOW.height - 40],
   ] as const;
   s.check(hole.every(([x, y]) => alphaAt(open, x, y) === 0), 'the 16:9 window is fully transparent: OBS would show the source under it');
-  s.check(alphaAt(open, 960, 160) === 255 && alphaAt(open, 1600, 700) === 255 && alphaAt(open, 20, 20) === 255, 'and the header, stat column and backdrop round it stay opaque');
+  s.check(alphaAt(open, 960, 150) === 255 && alphaAt(open, 1600, 700) === 255 && alphaAt(open, 20, 20) === 255, 'and the header, stat column and backdrop round it stay opaque');
   s.check(differing(pageOne, open, COLUMN) < 0.005, 'with the stat column on page 1');
 });

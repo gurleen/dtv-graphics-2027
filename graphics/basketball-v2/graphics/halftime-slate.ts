@@ -27,6 +27,7 @@ export const halftimeSlate = defineGraphic({
   scene: SCENES.halftime_slate,
   params: z.object({
     title: z.string().min(1).default('Halftime'),
+    ticker: z.string().min(1).default("We'll be right back!"),
     window: z.enum(['closed', 'open']).meta({ labels: { closed: 'No window', open: 'Highlights window' } }).default('closed'),
   }),
 })({
@@ -44,6 +45,7 @@ export const halftimeSlate = defineGraphic({
     return {
       showWindow: params.window === 'open',
       title: params.title,
+      ticker: params.ticker,
       clock: formatGameClock(remainingAt(live.clock, context.now)),
       awaySchool: away.school.name,
       homeSchool: home.school.name,

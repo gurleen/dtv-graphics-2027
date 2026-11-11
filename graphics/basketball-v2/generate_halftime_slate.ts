@@ -14,8 +14,9 @@
  *             window open the Stage is hidden, so whatever is under the graphic shows
  *             through, ringed by a hairline.
  *   Column    one dark glass panel paging through team stats, away leaders, home leaders.
+ *   Ticker    a strip along the foot of the frame repeating one line, scrolling left.
  *
- * The state machine has three layers that never key the same property:
+ * The state machine has four layers that never key the same property:
  *
  *   Display  Hidden -> Intro -> Hold -> Outro on `isPlaying`; keys only the shell.
  *   Pages    Idle -> Page 1 -> Page 2 -> Page 3 -> Page 1 ..., each page its 8 s dwell; keys
@@ -23,6 +24,7 @@
  *            which keys nothing, so the last page closes with the glass.
  *   Window   Closed / Open poses on `showWindow`, a crossfade between them on air; keys
  *            only the Stage's and the window frame's opacity.
+ *   Ticker   one looping state; keys only the ticker track's x.
  *
  * The game clock is drawn at the scorebug's size in a scaled node, so the scorebug's own
  * controller lays its digits out tabular.
@@ -81,6 +83,7 @@ const PROPS: readonly Prop[] = [
   { name: 'showWindow', kind: 'boolean', value: 'false' },
   string('title', 'HALFTIME'),
   string('clock', CLOCK),
+  string('ticker', "WE'LL BE RIGHT BACK!"),
   ...team('away', "SAINT JOSEPH'S", 'HAWKS', '68', AWAY, AWAY_LOGO_ASSET),
   ...team('home', 'DREXEL', 'DRAGONS', '72', HOME, HOME_LOGO_ASSET),
   ...TEAM_ROWS.flatMap(([label, away, home], i) => [string(`row${i + 1}Label`, label), string(`row${i + 1}AwayValue`, away), string(`row${i + 1}HomeValue`, home)]),
@@ -110,7 +113,7 @@ const FRAME = { width: 1920, height: 1080 };
 const GAP = 4;
 const OUTER = 24;
 const SEAM = 6;
-const HEADER = { x: 48, y: 48, width: 1824, height: 240 };
+const HEADER = { x: 48, y: 40, width: 1824, height: 216 };
 const TEAM_WIDTH = 700;
 const CENTRE_X = TEAM_WIDTH + GAP;
 const CENTRE_WIDTH = HEADER.width - 2 * (TEAM_WIDTH + GAP);
@@ -118,8 +121,14 @@ const HOME_X = CENTRE_X + CENTRE_WIDTH + GAP;
 // Header-local seams, at the middle of each gap.
 const LEFT_SEAM = TEAM_WIDTH + GAP / 2;
 const RIGHT_SEAM = HOME_X - GAP / 2;
-const WINDOW = { x: 48, y: 312, width: 1280, height: 720 };
-const COLUMN = { x: 1352, y: 312, width: 520, height: 720 };
+const WINDOW = { x: 48, y: 280, width: 1280, height: 720 };
+const COLUMN = { x: 1352, y: 280, width: 520, height: 720 };
+// The ticker runs edge to edge along the foot of the frame. Each unit is one copy of the
+// line in a box TICKER_UNIT wide, so the loop travels exactly one unit whatever the line's width.
+const TICKER = { y: 1024, height: 56 };
+const TICKER_UNIT = 384;
+const TICKER_UNITS = Math.ceil(FRAME.width / TICKER_UNIT) + 1;
+const TICKER_FRAMES = 360;
 const LOWER_SEAM = (WINDOW.x + WINDOW.width + COLUMN.x) / 2;
 const HALF_WIDTH = (WINDOW.width - GAP) / 2;
 
@@ -130,7 +139,7 @@ const HAIRLINE = '1FFFFFFF';
 const LABEL_BAND = '0AFFFFFF';
 
 // Header logos: the 1024 source at 0.27, a mark about 190 across; the hero's at 0.5.
-const HEADER_LOGO = { x: 150, y: 126, scale: 0.27, bloom: 380 };
+const HEADER_LOGO = { x: 150, y: 110, scale: 0.27, bloom: 380 };
 const HERO_LOGO = { y: WINDOW.height / 2, scale: 0.5, bloom: 720 };
 const CLOCK_SCALE = 1.75;
 const CLOCK_TEXT_WIDTH = 124;
@@ -168,6 +177,8 @@ const HEADER_MASK_RECTS = [id(506), id(507), id(508), id(509)] as const;
 const LOWER_MASK = id(510);
 const LOWER_MASK_RECTS = [id(511), id(512)] as const;
 const WINDOW_CUTOUT = id(600);
+const TICKER_NODE = id(650);
+const TICKER_TRACK = id(651);
 const SWEEP = id(601);
 const SILHOUETTE = id(610);
 const FONT_BOLD = id(900);
@@ -299,9 +310,9 @@ const headerTeam = (side: 'away' | 'home') => {
   const markup = `<Node name="${t.name} Panel" x="${t.panelX}" y="0">
   ${stripe(t.name, t.stripe, t.hairline, side, TEAM_WIDTH, away, t.tint)}
   <Node name="${t.name} Content" id="${t.content}">
-    ${text({ name: `${t.name} School`, x: mirror(290, 200), y: 106, width: 200, size: 32, align: away ? 'left' : 'right', runs: [regular(`${side}School`, 32)], reveal: t.schoolReveal })}
-    ${text({ name: `${t.name} Mascot`, x: mirror(290, 200), y: 182, width: 200, size: 80, align: away ? 'left' : 'right', runs: [bold(`${side}Mascot`, 80)], reveal: t.mascotReveal })}
-    ${text({ name: `${t.name} Score`, x: mirror(490, 186), y: 180, width: 186, size: 150, align: away ? 'right' : 'left', runs: [bold(`${side}Score`, 150)], reveal: t.scoreReveal })}
+    ${text({ name: `${t.name} School`, x: mirror(290, 200), y: 94, width: 200, size: 32, align: away ? 'left' : 'right', runs: [regular(`${side}School`, 32)], reveal: t.schoolReveal })}
+    ${text({ name: `${t.name} Mascot`, x: mirror(290, 200), y: 170, width: 200, size: 80, align: away ? 'left' : 'right', runs: [bold(`${side}Mascot`, 80)], reveal: t.mascotReveal })}
+    ${text({ name: `${t.name} Score`, x: mirror(490, 186), y: 168, width: 186, size: 150, align: away ? 'right' : 'left', runs: [bold(`${side}Score`, 150)], reveal: t.scoreReveal })}
     <Node name="${t.name} Logo Group" id="${t.logo}" x="${mirror(HEADER_LOGO.x)}" y="${HEADER_LOGO.y}">${image(`${t.name} Logo`, side, HEADER_LOGO.scale)}</Node>
     ${bloom(t.name, t.bloom, mirror(HEADER_LOGO.x), HEADER_LOGO.y, HEADER_LOGO.bloom, t.tint)}
   </Node>
@@ -315,7 +326,7 @@ const HEADER_TEAMS = [headerTeam('away'), headerTeam('home')] as const;
 // digit at its 62-unit size, and the node scales the clock up to the cell.
 const clockNodeX = CENTRE_X + (CENTRE_WIDTH - CLOCK_TEXT_WIDTH * CLOCK_SCALE) / 2;
 const clockStyles = Array.from({ length: CLOCK_SLOTS }, (_, i) => id(160 + i));
-const clock = `<Node name="Clock Scale" x="${clockNodeX}" y="198" scaleX="${CLOCK_SCALE}" scaleY="${CLOCK_SCALE}">
+const clock = `<Node name="Clock Scale" x="${clockNodeX}" y="184" scaleX="${CLOCK_SCALE}" scaleY="${CLOCK_SCALE}">
     <Text name="Clock" x="${valueOf('_clockX')}" y="0" originValue="baseline" wrapValue="noWrap" width="${CLOCK_TEXT_WIDTH}" sizingValue="fixed" alignValue="center">${bind('_clockX', X)}
       ${clockStyles.map((style, i) => `<TextStylePaint id="${style}" fontAssetId="${FONT_BOLD}" fontSize="${CLOCK_FONT}" letterSpacing="${valueOf(`_clockSpacing${i + 1}`)}">${bind(`_clockSpacing${i + 1}`, LETTER_SPACING)}<Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>`).join('\n      ')}
       ${clockStyles.map((style, i) => `<TextValueRun name="Clock Character ${i + 1}" styleId="${style}" text="${valueOf(`_clockChar${i + 1}`)}">${bind(`_clockChar${i + 1}`, TEXT)}</TextValueRun>`).join('\n      ')}
@@ -325,7 +336,7 @@ const clock = `<Node name="Clock Scale" x="${clockNodeX}" y="198" scaleX="${CLOC
 
 const centre = `<Node name="Centre Cell" x="${CENTRE_X}" y="0">
   <Node name="Centre Content" id="${CENTRE}">
-    ${text({ name: 'Title', x: 24, y: 62, width: CENTRE_WIDTH - 48, size: 30, align: 'center', runs: [regular('title', 30, 'D9FFFFFF')], reveal: TITLE_REVEAL })}
+    ${text({ name: 'Title', x: 24, y: 62, width: CENTRE_WIDTH - 48, size: 38, align: 'center', runs: [regular('title', 38, 'D9FFFFFF')], reveal: TITLE_REVEAL })}
   </Node>
   ${darkGlass('Centre', CENTRE_WIDTH, HEADER.height, SEAMS)}
 </Node>`;
@@ -339,6 +350,20 @@ const header = `<Node name="Header" id="${HEADER_NODE}" x="${HEADER.x}" y="${HEA
   <Shape name="Header Reveal Mask" id="${HEADER_MASK}">
     ${HEADER_MASKS.map((m) => `<Rectangle id="${m.rect}" x="${m.x}" y="${m.y}" width="${m.width}" height="${m.height}" originX="${m.originX}" originY="0"/>`).join('\n    ')}
   </Shape>
+</Node>`;
+
+// --- ticker ---------------------------------------------------------------------------
+
+const tickerUnit = (i: number) => `<Node name="Ticker Unit ${i + 1}" x="${i * TICKER_UNIT}" y="0">
+      ${text({ name: `Ticker Line ${i + 1}`, x: 32, y: 39, width: TICKER_UNIT - 64, size: 30, align: 'center', runs: [{ prop: 'ticker', font: FONT_BOLD, size: 30, spacing: 1, color: 'FFFFFFFF' }] })}
+      <Shape name="Ticker Mark ${i + 1}" x="0" y="${TICKER.height / 2}" rotation="0.7853982"><Rectangle width="9" height="9" originX="0.5" originY="0.5"/><Fill><SolidColor colorValue="A6FFFFFF"/></Fill></Shape>
+    </Node>`;
+
+const ticker = `<Node name="Ticker" id="${TICKER_NODE}" x="0" y="${TICKER.y}">
+  <Node name="Ticker Track" id="${TICKER_TRACK}" x="0" y="0">
+    ${Array.from({ length: TICKER_UNITS }, (_, i) => tickerUnit(i)).join('\n    ')}
+  </Node>
+  ${darkGlass('Ticker', FRAME.width, TICKER.height, SQUARE)}
 </Node>`;
 
 // --- window ---------------------------------------------------------------------------
@@ -575,6 +600,7 @@ const intro: Track[] = [
   ...reveal(TITLE_REVEAL, 22, 46),
   ...reveal(CLOCK_REVEAL, 24, 50),
   ...HEADER_TEAMS.flatMap((t) => [...reveal(t.scoreReveal, 24, 50), ...reveal(t.schoolReveal, 26, 50), ...reveal(t.mascotReveal, 28, 54)]),
+  move(TICKER_NODE, Y, TICKER.y + TICKER.height, TICKER.y, 22, 46, EASE_OUT),
   move(SWEEP, X, SWEEP_START, SWEEP_END, 42, INTRO_FRAMES, EASE_SWEEP),
   { objectId: SWEEP, propertyKey: OPACITY, keys: sheen },
 ];
@@ -592,6 +618,7 @@ const settled: Track[] = [
   ]),
   ...STRIPES.map((s) => hold(s, SCALE_X, 1)),
   ...RANGES.flatMap(revealed),
+  hold(TICKER_NODE, Y, TICKER.y),
   hold(SWEEP, X, SWEEP_END), hold(SWEEP, OPACITY, 0),
 ];
 
@@ -615,6 +642,7 @@ const outro: Track[] = [
   ]),
   ...STRIPES.map((s) => closing(s, SCALE_X, 1, 0, 6, 22)),
   ...RANGES.flatMap(revealed),
+  closing(TICKER_NODE, Y, TICKER.y, TICKER.y + TICKER.height, 0, 18),
   hold(SWEEP, X, SWEEP_END), hold(SWEEP, OPACITY, 0),
 ];
 
@@ -660,15 +688,18 @@ const windowFade = (open: boolean): Track[] => [
   move(WINDOW_FRAME, OPACITY, open ? 0 : 1, open ? 1 : 0, 0, WINDOW_FRAMES, EASE_SWEEP),
 ];
 
+// Ticker: the track travels one unit and loops, so the line never jumps.
+const tickerScroll: Track[] = [{ objectId: TICKER_TRACK, propertyKey: X, keys: [{ frame: 0, value: 0, linear: true }, { frame: TICKER_FRAMES, value: -TICKER_UNIT }] }];
+
 const ANIMATION = {
   hold: 30, intro: 31, outro: 32, hidden: 33,
   pagesIdle: 34, page1: 35, page2: 36, page3: 37,
-  windowClosed: 38, windowOpen: 39, windowOpening: 50, windowClosing: 51,
+  windowClosed: 38, windowOpen: 39, windowOpening: 50, windowClosing: 51, ticker: 54,
 } as const;
 const STATE = {
   hold: 40, intro: 41, outro: 42, hidden: 43,
   pagesIdle: 44, page1: 45, page2: 46, page3: 47,
-  windowClosed: 48, windowOpen: 49, windowOpening: 52, windowClosing: 53,
+  windowClosed: 48, windowOpen: 49, windowOpening: 52, windowClosing: 53, ticker: 55,
 } as const;
 
 const animation = (name: string, local: number, duration: number, loop: 'oneShot' | 'loop', tracks: Track[]) =>
@@ -707,6 +738,11 @@ ${PAGE_STATES.map((state, i) => `  <AnimationState x="${180 + 240 * i}" y="0" id
   <AnimationState x="660" y="0" id="${id(STATE.windowOpen)}" animationId="${id(ANIMATION.windowOpen)}">${to(STATE.windowClosing, windowOpen('notEqual') + onAir('equal'))}${to(STATE.windowClosed, windowOpen('notEqual') + onAir('notEqual'))}</AnimationState>
   <AnimationState x="420" y="140" id="${id(STATE.windowClosing)}" animationId="${id(ANIMATION.windowClosing)}" reset="true">${atEnd(STATE.windowClosed)}${to(STATE.windowOpening, windowOpen('equal'))}</AnimationState>
 </StateMachineLayer>
+<StateMachineLayer name="Ticker">
+  <AnyState x="820" y="-120"/><ExitState x="940" y="-120"/>
+  <EntryState x="0" y="0"><StateTransition stateToId="${id(STATE.ticker)}"/></EntryState>
+  <AnimationState x="180" y="0" id="${id(STATE.ticker)}" animationId="${id(ANIMATION.ticker)}"/>
+</StateMachineLayer>
 </StateMachine>`;
 
 // --- view model -----------------------------------------------------------------------
@@ -731,14 +767,15 @@ const silhouette = [
   rectangle(CENTRE_WIDTH, HEADER.height, SEAMS, ` x="${HEADER.x + CENTRE_X}" y="${HEADER.y}"`),
   rectangle(TEAM_WIDTH, HEADER.height, RIGHT_OUTER, ` x="${HEADER.x + HOME_X}" y="${HEADER.y}"`),
   rectangle(COLUMN.width, COLUMN.height, ALL_OUTER, ` x="${COLUMN.x}" y="${COLUMN.y}"`),
+  rectangle(FRAME.width, TICKER.height, SQUARE, ` x="0" y="${TICKER.y}"`),
 ].join('\n  ');
 
 const document = `<Rive version="1" kind="fragment">
 <!-- Generated by generate_halftime_slate.ts; edit that file, not this one.
      Basketball halftime slate v2: an opaque 1920 x 1080 slate with a header (away panel, title
      and clock, home panel), a ${WINDOW.width} x ${WINDOW.height} window at ${WINDOW.x}, ${WINDOW.y} that can open onto
-     whatever is under the graphic, and a column paging through team stats and each team's
-     leaders. Sibling draw order is front to back. -->
+     whatever is under the graphic, a column paging through team stats and each team's
+     leaders, and a ticker along the foot of the frame. Sibling draw order is front to back. -->
 <Artboard name="Basketball Halftime Slate v2" id="${id(2)}" x="0" y="${ARTBOARD_Y}" width="${FRAME.width}" height="${FRAME.height}" viewModelId="${id(1000)}" viewModelInstanceId="${id(1001)}" defaultStateMachineId="${id(7)}" styleId="${id(5)}">
 <LayoutComponentStyle name="Halftime Slate v2 Style" id="${id(5)}"/>
 <Fill><SolidColor colorValue="00000000"/></Fill>
@@ -756,6 +793,8 @@ ${EDGES.map(edgeLight).join('\n')}
 </Shape>
 
 ${header}
+
+${ticker}
 
 ${column}
 
@@ -794,6 +833,9 @@ ${animation('Window Closed', ANIMATION.windowClosed, 1, 'oneShot', windowPose(fa
 ${animation('Window Open', ANIMATION.windowOpen, 1, 'oneShot', windowPose(true))}
 ${animation('Window Opening', ANIMATION.windowOpening, WINDOW_FRAMES, 'oneShot', windowFade(true))}
 ${animation('Window Closing', ANIMATION.windowClosing, WINDOW_FRAMES, 'oneShot', windowFade(false))}
+
+<!-- Ticker: runs whether or not the slate is on air; the root's opacity hides it. -->
+${animation('Ticker Scroll', ANIMATION.ticker, TICKER_FRAMES, 'loop', tickerScroll)}
 
 ${stateMachine}
 </Artboard>

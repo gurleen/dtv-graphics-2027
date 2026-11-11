@@ -923,7 +923,8 @@ A full-frame slate for halftime, on the card layer. It clears the scorebug and t
 lower third (`clears: ['bug', 'lower']`). It shows the score and the game clock,
 pages through the team stats and each team's leaders on its own, and can open a
 transparent window onto highlights: an OBS source under the browser source shows
-through it. It is built in the package's glass language, not the press
+through it. A ticker along the foot of the frame repeats one line, `WE'LL BE RIGHT
+BACK!` by default. It is built in the package's glass language, not the press
 conference's.
 
 - **Generated.** `generate_halftime_slate.ts` writes the `.rml`. Edit the generator,
@@ -934,24 +935,24 @@ conference's.
   primary colour from its side (away from the left, home from the right, at about a
   third opacity). The press conference's even-odd `ClippingShape` cuts a 16:9 hole
   out of it at the window, so the backdrop is never drawn there.
-- **Header (origin 48, 48; 1824 x 240).** The away panel (700 wide, team tint, the
+- **Header (origin 48, 40; 1824 x 216).** The away panel (700 wide, team tint, the
   secondary-colour stripe and hairline along the top), the centre cell (416 wide,
   dark glass) and the home panel, mirrored, 4 apart. Each team panel has the
   full-colour logo at its outer end over a bloom, the school (Regular 32, muted) over
   the mascot (Bold 80), and the score (Bold 150) at the inner end. The centre cell has
-  `title` (Regular 30) over the clock (Bold, about 108). Corners are 24 outside and 6
+  `title` (Regular 38) over the clock (Bold, about 108). Corners are 24 outside and 6
   on the seams.
 - **Clock.** Zuume has no tabular figures, so the clock is the scorebug's: five runs,
   each digit padded to the widest digit, laid out by `scorebug_controller.luau` (the
   scene declares it as its own script asset). The text is set at the scorebug's 62
   and scaled up in its node, so the controller's padding holds at any size. `0.0` and
   `20:00` both centre.
-- **Window (origin 48, 312; 1280 x 720, exactly 16:9).** A `Stage` node fills the
+- **Window (origin 48, 280; 1280 x 720, exactly 16:9).** A `Stage` node fills the
   hole: two team-tint halves (away left, home right, 4 apart) with each team's logo
   over a bloom, on an opaque base so the seam between them shows the slate. With
   `showWindow` true the Stage is at opacity 0, the hole is transparent, and a
   one-unit hairline, lit from above, rings the window just outside it.
-- **Column (origin 1352, 312; 520 x 720).** One dark glass panel, divided by
+- **Column (origin 1352, 280; 520 x 720).** One dark glass panel, divided by
   hairlines per the design system's Tables rules. A title strip (64 high) names the
   page. Three pages share the column:
   1. `TEAM STATS`. A cap row holds each team's small logo on its tint over its value
@@ -962,16 +963,23 @@ conference's.
      with the value (Bold 140) at the right.
   3. Home leaders, the same on the home tint.
   Every text shrinks to fit, so a long name or school stays inside its box.
+- **Ticker (origin 0, 1024; 1920 x 56).** A strip of dark glass from edge to edge,
+  flush with the foot of the frame, 24 under the window and the column. It holds six
+  copies of `ticker` (Bold 30), each centred in a unit 384 wide with a small diamond
+  on the unit's left edge. The track travels one unit to the left in 6 s and loops,
+  so the line never jumps, whatever its width. A line wider than 320 shrinks to fit
+  its unit.
 - **Intro (1.4 s):** the backdrop fades up (frames 0 to 12). A light ignites at the
   header's two seams and at the window/column seam (frames 8 to 22), and six leading
   edges wipe the panels open from them (frames 14 to 50). Content drifts in behind
   the edges, logos settle from 112%, the stripes draw from the seams, text rises in
-  letter by letter, and one sheen crosses the header and the column (never the
-  window). Everything reads by about 0.9 s.
+  letter by letter, the ticker slides up from under the frame (frames 22 to 46), and
+  one sheen crosses the header, the column and the ticker (never the window). Everything reads by about 0.9 s.
 - **Outro (0.4 s):** logos swell and fade, the stripes retract, the edges close the
-  glass toward the seams by frame 20 with a brief edge light, and the backdrop and
+  glass toward the seams by frame 20 with a brief edge light, the ticker slides back
+  down, and the backdrop and
   what is left fade out. The last frame is empty.
-- **State machine:** three layers that never key the same property.
+- **State machine:** four layers that never key the same property.
   - Display (Hidden, Intro, Hold, Outro) follows `isPlaying` and keys only the shell.
   - Pages runs Idle, then Page 1, 2 and 3 in a loop. Each page is an 8 s oneShot
     whose exit time moves to the next; its parts rise and fade in a few frames apart
@@ -981,16 +989,19 @@ conference's.
   - Window (Closed, Open) follows `showWindow` and keys only the Stage's and the
     frame's opacity. On air the change is a 20-frame crossfade; off air it snaps, so a
     take with the window open builds it open.
+  - Ticker is one looping state that keys only the track's x. It runs on air and off;
+    off air the root's opacity hides it.
 
 View model `BasketballHalftimeSlateV2`, public properties: `isPlaying`, `showWindow`
-(false by default), `title` (default `HALFTIME`), `clock`, `awaySchool`/`homeSchool`,
+(false by default), `title` (default `HALFTIME`), `clock`, `ticker` (default `WE'LL BE RIGHT BACK!`), `awaySchool`/`homeSchool`,
 `awayMascot`/`homeMascot`, `awayScore`/`homeScore` (strings), `awayLogo`/`homeLogo`,
 `awayPrimaryColor`/`homePrimaryColor`, `awaySecondaryColor`/`homeSecondaryColor`,
 `rowNLabel`, `rowNAwayValue`, `rowNHomeValue` for N = 1 to 6, and
 `awayLeaderNLabel`, `awayLeaderNName`, `awayLeaderNValue` and the `homeLeader` set
 for N = 1 to 3. The `_clock` properties are internal: the controller writes them.
 
-The registry entry takes `title` (`Halftime` by default) and `window` (`closed`, No
+The registry entry takes `title` (`Halftime` by default), `ticker` (`We'll be right
+back!` by default) and `window` (`closed`, No
 window, or `open`, Highlights window), which it binds as `showWindow`. The clock is
 bound as the scorebug binds it, so it re-projects as it ticks. The team rows come from
 the live team lines. Each leader row is the team's player with the highest points,

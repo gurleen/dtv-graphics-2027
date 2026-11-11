@@ -389,7 +389,8 @@ export const SCENES = {
     "layers": [
       "Display",
       "Pages",
-      "Window"
+      "Window",
+      "Ticker"
     ],
     "animations": {
       "Intro": 1400,
@@ -403,11 +404,13 @@ export const SCENES = {
       "Window Closed": 17,
       "Window Open": 17,
       "Window Opening": 333,
-      "Window Closing": 333
+      "Window Closing": 333,
+      "Ticker Scroll": 6000
     },
     "props": {
       "title": "string",
       "clock": "string",
+      "ticker": "string",
       "awaySchool": "string",
       "awayMascot": "string",
       "awayScore": "string",
@@ -467,6 +470,7 @@ export const SCENES = {
       "showWindow": false,
       "title": "HALFTIME",
       "clock": "13:59",
+      "ticker": "WE'LL BE RIGHT BACK!",
       "awaySchool": "SAINT JOSEPH'S",
       "awayMascot": "HAWKS",
       "awayScore": "68",
