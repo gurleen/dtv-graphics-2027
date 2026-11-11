@@ -22,6 +22,11 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A persistent corner bug | `basketball_scorebug.rml` |
 | A corner block the operator can stand on either side | `generate_score_to_break.ts` output |
 | A strip as wide as its text (the venue, the commentators) | `generate_scorebug_slider.ts` output |
+| A full-frame slate, or a scene that pages through content on its own | `generate_halftime_slate.ts` output |
+
+Press Conference is a one-off design that departs from the package language
+(marble, coloured borders, a fade only). Do not copy it for look; only its window
+cut-out, an even-odd `ClippingShape`, is reusable.
 
 ## Colour and material
 
@@ -288,6 +293,26 @@ Outro  → Hidden       at exit time 100%
 
 Intro and Outro set `reset="true"`. All transitions have duration 0.
 
+### Paging on its own
+
+A scene that cycles through pages without an operator (the Halftime Slate) adds a
+Pages layer of chained exit-time states:
+
+```
+Entry  → Idle
+Idle   → Page 1      when isPlaying == true
+Page N → Page N+1    at exit time 100%  (the last back to Page 1)
+Page N → Idle        when isPlaying != true
+```
+
+Each page is a oneShot timeline of its dwell (8 s = 480 frames) with
+`reset="true"`. It brings its page in at its start (parts rise 18 and fade in, 3
+frames apart), takes it out at its end (parts sink 12 and fade, 2 frames apart), and
+holds the other pages at opacity 0. Idle keys nothing, so the page on screen stays
+as the Outro closes the glass, and the next take starts on Page 1. The Pages layer
+keys only the page containers and their contents; the Display layer keys only the
+shell, never text inside a page.
+
 ### Keying rules
 
 These keep a second take identical to the first:
@@ -347,7 +372,8 @@ Namespaces in use:
 | 46 | Score to Break | 21800 |
 | 47 | Scorebug Slider | 23000 |
 | 48 | Press Conference | 24200 |
-| **49** | **Next free** | **25400** |
+| 49 | Halftime Slate | 25400 |
+| **50** | **Next free** | **26600** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.
