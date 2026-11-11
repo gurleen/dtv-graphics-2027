@@ -499,6 +499,49 @@ describe('output and the clock', () => {
     expect(data.values).toHaveLength(1);
   });
 
+  test('a bars slate on program makes a frame at every whole second, and clearing it stops them', async () => {
+    const store = open();
+    send(store, { type: 'activate', game: GAME });
+    expect(clock.pending()).toBe(0);
+    const output = collect((signal) => store.watchOutput({ kind: 'program' }, signal));
+    let clockWakes = 0;
+    store.onChange(['clock'], () => clockWakes++);
+    const slate = { kind: 'rundown', cue: CueId.parse('bars-slate-pre') } as const;
+    send(store, { type: 'air', operator: alex, ref: slate });
+    await flush();
+    const shown = () => output.values.at(-1)?.layers.find((layer) => layer.layer === 'card')?.values.clock;
+    expect(shown()).toBe('08:00:00');
+    expect(clock.pending()).toBe(1);
+
+    const seen: [number, unknown][] = [];
+    const start = clock.now();
+    for (let tick = 0; tick < 3; tick++) {
+      expect(clock.fireNext()).toBe(true);
+      await flush();
+      seen.push([clock.now() - start, shown()]);
+    }
+    expect(seen).toEqual([[1000, '08:00:01'], [2000, '08:00:02'], [3000, '08:00:03']]);
+    expect(clockWakes).toBe(3);
+
+    send(store, { type: 'clearAll' });
+    await flush();
+    expect(clock.pending()).toBe(0);
+    expect(clock.fireNext()).toBe(false);
+    expect(clockWakes).toBe(3);
+    await output.stop();
+  });
+
+  test('a bars slate in a preview ticks too, and taking it keeps ticking until it is cleared', async () => {
+    const store = open();
+    send(store, { type: 'activate', game: GAME });
+    send(store, { type: 'cue', operator: sam, ref: { kind: 'rundown', cue: CueId.parse('bars-slate-post') } });
+    expect(clock.pending()).toBe(1);
+    send(store, { type: 'take', operator: sam });
+    expect(clock.pending()).toBe(1);
+    send(store, { type: 'clearAll' });
+    expect(clock.pending()).toBe(0);
+  });
+
   test('a slow consumer gets the newest frame, not a backlog', async () => {
     const store = open();
     send(store, { type: 'activate', game: GAME });

@@ -19,7 +19,7 @@ import {
 } from '@dtv/domain';
 import { fetchSportsdataverse, type SdvFetcher } from '@dtv/sportsdataverse';
 import {
-  type BusRef, checkCue, CommandId, EMPTY_SHOW, type OperatorId, type OutputFrame, previewOf, project, type Registry, reduceShow, type ShowCommand,
+  type BusRef, checkCue, CommandId, EMPTY_SHOW, entryOf,type OperatorId, type OutputFrame, previewOf, project, type Registry, reduceShow, type ShowCommand,
   showContext, ShowState, type ShowView, SlotId, viewShow,
 } from '@dtv/playout';
 import { z } from 'zod';
@@ -127,12 +127,20 @@ export function createStore(options: {
   const context = () => showContext({ world, gameId: show.gameId, live: (game) => lives.get(game), now: clock.now() });
 
   let cancelTimer: (() => void) | null = null;
-  /** One timer, at the earliest moment any live game's displayed clock changes. */
+  /** Whether a graphic that shows the time of day is on program or in any preview. */
+  const showsTimeOfDay = () =>
+    [show.program, ...Object.values(show.previews)].some((bus) => Object.values(bus).some((slot) => entryOf(registry, slot.graphic)?.ticks === 'second'));
+  /**
+   * One timer, at the earliest moment anything on screen changes: a live game's displayed
+   * clock, or the next whole second while a time-of-day graphic is up. It runs again after
+   * every change that could move that moment, a take or clear included.
+   */
   const schedule = () => {
     cancelTimer?.();
     cancelTimer = null;
     const now = clock.now();
     const changes = [...lives.values()].flatMap((live) => SPORT_MODULES[live.sport].nextChange(live, now) ?? []);
+    if (showsTimeOfDay()) changes.push((Math.floor(now / 1000) + 1) * 1000);
     if (!changes.length) return;
     cancelTimer = clock.at(Math.min(...changes), () => {
       notify('clock');
@@ -262,6 +270,7 @@ export function createStore(options: {
         show = result.state;
         answer = { ok: true, revision: showRevision, changed: true };
         notify('show');
+        schedule();
       }
       remember(id, answer);
       return answer;
