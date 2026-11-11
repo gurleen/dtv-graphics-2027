@@ -87,10 +87,11 @@ async function main() {
   await until(game.id, api, 'the handover', (live) => live.authority.clock === 'allsport' && live.authority.score === 'allsport');
   log('clock and score handed to allsport');
 
+  const untouched = await until(game.id, api, 'a read', () => true);
   fake.send({ period: ' 2', clockMain: '14:30', clockTenths: '14:30', clockStopped: 's', scoreHome: '  41', scoreAway: '  38', timeoutsHome: ' 2', timeoutsAway: ' 3', shotClock: ' 24' });
   const stopped = await until(game.id, api, 'the first screen', (live) => live.score.home === 41 && live.shotClock !== null);
   assert.deepEqual(stopped.score, { away: 38, home: 41 });
-  assert.deepEqual(stopped.timeouts, { away: 3, home: 2 });
+  assert.deepEqual(stopped.timeouts, untouched.timeouts, 'the console\'s timeouts are not written: StatCrew owns them');
   assert.equal(stopped.period, 2);
   assert.deepEqual(stopped.clock, { running: false, remainingMs: 870_000 });
   assert.deepEqual(stopped.shotClock, { running: false, remainingMs: 24_000 });
@@ -100,9 +101,9 @@ async function main() {
   const running = await until(game.id, api, 'the clock running', (live) => live.clock.running);
   assert.equal(running.phase, 'live', 'starting the clock sets the phase live');
   assert.equal(running.possession, 'home');
-  assert.equal(running.bonus.away, true);
+  assert.equal(running.bonus.away, untouched.bonus.away, 'the console\'s bonus is not written: StatCrew owns it');
   assert(running.shotClock?.running, 'the shot clock runs with the game clock');
-  log('clock running, phase live, possession home, away in the bonus');
+  log('clock running, phase live, possession home; timeouts and bonus left alone');
 
   await Bun.sleep(1500);
   const projected = clockNow((await until(game.id, api, 'a read', () => true)));

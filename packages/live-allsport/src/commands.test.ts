@@ -8,8 +8,6 @@ const BLANK: Scoreboard = {
   shotClock: undefined,
   period: undefined,
   score: { away: undefined, home: undefined },
-  timeouts: { away: undefined, home: undefined },
-  bonus: { away: undefined, home: undefined },
   possession: undefined,
 };
 const clock = (remainingMs: number, running: boolean, precisionMs = 1000) => ({ ...BLANK, clock: { remainingMs, running, precisionMs } });
@@ -98,31 +96,24 @@ describe('the shot clock', () => {
   });
 });
 
-describe('score, timeouts, bonus and possession', () => {
+describe('score and possession', () => {
   const board: Scoreboard = {
     ...BLANK,
-    score: { away: 10, home: 12 },
-    timeouts: { away: undefined, home: 3 },
-    bonus: { away: false, home: true },
+    score: { away: undefined, home: 12 },
     possession: null,
   };
 
   test('are written absolutely, only what the console has shown, and only when they change', () => {
     const next = session();
-    const first = next(board, 0);
-    expect(first).toHaveLength(6);
-    expect(first).toEqual(
-      expect.arrayContaining([
-        { type: 'score', side: 'away', value: 10 },
-        { type: 'score', side: 'home', value: 12 },
-        { type: 'timeouts', side: 'home', remaining: 3 },
-        { type: 'bonus', side: 'away', value: false },
-        { type: 'bonus', side: 'home', value: true },
-        { type: 'possession', side: null },
-      ]),
-    );
+    expect(next(board, 0)).toEqual([
+      { type: 'score', side: 'home', value: 12 },
+      { type: 'possession', side: null },
+    ]);
     expect(next(board, 1)).toEqual([]);
-    expect(next({ ...board, score: { away: 10, home: 14 } }, 2)).toEqual([{ type: 'score', side: 'home', value: 14 }]);
+    expect(next({ ...board, score: { away: 10, home: 14 } }, 2)).toEqual([
+      { type: 'score', side: 'away', value: 10 },
+      { type: 'score', side: 'home', value: 14 },
+    ]);
   });
 
   test('are left alone when the score group is off', () => {

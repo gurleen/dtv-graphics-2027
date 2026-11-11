@@ -132,8 +132,9 @@ team and player stat lines, `shots` (every field goal and free throw attempt fro
 group, which the Scorebug Slider's insights read), and `authority`. Commands set absolute values (`score home 74`), never deltas, so a
 resent packet changes nothing and two operators who press +2 for one basket agree on 74.
 
-`authority` names one writer per field group (`clock`, `score`, `stats`). A feed and an operator never both write
-the score. Only the `operator` source can hand a group to a feed or take it back.
+`authority` names one writer per field group: `clock` (game clock, shot clock, period, phase) and `score` (score,
+possession) for AllSport, `stats` (box score, shots, timeouts, bonus) for StatCrew. A feed and an operator never both
+write the score. Only the `operator` source can hand a group to a feed or take it back.
 
 A running clock is `{ running: true, remainingMs, since }`, anchored on the server's time. Nothing ticks it.
 Every display is computed from `now` at projection time, so a restart cannot lose time. A clock command is

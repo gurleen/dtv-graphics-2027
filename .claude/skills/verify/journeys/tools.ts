@@ -82,7 +82,7 @@ await s.run(async () => {
   await alex.keyboard.press('Tab');
   await alex.getByRole('button', { name: /Game/ }).click();
   await alex.getByRole('option', { name: /Saint Joseph's at Drexel/ }).click();
-  s.check(await alex.getByRole('checkbox', { name: /Score, timeouts, bonus, possession/ }).isChecked(), 'Score is on');
+  s.check(await alex.getByRole('checkbox', { name: /Score, possession/ }).isChecked(), 'Score is on');
   await alex.getByRole('button', { name: /^(Start|Restart)$/ }).click();
   await alex.getByRole('alert').filter({ hasText: 'No device at that path' }).waitFor();
   s.check(true, 'AllSport with Score on beside StatCrew is refused only for the missing port');

@@ -33,7 +33,7 @@ export function AllsportTool() {
     <section className="tool" aria-label="AllSport">
       <h2>AllSport</h2>
       <p className="hint">
-        While it runs, the AllSport console supplies the clock, shot clock and period, and the operator cannot edit them. With Score on, it also supplies score, timeouts, bonus and possession; with it off, the operator keeps those.
+        While it runs, the AllSport console supplies the clock, shot clock and period, and the operator cannot edit them. With Score on, it also supplies score and possession; with it off, the operator keeps those. Timeouts and bonus come from StatCrew.
         Stop gives everything back, and is the way to set halftime or final.
       </p>
       <FeedState feed={feed} />
@@ -73,7 +73,7 @@ export function AllsportTool() {
       <div className="tool-form">
         <Checkbox className="tool-check" isSelected={score} onChange={setChosenScore}>
           <span className="check-box" aria-hidden="true">{score ? '✓' : ''}</span>
-          Score, timeouts, bonus, possession
+          Score, possession
         </Checkbox>
         <Button className="button primary" isDisabled={busy || !port || !game || sameAsRunning} onPress={() => call(() => api.tools.allsport.start({ port, game: game as never, score }))}>
           {running && !sameAsRunning ? 'Restart' : 'Start'}

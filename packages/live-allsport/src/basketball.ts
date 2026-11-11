@@ -3,7 +3,10 @@
 import type { Side, Sides } from '@dtv/domain';
 import type { RtdBuffer } from './rtd';
 
-/** `[position, length]`, 1-based, from the AllSport 5000 basketball RTD layout. Home is `home`, Guest is `away`. */
+/**
+ * `[position, length]`, 1-based, from the AllSport 5000 basketball RTD layout. Home is `home`, Guest is `away`.
+ * Timeouts, bonus, fouls and names are mapped but not read: StatCrew owns timeouts and bonus.
+ */
 export const FIELDS = {
   clockMain: [1, 5],
   clockTenths: [6, 8],
@@ -44,8 +47,6 @@ export interface Scoreboard {
   readonly shotClockRunning?: boolean;
   readonly period: number | undefined;
   readonly score: Sides<number | undefined>;
-  readonly timeouts: Sides<number | undefined>;
-  readonly bonus: Sides<boolean | undefined>;
   readonly possession: Side | null | undefined;
 }
 
@@ -91,8 +92,6 @@ export function readBasketball(buffer: RtdBuffer): Scoreboard {
     shotClock: shot === null ? undefined : parseTime(shot),
     period: integer('period') || undefined,
     score: { away: integer('scoreAway'), home: integer('scoreHome') },
-    timeouts: { away: integer('timeoutsAway'), home: integer('timeoutsHome') },
-    bonus: { away: marked(['bonusAwayOneAndOne', 'bonusAwayDouble'], '>'), home: marked(['bonusHomeOneAndOne', 'bonusHomeDouble'], '<') },
     possession: homeBall === undefined && awayBall === undefined ? undefined : homeBall ? 'home' : awayBall ? 'away' : null,
   };
 }

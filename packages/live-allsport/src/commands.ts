@@ -3,7 +3,7 @@
 import { type basketball, SIDES } from '@dtv/domain';
 import type { Scoreboard } from './basketball';
 
-/** The field groups the feed can hold: `clock` is the clocks, period and phase; `score` is score, timeouts, bonus and possession. */
+/** The field groups the feed can hold: `clock` is the clocks, period and phase; `score` is score and possession. Timeouts and bonus are StatCrew's. */
 export type AllsportGroup = 'clock' | 'score';
 
 /** A clock as last written to the server. The server projects it forward, so it is the console's value plus when it was sent. */
@@ -80,10 +80,8 @@ export function commandsFor(board: Scoreboard, sent: Sent, now: number, groups: 
 
   if (groups.includes('score')) {
     for (const side of SIDES) {
-      const { score, timeouts, bonus } = { score: board.score[side], timeouts: board.timeouts[side], bonus: board.bonus[side] };
+      const score = board.score[side];
       if (score !== undefined) absolute(`score:${side}`, { type: 'score', side, value: score });
-      if (timeouts !== undefined) absolute(`timeouts:${side}`, { type: 'timeouts', side, remaining: timeouts });
-      if (bonus !== undefined) absolute(`bonus:${side}`, { type: 'bonus', side, value: bonus });
     }
     if (board.possession !== undefined) absolute('possession', { type: 'possession', side: board.possession });
   }

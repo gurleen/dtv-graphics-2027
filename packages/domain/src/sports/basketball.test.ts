@@ -159,7 +159,15 @@ describe('applyBasketball: authority', () => {
   test('a feed writes the group handed to it, and the operator then may not', () => {
     const result = apply(fed, { type: 'score', side: 'home', value: 74 }, STATCREW);
     expect(result.ok && result.live.score.home).toBe(74);
-    expect(apply(fed, { type: 'bonus', side: 'home', value: true }, OPERATOR)).toEqual({ ok: false, reason: 'not-authority', group: 'score' });
+    expect(apply(fed, { type: 'possession', side: 'home' }, OPERATOR)).toEqual({ ok: false, reason: 'not-authority', group: 'score' });
+  });
+
+  test('timeouts and bonus are written by the stats holder, StatCrew, not the score holder, AllSport', () => {
+    const split = applied(applied(BASE, { type: 'authority', group: 'score', source: ALLSPORT }), { type: 'authority', group: 'stats', source: STATCREW });
+    for (const command of [{ type: 'timeouts', side: 'home', remaining: 2 }, { type: 'bonus', side: 'home', value: true }] as const) {
+      expect(apply(split, command, ALLSPORT)).toEqual({ ok: false, reason: 'not-authority', group: 'stats' });
+      expect(apply(split, command, STATCREW).ok).toBe(true);
+    }
   });
 
   test('the feed still may not write the groups it was not given', () => {

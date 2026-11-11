@@ -205,8 +205,6 @@ export type BasketballCommand = z.infer<typeof BasketballCommand>;
 /** The field group each command writes. Handing a group over is the operator's alone. */
 const COMMAND_GROUP: Record<BasketballCommand['type'], FieldGroup | 'operator'> = {
   score: 'score',
-  timeouts: 'score',
-  bonus: 'score',
   possession: 'score',
   clock: 'clock',
   clockSet: 'clock',
@@ -214,6 +212,9 @@ const COMMAND_GROUP: Record<BasketballCommand['type'], FieldGroup | 'operator'> 
   period: 'clock',
   phase: 'clock',
   stageOverride: 'operator',
+  /** StatCrew's, worked out from its play by play: the scoreboard's timeouts and bonus lights are not trusted. */
+  timeouts: 'stats',
+  bonus: 'stats',
   starters: 'stats',
   teamLine: 'stats',
   playerLine: 'stats',

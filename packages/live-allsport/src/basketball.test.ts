@@ -34,8 +34,6 @@ describe('readBasketball', () => {
       shotClock: undefined,
       period: undefined,
       score: { away: undefined, home: undefined },
-      timeouts: { away: undefined, home: undefined },
-      bonus: { away: undefined, home: undefined },
       possession: undefined,
     });
   });
@@ -54,9 +52,9 @@ describe('readBasketball', () => {
     expect(board.clock).toMatchObject({ running: true });
   });
 
-  test('reads score, timeouts and period for guest as away and home as home', () => {
-    const board = show({ scoreHome: '  72', scoreAway: '  65', timeoutsHome: ' 3', timeoutsAway: ' 4', period: ' 2' });
-    expect(board).toMatchObject({ score: { home: 72, away: 65 }, timeouts: { home: 3, away: 4 }, period: 2 });
+  test('reads score and period for guest as away and home as home', () => {
+    const board = show({ scoreHome: '  72', scoreAway: '  65', period: ' 2' });
+    expect(board).toMatchObject({ score: { home: 72, away: 65 }, period: 2 });
   });
 
   test('a blank shot clock is null, which differs from one that was never sent', () => {
@@ -66,11 +64,9 @@ describe('readBasketball', () => {
     expect(show({ clockMain: '1:00' }).shotClock).toBeUndefined();
   });
 
-  test('possession and bonus follow the marks, and clear when the console blanks them', () => {
+  test('possession follows the marks, and clears when the console blanks them', () => {
     expect(show({ possessionHomeArrow: '<' }).possession).toBe('home');
     expect(show({ possessionAwayIndicator: '>' }).possession).toBe('away');
     expect(show({ possessionHomeArrow: '<' }, { possessionHomeArrow: ' ' }).possession).toBeNull();
-    expect(show({ bonusHomeDouble: '<', bonusAwayOneAndOne: ' ' }).bonus).toEqual({ home: true, away: false });
-    expect(show({ bonusAwayOneAndOne: '>' }).bonus).toEqual({ home: undefined, away: true });
   });
 });

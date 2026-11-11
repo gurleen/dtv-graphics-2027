@@ -118,15 +118,13 @@ export function createCgBoard() {
     },
     read(): Scoreboard {
       const none = { away: undefined, home: undefined };
-      if (text === undefined) return { clock: undefined, shotClock: undefined, period: undefined, score: none, timeouts: none, bonus: none, possession: undefined };
+      if (text === undefined) return { clock: undefined, shotClock: undefined, period: undefined, score: none, possession: undefined };
       return {
         clock: gameClock(),
         shotClock: parseTime(field('shotClock')),
         shotClockRunning: shotRunning,
         period: integer('period') || undefined,
         score: { away: integer('scoreAway'), home: integer('scoreHome') },
-        timeouts: none,
-        bonus: none,
         possession: undefined,
       };
     },

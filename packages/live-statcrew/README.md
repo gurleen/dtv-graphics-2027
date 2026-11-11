@@ -1,6 +1,6 @@
 # @dtv/live-statcrew
 
-Watches a StatCrew basketball XML file and writes its box score into a game on the running show server, through
+Watches a StatCrew basketball XML file and writes its box score, timeouts and bonus into a game on the running show server, through
 `game.apply`. It is a separate process that imports only `@dtv/api` and `@dtv/domain`.
 
 ## Run it
@@ -21,19 +21,32 @@ last one sent is skipped.
 
 | Group | Commands |
 |---|---|
-| `stats` | `teamLine` for each side, from `<totals>`; `playerLine` for each player; `starters` for a side when exactly five matched players have `gs="1"`; `shots`, below |
+| `stats` | `teamLine` for each side, from `<totals>`; `playerLine` for each player; `starters` for a side when exactly five matched players have `gs="1"`; `shots`, below; `timeouts` and `bonus` for each side, below |
 
 A StatCrew player joins a roster spot by jersey: the `uni` attribute against `Player.jersey`, both strings, so `0`
 and `00` differ. Rosters come from the server's data and follow edits made while the tool runs. A player with no
 roster spot is logged once as `home #23 SMITH,JOHN` and gets no command. The server refuses a whole batch that
 names a player who is not in the game, so one unknown player would otherwise stop every update.
 
+## Timeouts and bonus
+
+The file has no count of either, so the tool works them out for the current period, `<status period>` (or the last
+play's period on a file without one). Regulation is `<rules prds>`: 2 is halves, 4 quarters, and a file without it
+goes by the game's program. With neither a status nor a play, the tool leaves both alone.
+
+- **Timeouts left**: four a game, less each `TIMEOUT` play charged to the side. Media timeouts (`type="MEDIA"`) are charged
+  to a team in the file but do not count. Halves carry at most three into the second half; each overtime adds one.
+- **Bonus**: a side is in the bonus when the other side has 7 team fouls in the half (halves) or 5 in the quarter
+  (quarters), from `<totals><statsbyprd pf>`. Overtime counts with the last regulation period. `<rules fouls>` is the
+  foul-out limit, not the bonus.
+
+These are NCAA rules. A different timeout allotment would be a change to `commands.ts`.
+
 ## What it does not write
 
-Anything AllSport writes: the score, timeouts, bonus and possession (the `score` group) and the clock, shot clock,
-period and phase (the `clock` group). Those come from the AllSport console or the operator, never from StatCrew, so
-the two feeds can run on one game at once without contending. The plays themselves do not reach the game, only the
-shots below.
+Anything AllSport writes: the score and possession (the `score` group) and the clock, shot clock, period and phase
+(the `clock` group). Those come from the AllSport console or the operator, so the two feeds run on one game at once
+without contending. The plays themselves do not reach the game, only the shots below.
 
 ## Shots
 

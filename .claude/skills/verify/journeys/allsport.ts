@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * The Tools page's AllSport tab: alex opens #/tools/allsport, points the feed at a pseudo-terminal that plays a
- * Daktronics console, starts it, and sees Running, the log, and the clock, shot clock, period, score and timeouts on
+ * Daktronics console, starts it, and sees Running, the log, and the clock, shot clock, period and score on
  * the game over the API with allsport as the authority. A missing device shows NO_PORT inline. Turning Score off
  * and restarting leaves the score with the operator. Stop shows Stopped and hands authority back.
  * Screenshots go to build/controller/tools/ as well as the evidence folder.
@@ -39,13 +39,13 @@ await s.run(async () => {
   await tab.waitFor();
   s.check((await tab.getAttribute('aria-selected')) === 'true', 'the deep link #/tools/allsport selects the AllSport tab');
   await alex.getByRole('status').filter({ hasText: 'Stopped' }).waitFor();
-  s.check((await alex.getByRole('checkbox', { name: /Score, timeouts, bonus, possession/ }).isChecked()), 'Score is on by default');
+  s.check((await alex.getByRole('checkbox', { name: /Score, possession/ }).isChecked()), 'Score is on by default');
   await shoot('allsport-stopped');
 
   const start = alex.getByRole('button', { name: /^(Start|Restart)$/ });
   const stop = alex.getByRole('button', { name: 'Stop' });
   const port = alex.getByRole('combobox', { name: 'Port' });
-  const score = alex.getByRole('checkbox', { name: /Score, timeouts, bonus, possession/ });
+  const score = alex.getByRole('checkbox', { name: /Score, possession/ });
   // Typing opens the list of devices on the server; Tab commits the typed path and closes it.
   await port.fill('/dev/not-a-console');
   await alex.keyboard.press('Tab');
@@ -65,10 +65,12 @@ await s.run(async () => {
   await s.until('the game has the feed as clock and score authority', live, (state) => state?.authority.clock === 'allsport' && state.authority.score === 'allsport');
   s.check((await live())?.authority.stats === 'operator', 'stats stay with the operator');
 
+  const timeoutsBefore = (await live())!.timeouts;
   fake.send({ period: ' 2', clockMain: '14:30', clockTenths: '14:30', clockStopped: 's', scoreHome: '  41', scoreAway: '  38', timeoutsHome: ' 2', timeoutsAway: ' 3', shotClock: ' 24' });
   await s.until('the game shows the console screen', live, (state) => state?.score.home === 41 && state.shotClock?.remainingMs === 24_000);
   const first = (await live())!;
-  s.check(first.period === 2 && first.score.away === 38 && first.timeouts.home === 2 && first.timeouts.away === 3, 'period 2, score 38-41 and timeouts 3-2 are on the game');
+  s.check(first.period === 2 && first.score.away === 38, 'period 2 and score 38-41 are on the game');
+  s.check(JSON.stringify(first.timeouts) === JSON.stringify(timeoutsBefore), 'the console\'s timeouts 3-2 stay off the game: StatCrew owns them');
   s.check(!first.clock.running && first.clock.remainingMs === 870_000, 'the clock reads 14:30, stopped');
 
   fake.send({ clockStopped: ' ', possessionAwayArrow: '>' });
@@ -86,7 +88,7 @@ await s.run(async () => {
   await alex.getByRole('status').filter({ hasText: /Running since/ }).waitFor();
   s.check((await port.inputValue()) === fake.path, 'after a reload the form shows the running port');
 
-  await alex.getByText('Score, timeouts, bonus, possession').click();
+  await alex.getByText('Score, possession').click();
   s.check(!(await score.isChecked()), 'clicking its label turns Score off');
   s.check((await start.innerText()) === 'Restart', 'changing Score offers Restart');
   await start.click();

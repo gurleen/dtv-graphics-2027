@@ -1,7 +1,7 @@
 # @dtv/live-allsport
 
 Reads a Daktronics AllSport 5000 console's serial output, RTD or the whole-board `cg` output, and writes its basketball clock, shot clock, period,
-score, timeouts, bonus and possession into a game on the running show server, through `game.apply`. It is a
+score and possession into a game on the running show server, through `game.apply`. It is a
 separate process that imports only `@dtv/api` and `@dtv/domain`, and it needs no native serial module.
 
 ## Run it
@@ -14,7 +14,8 @@ bun run live:allsport --port=<path> --game=<GameId> [--score=true|false] [--form
 Windows. `--game` is a
 game id from the data page, such as `2026-27/2026-11-08/saint-josephs-mbb.at.drexel-mbb`. The tool stops with a
 message if the game is not in the server's data or is not basketball. Bad arguments print the usage and exit 2.
-`--score=false` leaves score, timeouts, bonus and possession alone, for when StatCrew writes the score.
+`--score=false` leaves score and possession with the operator. Timeouts and bonus are never written: StatCrew works
+them out from its play by play.
 
 `--format` defaults to `cg` on every platform, since that is what our console sends, and `--baud` follows it: 9600 for
 `cg`, 19200 for `rtd`.
@@ -43,7 +44,7 @@ as `SOH <34 characters> <2 hex checksum> EOT`, with no header. The checksum is t
 | 12-14, 15-17 | Home score, Guest score | `score` |
 | 28 | Period | `period` |
 
-It has no timeouts, bonus or possession, so those stay with whoever sets them. Character 21 changes during play and
+It has no possession, so that stays with whoever sets it. Character 21 changes during play and
 is not mapped. The console marks a stopped game clock but not a stopped shot clock, so the shot clock counts as running
 while the game clock runs and the shot clock has ticked down within the last 1.5 s; one that holds a value, such as a
 shot clock that is not in use, is written once, stopped.
@@ -64,10 +65,10 @@ is unknown and nothing is written for it. Guest is `away`.
 | Main clock, tenths clock, zero and stopped marks | `clockSet`, with `phase live` when the clock starts |
 | Shot clock | `shotClock`, `null` when the console blanks it |
 | Period | `period` |
-| Score, timeouts, bonus, possession | `score`, `timeouts`, `bonus`, `possession` |
+| Score, possession | `score`, `possession` |
 
-Timeouts are written as the console's value, taken as timeouts remaining. Team fouls and names are in the field
-table but not written: the API has no place for them.
+Timeouts, bonus, team fouls and names are in the field table but not written: timeouts and bonus are StatCrew's, and
+the API has no place for fouls or names.
 
 The server runs a clock by itself, so the tool does not write every tick. It writes the clock when it starts or
 stops, and when the console differs from the server's projection by more than the display shows: a second when the

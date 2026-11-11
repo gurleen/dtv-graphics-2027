@@ -131,6 +131,8 @@ async function main() {
   assert.deepEqual({ clock: seen.authority.clock, score: seen.authority.score }, { clock: 'operator', score: 'operator' }, 'the clock and score stay with the operator');
   assert.deepEqual(seen.score, before.score, 'the file\'s 61-70 does not reach the score');
   assert.equal(seen.team.home.pts, 50 + 2);
+  assert.deepEqual(seen.bonus, { away: true, home: false }, 'seven home fouls put away in the bonus');
+  assert.deepEqual(seen.timeouts, { away: 4, home: 4 });
   for (const side of SIDES) {
     const player = firstPlayer(side);
     assert.equal(seen.players[player.id]?.pts, Number(player.jersey) + 2, `${side} player line written`);
@@ -149,11 +151,13 @@ async function main() {
   assert.equal(String(aired.statLabel).toLowerCase(), 'tonight');
   log(`on program: ${featured.lastName} ${aired.statLabel} ${aired.statLine}`);
 
-  replaceFile(boxScore(rosters, { away: 61, home: 73 }, 3));
+  const homeTimeout = '<plays><period number="1"><play vh="H" time="08:12" uni="TM" team="home" checkname="TEAM" action="TIMEOUT" type="30SEC"/></period></plays>';
+  replaceFile(boxScore(rosters, { away: 61, home: 73 }, 3).replace('</bbgame>', `${homeTimeout}</bbgame>`));
   const updated = await until(game.id, api, 'the replaced file', (live) => live.sport === 'basketball' && live.team.home.pts === 50 + 2 + 3);
+  assert.deepEqual(updated.timeouts, { away: 4, home: 3 }, 'the home timeout play is charged');
   assert.deepEqual(updated.score, before.score, 'the score is still untouched');
   assert.equal(updated.players[firstPlayer('home').id]?.pts, Number(firstPlayer('home').jersey) + 2 + 3);
-  log(`replaced file: score ${updated.score.away}-${updated.score.home}, ${firstPlayer('home').lastName} ${updated.players[firstPlayer('home').id]!.pts} pts`);
+  log(`replaced file: score ${updated.score.away}-${updated.score.home}, timeouts ${updated.timeouts.away}-${updated.timeouts.home}, ${firstPlayer('home').lastName} ${updated.players[firstPlayer('home').id]!.pts} pts`);
   const onAir = await lowerThirdUntil(api, 'the lower third to follow the file', (values) => values.statLine === tonightLine(featured, 3));
   log(`still on program: ${featured.lastName} ${onAir.statLabel} ${onAir.statLine}`);
 

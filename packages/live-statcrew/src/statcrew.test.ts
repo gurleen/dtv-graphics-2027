@@ -59,8 +59,11 @@ test('a file with no plays, or an empty <plays/>, has none', () => {
 
 const LIVESTATS = await Bun.file(new URL('../fixtures/livestats.xml', import.meta.url)).text();
 
-test('reads a LiveStats file\'s timeouts as plays, media ones included', () => {
+test('reads a LiveStats file: the period from <status>, regulation periods from <rules>, and team fouls by period', () => {
   const game = parseStatcrew(LIVESTATS);
+  expect([game.period, game.periods]).toEqual([1, 2]);
+  expect([...game.teams.away.fouls]).toEqual([[1, 3]]);
+  expect([...game.teams.home.fouls]).toEqual([[1, 9]]);
   expect(game.plays.filter((play) => play.action === 'TIMEOUT').map((play) => `${play.side} ${play.type}`)).toEqual([
     'away MEDIA',
     'away MEDIA',
@@ -68,4 +71,9 @@ test('reads a LiveStats file\'s timeouts as plays, media ones included', () => {
     'away MEDIA',
     'home 30SEC',
   ]);
+});
+
+test('a file without <status>, <rules> or <statsbyprd> has no period, periods or fouls', () => {
+  const game = parseStatcrew(FIXTURE);
+  expect([game.period, game.periods, game.teams.home.fouls.size]).toEqual([null, null, 0]);
 });

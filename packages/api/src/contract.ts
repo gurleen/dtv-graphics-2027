@@ -119,7 +119,7 @@ export const contract = {
     },
     allsport: {
       watch: oc.output(eventIterator(type<AllsportFeed>())),
-      /** Idempotent: the same port, game and score while running changes nothing; other values restart the feed. `score` false leaves score, timeouts, bonus and possession to someone else. */
+      /** Idempotent: the same port, game and score while running changes nothing; other values restart the feed. `score` false leaves score and possession to someone else. Timeouts and bonus are never AllSport's. */
       start: oc
         .input(z.object({ port: z.string().min(1), game: GameId, score: z.boolean().default(true) }))
         .output(type<AllsportFeed>())

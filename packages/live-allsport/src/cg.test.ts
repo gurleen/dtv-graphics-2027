@@ -36,7 +36,6 @@ test('the board reads the clock, its stop mark, the shot clock, the score and th
     shotClockRunning: false,
     period: 2,
     score: { home: 1, away: 2 },
-    timeouts: { home: undefined, away: undefined },
     possession: undefined,
   });
   board.apply(RUNNING, 1000);
