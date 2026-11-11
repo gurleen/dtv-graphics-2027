@@ -27,7 +27,7 @@ export const halftimeSlate = defineGraphic({
   scene: SCENES.halftime_slate,
   params: z.object({
     title: z.string().min(1).default('Halftime'),
-    window: z.enum(['closed', 'open']).default('closed').meta({ labels: { closed: 'No window', open: 'Highlights window' } }),
+    window: z.enum(['closed', 'open']).meta({ labels: { closed: 'No window', open: 'Highlights window' } }).default('closed'),
   }),
 })({
   name: 'Halftime Slate',
