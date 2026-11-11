@@ -19,7 +19,7 @@ import {
 } from '@dtv/domain';
 import { fetchSportsdataverse, type SdvFetcher } from '@dtv/sportsdataverse';
 import {
-  type BusRef, checkCue, CommandId, EMPTY_SHOW, entryOf,type OperatorId, type OutputFrame, previewOf, project, type Registry, reduceShow, type ShowCommand,
+  type BusRef, checkCue, CommandId, EMPTY_SHOW, entryOf, type OperatorId, type OutputFrame, previewOf, project, type Registry, reduceShow, type ShowCommand,
   showContext, ShowState, type ShowView, SlotId, viewShow,
 } from '@dtv/playout';
 import { z } from 'zod';
