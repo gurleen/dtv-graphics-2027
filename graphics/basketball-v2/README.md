@@ -7,7 +7,7 @@ follows the design language below. The earlier ports (`graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 50), naming, and a five-step checklist
+the id namespace registry (next free: 51), naming, and a five-step checklist
 from scene to registry entry. This README describes the finished graphics.
 Intro and outro lengths are not kept by hand: `bun run codegen` reads every
 timeline's length from the scene into `scenes.gen.ts`, and the renderer waits
@@ -1011,6 +1011,48 @@ only for Josh Reed, so the golden test lists the difference in `KNOWN_DRIFT`. To
 review: `rive . --artboard="Basketball Halftime Slate v2" --data=isPlaying=true
 --advance=120 --screenshot=build/halftime_slate.png`, with `--data=showWindow=true`
 for the window, and `--advance=700` or `--advance=1180` for the leader pages.
+
+## Bars slate (`bars_slate.rml`)
+
+The test pattern a broadcast feeds before and after the show: SMPTE colour bars
+across the whole frame with a time-of-day clock and a line of copy over them. It
+is on the card layer and clears the scorebug and the lower third (`clears: ['bug',
+'lower']`). It needs no game: the bind reads only the time.
+
+- **Generated.** `generate_bars_slate.ts` writes the `.rml`; edit the generator,
+  then run `bun graphics/basketball-v2/generate_bars_slate.ts`. The bars are rows
+  of rectangles built from tables of colour and width.
+- **Pattern.** Top 720 (2/3): seven 75% bars (grey `C0C0C0`, yellow `C0C000`, cyan
+  `00C0C0`, green `00C000`, magenta `C000C0`, red `C00000`, blue `0000C0`). Next
+  88: the castellations (blue, black, magenta, black, cyan, black, grey) under
+  their bars. Bottom 272: -I `00214C`, 100% white, +Q `32006A`, black, then the
+  PLUGE (sub-black `090909`, black, super-black `1D1D1D`) and black. Each row's
+  widths are counted in twelfths of a top bar (a wide bottom cell is 15, a PLUGE
+  stripe 4) and edges are rounded from the running total, so every row tiles 1920
+  exactly and the edges agree row to row. The "black" cells and the PLUGE's centre
+  stripe are `131313`, so the sub-black and super-black stripes read as darker and
+  lighter than their surround.
+- **Box.** Dark glass (`D10E1116`, glaze, hairline, radius 24 all round), 1100 x
+  300, centred on the top bars. The clock is Bold 120 (drawn at 62 and scaled,
+  because the controller `bars_slate_clock.luau` pads each digit to the widest at
+  that size, so the seconds do not shift the line) with `PM ET` beside it in Bold
+  56, over the message in Regular 44, letter spacing 2. The message is fixed width
+  and `fitFontSize`.
+- **Motion.** It cuts in: Intro is a 12-frame fade of the whole frame (ease-out)
+  and Outro a 12-frame fade (ease-in), the last frame empty. Hold keys the
+  frame's opacity at 1 and Hidden at 0. One state machine layer, on `isPlaying`.
+- **View model `BasketballBarsSlateV2`.** `isPlaying`, `clock` (`04:00:00`, a
+  zero-padded 12-hour `hh:mm:ss`), `period` (`PM ET`) and `message` (`GOOD
+  AFTERNOON FROM PHILADELPHIA`). The `_clock` properties are internal.
+- **Registry entry** (`graphics/bars-slate.ts`) takes `show`, `pre` (Pre-show) or
+  `post` (Post-show). `slateTime(now, show)` formats `context.now` in
+  `America/New_York`, DST included. Pre-show says GOOD AFTERNOON before 17:00 Eastern
+  and GOOD EVENING from 17:00; post-show says GOOD NIGHT. The entry declares
+  `ticks: 'second'`, so the server wakes at every whole second while the slate is
+  on program or in a preview; see `docs/ARCHITECTURE.md` section 4, The clock. The
+  demo shows 4 PM at the golden test's `now`, so the Default instance matches it.
+  To review: `rive . --artboard="Basketball Bars Slate v2" --data=isPlaying=true
+  --advance=120 --screenshot=build/bars_slate.png`.
 
 ## Test data
 

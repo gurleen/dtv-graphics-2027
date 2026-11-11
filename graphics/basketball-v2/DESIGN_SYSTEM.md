@@ -23,6 +23,7 @@ renumber it (see [Building a new graphic](#building-a-new-graphic)):
 | A corner block the operator can stand on either side | `generate_score_to_break.ts` output |
 | A strip as wide as its text (the venue, the commentators) | `generate_scorebug_slider.ts` output |
 | A full-frame slate, or a scene that pages through content on its own | `generate_halftime_slate.ts` output |
+| A full-frame pattern that cuts in, with a ticking clock | `generate_bars_slate.ts` output |
 
 Press Conference is a one-off design that departs from the package language
 (marble, coloured borders, a fade only). Do not copy it for look; only its window
@@ -409,7 +410,8 @@ Namespaces in use:
 | 47 | Scorebug Slider | 23000 |
 | 48 | Press Conference | 24200 |
 | 49 | Halftime Slate | 25400 |
-| **50** | **Next free** | **26600** |
+| 50 | Bars Slate | 26600 |
+| **51** | **Next free** | **27800** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

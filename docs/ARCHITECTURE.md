@@ -370,10 +370,10 @@ graphics that would overlap are never on air together.
 |---|---|
 | `bug` | Scorebug, Score to Break, Halftime Adjustments |
 | `lower` | Player, staff, team, and talent lower thirds, Starting Five, Player To Watch, Player Of The Game, Matchup Locator lower third, Burning Question, Scorebug Slider |
-| `card` | Matchup Locator, Halftime Statistics, Conference Standings, Press Conference, Halftime Slate |
+| `card` | Matchup Locator, Halftime Statistics, Conference Standings, Press Conference, Halftime Slate, Bars Slate |
 
 An entry can name layers it covers in `clears`. The double and triple talent lower thirds clear `bug`, because they
-overlap the scorebug. Press Conference clears `bug`, and the Halftime Slate clears `bug` and `lower`, because it fills
+overlap the scorebug. Press Conference clears `bug`, and the Halftime Slate and Bars Slate clear `bug` and `lower`, because they fill
 the frame. Take, air, and toggle share one placement rule. Putting a graphic on air takes off the layers
 it covers, and putting a graphic on a covered layer takes off the graphic that covers it. A take whose preview holds
 both puts only the covering graphic on air, so the two are never on air together.
@@ -465,6 +465,10 @@ The owner chose the controller's design on 2026-10-21, from four rounds of quest
 The server keeps one timer, set to the earliest `nextChange` across live games. That is the next second change
 above a minute, the next tenth below it, or the next shot-clock second. When the timer fires, output streams
 re-project. Renderers never tick a clock, so every output shows the same digits.
+
+A registry entry that shows the time of day declares `ticks: 'second'` (the Bars Slate does). While any slot on
+program or in any operator's preview holds such a graphic, the timer also fires at the next whole second. The store
+sets the timer again after every show command, so a take or clear starts or stops it at once.
 
 ## 5. Graphics and the renderer
 
