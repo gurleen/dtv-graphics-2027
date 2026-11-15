@@ -218,15 +218,15 @@
     <!-- Drawn round the shot clock cell during the intro, then faded out;
          invisible at rest. -->
     <Shape name="Shot Clock Trace" id="30:360" x="157" y="65" opacity="0">
-      <Rectangle width="66" height="62" originX="0.5" originY="0.5" cornerRadiusTL="10"/>
+      <Rectangle width="58" height="54" originX="0.5" originY="0.5" cornerRadiusTL="10"/>
       <Stroke thickness="1.5" cap="round"><SolidColor colorValue="E6FFFFFF"/><TrimPath name="Shot Clock Trace Trim" id="30:361" start="0" end="1"/></Stroke>
     </Shape>
     <!-- Tabular like the game clock below: one run per digit, padded by the
          controller to the widest digit. -->
     <Node name="Shot Clock Value" x="128" y="65">
-    <Text name="Shot Clock" x="0.093" y="23" originValue="baseline" wrapValue="noWrap" width="58" sizingValue="fixed" alignValue="center"><DataBindContext sourcePathIds="30:1000-30:1077" propertyKey="13"/>
-      <TextStylePaint id="30:320" fontAssetId="30:900" fontSize="62" letterSpacing="1.306"><DataBindContext sourcePathIds="30:1000-30:1075" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
-      <TextStylePaint id="30:321" fontAssetId="30:900" fontSize="62" letterSpacing="1.12"><DataBindContext sourcePathIds="30:1000-30:1076" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+    <Text name="Shot Clock" x="0.1333" y="15.65" originValue="baseline" wrapValue="noWrap" width="58" sizingValue="fixed" alignValue="center"><DataBindContext sourcePathIds="30:1000-30:1077" propertyKey="13"/>
+      <TextStylePaint id="30:320" fontAssetId="30:901" fontSize="41" letterSpacing="1.8325"><DataBindContext sourcePathIds="30:1000-30:1075" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
+      <TextStylePaint id="30:321" fontAssetId="30:901" fontSize="41" letterSpacing="1.566"><DataBindContext sourcePathIds="30:1000-30:1076" propertyKey="390"/><Fill><SolidColor colorValue="FFFFFFFF"/></Fill><TextStyleFeature name="kern" tag="1801810542" featureValue="0"/></TextStylePaint>
       <TextValueRun name="Shot Clock Character 1" styleId="30:320" text="2"><DataBindContext sourcePathIds="30:1000-30:1073" propertyKey="268"/></TextValueRun>
       <TextValueRun name="Shot Clock Character 2" styleId="30:321" text="4"><DataBindContext sourcePathIds="30:1000-30:1074" propertyKey="268"/></TextValueRun>
       <!-- The clock panel cascades run the other way: from the start of the text
@@ -237,8 +237,8 @@
         </TextModifierRange>
       </TextModifierGroup>
     </Text></Node>
-    <Shape name="Shot Clock Alert" id="30:310" x="128" y="38" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1060" propertyKey="18"/>
-      <Rectangle width="58" height="54" originX="0" originY="0" cornerRadiusTL="6"/>
+    <Shape name="Shot Clock Alert" id="30:310" x="132" y="42" opacity="0"><DataBindContext sourcePathIds="30:1000-30:1060" propertyKey="18"/>
+      <Rectangle width="50" height="46" originX="0" originY="0" cornerRadiusTL="6"/>
       <Fill><SolidColor colorValue="FFE5322D"/></Fill>
     </Shape>
     <!-- Zuume has no tabular figures, so scorebug_controller.luau splits the clock
@@ -270,8 +270,8 @@
       </TextModifierGroup>
     </Text>
     <Image name="Sponsor Logo" id="30:362" x="97" y="116.5" scaleX="0.105" scaleY="0.105" assetId="30:912"><DataBindContext sourcePathIds="30:1000-30:1043" propertyKey="206"/></Image>
-    <Shape name="Shot Clock Cell" x="128" y="38">
-      <Rectangle width="58" height="54" originX="0" originY="0" cornerRadiusTL="6"/>
+    <Shape name="Shot Clock Cell" x="132" y="42">
+      <Rectangle width="50" height="46" originX="0" originY="0" cornerRadiusTL="6"/>
       <Fill><SolidColor colorValue="1AFFFFFF"/></Fill>
     </Shape>
     <!-- Anchored at its seam end, so the intro draws it outward. -->
@@ -915,9 +915,9 @@
 <ViewModelInstanceNumber viewModelPropertyId="30:1072" propertyValue="2.1545"/>
 <ViewModelInstanceString viewModelPropertyId="30:1073" propertyValue="2"/>
 <ViewModelInstanceString viewModelPropertyId="30:1074" propertyValue="4"/>
-<ViewModelInstanceNumber viewModelPropertyId="30:1075" propertyValue="1.306"/>
-<ViewModelInstanceNumber viewModelPropertyId="30:1076" propertyValue="1.12"/>
-<ViewModelInstanceNumber viewModelPropertyId="30:1077" propertyValue="0.093"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1075" propertyValue="1.8325"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1076" propertyValue="1.566"/>
+<ViewModelInstanceNumber viewModelPropertyId="30:1077" propertyValue="0.1333"/>
 </ViewModelInstance>
 </ViewModel>
 

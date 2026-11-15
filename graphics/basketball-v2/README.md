@@ -46,7 +46,7 @@ action-safe margin (block origin 96, 890; size 430 x 132).
   logo cropped by the row, up to four timeout pips beneath the acronym, the `BONUS` tag, the possession chevron, and the
   score, right-aligned.
 - **Clock panel (194 x 132, dark glass):** the period centred across the top,
-  then the game clock beside the shot clock digits (no label, same size) in their
+  then the game clock beside the shot clock digits (no label; Regular 41 against the game clock's Bold 62) in their
   own sub-cell at the right, and a sponsor strip along the bottom.
 - **Sponsor:** Independence Blue Cross, white wordmark directly on the dark
   glass. `assets/images/sponsors/independence_blue_cross.svg` is the source (the

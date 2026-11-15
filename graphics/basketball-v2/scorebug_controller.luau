@@ -20,10 +20,15 @@ local ALERT_THRESHOLD = 5
 local ALERT_FADE = 0.2
 local PULSE_PERIOD = 1.0
 
--- Zuume Bold digit advances in font units (1000 per em), widest last.
-local DIGIT_ADVANCE = { [0] = 373, 236, 369, 369, 355, 371, 375, 316, 371, 375 }
-local DIGIT_CELL = 375
-local CLOCK_SIZE = 62
+-- Digit advances in font units (1000 per em), the widest as the cell, and the
+-- size each clock is set at.
+type ClockFace = { advance: {[number]: number}, cell: number, size: number }
+local GAME_CLOCK_FACE: ClockFace = {
+    advance = { [0] = 373, 236, 369, 369, 355, 371, 375, 316, 371, 375 }, cell = 375, size = 62,
+} -- Zuume Bold
+local SHOT_CLOCK_FACE: ClockFace = {
+    advance = { [0] = 383, 227, 371, 379, 332, 375, 384, 307, 381, 384 }, cell = 384, size = 41,
+} -- Zuume Regular
 local CLOCK_TRACKING = 0.5
 local GAME_CLOCK_SLOTS = 5
 local SHOT_CLOCK_SLOTS = 2
@@ -36,7 +41,7 @@ type Reel = {
 type ShotAlert = { input: Property<string>, alert: Property<number>, level: number, phase: number }
 type TabularClock = {
     input: Property<string>, chars: {Property<string>}, spacings: {Property<number>},
-    x: Property<number>, shown: string?,
+    x: Property<number>, face: ClockFace, shown: string?,
 }
 type Controller = { reels: {Reel}, shotAlert: ShotAlert?, clocks: {TabularClock} }
 
@@ -58,10 +63,10 @@ local function flashLevel(elapsed: number): number
 end
 
 -- Half the space a character gives up against a digit cell, in pixels.
-local function digitPad(char: string): number
+local function digitPad(face: ClockFace, char: string): number
     local digit = tonumber(char)
     if digit == nil or #char ~= 1 then return 0 end
-    return (DIGIT_CELL - DIGIT_ADVANCE[digit]) * CLOCK_SIZE / 1000 / 2
+    return (face.cell - face.advance[digit]) * face.size / 1000 / 2
 end
 
 -- Letter spacing follows a glyph, so each run carries its own glyph's trailing
@@ -74,15 +79,15 @@ local function layoutClock(clock: TabularClock, text: string)
         local char = if i < slots then string.sub(text, i, i) else string.sub(text, i)
         clock.chars[i].value = char
         local nextChar = if i < count then string.sub(text, i + 1, i + 1) else ''
-        clock.spacings[i].value = CLOCK_TRACKING + digitPad(char) + digitPad(nextChar)
+        clock.spacings[i].value = CLOCK_TRACKING + digitPad(clock.face, char) + digitPad(clock.face, nextChar)
     end
-    clock.x.value = digitPad(string.sub(text, 1, 1)) / 2
+    clock.x.value = digitPad(clock.face, string.sub(text, 1, 1)) / 2
     clock.shown = text
 end
 
 -- The clock's runs are `_<prefix>Char<n>`, spaced by `_<prefix>Spacing<n>`,
 -- and its text is shifted by `_<prefix>X`.
-local function bindClock(vm: ViewModel, inputName: string, prefix: string, slots: number): TabularClock?
+local function bindClock(vm: ViewModel, inputName: string, prefix: string, slots: number, face: ClockFace): TabularClock?
     local input = vm:getString(inputName)
     local x = vm:getNumber('_' .. prefix .. 'X')
     local chars, spacings = {}, {}
@@ -95,7 +100,7 @@ local function bindClock(vm: ViewModel, inputName: string, prefix: string, slots
         end
     end
     if input == nil or x == nil or #chars ~= slots then return nil end
-    return { input = input, chars = chars, spacings = spacings, x = x, shown = nil }
+    return { input = input, chars = chars, spacings = spacings, x = x, face = face, shown = nil }
 end
 
 local function init(self: Controller, context: Context): boolean
@@ -126,9 +131,9 @@ local function init(self: Controller, context: Context): boolean
         alert.value = 0
         self.shotAlert = { input = shotInput, alert = alert, level = 0, phase = 0 }
     end
-    local gameClock = bindClock(vm, 'clock', 'clock', GAME_CLOCK_SLOTS)
+    local gameClock = bindClock(vm, 'clock', 'clock', GAME_CLOCK_SLOTS, GAME_CLOCK_FACE)
     if gameClock then table.insert(self.clocks, gameClock) end
-    local shotClock = bindClock(vm, 'shotClock', 'shot', SHOT_CLOCK_SLOTS)
+    local shotClock = bindClock(vm, 'shotClock', 'shot', SHOT_CLOCK_SLOTS, SHOT_CLOCK_FACE)
     if shotClock then table.insert(self.clocks, shotClock) end
     return true
 end
