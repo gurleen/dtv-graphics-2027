@@ -1054,6 +1054,57 @@ is on the card layer and clears the scorebug and the lower third (`clears: ['bug
   To review: `rive . --artboard="Basketball Bars Slate v2" --data=isPlaying=true
   --advance=120 --screenshot=build/bars_slate.png`.
 
+## Big 5 Format card (`big5_format.rml`)
+
+How the Big 5 Classic works, then the two pods' standings, on one card the operator
+advances with Next. Card origin 216, 150; size 1488 x 696. It ends at y 846, clear of
+the scorebug (y 890). Like the halftime card, it takes 24 on the outer corners and 6 on
+inner seams, and one piece of dark glass backs the whole card, so the shell never moves.
+
+- **Generated.** `generate_big5_format.ts` writes the `.rml`. Edit the generator, then
+  run `bun graphics/basketball-v2/generate_big5_format.ts`; never edit the `.rml`
+  output by hand.
+- **Title bar (1488 x 104):** a Drexel gold marker (8 wide) on the left edge, `BIG 5
+  CLASSIC` (Bold 68), and the step's label at the right (Regular 34, muted):
+  `HOW IT WORKS` or `POD STANDINGS`. There is no Big 5 logo.
+- **Step 0, how it works (three columns, 494 / 492 / 494 x 520):** each column opens
+  with a gold numeral (Bold 84) and its heading (Bold 44) over a hairline, then a lead
+  line (Bold 40). Pod play adds two muted lines and the six logos in a 3 x 2 grid, pod 1
+  over pod 2 in standings order, on lifted cells. Pod standings adds a wrapped line and a
+  lifted box with the tiebreak. Classic Saturday gives the date (Bold 40) and venue
+  (Regular 32), then the three games (time, name, pairing) divided by hairlines, the
+  championship lifted to the column's edges with its time in gold.
+- **Step 1, pod standings (two panels, 742 x 520):** a header (`POD 1` Bold 48,
+  `POD RECORD` muted) over three rows 140 high, divided by hairlines in the 4-unit gaps:
+  the rank (Bold 40, muted), the logo (128), the school (Bold 60, shrinks to fit) and
+  the pod record (Bold 64, right-aligned). A row whose `rowNTonight` is true takes its
+  team's tint out to the hairlines, with the standings card's logo shade, so a logo
+  reads on its own colour. Teams level on wins and losses share a rank.
+- **Footer (1488 x 64):** `POD WINNERS PLAY FOR THE BIG 5 TITLE` on step 0; on step 1 a
+  muted `TONIGHT`, then `tonightGame` (Bold 30).
+- **Intro (1.5 s) and outro (0.4 s):** the standings card's build. A light ignites at
+  the centre of the card and splits into two edges that wipe the glass open. The title
+  rises in, the marker draws down, then the body rises column by column (or pod by pod,
+  row by row) as the logos settle from 112%; tonight's rows light last and one sheen
+  crosses the card.
+- **Step change (0.6 s):** the shell holds. The outgoing body sinks 12 and fades as the
+  incoming one rises 18 and fades in; the title's label and the footer cross-fade with
+  it. Off air the change snaps, so a take with `showPods` set builds the pods in the
+  intro.
+- **State machine:** two layers. Display (Hidden, Intro, Hold, Outro) follows
+  `isPlaying` and keys the shell and every text and logo reveal. Step (Format, Pods,
+  `Show Pods`, `Show Format`) follows `showPods`, animating only on air, and keys only
+  the two bodies and the label and footer twins.
+
+View model `BasketballBig5FormatV2`, public properties: `isPlaying`, `showPods`,
+`classicDate`, `classicVenue`, `gameNTime`, `gameNName`, `gameNPairing` for N = 1 to 3,
+`rowNRank`, `rowNTeam`, `rowNRecord`, `rowNLogo`, `rowNPrimaryColor` and `rowNTonight`
+for N = 1 to 6 (rows 1 to 3 are pod 1, 4 to 6 pod 2; the grid's logos are the rows'),
+and `tonightGame`. The registry entry (`basketball-v2/big5-format`) takes no params: it
+binds `CLASSIC`, each pod's `podStandings` and the show's game from `big5.ts`, so a
+result entered there moves the table. To review the step change:
+`bun scripts/render_frames.ts graphics/basketball-v2/big5_format.rml --on-air --data=showPods=true --frames=0-40:4 --out=build/frames/big5_format/step --sheet=4`.
+
 ## Test data
 
 When testing any graphic in this package, always use the **Drexel Dragons as
