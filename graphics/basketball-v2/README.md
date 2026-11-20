@@ -1054,6 +1054,62 @@ is on the card layer and clears the scorebug and the lower third (`clears: ['bug
   To review: `rive . --artboard="Basketball Bars Slate v2" --data=isPlaying=true
   --advance=120 --screenshot=build/bars_slate.png`.
 
+## Big 5 Stakes lower third (`big5_stakes.rml`)
+
+A pre-game lower third for a Big 5 Classic pod game: what a win tonight means for
+each team. It is the matchup locator lower third's build split into two halves.
+Block origin 96, 842; size 1728 x 180, spanning the action-safe width and
+standing on the scorebug's baseline (y 1022). It covers the scorebug, so its
+entry clears the `bug` layer.
+
+- **Generated.** `generate_big5_stakes.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_big5_stakes.ts`.
+  Never edit the `.rml` output by hand.
+- **Title tab (44 high, dark glass):** centred above the block, 4 units clear
+  of it, with `title` in Bold 28. The tab hugs its text plus 28 each side, as
+  the Scorebug Slider's glass does: a hug layout box whose glaze and backing
+  are absolute boxes at 100% of its width. A title wider than 944 scales down
+  to fit, so the tab never passes 1000.
+- **Halves (862 wide, 4 apart):** home at the left, away at the right. Each is
+  an 84 team-tint panel over a 44 dark-glass strip. Outer corners 12, seams 3.
+- **Panels:** the team logo at the outer end (the 1024 source at 0.18, centred
+  66 units in from the outer edge, over a soft white bloom and clipped by the
+  tint), then `<SCHOOL> WIN` (Regular 30, 70% white, letter spacing 2) and the
+  headline (Bold 50) on one line, on baseline 60, starting 150 units in from
+  the outer edge. The away half mirrors the home half: its text is
+  right-aligned and reads headline then label, so the label sits beside the
+  logo on both sides. An 8-wide marker runs down the outer edge: home's in
+  `homeSecondaryColor`, away's white.
+- **Strips:** one line of detail (Regular 26, 85% white), 26 in from the outer
+  edge, aligned like the panel above it.
+- **Live text:** the headline line and each detail are fixed width, no wrap,
+  `fitFontSize`, so a long value shrinks. The school label and its headline
+  share one line and shrink together.
+- **Intro (1.4 s, 84 frames):** as the matchup locator lower third. A light
+  ignites at the centre seam and two edges wipe the panels open outward (frames
+  6 to 40). Each side's line rises in from the seam outward, so the home lines
+  build from their last glyph. The strips slide down from under the panels, the
+  logos settle from 112% drifting outward, the markers draw upward, and the tab
+  fades up as it rises 12. Box fills ignore an ancestor's clip, so the hugging
+  tab cannot rise from behind the panels as the locator's tab does. One sheen
+  crosses the halves.
+- **Outro (0.4 s):** the logos swell and fade, the markers retract, the strips
+  withdraw, the tab sinks and fades, and the edges close toward the seam. The
+  last frame is empty.
+
+View model `BasketballBig5StakesV2`, public properties: `isPlaying`, `title`,
+`homeSchool`/`awaySchool` (the label reads `<SCHOOL> WIN`),
+`homeHeadline`/`awayHeadline`, `homeDetail`/`awayDetail`,
+`homeLogo`/`awayLogo`, `homePrimaryColor`/`awayPrimaryColor`,
+`homeSecondaryColor`. Send text in capitals.
+
+The registry entry (`graphics/big5-stakes.ts`) takes five strings with
+tonight's defaults (`title`, `homeHeadline`, `homeDetail`, `awayHeadline`,
+`awayDetail`); the title may not be blank. The bind adds each side's school
+name, logo and colours from the game's sides. To review:
+`rive . --artboard="Basketball Big 5 Stakes v2" --data=isPlaying=true
+--advance=120 --screenshot=build/big5_stakes.png`.
+
 ## Test data
 
 When testing any graphic in this package, always use the **Drexel Dragons as
