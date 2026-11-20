@@ -53,8 +53,10 @@ export function createImageCache<I extends { unref(): void }>(decode: (url: stri
   };
 }
 
+// `no-cache` revalidates with the server on every load. The logo bucket sends no Cache-Control, so a browser
+// would otherwise keep a replaced logo for days on the age of its Last-Modified.
 const fetchAndDecode = async (url: string): Promise<DecodedImage> => {
-  const response = await fetch(url);
+  const response = await fetch(url, { cache: 'no-cache' });
   if (!response.ok) throw new Error(`${url}: ${response.status} ${response.statusText}`);
   return decodeImage(new Uint8Array(await response.arrayBuffer()));
 };
