@@ -417,7 +417,8 @@ Namespaces in use:
 | 54 | Series History Carousel | 31400 |
 | 55 | Big 5 Stakes lower third | 32600 |
 | 56 | Big 5 Champions lower third | 33800 |
-| **57** | **Next free** | **35000** |
+| 57 | Coming Up Next lower third | 35000 |
+| **58** | **Next free** | **36200** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

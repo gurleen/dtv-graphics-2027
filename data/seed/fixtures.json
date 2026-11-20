@@ -170,7 +170,8 @@
           { "id": "series-history", "graphic": "basketball-v2/series-history", "params": {} },
           { "id": "series-history-carousel", "graphic": "basketball-v2/series-history-carousel", "params": {} },
           { "id": "big5-stakes", "graphic": "basketball-v2/big5-stakes", "params": {} },
-          { "id": "big5-champions", "graphic": "basketball-v2/big5-champions", "params": {} }
+          { "id": "big5-champions", "graphic": "basketball-v2/big5-champions", "params": {} },
+          { "id": "coming-up-next", "graphic": "basketball-v2/coming-up-next", "params": {} }
         ]
       }
     ]

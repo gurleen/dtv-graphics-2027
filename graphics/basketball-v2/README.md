@@ -7,7 +7,7 @@ follows the design language below. The earlier ports (`graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 57), naming, and a five-step checklist
+the id namespace registry (next free: 58), naming, and a five-step checklist
 from scene to registry entry. This README describes the finished graphics.
 Intro and outro lengths are not kept by hand: `bun run codegen` reads every
 timeline's length from the scene into `scenes.gen.ts`, and the renderer waits
@@ -1343,6 +1343,48 @@ registry entry (`graphics/big5-champions.ts`, id `basketball-v2/big5-champions`)
 takes no params and binds `CHAMPIONS` from `graphics/big5.ts`: each school's
 short name (`PENN`, not `PENNSYLVANIA`), `<score> over <runner-up>` and the
 champion's logo and primary colour. Send text in capitals.
+
+## Coming Up Next lower third (`coming_up_next.rml`)
+
+The lower third the operator takes going to a break before the game: tonight's
+matchup, with less on it than the matchup locator lower third. It is the Big 5
+Stakes build with team names and records. Block origin 96, 842; size 1728 x
+180, standing on the scorebug's baseline (y 1022). It covers the scorebug, so
+its entry clears the `bug` layer. Namespace 57, artboard y 35000.
+
+- **Generated.** `generate_coming_up_next.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_coming_up_next.ts`.
+- **Title tab (44 high, dark glass):** as on the Big 5 Stakes: `title` (default
+  `COMING UP NEXT`) in Bold 28, centred above the block, hugging its text.
+- **Halves (862 wide, 4 apart):** away at the left and home at the right, as a
+  matchup reads (`SAINT JOSEPH'S` at `DREXEL`). The home half mirrors the away
+  half: logo and marker on the outer edge, text right-aligned.
+- **Panels (84, team tint):** the logo at the outer end (0.18, centred 66 in,
+  over a soft bloom, cropped by the tint), then the school (Bold 54) and the
+  mascot (Regular 32, 70% white, letter spacing 2) on baseline 60, starting 150
+  in from the outer edge. The line shrinks to fit 688. Home's 8-wide marker is
+  `homeSecondaryColor`; away's is white, since Saint Joseph's secondary is near
+  black.
+- **Strips (44, dark glass):** the record (Bold 28, 85% white) in the same
+  column as the school. A blank record leaves an empty strip.
+- **No `AT`.** A chip at the centre seam would cover the 4-unit gap, so the
+  halves stand alone.
+- **Intro (1.4 s) and outro (0.4 s):** the Big 5 Stakes motion unchanged. The
+  light ignites at the centre seam and the glass wipes outward; the outro
+  closes it back into the seam and ends empty.
+
+View model `BasketballComingUpNextV2`, public properties: `isPlaying`, `title`,
+`awaySchool`/`homeSchool`, `awayMascot`/`homeMascot`, `awayRecord`/`homeRecord`,
+`awayLogo`/`homeLogo`, `awayPrimaryColor`/`homePrimaryColor`,
+`homeSecondaryColor`. Send text in capitals.
+
+The registry entry (`graphics/coming-up-next.ts`, id
+`basketball-v2/coming-up-next`) takes one param, `title` (default `Coming up
+next`, never blank). The bind reads the game's sides: school name, mascot, logo,
+colours, and the record line, `overallRecord` and `conferenceRecord` joined with
+` · `, blank when the team has no season row. To review:
+`rive . --artboard="Basketball Coming Up Next v2" --data=isPlaying=true
+--advance=120 --screenshot=build/coming_up_next.png`.
 
 ## Test data
 

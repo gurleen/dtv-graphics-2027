@@ -508,6 +508,53 @@ export const SCENES = {
       "sponsorLogo": "asset:Burning Question v2 Steamfitters Local 420"
     }
   },
+  "coming_up_next": {
+    "file": "coming_up_next.rml",
+    "artboard": "Basketball Coming Up Next v2",
+    "stateMachine": "Coming Up Next",
+    "viewModel": "BasketballComingUpNextV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 1400,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17
+    },
+    "props": {
+      "title": "string",
+      "awaySchool": "string",
+      "awayMascot": "string",
+      "awayRecord": "string",
+      "homeSchool": "string",
+      "homeMascot": "string",
+      "homeRecord": "string",
+      "isPlaying": "boolean",
+      "awayPrimaryColor": "color",
+      "homePrimaryColor": "color",
+      "homeSecondaryColor": "color",
+      "awayLogo": "image",
+      "homeLogo": "image"
+    },
+    "groups": {},
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "title": "COMING UP NEXT",
+      "awaySchool": "SAINT JOSEPH'S",
+      "awayMascot": "HAWKS",
+      "awayRecord": "15-5 · 7-2 A10",
+      "awayLogo": "asset:Coming Up Next v2 Saint Joseph's",
+      "awayPrimaryColor": "#c2071b",
+      "homeSchool": "DREXEL",
+      "homeMascot": "DRAGONS",
+      "homeRecord": "14-6 · 6-3 CAA",
+      "homeLogo": "asset:Coming Up Next v2 Drexel",
+      "homePrimaryColor": "#07294d",
+      "homeSecondaryColor": "#ffc600"
+    }
+  },
   "conference_standings": {
     "file": "conference_standings.rml",
     "artboard": "Basketball Conference Standings v2",

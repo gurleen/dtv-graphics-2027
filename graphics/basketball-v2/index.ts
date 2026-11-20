@@ -11,6 +11,7 @@ import { seriesHistory } from './graphics/series-history';
 import { seriesHistoryCarousel } from './graphics/series-history-carousel';
 import { big5Stakes } from './graphics/big5-stakes';
 import { big5Champions } from './graphics/big5-champions';
+import { comingUpNext } from './graphics/coming-up-next';
 import { burningQuestion } from './graphics/burning-question';
 import { conferenceStandings } from './graphics/conference-standings';
 import { halftimeAdjustments } from './graphics/halftime-adjustments';
@@ -32,7 +33,7 @@ import { talentLowerThirdSingle } from './graphics/talent-lower-third-single';
 import { talentLowerThirdTriple } from './graphics/talent-lower-third-triple';
 import { teamLowerThird } from './graphics/team-lower-third';
 
-const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings, pressConference, halftimeSlate, barsSlate, big5Format, big5PodSchedule, seriesHistory, seriesHistoryCarousel, big5Stakes, big5Champions] as const;
+const ENTRIES = [scorebug, playerLowerThird, staffLowerThird, teamLowerThird, matchupLocator, matchupLocatorLowerThird, talentLowerThirdSingle, talentLowerThirdDouble, talentLowerThirdTriple, scoreToBreak, scorebugSlider, burningQuestion, startingFive, halftimeAdjustments, halftimeStatistics, playerToWatch, playerOfTheGame, conferenceStandings, pressConference, halftimeSlate, barsSlate, big5Format, big5PodSchedule, seriesHistory, seriesHistoryCarousel, big5Stakes, big5Champions, comingUpNext] as const;
 
 type Entry = (typeof ENTRIES)[number];
 
