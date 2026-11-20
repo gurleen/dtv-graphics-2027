@@ -1203,6 +1203,59 @@ and each team's abbreviation, colour and logo from `teamOf`. To review: `rive .
 --screenshot=build/series_history.png`, and for a page change `bun
 scripts/render_frames.ts graphics/basketball-v2/series_history.rml --frames=342-396:4
 --out=build/frames/series_history/page --sheet=5 --crop=500:220:1364:822`.
+## Series history carousel (`series_history_carousel.rml`)
+
+A mid-screen card on the last five Drexel and Saint Joseph's meetings, for the Big 5
+Classic. It pages through the meetings on its own, 8 s each, and loops. Card origin
+216, 154; size 1488 x 704. It ends at y 858, as the halftime and standings cards do,
+so it clears the scorebug (y 890). It takes 24 on the outer corners and 6 on the seams.
+Namespace 54, artboard y 31400.
+
+- **Generated.** `generate_series_history_carousel.ts` writes the `.rml`. Edit the
+  generator, then run `bun graphics/basketball-v2/generate_series_history_carousel.ts`.
+  Never edit the `.rml` by hand. One property table (`PROPS`) drives the view model's
+  declarations and its Default instance.
+- **Title panel (1488 x 92).** `SERIES HISTORY` (Bold 68) at the left. At the right, the
+  leader (Regular 34, muted) and the series record (Bold 68), on one line.
+- **Feature panel (880 x 540).** One page per meeting. The winner's tint fills the panel
+  and the winner's logo, about 310 across, sits in its upper half on a soft dark shade.
+  The year (Regular 36), the winner and score (Bold 84) and the caption with the date
+  (Regular 28) sit at the foot on a dark gradient. A photo, when given, covers the tint
+  and the logo (fit cover), and the gradient keeps the text legible over it. The visual
+  pushes in 4% across the page's 8 s.
+- **List panel (604 x 540).** One dark glass panel with five rows, 108 high, divided by
+  hairlines: the year (Bold 40) over the site (Regular 22, muted), the winner's school
+  (Bold 44) and the score (Bold 50). The row of the meeting on show takes the winner's
+  tint. All five tints sit under one mask a row high, and the mask slides to the next
+  row on a page change, so the highlight takes each row's colour as it arrives.
+- **Footer (1488 x 64).** `footer` (Bold 30) at the left, a pip per page at the right.
+- **Intro (1.43 s) and outro (0.4 s).** The halftime card's build. A light ignites at the
+  seam between the feature and the list and splits into two leading edges that wipe the
+  glass open both ways. The title, the rows and the footer rise in letter by letter, the
+  highlight lights and one sheen crosses the card. The outro closes the glass to the seam.
+- **State machine.** Two layers that never key the same property.
+  - Display (Hidden, Intro, Hold, Outro) follows `isPlaying` and keys only the shell.
+  - Pages runs Idle, Page 1, Page 2 to Page 5, then Page 1 Again, which cross-fades
+    from Page 5, and on round. A page cross-fades its visual over the last page's,
+    slides the highlight and moves the lit pip in its first 30 frames. Its text then
+    rises in a line at a time and sinks out at its end. Idle keys nothing, so the page
+    on show closes with the glass, and each take starts on the first meeting.
+
+View model `BasketballSeriesHistoryCarouselV2`, public properties: `isPlaying`,
+`seriesLeader` (`SAINT JOSEPH'S LEADS`), `seriesRecord` (`48-11`), `footer`, and for N =
+1 to 5 `meetingNYear`, `meetingNSite`, `meetingNWinner`, `meetingNScore`,
+`meetingNCaption`, `meetingNLogo`, `meetingNPrimaryColor` and `meetingNPhoto`. Every
+photo defaults to `assets/images/blank.png`.
+
+The registry entry (`graphics/series-history-carousel.ts`) binds everything from
+`SERIES` in `graphics/big5.ts`, in its order. The site is `at` and the host's short name,
+or its abbreviation when the short name is more than one word (`AT DREXEL`, `AT SJU`).
+The caption is the date, ` · `, and the meeting's caption. It takes `footer` (`First
+meeting 1919 · Drexel has won 2 of the last 4` by default) and `photos`, up to five URLs
+in meeting order. A blank photo or a missing one binds `null`, so the tint and the logo
+show. To review: `rive . --artboard="Basketball Series History Carousel v2"
+--data=isPlaying=true --advance=120 --screenshot=build/series_history_carousel.png`,
+and `--advance=600` for the second page.
 
 ## Test data
 
