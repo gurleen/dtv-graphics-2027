@@ -1104,6 +1104,57 @@ and `tonightGame`. The registry entry (`basketball-v2/big5-format`) takes no par
 binds `CLASSIC`, each pod's `podStandings` and the show's game from `big5.ts`, so a
 result entered there moves the table. To review the step change:
 `bun scripts/render_frames.ts graphics/basketball-v2/big5_format.rml --on-air --data=showPods=true --frames=0-40:4 --out=build/frames/big5_format/step --sheet=4`.
+## Big 5 Pod Schedule (`big5_pod_schedule.rml`)
+
+The Big 5 Classic's six campus pod games, results and games to come, with the
+show's own game lit. Card origin 216, 150; size 1488 x 704, so it ends at y 854,
+clear of the scorebug (y 890). Outer corners 24, inner seams 6. Namespace 52,
+artboard y 29000.
+
+- **Generated.** `generate_big5_pod_schedule.ts` writes the `.rml` and takes
+  its defaults from `graphics/big5.ts`. Edit the generator, then run
+  `bun graphics/basketball-v2/generate_big5_pod_schedule.ts`.
+- **Title panel (1488 x 92):** `BIG 5 CLASSIC` (Bold 62) at the left,
+  `POD PLAY · CAMPUS GAMES` (Regular 32) at the right, and an 8-wide marker on
+  the left edge in `markerColor`. No logo: there is no Big 5 asset.
+- **Table panel (1488 x 548):** the conference standings card's table. One
+  panel of dark glass, a hairline in each 4-unit gap, a lighter 44-high band
+  naming each pod (`pod1Name`, `pod2Name`), and three game rows under each.
+  A row reads the date, the away team (logo, school, score), a muted `AT`,
+  the home team, and a right-aligned status.
+- **Footer panel (1488 x 56):** `classicLine` (Bold 30) at the left and
+  `classicTimes` (Regular 28) at the right.
+- **Row states.** Two numbers per row draw them, with no script:
+  - `gameNWinner` is 0 for no result, 1 when the away team won and 2 when the
+    home team won. A final dims its loser's logo, name and score to 55%.
+  - `gameNTonight` is 1 on the show's own game while it has no score. That row
+    grows from 66 to 102, takes `homePrimaryColor` as its tint with a shade
+    behind each logo, shows `TONIGHT` in `markerColor` in place of the date,
+    and shows `gameNAwayRecord`/`gameNHomeRecord` (the pod records) where the
+    scores go. A tonight game with a score is a final row.
+
+  The table's height is fixed. The tonight row takes its 36 from the other
+  rows. With no tonight row, every row is 72. Each row's top and centre are
+  `DataConverterFormula`s of the six tonight flags, so any row can be the
+  tonight row.
+- **Intro (1.5 s) and outro (0.4 s):** the standings card's build. A seam
+  ignites at the centre and wipes the glass open both ways. The title rises
+  and the marker draws. The bands and rows then rise in order, three frames
+  apart, with each logo settling from 112%. The tonight row's tint lights
+  last, then the footer rises and one sheen crosses the card.
+
+View model `BasketballBig5PodScheduleV2`, public properties: `isPlaying`,
+`pod1Name`, `pod2Name`, `classicLine`, `classicTimes`, `homePrimaryColor`,
+`markerColor`, and for N = 1 to 6 (games 1 to 3 are pod 1, 4 to 6 pod 2, in
+`PODS` order) `gameNDate`, `gameNAwayName`, `gameNAwayScore`,
+`gameNAwayRecord`, `gameNAwayLogo`, `gameNHomeName`, `gameNHomeScore`,
+`gameNHomeRecord`, `gameNHomeLogo`, `gameNStatus`, `gameNWinner` and
+`gameNTonight`. The entry `basketball-v2/big5-pod-schedule` takes no params.
+It binds every row from `PODS` and `CLASSIC`, and marks tonight's row with
+`isTonight`. The marker is the home team's secondary colour for Drexel and
+white for any other host, because Saint Joseph's near-black does not read on
+glass. The scene embeds the six logos from `assets/images/big5/`. On air, the
+bind's logo URLs replace them.
 
 ## Test data
 
