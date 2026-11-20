@@ -1311,6 +1311,38 @@ tonight's defaults (`title`, `homeHeadline`, `homeDetail`, `awayHeadline`,
 name, logo and colours from the game's sides. To review:
 `rive . --artboard="Basketball Big 5 Stakes v2" --data=isPlaying=true
 --advance=120 --screenshot=build/big5_stakes.png`.
+## Big 5 Champions lower third (`big5_champions.rml`)
+
+The Big 5 Classic's past champions, oldest first, in three cells beside the
+scorebug. Block origin 550, 842; size 1274 x 180, so it keeps 24 clear of the
+scorebug's right edge (x 526), ends on the right action-safe margin and shares
+the scorebug's foot (y 1022). Namespace 56, artboard y 33800.
+
+- **Generated.** `generate_big5_champions.ts` writes the `.rml`; edit the
+  generator, then run `bun graphics/basketball-v2/generate_big5_champions.ts`.
+- **Title strip (1274 x 44, dark glass, radii 12 12 3 3):** a white 6-wide
+  marker at the left end, `BIG 5 CLASSIC CHAMPIONS` in Bold 28, and `subtitle`
+  (`FOURTH YEAR OF THE FORMAT`) right-aligned in muted Regular 22.
+- **Cells (three, 422 wide, 4 apart):** an 84 panel in the champion's tint with
+  the year (Regular 30, 70% white), the school (Bold 50, shrinks to fit) and the
+  logo at the right end in the standings card's logo shade, over a 44 dark-glass
+  strip with the title game (Bold 28, shrinks to fit). The strips take the
+  block's 12 corners at the foot; every seam is 3.
+- **Intro (1.4 s) and outro (0.4 s):** the light ignites at the left end. The
+  title strip and then each cell, 6 frames apart, wipe open left to right, each
+  behind its own edge light. Each cell's content drifts in, the logo settles
+  from 112%, the strip slides down and the type rises; one sheen finishes the
+  glass. The outro retracts the strips and closes every part toward its left
+  edge; the last frame is empty.
+- **On air:** `isPlaying`, as on the scorebug.
+
+View model `BasketballBig5ChampionsV2`, public properties: `isPlaying`,
+`subtitle`, and `championNYear`, `championNName`, `championNResult`,
+`championNLogo`, `championNPrimaryColor` for N = 1 to 3 (group `champion`). The
+registry entry (`graphics/big5-champions.ts`, id `basketball-v2/big5-champions`)
+takes no params and binds `CHAMPIONS` from `graphics/big5.ts`: each school's
+short name (`PENN`, not `PENNSYLVANIA`), `<score> over <runner-up>` and the
+champion's logo and primary colour. Send text in capitals.
 
 ## Test data
 
