@@ -1054,6 +1054,55 @@ is on the card layer and clears the scorebug and the lower third (`clears: ['bug
   To review: `rive . --artboard="Basketball Bars Slate v2" --data=isPlaying=true
   --advance=120 --screenshot=build/bars_slate.png`.
 
+## Series History (`series_history.rml`)
+
+A small card with the all-time series between tonight's two teams, on the lower layer.
+It stands where the Burning Question stands: right edge on the action-safe margin (x
+1824), foot on the scorebug's baseline (y 1022), 430 x 180 from (1394, 842). It clears
+the scorebug, so the two can be on air together. Like the Burning Question, it puts its
+marker on the outer (right) edge and sets its header and facts against it.
+
+- **Generated.** `generate_series_history.ts` writes the `.rml`; edit the generator, then
+  run `bun graphics/basketball-v2/generate_series_history.ts`. It reads the default
+  wins, year and facts from `SERIES` in `graphics/big5.ts`, so the Default instance
+  matches the entry's demo. One property table (`PROPS`) drives the view model's
+  declarations and its Default instance.
+- **Header (430 x 44, dark glass).** `SERIES HISTORY` (Bold 28) right-aligned against a
+  white marker (6 wide) on the outer edge, and a muted `SINCE 1919` (Regular 22) at the
+  inner end.
+- **Team cells (two 213 x 84, 4 apart, team tint).** The series leader first. Each has
+  the abbreviation (Bold 36) over a muted `WINS` (Regular 20) at its left, the win count
+  (Bold 66) at its right, and the team's logo as a faded mark (12%) behind the count,
+  cropped by the cell.
+- **Foot strip (430 x 44, dark glass).** One fact at a time, right-aligned with the
+  title: a muted label (Regular 22) then the value (Bold 28). Four pips at the inner end
+  show which fact is up. Every line shrinks to fit.
+- **Paging.** A Pages layer, as on the halftime slate: Idle, then Fact 1 to 4 in a loop,
+  each a 6 s oneShot. A fact rises 18 and fades in over frames 4 to 28, and sinks 12 and
+  fades over its last 12 frames; its pip lights as it rises. A window the size of the
+  strip clips the facts, so a rising fact never shows below the block. Idle keys
+  nothing, so the fact on screen closes with the glass, and each take starts on Fact 1.
+- **Intro (1.2 s):** a white light ignites in the gap between the team cells and splits;
+  the two edges wipe the block open outward (frames 6 to 36). Content drifts in behind
+  the edges, text rises from the seam outward (from its last glyph left of the seam),
+  the logos settle from 112%, the marker draws down and one sheen crosses the glass right
+  to left.
+- **Outro (0.4 s):** the edges close the glass toward the seam with a brief edge light,
+  the content drifts toward the seam, the marker retracts and the logos swell and fade.
+  The last frame is empty.
+- **State machine:** Display (Hidden, Intro, Hold, Outro) on `isPlaying` keys only the
+  shell; Pages keys only the facts and the pips.
+
+View model `BasketballSeriesHistoryV2`, public properties: `isPlaying`, `since`,
+`team1Abbreviation`, `team1Wins`, `team1PrimaryColor`, `team1Logo` and the same for
+`team2`, and `fact1Label`, `fact1Value` to `fact4Label`, `fact4Value`. The registry entry
+(`graphics/series-history.ts`) takes no params: it binds `SERIES` (the leader as team 1)
+and each team's abbreviation, colour and logo from `teamOf`. To review: `rive .
+--artboard="Basketball Series History v2" --data=isPlaying=true --advance=120
+--screenshot=build/series_history.png`, and for a page change `bun
+scripts/render_frames.ts graphics/basketball-v2/series_history.rml --frames=342-396:4
+--out=build/frames/series_history/page --sheet=5 --crop=500:220:1364:822`.
+
 ## Test data
 
 When testing any graphic in this package, always use the **Drexel Dragons as
