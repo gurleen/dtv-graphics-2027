@@ -7,7 +7,7 @@ follows the design language below. The earlier ports (`graphics/10_*`,
 
 **Building a new graphic?** Read [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) first:
 exact colour and type values, the layout grid, the intro/outro frame recipe,
-the id namespace registry (next free: 51), naming, and a five-step checklist
+the id namespace registry (next free: 57), naming, and a five-step checklist
 from scene to registry entry. This README describes the finished graphics.
 Intro and outro lengths are not kept by hand: `bun run codegen` reads every
 timeline's length from the scene into `scenes.gen.ts`, and the renderer waits

@@ -41,7 +41,7 @@ const ARTBOARD_Y = 29000;
 const TEAMS = [
   { id: SAINT_JOSEPHS, name: "SAINT JOSEPH'S", color: 'FFC2071B', logo: 'saint-josephs' },
   { id: DREXEL, name: 'DREXEL', color: 'FF07294D', logo: 'drexel' },
-  { id: PENN, name: 'PENNSYLVANIA', color: 'FF082A74', logo: 'pennsylvania' },
+  { id: PENN, name: 'PENN', color: 'FF082A74', logo: 'pennsylvania' },
   { id: TEMPLE, name: 'TEMPLE', color: 'FFA80532', logo: 'temple' },
   { id: VILLANOVA, name: 'VILLANOVA', color: 'FF123D7C', logo: 'villanova' },
   { id: LA_SALLE, name: 'LA SALLE', color: 'FF003356', logo: 'la-salle' },

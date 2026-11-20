@@ -37,6 +37,12 @@ test('every graphic’s params fit the generic form, with a picker for each id',
   const found = Object.fromEntries(Object.values(GRAPHICS).map((entry) => [entry.id, refs(fieldsOf(paramForm(entry.params)))]));
   expect(found).toEqual({
     'basketball-v2/bars-slate': [],
+    'basketball-v2/big5-format': [],
+    'basketball-v2/big5-pod-schedule': [],
+    'basketball-v2/series-history': [],
+    'basketball-v2/series-history-carousel': [],
+    'basketball-v2/big5-stakes': [],
+    'basketball-v2/big5-champions': [],
     'basketball-v2/burning-question': ['team: team'],
     'basketball-v2/conference-standings': ['season: season'],
     'basketball-v2/halftime-adjustments': [],

@@ -33,11 +33,11 @@ export const big5PodSchedule = defineGraphic({
       };
       return {
         date: row.date,
-        awayName: away.school.name,
+        awayName: away.school.shortName,
         awayScore: row.score ? String(row.score.away) : '',
         awayRecord: recordOf(row.away),
         awayLogo: away.brand.logo,
-        homeName: hosts.school.name,
+        homeName: hosts.school.shortName,
         homeScore: row.score ? String(row.score.home) : '',
         homeRecord: recordOf(row.home),
         homeLogo: hosts.brand.logo,

@@ -411,7 +411,13 @@ Namespaces in use:
 | 48 | Press Conference | 24200 |
 | 49 | Halftime Slate | 25400 |
 | 50 | Bars Slate | 26600 |
-| **51** | **Next free** | **27800** |
+| 51 | Big 5 Format card | 27800 |
+| 52 | Big 5 Pod Schedule card | 29000 |
+| 53 | Series History | 30200 |
+| 54 | Series History Carousel | 31400 |
+| 55 | Big 5 Stakes lower third | 32600 |
+| 56 | Big 5 Champions lower third | 33800 |
+| **57** | **Next free** | **35000** |
 
 Artboards sit at x 0 and step 1200 in y. Update this table when you take a
 namespace.

@@ -164,7 +164,13 @@
           { "id": "press-conference", "graphic": "basketball-v2/press-conference", "params": { "side": "home" } },
           { "id": "halftime-slate", "graphic": "basketball-v2/halftime-slate", "params": {} },
           { "id": "bars-slate-pre", "graphic": "basketball-v2/bars-slate", "params": { "show": "pre" } },
-          { "id": "bars-slate-post", "graphic": "basketball-v2/bars-slate", "params": { "show": "post" } }
+          { "id": "bars-slate-post", "graphic": "basketball-v2/bars-slate", "params": { "show": "post" } },
+          { "id": "big5-format", "graphic": "basketball-v2/big5-format", "params": {} },
+          { "id": "big5-pod-schedule", "graphic": "basketball-v2/big5-pod-schedule", "params": {} },
+          { "id": "series-history", "graphic": "basketball-v2/series-history", "params": {} },
+          { "id": "series-history-carousel", "graphic": "basketball-v2/series-history-carousel", "params": {} },
+          { "id": "big5-stakes", "graphic": "basketball-v2/big5-stakes", "params": {} },
+          { "id": "big5-champions", "graphic": "basketball-v2/big5-champions", "params": {} }
         ]
       }
     ]

@@ -138,6 +138,334 @@ export const SCENES = {
       "sponsorLogo": "asset:Scorebug v2 Independence Blue Cross"
     }
   },
+  "big5_champions": {
+    "file": "big5_champions.rml",
+    "artboard": "Basketball Big 5 Champions v2",
+    "stateMachine": "Big 5 Champions",
+    "viewModel": "BasketballBig5ChampionsV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 1400,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17
+    },
+    "props": {
+      "subtitle": "string",
+      "isPlaying": "boolean"
+    },
+    "groups": {
+      "champion": {
+        "count": 3,
+        "fields": {
+          "year": "string",
+          "name": "string",
+          "result": "string",
+          "primaryColor": "color",
+          "logo": "image"
+        }
+      }
+    },
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "subtitle": "FOURTH YEAR OF THE FORMAT",
+      "champion1Year": "2023",
+      "champion1Name": "SAINT JOSEPH'S",
+      "champion1Result": "74-65 OVER TEMPLE",
+      "champion1Logo": "asset:Big 5 Champions v2 Saint Joseph's",
+      "champion1PrimaryColor": "#c2071b",
+      "champion2Year": "2024",
+      "champion2Name": "SAINT JOSEPH'S",
+      "champion2Result": "82-68 OVER LA SALLE",
+      "champion2Logo": "asset:Big 5 Champions v2 Saint Joseph's",
+      "champion2PrimaryColor": "#c2071b",
+      "champion3Year": "2025",
+      "champion3Name": "VILLANOVA",
+      "champion3Result": "90-63 OVER PENN",
+      "champion3Logo": "asset:Big 5 Champions v2 Villanova",
+      "champion3PrimaryColor": "#123d7c"
+    }
+  },
+  "big5_format": {
+    "file": "big5_format.rml",
+    "artboard": "Basketball Big 5 Format v2",
+    "stateMachine": "Big 5 Format",
+    "viewModel": "BasketballBig5FormatV2",
+    "layers": [
+      "Display",
+      "Step"
+    ],
+    "animations": {
+      "Intro": 1500,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17,
+      "Format": 17,
+      "Pods": 17,
+      "Show Pods": 600,
+      "Show Format": 600
+    },
+    "props": {
+      "classicDate": "string",
+      "classicVenue": "string",
+      "tonightGame": "string",
+      "isPlaying": "boolean",
+      "showPods": "boolean"
+    },
+    "groups": {
+      "game": {
+        "count": 3,
+        "fields": {
+          "time": "string",
+          "name": "string",
+          "pairing": "string"
+        }
+      },
+      "row": {
+        "count": 6,
+        "fields": {
+          "rank": "string",
+          "team": "string",
+          "record": "string",
+          "tonight": "boolean",
+          "primaryColor": "color",
+          "logo": "image"
+        }
+      }
+    },
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "showPods": false,
+      "classicDate": "SAT DEC 5",
+      "classicVenue": "XFINITY MOBILE ARENA",
+      "game1Time": "2:00",
+      "game1Name": "5TH PLACE",
+      "game1Pairing": "3RD VS 3RD",
+      "game2Time": "4:30",
+      "game2Name": "3RD PLACE",
+      "game2Pairing": "2ND VS 2ND",
+      "game3Time": "7:00",
+      "game3Name": "CHAMPIONSHIP",
+      "game3Pairing": "1ST VS 1ST",
+      "row1Rank": "1",
+      "row1Team": "SAINT JOSEPH'S",
+      "row1Record": "1-0",
+      "row1Logo": "asset:Big 5 Format v2 SAINT JOSEPH'S",
+      "row1PrimaryColor": "#c2071b",
+      "row1Tonight": true,
+      "row2Rank": "2",
+      "row2Team": "DREXEL",
+      "row2Record": "0-0",
+      "row2Logo": "asset:Big 5 Format v2 DREXEL",
+      "row2PrimaryColor": "#07294d",
+      "row2Tonight": true,
+      "row3Rank": "3",
+      "row3Team": "PENN",
+      "row3Record": "0-1",
+      "row3Logo": "asset:Big 5 Format v2 PENN",
+      "row3PrimaryColor": "#082a74",
+      "row3Tonight": false,
+      "row4Rank": "1",
+      "row4Team": "TEMPLE",
+      "row4Record": "1-0",
+      "row4Logo": "asset:Big 5 Format v2 TEMPLE",
+      "row4PrimaryColor": "#a80532",
+      "row4Tonight": false,
+      "row5Rank": "1",
+      "row5Team": "VILLANOVA",
+      "row5Record": "1-0",
+      "row5Logo": "asset:Big 5 Format v2 VILLANOVA",
+      "row5PrimaryColor": "#123d7c",
+      "row5Tonight": false,
+      "row6Rank": "3",
+      "row6Team": "LA SALLE",
+      "row6Record": "0-2",
+      "row6Logo": "asset:Big 5 Format v2 LA SALLE",
+      "row6PrimaryColor": "#003356",
+      "row6Tonight": false,
+      "tonightGame": "SAINT JOSEPH'S AT DREXEL · POD 1"
+    }
+  },
+  "big5_pod_schedule": {
+    "file": "big5_pod_schedule.rml",
+    "artboard": "Basketball Big 5 Pod Schedule v2",
+    "stateMachine": "Big 5 Pod Schedule",
+    "viewModel": "BasketballBig5PodScheduleV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 1500,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17
+    },
+    "props": {
+      "classicLine": "string",
+      "classicTimes": "string",
+      "isPlaying": "boolean",
+      "homePrimaryColor": "color",
+      "markerColor": "color"
+    },
+    "groups": {
+      "pod": {
+        "count": 2,
+        "fields": {
+          "name": "string"
+        }
+      },
+      "game": {
+        "count": 6,
+        "fields": {
+          "date": "string",
+          "awayName": "string",
+          "awayScore": "string",
+          "awayRecord": "string",
+          "homeName": "string",
+          "homeScore": "string",
+          "homeRecord": "string",
+          "status": "string",
+          "winner": "number",
+          "tonight": "number",
+          "awayLogo": "image",
+          "homeLogo": "image"
+        }
+      }
+    },
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "pod1Name": "POD 1",
+      "pod2Name": "POD 2",
+      "classicLine": "BIG 5 CLASSIC TRIPLEHEADER · SAT DEC 5 · XFINITY MOBILE ARENA",
+      "classicTimes": "2:00 · 4:30 · 7:00",
+      "homePrimaryColor": "#07294d",
+      "markerColor": "#ffc600",
+      "game1Date": "SAT NOV 14",
+      "game1AwayName": "PENN",
+      "game1AwayScore": "77",
+      "game1AwayRecord": "",
+      "game1AwayLogo": "asset:Big 5 Pod Schedule v2 PENN",
+      "game1HomeName": "SAINT JOSEPH'S",
+      "game1HomeScore": "83",
+      "game1HomeRecord": "",
+      "game1HomeLogo": "asset:Big 5 Pod Schedule v2 SAINT JOSEPH'S",
+      "game1Status": "FINAL · HAGAN ARENA",
+      "game1Winner": 2,
+      "game1Tonight": 0,
+      "game2Date": "FRI NOV 20",
+      "game2AwayName": "SAINT JOSEPH'S",
+      "game2AwayScore": "",
+      "game2AwayRecord": "1-0",
+      "game2AwayLogo": "asset:Big 5 Pod Schedule v2 SAINT JOSEPH'S",
+      "game2HomeName": "DREXEL",
+      "game2HomeScore": "",
+      "game2HomeRecord": "0-0",
+      "game2HomeLogo": "asset:Big 5 Pod Schedule v2 DREXEL",
+      "game2Status": "7:00 · DASKALAKIS ATHLETIC CENTER",
+      "game2Winner": 0,
+      "game2Tonight": 1,
+      "game3Date": "TUE NOV 24",
+      "game3AwayName": "DREXEL",
+      "game3AwayScore": "",
+      "game3AwayRecord": "",
+      "game3AwayLogo": "asset:Big 5 Pod Schedule v2 DREXEL",
+      "game3HomeName": "PENN",
+      "game3HomeScore": "",
+      "game3HomeRecord": "",
+      "game3HomeLogo": "asset:Big 5 Pod Schedule v2 PENN",
+      "game3Status": "8:00 · THE PALESTRA",
+      "game3Winner": 0,
+      "game3Tonight": 0,
+      "game4Date": "TUE NOV 10",
+      "game4AwayName": "LA SALLE",
+      "game4AwayScore": "59",
+      "game4AwayRecord": "",
+      "game4AwayLogo": "asset:Big 5 Pod Schedule v2 LA SALLE",
+      "game4HomeName": "VILLANOVA",
+      "game4HomeScore": "80",
+      "game4HomeRecord": "",
+      "game4HomeLogo": "asset:Big 5 Pod Schedule v2 VILLANOVA",
+      "game4Status": "FINAL · FINNERAN PAVILION",
+      "game4Winner": 2,
+      "game4Tonight": 0,
+      "game5Date": "SUN NOV 15",
+      "game5AwayName": "TEMPLE",
+      "game5AwayScore": "84",
+      "game5AwayRecord": "",
+      "game5AwayLogo": "asset:Big 5 Pod Schedule v2 TEMPLE",
+      "game5HomeName": "LA SALLE",
+      "game5HomeScore": "71",
+      "game5HomeRecord": "",
+      "game5HomeLogo": "asset:Big 5 Pod Schedule v2 LA SALLE",
+      "game5Status": "FINAL · GLASER ARENA",
+      "game5Winner": 1,
+      "game5Tonight": 0,
+      "game6Date": "TUE DEC 1",
+      "game6AwayName": "VILLANOVA",
+      "game6AwayScore": "",
+      "game6AwayRecord": "",
+      "game6AwayLogo": "asset:Big 5 Pod Schedule v2 VILLANOVA",
+      "game6HomeName": "TEMPLE",
+      "game6HomeScore": "",
+      "game6HomeRecord": "",
+      "game6HomeLogo": "asset:Big 5 Pod Schedule v2 TEMPLE",
+      "game6Status": "6:30 · LIACOURAS CENTER",
+      "game6Winner": 0,
+      "game6Tonight": 0
+    }
+  },
+  "big5_stakes": {
+    "file": "big5_stakes.rml",
+    "artboard": "Basketball Big 5 Stakes v2",
+    "stateMachine": "Big 5 Stakes",
+    "viewModel": "BasketballBig5StakesV2",
+    "layers": [
+      "Display"
+    ],
+    "animations": {
+      "Intro": 1400,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17
+    },
+    "props": {
+      "title": "string",
+      "homeSchool": "string",
+      "homeHeadline": "string",
+      "homeDetail": "string",
+      "awaySchool": "string",
+      "awayHeadline": "string",
+      "awayDetail": "string",
+      "isPlaying": "boolean",
+      "homePrimaryColor": "color",
+      "awayPrimaryColor": "color",
+      "homeSecondaryColor": "color",
+      "homeLogo": "image",
+      "awayLogo": "image"
+    },
+    "groups": {},
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "title": "BIG 5 CLASSIC · POD 1 · WHAT'S AT STAKE",
+      "homeSchool": "DREXEL",
+      "homeHeadline": "DRAGONS CONTROL THE POD",
+      "homeDetail": "THEN A WIN AT PENN ON TUESDAY PUTS DREXEL IN THE TITLE GAME",
+      "homeLogo": "asset:Big 5 Stakes v2 Drexel",
+      "homePrimaryColor": "#07294d",
+      "awaySchool": "SAINT JOSEPH'S",
+      "awayHeadline": "HAWKS CLINCH POD 1",
+      "awayDetail": "2-0 IN THE POD · CHAMPIONSHIP GAME DEC 5 AT 7:00",
+      "awayLogo": "asset:Big 5 Stakes v2 Saint Joseph's",
+      "awayPrimaryColor": "#c2071b",
+      "homeSecondaryColor": "#ffc600"
+    }
+  },
   "burning_question": {
     "file": "burning_question.rml",
     "artboard": "Basketball Burning Question v2",
@@ -1134,6 +1462,161 @@ export const SCENES = {
       "isPlaying": false,
       "title": "VENUE",
       "subtitle": "DASKALAKIS ATHLETIC CENTER · PHILADELPHIA, PA"
+    }
+  },
+  "series_history": {
+    "file": "series_history.rml",
+    "artboard": "Basketball Series History v2",
+    "stateMachine": "Series History",
+    "viewModel": "BasketballSeriesHistoryV2",
+    "layers": [
+      "Display",
+      "Pages"
+    ],
+    "animations": {
+      "Intro": 1200,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17,
+      "Pages Idle": 17,
+      "Fact 1": 6000,
+      "Fact 2": 6000,
+      "Fact 3": 6000,
+      "Fact 4": 6000
+    },
+    "props": {
+      "since": "string",
+      "isPlaying": "boolean"
+    },
+    "groups": {
+      "team": {
+        "count": 2,
+        "fields": {
+          "abbreviation": "string",
+          "wins": "string",
+          "primaryColor": "color",
+          "logo": "image"
+        }
+      },
+      "fact": {
+        "count": 4,
+        "fields": {
+          "label": "string",
+          "value": "string"
+        }
+      }
+    },
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "since": "1919",
+      "team1Abbreviation": "SJU",
+      "team1Wins": "48",
+      "team1PrimaryColor": "#c2071b",
+      "team1Logo": "asset:Series History v2 Saint Joseph's",
+      "team2Abbreviation": "DREX",
+      "team2Wins": "11",
+      "team2PrimaryColor": "#07294d",
+      "team2Logo": "asset:Series History v2 Drexel",
+      "fact1Label": "NOV 8, 2025",
+      "fact1Value": "SJU 76-65",
+      "fact2Label": "LAST 10 MEETINGS",
+      "fact2Value": "SJU 7-3",
+      "fact3Label": "AT DREXEL",
+      "fact3Value": "SJU 19-4",
+      "fact4Label": "JAN 1, 1919",
+      "fact4Value": "SJU 26-17"
+    }
+  },
+  "series_history_carousel": {
+    "file": "series_history_carousel.rml",
+    "artboard": "Basketball Series History Carousel v2",
+    "stateMachine": "Series History Carousel",
+    "viewModel": "BasketballSeriesHistoryCarouselV2",
+    "layers": [
+      "Display",
+      "Pages"
+    ],
+    "animations": {
+      "Intro": 1433,
+      "Hold": 17,
+      "Outro": 400,
+      "Hidden": 17,
+      "Pages Idle": 17,
+      "Page 1": 8000,
+      "Page 1 Again": 8000,
+      "Page 2": 8000,
+      "Page 3": 8000,
+      "Page 4": 8000,
+      "Page 5": 8000
+    },
+    "props": {
+      "seriesLeader": "string",
+      "seriesRecord": "string",
+      "footer": "string",
+      "isPlaying": "boolean"
+    },
+    "groups": {
+      "meeting": {
+        "count": 5,
+        "fields": {
+          "year": "string",
+          "site": "string",
+          "winner": "string",
+          "score": "string",
+          "caption": "string",
+          "primaryColor": "color",
+          "logo": "image",
+          "photo": "image"
+        }
+      }
+    },
+    "internal": {},
+    "defaults": {
+      "isPlaying": false,
+      "seriesLeader": "SAINT JOSEPH'S LEADS",
+      "seriesRecord": "48-11",
+      "footer": "FIRST MEETING 1919 · DREXEL HAS WON 2 OF THE LAST 4",
+      "meeting1Year": "2025",
+      "meeting1Site": "AT SJU",
+      "meeting1Winner": "SAINT JOSEPH'S",
+      "meeting1Score": "76-65",
+      "meeting1Caption": "NOV 8, 2025 · HAWKS RALLY FROM 3 DOWN AT THE HALF",
+      "meeting1Logo": "asset:Series History Carousel v2 Saint Joseph's",
+      "meeting1PrimaryColor": "#c2071b",
+      "meeting1Photo": "asset:Series History Carousel v2 No Photo",
+      "meeting2Year": "2021",
+      "meeting2Site": "AT SJU",
+      "meeting2Winner": "DREXEL",
+      "meeting2Score": "78-75",
+      "meeting2Caption": "NOV 17, 2021 · DRAGONS WIN AT HAGAN ARENA",
+      "meeting2Logo": "asset:Series History Carousel v2 Drexel",
+      "meeting2PrimaryColor": "#07294d",
+      "meeting2Photo": "asset:Series History Carousel v2 No Photo",
+      "meeting3Year": "2020",
+      "meeting3Site": "AT DREXEL",
+      "meeting3Winner": "DREXEL",
+      "meeting3Score": "81-77",
+      "meeting3Caption": "DEC 17, 2020 · DRAGONS WIN AT HOME",
+      "meeting3Logo": "asset:Series History Carousel v2 Drexel",
+      "meeting3PrimaryColor": "#07294d",
+      "meeting3Photo": "asset:Series History Carousel v2 No Photo",
+      "meeting4Year": "2016",
+      "meeting4Site": "AT DREXEL",
+      "meeting4Winner": "SAINT JOSEPH'S",
+      "meeting4Score": "72-71",
+      "meeting4Caption": "DEC 11, 2016 · DECIDED BY A SINGLE POINT",
+      "meeting4Logo": "asset:Series History Carousel v2 Saint Joseph's",
+      "meeting4PrimaryColor": "#c2071b",
+      "meeting4Photo": "asset:Series History Carousel v2 No Photo",
+      "meeting5Year": "2015",
+      "meeting5Site": "AT SJU",
+      "meeting5Winner": "SAINT JOSEPH'S",
+      "meeting5Score": "82-81",
+      "meeting5Caption": "NOV 13, 2015 · ONE POINT AGAIN",
+      "meeting5Logo": "asset:Series History Carousel v2 Saint Joseph's",
+      "meeting5PrimaryColor": "#c2071b",
+      "meeting5Photo": "asset:Series History Carousel v2 No Photo"
     }
   },
   "staff_lower_third": {
