@@ -1348,8 +1348,8 @@ champion's logo and primary colour. Send text in capitals.
 
 The lower third the operator takes going to a break before the game: tonight's
 matchup, with less on it than the matchup locator lower third. It is the Big 5
-Stakes build with team names and records. Block origin 96, 842; size 1728 x
-180, standing on the scorebug's baseline (y 1022). It covers the scorebug, so
+Stakes build with team names and records, narrower. Block origin 360, 842; size 1200 x
+180, centred in the frame and standing on the scorebug's baseline (y 1022). It overlaps the scorebug, so
 its entry clears the `bug` layer. Namespace 57, artboard y 35000.
 
 - **Generated.** `generate_coming_up_next.ts` writes the `.rml`. Edit the
