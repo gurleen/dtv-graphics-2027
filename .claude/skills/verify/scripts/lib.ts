@@ -104,8 +104,8 @@ export async function session(journey: string) {
     log,
     until,
 
-    /** A controller page as `operator` (stored under localStorage `dtv.operator`), on `#/show` or `#/data`. */
-    async operator(operator: string, route: 'show' | 'data' = 'show') {
+    /** A controller page as `operator` (stored under localStorage `dtv.operator`), on `#/show`, `#/scorebug` or `#/data`. */
+    async operator(operator: string, route: 'show' | 'scorebug' | 'data' = 'show') {
       const context = await newContext({ width: 1440, height: 900 }, operator);
       await context.addInitScript((name) => localStorage.setItem('dtv.operator', name), operator);
       const page = await context.newPage();

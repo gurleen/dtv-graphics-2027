@@ -1,0 +1,143 @@
+/* The scorebug page: the slider's lines, the player lower third and the monitor rail, side by side. */
+
+.scorebug-page {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(0, 1.6fr) var(--rail);
+  grid-template-areas: 'sliders lower rail';
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-4);
+}
+
+.scorebug-page .sliders {
+  grid-area: sliders;
+  overflow: auto;
+}
+
+.scorebug-page .lower-third {
+  grid-area: lower;
+  overflow: auto;
+}
+
+.quick-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+}
+
+.quick-row[data-pvw] {
+  border-color: var(--pvw);
+}
+
+.quick-row[data-pgm] {
+  border-color: var(--pgm);
+}
+
+.quick-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.quick-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.quick-value {
+  font-size: var(--text-md);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.custom-slider {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.rosters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.roster h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.roster-player {
+  display: grid;
+  grid-template-columns: 3.5ch minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--row);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--panel-raised);
+  color: var(--text);
+  font: var(--text-md) var(--font);
+  text-align: left;
+  cursor: pointer;
+}
+
+.roster-player[data-hovered] {
+  border-color: var(--border-strong);
+}
+
+.roster-player[data-focus-visible] {
+  outline: 2px solid var(--focus);
+}
+
+.roster-player[data-selected] {
+  border-color: var(--pvw);
+  background: var(--selected);
+}
+
+.roster-player .jersey,
+.roster-player .player-stats {
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.roster-player .player-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.stat-chip .stat-value {
+  color: var(--text);
+}
+
+.stat-chip[data-zero] .stat-value {
+  color: var(--text-faint);
+}

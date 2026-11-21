@@ -169,6 +169,15 @@ describe('air, toggle and clear', () => {
     expect(state().program.bug).toMatchObject({ id: 'slot-1', by: alex });
   });
 
+  test('a direct cue airs its own params, checked against the graphic', () => {
+    const { send, state } = harness();
+    const direct = (params: Record<string, unknown>): CueRef => ({ kind: 'direct', graphic: GraphicId.parse('test/name'), params });
+    expect(changed(send({ type: 'air', operator: alex, ref: direct({ talent: 'rob-brooks' }) }))).toBe(true);
+    expect(state().program.lower).toMatchObject({ graphic: 'test/name', params: { talent: 'rob-brooks', live: false } });
+    expect(changed(send({ type: 'air', operator: alex, ref: direct({ talent: 'rob-brooks' }) }))).toBe(false);
+    expect(changed(send({ type: 'air', operator: alex, ref: direct({}) }))).toMatch(/^rejected: /);
+  });
+
   test('toggle puts a graphic on, then takes it off', () => {
     const { send, state } = harness();
     send({ type: 'toggle', operator: alex, ref: free('test/bug') });

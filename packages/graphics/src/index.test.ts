@@ -80,5 +80,5 @@ test('the player lower third’s stat line is a union of stat picks and text', (
     ['none', []],
   ]);
   const picks = line.node.kind === 'variants' ? line.node.variants[0]!.fields[0]!.node : null;
-  expect(picks?.kind === 'choices' && picks.options.map((option) => picks.labels[option])).toEqual(['PTS', 'REB', 'AST', 'STL', 'BLK', 'FG', '3PT', 'FT']);
+  expect(picks?.kind === 'choices' && picks.options.map((option) => picks.labels[option])).toEqual(['PTS', 'REB', 'AST', 'BLK', 'STL', '3PT', 'FG', 'FT']);
 });

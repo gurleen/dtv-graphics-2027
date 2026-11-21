@@ -278,6 +278,16 @@ describe('broadcast formatting', () => {
     expect(PLAYER_SEASON_STATS.tpPct.value(season)).toBe('-');
     expect(PLAYER_GAME_STATS.threes.value(StatLine.parse({ tpm: 3, tpa: 5 }))).toBe('3-5');
   });
+
+  test('relevant stats skip zeros, most important first, points leading', () => {
+    const { relevantStats } = basketball;
+    expect(relevantStats(PLAYER_GAME_STATS, StatLine.parse({ pts: 12, ast: 4, stl: 2, blk: 1, fgm: 5, fga: 9, tpa: 3 }))).toEqual(['pts', 'ast', 'blk', 'stl']);
+    expect(relevantStats(PLAYER_GAME_STATS, StatLine.parse({ reb: 3, fga: 2 }))).toEqual(['reb']);
+    expect(relevantStats(PLAYER_GAME_STATS, StatLine.parse({}))).toEqual([]);
+    const season = { sport: 'basketball' as const, gp: 20, totals: StatLine.parse({ pts: 368, reb: 144, fgm: 132, fga: 274, tpa: 10 }) };
+    expect(relevantStats(PLAYER_SEASON_STATS, season)).toEqual(['ppg', 'rpg', 'fgPct']);
+    expect(relevantStats(PLAYER_SEASON_STATS, { ...season, gp: 0, totals: StatLine.parse({}) })).toEqual([]);
+  });
 });
 
 describe('the shot clock stops when the game clock expires', () => {

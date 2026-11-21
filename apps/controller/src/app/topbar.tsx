@@ -1,4 +1,4 @@
-/** The active game, who is connected, the Reconnecting badge, Clear All, and Show | Data | Tools. */
+/** The active game, who is connected, the Reconnecting badge, Clear All, and Show | Scorebug | Data | Tools. */
 
 import { useState } from 'react';
 import { Button, Link } from 'react-aria-components';
@@ -19,6 +19,9 @@ export function TopBar(props: { readonly route: Route }) {
       <nav className="nav" aria-label="Pages">
         <Link href="#/show" className="nav-link" data-current={props.route === 'show' || undefined}>
           Show
+        </Link>
+        <Link href="#/scorebug" className="nav-link" data-current={props.route === 'scorebug' || undefined}>
+          Scorebug
         </Link>
         <Link href="#/data" className="nav-link" data-current={props.route === 'data' || undefined}>
           Data

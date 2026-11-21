@@ -372,33 +372,38 @@ export const avg = (total: number, games: number): string => (games > 0 ? (total
 export const pct = (made: number, attempted: number): string =>
   attempted > 0 ? `${((made / attempted) * 100).toFixed(1)}%` : '-';
 
-type StatDef<T> = { readonly label: string; readonly value: (stats: T) => string };
+/** `holds` is false for a stat that would print a zero, so a lower third that picks stats for itself leaves it out. */
+type StatDef<T> = { readonly label: string; readonly value: (stats: T) => string; readonly holds: (stats: T) => boolean };
 
-/** The stats a cue can pick for a player's season, by key. */
+/** The stats a cue can pick for a player's season, by key, most important first. */
 export const PLAYER_SEASON_STATS = {
-  ppg: { label: 'PPG', value: (s) => avg(s.totals.pts, s.gp) },
-  rpg: { label: 'RPG', value: (s) => avg(s.totals.reb, s.gp) },
-  apg: { label: 'APG', value: (s) => avg(s.totals.ast, s.gp) },
-  spg: { label: 'SPG', value: (s) => avg(s.totals.stl, s.gp) },
-  bpg: { label: 'BPG', value: (s) => avg(s.totals.blk, s.gp) },
-  fgPct: { label: 'FG%', value: (s) => pct(s.totals.fgm, s.totals.fga) },
-  tpPct: { label: '3PT%', value: (s) => pct(s.totals.tpm, s.totals.tpa) },
-  ftPct: { label: 'FT%', value: (s) => pct(s.totals.ftm, s.totals.fta) },
+  ppg: { label: 'PPG', value: (s) => avg(s.totals.pts, s.gp), holds: (s) => s.gp > 0 && s.totals.pts > 0 },
+  rpg: { label: 'RPG', value: (s) => avg(s.totals.reb, s.gp), holds: (s) => s.gp > 0 && s.totals.reb > 0 },
+  apg: { label: 'APG', value: (s) => avg(s.totals.ast, s.gp), holds: (s) => s.gp > 0 && s.totals.ast > 0 },
+  bpg: { label: 'BPG', value: (s) => avg(s.totals.blk, s.gp), holds: (s) => s.gp > 0 && s.totals.blk > 0 },
+  spg: { label: 'SPG', value: (s) => avg(s.totals.stl, s.gp), holds: (s) => s.gp > 0 && s.totals.stl > 0 },
+  fgPct: { label: 'FG%', value: (s) => pct(s.totals.fgm, s.totals.fga), holds: (s) => s.totals.fgm > 0 },
+  tpPct: { label: '3PT%', value: (s) => pct(s.totals.tpm, s.totals.tpa), holds: (s) => s.totals.tpm > 0 },
+  ftPct: { label: 'FT%', value: (s) => pct(s.totals.ftm, s.totals.fta), holds: (s) => s.totals.ftm > 0 },
 } as const satisfies Record<string, StatDef<BasketballPlayerSeasonStats>>;
 export type PlayerSeasonStatKey = keyof typeof PLAYER_SEASON_STATS;
 
-/** The stats a cue can pick from tonight's line. */
+/** The stats a cue can pick from tonight's line, most important first. */
 export const PLAYER_GAME_STATS = {
-  pts: { label: 'PTS', value: (l) => String(l.pts) },
-  reb: { label: 'REB', value: (l) => String(l.reb) },
-  ast: { label: 'AST', value: (l) => String(l.ast) },
-  stl: { label: 'STL', value: (l) => String(l.stl) },
-  blk: { label: 'BLK', value: (l) => String(l.blk) },
-  fg: { label: 'FG', value: (l) => `${l.fgm}-${l.fga}` },
-  threes: { label: '3PT', value: (l) => `${l.tpm}-${l.tpa}` },
-  ft: { label: 'FT', value: (l) => `${l.ftm}-${l.fta}` },
+  pts: { label: 'PTS', value: (l) => String(l.pts), holds: (l) => l.pts > 0 },
+  reb: { label: 'REB', value: (l) => String(l.reb), holds: (l) => l.reb > 0 },
+  ast: { label: 'AST', value: (l) => String(l.ast), holds: (l) => l.ast > 0 },
+  blk: { label: 'BLK', value: (l) => String(l.blk), holds: (l) => l.blk > 0 },
+  stl: { label: 'STL', value: (l) => String(l.stl), holds: (l) => l.stl > 0 },
+  threes: { label: '3PT', value: (l) => `${l.tpm}-${l.tpa}`, holds: (l) => l.tpm > 0 },
+  fg: { label: 'FG', value: (l) => `${l.fgm}-${l.fga}`, holds: (l) => l.fgm > 0 },
+  ft: { label: 'FT', value: (l) => `${l.ftm}-${l.fta}`, holds: (l) => l.ftm > 0 },
 } as const satisfies Record<string, StatDef<StatLine>>;
 export type PlayerGameStatKey = keyof typeof PLAYER_GAME_STATS;
+
+/** The first `max` stats of a catalogue that hold for `stats`, in the catalogue's order of importance. */
+export const relevantStats = <K extends string, T>(catalogue: Record<K, StatDef<T>>, stats: T, max = 4): K[] =>
+  (Object.keys(catalogue) as K[]).filter((key) => catalogue[key].holds(stats)).slice(0, max);
 
 // Insights: what the run of play says about one team, from `shots` and the game clock.
 

@@ -33,6 +33,8 @@ export const Layer = z.enum(LAYERS);
 export const CueRef = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('free'), graphic: GraphicId }),
   z.object({ kind: z.literal('rundown'), cue: CueId }),
+  /** A graphic and its params sent as they are, by a page that builds a cue on the spot instead of from the rundown. */
+  z.object({ kind: z.literal('direct'), graphic: GraphicId, params: z.record(z.string(), z.unknown()) }),
 ]);
 export type CueRef = z.infer<typeof CueRef>;
 
@@ -245,7 +247,7 @@ export type ResolvedCue =
     }
   | { readonly ok: false; readonly error: string };
 
-/** A free-panel graphic's params from the show, or a rundown cue, checked against the registry. */
+/** A free-panel graphic's params from the show, a rundown cue, or a direct cue, checked against the registry. */
 export function resolveCue(registry: Registry, ref: CueRef, context: ShowContext): ResolvedCue {
   const checked = (graphic: GraphicId, params: unknown, overrides: Overrides): ResolvedCue => {
     const check = checkCue(registry, { graphic, params, overrides });
@@ -256,6 +258,7 @@ export function resolveCue(registry: Registry, ref: CueRef, context: ShowContext
     if (!cue) return { ok: false, error: `The rundown has no cue ${ref.cue}` };
     return checked(cue.graphic, cue.params, cue.overrides);
   }
+  if (ref.kind === 'direct') return checked(ref.graphic, ref.params, {});
   const entry = entryOf(registry, ref.graphic);
   if (!entry) return { ok: false, error: `No graphic ${ref.graphic}` };
   if (!entry.free) return { ok: false, error: `${entry.name} is not on the free panel` };
